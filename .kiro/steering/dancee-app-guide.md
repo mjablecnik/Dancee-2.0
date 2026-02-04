@@ -1,4 +1,8 @@
-# AI Agent Guide - Dancee App
+---
+inclusion: always
+---
+
+# Kiro AI Guide - Dancee App
 
 ## Project Overview
 
@@ -19,10 +23,10 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 └── backend/                 # Backend services (if applicable)
 ```
 
-## Important Development Guidelines
+## Critical Development Guidelines for Kiro AI
 
 ### 🌍 Language Requirements
-**CRITICAL**: All code, comments, strings, variable names, function names, and documentation MUST be written in English only. This is mandatory because international developers who don't speak Czech may work on this project.
+**MANDATORY**: All code, comments, strings, variable names, function names, and documentation MUST be written in English only. This is non-negotiable because international developers who don't speak Czech may work on this project.
 
 Examples:
 - ✅ `String userName = "Enter your name";`
@@ -32,7 +36,7 @@ Examples:
 
 ### 🛠️ Task Management
 
-This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands:
+This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands when suggesting or running commands:
 
 #### Essential Tasks:
 - `task run-web` - Run app on web (port 3000)
@@ -59,30 +63,38 @@ The app supports three platforms:
 2. **Android** - Native Android application
 3. **iOS** - Native iOS application
 
-### 🔧 Development Workflow
+### 🔧 Development Workflow for Kiro AI
 
-1. **Setup**: Run `task get-deps` to install dependencies
-2. **Development**: Use `task run-web` for quick testing
+When working with this project:
+
+1. **Setup**: Always suggest `task get-deps` to install dependencies
+2. **Development**: Recommend `task run-web` for quick testing
 3. **Code Generation**: Use `task build-runner-watch` when working with generated code
-4. **Testing**: Test on all platforms before deployment
-5. **Build**: Use appropriate build tasks for production
+4. **Testing**: Suggest testing on multiple platforms when relevant
+5. **Build**: Use appropriate build tasks for production builds
 
-### 📋 Code Standards
+### 📋 Code Standards for AI
 
-- Follow Flutter/Dart conventions
+When generating or modifying code:
+- Follow Flutter/Dart conventions strictly
 - Use meaningful English variable and function names
 - Add English comments for complex logic
 - Ensure cross-platform compatibility
 - Use proper state management patterns
+- Never use Czech language in any code elements
 
 ### 🚨 Before Making Changes
 
+As Kiro AI, always:
 1. Check current taskfile.yaml for available commands
 2. Ensure all new code follows English-only rule
-3. Test changes on multiple platforms when possible
+3. Consider cross-platform implications
 4. Use build runner tasks for code generation needs
+5. Suggest appropriate task commands instead of direct Flutter commands
 
 ### 📞 Quick Commands Reference
+
+When suggesting commands to users:
 
 ```bash
 # Start development
@@ -98,4 +110,13 @@ task build-android
 task build-ios
 ```
 
-Remember: Always prioritize English language usage and utilize the taskfile for all operations!
+### 🤖 AI-Specific Instructions
+
+- Always prioritize English language usage in all generated content
+- Utilize taskfile commands in all suggestions
+- Consider Flutter best practices and cross-platform compatibility
+- When creating new files, ensure they follow the project structure
+- Suggest appropriate testing strategies for multi-platform development
+- Be aware of Flutter-specific patterns and state management approaches
+
+Remember: This guide ensures consistency and maintainability for international development teams working on the Dancee App project.
