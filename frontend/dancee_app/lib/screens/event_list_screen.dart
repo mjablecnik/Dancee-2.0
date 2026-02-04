@@ -35,14 +35,9 @@ class _EventListScreenState extends State<EventListScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            _buildAnimatedHeader(),
             SliverToBoxAdapter(
-              child: _buildHeader(),
-            ),
-            SliverToBoxAdapter(
-              child: _buildActiveFilters(),
-            ),
-            SliverToBoxAdapter(
-              child: _buildStatsBar(),
+              child: _buildSearchAndFilters(),
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
@@ -55,7 +50,107 @@ class _EventListScreenState extends State<EventListScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildAnimatedHeader() {
+    return SliverAppBar(
+      expandedHeight: 100.0, // Large header height
+      collapsedHeight: 70, // Small header height when collapsed
+      floating: false,
+      pinned: true,
+      backgroundColor: const Color(0xFF6366F1),
+      flexibleSpace: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          // Calculate animation progress (0.0 = expanded, 1.0 = collapsed)
+          final double appBarHeight = constraints.biggest.height;
+          final double expandedHeight = 120.0;
+          final double collapsedHeight = 60.0;
+          
+          // Normalize the animation progress
+          final double animationProgress = ((expandedHeight - appBarHeight) / (expandedHeight - collapsedHeight)).clamp(0.0, 1.0);
+          
+          // Interpolate sizes based on animation progress - matching design exactly
+          final double iconSize = 48.0 - (16.0 * animationProgress); // 40px -> 32px (w-10 h-10 -> smaller)
+          final double iconInnerSize = 24.0 - (8.0 * animationProgress); // 18px -> 16px (text-lg equivalent)
+          final double borderRadius = 12.0 - (4.0 * animationProgress); // 12px -> 8px (rounded-xl -> rounded-lg)
+          final double titleFontSize = 32.0 - (16.0 * animationProgress); // 24px -> 16px (larger initial size)
+          final double subtitleFontSize = 12.0 - (2.0 * animationProgress); // 12px -> 10px (text-xs -> smaller)
+          final double horizontalPadding = 20.0;
+          final double verticalPadding = 48.0 - (36.0 * animationProgress); // 48px -> 12px
+          
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  //vertical: verticalPadding,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: iconSize,
+                      height: iconSize,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(borderRadius), // Exact border radius from design
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8.0 - (4.0 * animationProgress), // shadow-lg equivalent
+                            offset: Offset(0, 2.0 - (1.0 * animationProgress)),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.music_note, // Closest Flutter equivalent to fa-music
+                        color: const Color(0xFF6366F1), // text-primary color
+                        size: iconInnerSize,
+                      ),
+                    ),
+                    SizedBox(width: 12.0 * (1.0 - animationProgress * 0.5)), // gap-3 equivalent
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Dancee',
+                            style: GoogleFonts.inter(
+                              fontSize: titleFontSize,
+                              fontWeight: FontWeight.bold, // font-bold
+                              color: Colors.white, // text-white
+                            ),
+                          ),
+                          // Hide subtitle when fully collapsed to save space
+                          //if (animationProgress < 0.8) ...[
+                          //  SizedBox(height: 2.0 * (1.0 - animationProgress)),
+                          //  Text(
+                          //    'Dance Events',
+                          //    style: GoogleFonts.inter(
+                          //      fontSize: subtitleFontSize,
+                          //      color: Colors.white.withValues(alpha: 0.8), // text-white/80
+                          //    ),
+                          //  ),
+                          //],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSearchAndFilters() {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -65,110 +160,14 @@ class _EventListScreenState extends State<EventListScreen> {
           end: Alignment.centerRight,
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 48, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       child: Column(
         children: [
-          _buildHeaderTop(),
-          const SizedBox(height: 24),
           _buildSearchSection(),
           const SizedBox(height: 16),
           _buildFilterSection(),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeaderTop() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.music_note,
-                color: Color(0xFF6366F1),
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dancee',
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'Taneční akce',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Stack(
-            children: [
-              const Center(
-                child: Icon(
-                  Icons.notifications,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-              Positioned(
-                top: 6,
-                right: 6,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '3',
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -185,7 +184,7 @@ class _EventListScreenState extends State<EventListScreen> {
           color: const Color(0xFF0F172A),
         ),
         decoration: InputDecoration(
-          hintText: 'Hledat akce...',
+          hintText: 'Search events...',
           hintStyle: GoogleFonts.inter(
             color: Colors.grey[400],
           ),
@@ -216,11 +215,11 @@ class _EventListScreenState extends State<EventListScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFilterChip('Filtry', hasNotification: true, notificationCount: 2),
+          _buildFilterChip('Filters', hasNotification: true, notificationCount: 2),
           const SizedBox(width: 8),
-          _buildFilterChip('Dnes', icon: Icons.calendar_today),
+          _buildFilterChip('Today', icon: Icons.calendar_today),
           const SizedBox(width: 8),
-          _buildFilterChip('Praha', icon: Icons.location_on),
+          _buildFilterChip('Prague', icon: Icons.location_on),
         ],
       ),
     );
@@ -231,7 +230,7 @@ class _EventListScreenState extends State<EventListScreen> {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -274,155 +273,6 @@ class _EventListScreenState extends State<EventListScreen> {
       ),
     );
   }
-
-  Widget _buildActiveFilters() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Color(0xFFDEF7FF),
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFBFE7FF)),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Aktivní filtry:',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'Zrušit vše',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF6366F1),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _buildActiveFilterChip('Salsa'),
-              const SizedBox(width: 8),
-              _buildActiveFilterChip('Praha'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActiveFilterChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFBFE7FF)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () {},
-            child: Icon(
-              Icons.close,
-              size: 12,
-              color: Colors.grey[400],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsBar() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFF0F4FF), Color(0xFFF3E8FF)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE0E7FF)),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.event_available,
-                color: Color(0xFF6366F1),
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              RichText(
-                text: TextSpan(
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                  ),
-                  children: const [
-                    TextSpan(text: 'Nalezeno '),
-                    TextSpan(
-                      text: '24',
-                      style: TextStyle(color: Color(0xFF6366F1)),
-                    ),
-                    TextSpan(text: ' akcí'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.sort,
-                color: Colors.grey,
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Seřadit',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
   Widget _buildEventsSliverList() {
     return SliverList(
       delegate: SliverChildListDelegate([
@@ -439,9 +289,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Dnes',
-          '(Úterý 4.2.2025)',
-          '3 akce',
+          'Today',
+          '(Tuesday 4.2.2025)',
+          '3 events',
           Icons.calendar_today,
           const Color(0xFF6366F1),
         ),
@@ -452,9 +302,9 @@ class _EventListScreenState extends State<EventListScreen> {
               'Salsa Social Night',
               'Lucerna Music Bar',
               '20:00 - 02:00',
-              '6 hodin',
-              '150 Kč',
-              '89 účastníků',
+              '6 hours',
+              '150 CZK',
+              '89 participants',
               ['Salsa', 'Bachata', 'Kizomba'],
               false,
             ),
@@ -462,9 +312,9 @@ class _EventListScreenState extends State<EventListScreen> {
               'Bachata Tuesdays',
               'Dance Arena Prague',
               '19:30 - 23:30',
-              '4 hodiny',
-              '100 Kč',
-              '54 účastníků',
+              '4 hours',
+              '100 CZK',
+              '54 participants',
               ['Bachata', 'Sensual'],
               true,
             ),
@@ -472,9 +322,9 @@ class _EventListScreenState extends State<EventListScreen> {
               'Zouk Workshop & Party',
               'Studio Tance',
               '18:00 - 22:00',
-              '4 hodiny',
-              '200 Kč',
-              '32 účastníků',
+              '4 hours',
+              '200 CZK',
+              '32 participants',
               ['Zouk', 'Brazilian Zouk'],
               false,
             ),
@@ -488,9 +338,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Zítra',
-          '(Středa 5.2.2025)',
-          '5 akcí',
+          'Tomorrow',
+          '(Wednesday 5.2.2025)',
+          '5 events',
           Icons.calendar_month,
           const Color(0xFF8B5CF6),
         ),
@@ -501,9 +351,9 @@ class _EventListScreenState extends State<EventListScreen> {
               'Kizomba Wednesday',
               'Club Lavka',
               '20:00 - 01:00',
-              '5 hodin',
-              '120 Kč',
-              '67 účastníků',
+              '5 hours',
+              '120 CZK',
+              '67 participants',
               ['Kizomba', 'Urban Kiz', 'Tarraxo'],
               false,
             ),
@@ -511,10 +361,10 @@ class _EventListScreenState extends State<EventListScreen> {
               'Tango Practica',
               'Café Milonga',
               '19:00 - 22:00',
-              '3 hodiny',
-              '80 Kč',
-              '28 účastníků',
-              ['Tango', 'Argentinské Tango'],
+              '3 hours',
+              '80 CZK',
+              '28 participants',
+              ['Tango', 'Argentine Tango'],
               true,
             ),
           ],
@@ -527,9 +377,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Tento týden',
+          'This week',
           '',
-          '16 akcí',
+          '16 events',
           Icons.calendar_view_week,
           const Color(0xFFEC4899),
         ),
@@ -540,9 +390,9 @@ class _EventListScreenState extends State<EventListScreen> {
               'Latin Mix Party',
               'Cross Club',
               '21:00 - 03:00',
-              '6 hodin',
-              '150 Kč',
-              '112 účastníků',
+              '6 hours',
+              '150 CZK',
+              '112 participants',
               ['Salsa', 'Bachata', 'Merengue'],
               false,
             ),
@@ -611,7 +461,7 @@ class _EventListScreenState extends State<EventListScreen> {
         border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -840,7 +690,7 @@ class _EventListScreenState extends State<EventListScreen> {
           'text': const Color(0xFF047857),
         };
       case 'tango':
-      case 'argentinské tango':
+      case 'argentine tango':
         return {
           'gradient': [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
           'border': const Color(0xFFCBD5E1),
@@ -862,7 +712,7 @@ class _EventListScreenState extends State<EventListScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -872,10 +722,10 @@ class _EventListScreenState extends State<EventListScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(Icons.home, 'Domů', true),
-            _buildNavItem(Icons.search, 'Hledat', false),
-            _buildNavItem(Icons.favorite, 'Oblíbené', false),
-            _buildNavItem(Icons.person, 'Profil', false),
+            _buildNavItem(Icons.home, 'Home', true),
+            _buildNavItem(Icons.search, 'Search', false),
+            _buildNavItem(Icons.favorite, 'Favorites', false),
+            _buildNavItem(Icons.person, 'Profile', false),
           ],
         ),
       ),
