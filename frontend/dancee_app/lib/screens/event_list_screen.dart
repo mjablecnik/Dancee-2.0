@@ -436,125 +436,190 @@ class _EventListScreenState extends State<EventListScreen> {
     bool isFavorite,
   ) {
     return Container(
-      width: double.infinity,
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[200]!),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey[200]!,
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            // Navigate to event detail
+            print('Navigate to event detail: $title');
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
-                        height: 1.3,
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: _getEventIconGradient(tags),
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        _getEventIcon(tags),
+                        color: Colors.white,
+                        size: 24,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: const Color(0xFF6366F1),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            venue,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
                             style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.grey[600],
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF0F172A),
+                              height: 1.3,
                             ),
-                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                size: 12,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                venue,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 12,
+                                color: const Color(0xFF6366F1),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                time,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                width: 4,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                duration,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: isFavorite ? Colors.red[50] : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () {
+                                // Toggle favorite status
+                                print('Toggle favorite for: $title');
+                              },
+                              child: Icon(
+                                isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: isFavorite ? Colors.red[600] : Colors.grey[400],
+                                size: 18,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: isFavorite ? Colors.red[50] : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: tags.map((tag) => _buildTag(tag)).toList(),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Detail",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Colors.grey[500],
+                          size: 24,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                child: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  size: 20,
-                  color: isFavorite ? Colors.red : Colors.grey[400],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Icon(
-                Icons.access_time,
-                size: 16,
-                color: const Color(0xFF6366F1),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                time,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF0F172A),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Container(
-                width: 4,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                duration,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: tags.map((tag) => _buildTag(tag)).toList(),
-          ),
-
-        ],
+        ),
       ),
     );
   }
@@ -562,91 +627,90 @@ class _EventListScreenState extends State<EventListScreen> {
   Widget _buildTag(String tag) {
     final colors = _getTagColors(tag);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: colors['gradient']!,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors['border']!),
+        color: colors['background'],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         tag,
         style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: colors['text']!,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: colors['text'],
         ),
       ),
     );
   }
 
-  Map<String, dynamic> _getTagColors(String tag) {
+  Map<String, Color> _getTagColors(String tag) {
     switch (tag.toLowerCase()) {
       case 'salsa':
-        return {
-          'gradient': [const Color(0xFFFEF2F2), const Color(0xFFFFF7ED)],
-          'border': const Color(0xFFFECACA),
-          'text': const Color(0xFFB91C1C),
-        };
+        return {'background': Colors.red[100]!, 'text': Colors.red[700]!};
       case 'bachata':
-        return {
-          'gradient': [const Color(0xFFFDF2F8), const Color(0xFFFFF1F2)],
-          'border': const Color(0xFFFBCAD3),
-          'text': const Color(0xFFBE185D),
-        };
+        return {'background': Colors.pink[100]!, 'text': Colors.pink[700]!};
       case 'kizomba':
-        return {
-          'gradient': [const Color(0xFFF3E8FF), const Color(0xFFEDE9FE)],
-          'border': const Color(0xFFD8B4FE),
-          'text': const Color(0xFF7C3AED),
-        };
+        return {'background': Colors.purple[100]!, 'text': Colors.purple[700]!};
       case 'zouk':
       case 'brazilian zouk':
-        return {
-          'gradient': [const Color(0xFFF0FDFA), const Color(0xFFECFDF5)],
-          'border': const Color(0xFFA7F3D0),
-          'text': const Color(0xFF047857),
-        };
+        return {'background': Colors.teal[100]!, 'text': Colors.teal[700]!};
+      case 'sensual':
+        return {'background': Colors.pink[100]!, 'text': Colors.pink[700]!};
+      case 'urban kiz':
+        return {'background': Colors.deepPurple[100]!, 'text': Colors.deepPurple[700]!};
+      case 'tarraxo':
+        return {'background': Colors.indigo[100]!, 'text': Colors.indigo[700]!};
+      case 'merengue':
+        return {'background': Colors.amber[100]!, 'text': Colors.amber[700]!};
       case 'tango':
       case 'argentine tango':
-        return {
-          'gradient': [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
-          'border': const Color(0xFFCBD5E1),
-          'text': const Color(0xFF475569),
-        };
-      case 'sensual':
-        return {
-          'gradient': [const Color(0xFFFDF2F8), const Color(0xFFFFF1F2)],
-          'border': const Color(0xFFFBCAD3),
-          'text': const Color(0xFFBE185D),
-        };
-      case 'urban kiz':
-        return {
-          'gradient': [const Color(0xFFF3E8FF), const Color(0xFFEDE9FE)],
-          'border': const Color(0xFFD8B4FE),
-          'text': const Color(0xFF7C3AED),
-        };
-      case 'tarraxo':
-        return {
-          'gradient': [const Color(0xFFF3E8FF), const Color(0xFFEDE9FE)],
-          'border': const Color(0xFFD8B4FE),
-          'text': const Color(0xFF7C3AED),
-        };
-      case 'merengue':
-        return {
-          'gradient': [const Color(0xFFFEF2F2), const Color(0xFFFFF7ED)],
-          'border': const Color(0xFFFECACA),
-          'text': const Color(0xFFB91C1C),
-        };
+        return {'background': Colors.grey[100]!, 'text': Colors.grey[700]!};
       default:
-        return {
-          'gradient': [const Color(0xFFF9FAFB), const Color(0xFFF3F4F6)],
-          'border': const Color(0xFFD1D5DB),
-          'text': const Color(0xFF6B7280),
-        };
+        return {'background': Colors.grey[100]!, 'text': Colors.grey[700]!};
+    }
+  }
+
+  List<Color> _getEventIconGradient(List<String> tags) {
+    if (tags.isEmpty) return [const Color(0xFF6B7280), const Color(0xFF9CA3AF)];
+    
+    final primaryTag = tags.first.toLowerCase();
+    switch (primaryTag) {
+      case 'salsa':
+        return [const Color(0xFFEF4444), const Color(0xFFF97316)];
+      case 'bachata':
+        return [const Color(0xFFEC4899), const Color(0xFFF43F5E)];
+      case 'kizomba':
+        return [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)];
+      case 'zouk':
+      case 'brazilian zouk':
+        return [const Color(0xFF14B8A6), const Color(0xFF06B6D4)];
+      case 'tango':
+      case 'argentine tango':
+        return [const Color(0xFF6B7280), const Color(0xFF9CA3AF)];
+      default:
+        return [const Color(0xFF6366F1), const Color(0xFF8B5CF6)];
+    }
+  }
+
+  IconData _getEventIcon(List<String> tags) {
+    if (tags.isEmpty) return Icons.music_note;
+    
+    final primaryTag = tags.first.toLowerCase();
+    switch (primaryTag) {
+      case 'salsa':
+        return Icons.local_fire_department;
+      case 'bachata':
+        return Icons.favorite;
+      case 'kizomba':
+        return Icons.nightlight_round;
+      case 'zouk':
+      case 'brazilian zouk':
+        return Icons.water_drop;
+      case 'tango':
+      case 'argentine tango':
+        return Icons.wb_sunny;
+      default:
+        return Icons.music_note;
     }
   }
 }
