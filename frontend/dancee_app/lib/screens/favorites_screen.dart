@@ -37,7 +37,7 @@ class FavoritesScreen extends StatefulWidget {
 class _FavoritesScreenState extends State<FavoritesScreen>
     with TickerProviderStateMixin {
   String selectedFilter = 'All';
-  
+
   List<FavoriteEvent> favoriteEvents = [
     FavoriteEvent(
       id: '1',
@@ -344,197 +344,190 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           ),
         ],
       ),
-      child: Opacity(
-        opacity: event.isPast ? 0.6 : 1.0,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: event.isPast ? null : () {
+            // Navigate to event detail
+            print('Navigate to event detail: ${event.title}');
+          },
+          child: Opacity(
+            opacity: event.isPast ? 0.6 : 1.0,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: event.gradientColors,
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: event.gradientColors,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          event.iconData,
+                          color: Colors.white,
+                          size: 24,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      event.iconData,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
+                            Text(
+                              event.title,
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: event.isPast ? Colors.grey[600] : const Color(0xFF0F172A),
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 12,
+                                  color: event.isPast ? Colors.grey[500] : Colors.grey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  event.venue,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: event.isPast ? Colors.grey[500] : Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 12,
+                                  color: event.isPast ? Colors.grey[500] : const Color(0xFF6366F1),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  event.date,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: event.isPast ? Colors.grey[500] : Colors.grey[700],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.access_time,
+                                  size: 12,
+                                  color: event.isPast ? Colors.grey[500] : const Color(0xFF8B5CF6),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  event.time,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: event.isPast ? Colors.grey[500] : Colors.grey[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (event.badge != null) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: _getBadgeColor(event.badge!),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               child: Text(
-                                event.title,
+                                event.badge!,
                                 style: GoogleFonts.inter(
-                                  fontSize: 16,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: event.isPast ? Colors.grey[600] : const Color(0xFF0F172A),
-                                  height: 1.3,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                            if (event.badge != null) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: _getBadgeColor(event.badge!),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  event.badge!,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                            const SizedBox(height: 8),
+                          ],
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(8),
+                                  onTap: () => _showRemoveConfirmation(event),
+                                  child: Icon(
+                                    event.isPast ? Icons.delete : Icons.heart_broken,
+                                    color: Colors.red[600],
+                                    size: 18,
                                   ),
                                 ),
                               ),
-                            ],
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 12,
-                              color: event.isPast ? Colors.grey[500] : Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              event.venue,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: event.isPast ? Colors.grey[500] : Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: 12,
-                              color: event.isPast ? Colors.grey[500] : const Color(0xFF6366F1),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              event.date,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: event.isPast ? Colors.grey[500] : Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Icon(
-                              Icons.access_time,
-                              size: 12,
-                              color: event.isPast ? Colors.grey[500] : const Color(0xFF8B5CF6),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              event.time,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: event.isPast ? Colors.grey[500] : Colors.grey[700],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: event.tags.map((tag) => _buildTag(tag, event.isPast)).toList(),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 36,
-                      decoration: BoxDecoration(
-                        gradient: event.isPast 
-                          ? null 
-                          : const LinearGradient(
-                              colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                        color: event.isPast ? Colors.grey[300] : null,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: event.isPast ? null : () {
-                            // Navigate to event detail
-                          },
-                          child: Center(
-                            child: Text(
-                              event.isPast ? 'Event Finished' : 'Event Detail',
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: event.isPast ? Colors.grey[600] : Colors.white,
-                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.red[50],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => _showRemoveConfirmation(event),
-                        child: Icon(
-                          event.isPast ? Icons.delete : Icons.heart_broken,
-                          color: Colors.red[600],
-                          size: 18,
+                  const SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: event.tags.map((tag) => _buildTag(tag, event.isPast)).toList(),
                         ),
                       ),
-                    ),
+                      Row(
+                        children: [
+                          Text(
+                            "Detail",
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: event.isPast ? Colors.grey[500] : Colors.grey[600],
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_right,
+                            color: event.isPast ? Colors.grey[400] : Colors.grey[500],
+                            size: 24,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
