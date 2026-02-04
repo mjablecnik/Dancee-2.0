@@ -78,24 +78,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           });
         }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? const Color(0xFF6366F1) : Colors.grey[400],
-            size: 24,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
+      child: SizedBox(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
               color: isActive ? const Color(0xFF6366F1) : Colors.grey[400],
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              size: 24,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isActive ? const Color(0xFF6366F1) : Colors.grey[400],
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
