@@ -33,18 +33,22 @@ class _EventListScreenState extends State<EventListScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 375),
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildActiveFilters(),
-              _buildStatsBar(),
-              Expanded(
-                child: _buildEventsList(),
-              ),
-            ],
-          ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: _buildHeader(),
+            ),
+            SliverToBoxAdapter(
+              child: _buildActiveFilters(),
+            ),
+            SliverToBoxAdapter(
+              child: _buildStatsBar(),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
+              sliver: _buildEventsSliverList(),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: _buildBottomNavigation(),
@@ -53,6 +57,7 @@ class _EventListScreenState extends State<EventListScreen> {
 
   Widget _buildHeader() {
     return Container(
+      width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
@@ -272,6 +277,7 @@ class _EventListScreenState extends State<EventListScreen> {
 
   Widget _buildActiveFilters() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Color(0xFFDEF7FF),
@@ -353,6 +359,7 @@ class _EventListScreenState extends State<EventListScreen> {
 
   Widget _buildStatsBar() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -416,18 +423,15 @@ class _EventListScreenState extends State<EventListScreen> {
       ),
     );
   }
-  Widget _buildEventsList() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
-      child: Column(
-        children: [
-          _buildTodaySection(),
-          const SizedBox(height: 24),
-          _buildTomorrowSection(),
-          const SizedBox(height: 24),
-          _buildUpcomingSection(),
-        ],
-      ),
+  Widget _buildEventsSliverList() {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        _buildTodaySection(),
+        const SizedBox(height: 24),
+        _buildTomorrowSection(),
+        const SizedBox(height: 24),
+        _buildUpcomingSection(),
+      ]),
     );
   }
 
@@ -441,7 +445,7 @@ class _EventListScreenState extends State<EventListScreen> {
           Icons.calendar_today,
           const Color(0xFF6366F1),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Column(
           children: [
             _buildEventCard(
@@ -454,7 +458,6 @@ class _EventListScreenState extends State<EventListScreen> {
               ['Salsa', 'Bachata', 'Kizomba'],
               false,
             ),
-            const SizedBox(height: 12),
             _buildEventCard(
               'Bachata Tuesdays',
               'Dance Arena Prague',
@@ -465,7 +468,6 @@ class _EventListScreenState extends State<EventListScreen> {
               ['Bachata', 'Sensual'],
               true,
             ),
-            const SizedBox(height: 12),
             _buildEventCard(
               'Zouk Workshop & Party',
               'Studio Tance',
@@ -492,7 +494,7 @@ class _EventListScreenState extends State<EventListScreen> {
           Icons.calendar_month,
           const Color(0xFF8B5CF6),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Column(
           children: [
             _buildEventCard(
@@ -505,7 +507,6 @@ class _EventListScreenState extends State<EventListScreen> {
               ['Kizomba', 'Urban Kiz', 'Tarraxo'],
               false,
             ),
-            const SizedBox(height: 12),
             _buildEventCard(
               'Tango Practica',
               'Café Milonga',
@@ -532,7 +533,7 @@ class _EventListScreenState extends State<EventListScreen> {
           Icons.calendar_view_week,
           const Color(0xFFEC4899),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Column(
           children: [
             _buildEventCard(
@@ -602,24 +603,27 @@ class _EventListScreenState extends State<EventListScreen> {
     bool isFavorite,
   ) {
     return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -628,25 +632,29 @@ class _EventListScreenState extends State<EventListScreen> {
                     Text(
                       title,
                       style: GoogleFonts.inter(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF0F172A),
+                        height: 1.3,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         Icon(
                           Icons.location_on,
-                          size: 12,
+                          size: 14,
                           color: const Color(0xFF6366F1),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          venue,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            venue,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -654,39 +662,40 @@ class _EventListScreenState extends State<EventListScreen> {
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
               Container(
-                width: 36,
-                height: 36,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: isFavorite ? Colors.red[50] : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isFavorite ? Icons.favorite : Icons.favorite_border,
-                  size: 16,
+                  size: 20,
                   color: isFavorite ? Colors.red : Colors.grey[400],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             children: [
               Icon(
                 Icons.access_time,
-                size: 14,
+                size: 16,
                 color: const Color(0xFF6366F1),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               Text(
                 time,
                 style: GoogleFonts.inter(
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF0F172A),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Container(
                 width: 4,
                 height: 4,
@@ -695,75 +704,82 @@ class _EventListScreenState extends State<EventListScreen> {
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Text(
                 duration,
                 style: GoogleFonts.inter(
-                  fontSize: 14,
+                  fontSize: 15,
                   color: Colors.grey[600],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: 8,
+            runSpacing: 8,
             children: tags.map((tag) => _buildTag(tag)).toList(),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Container(
             height: 1,
             color: Colors.grey[100],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.confirmation_number,
-                        size: 12,
-                        color: Colors.green[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        price,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+              Expanded(
+                child: Row(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.confirmation_number,
+                          size: 14,
                           color: Colors.green[600],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.people,
-                        size: 12,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        participants,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.grey[600],
+                        const SizedBox(width: 6),
+                        Text(
+                          price,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.green[600],
+                          ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.people,
+                            size: 14,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              participants,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
               Icon(
                 Icons.chevron_right,
                 color: Colors.grey[400],
-                size: 16,
+                size: 20,
               ),
             ],
           ),
@@ -775,7 +791,7 @@ class _EventListScreenState extends State<EventListScreen> {
   Widget _buildTag(String tag) {
     final colors = _getTagColors(tag);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: colors['gradient']!,
@@ -788,7 +804,7 @@ class _EventListScreenState extends State<EventListScreen> {
       child: Text(
         tag,
         style: GoogleFonts.inter(
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: FontWeight.w500,
           color: colors['text']!,
         ),
