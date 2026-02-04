@@ -723,7 +723,6 @@ class _EventListScreenState extends State<EventListScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(Icons.home, 'Home', true),
-            _buildNavItem(Icons.search, 'Search', false),
             _buildNavItem(Icons.favorite, 'Favorites', false),
             _buildNavItem(Icons.person, 'Profile', false),
           ],
