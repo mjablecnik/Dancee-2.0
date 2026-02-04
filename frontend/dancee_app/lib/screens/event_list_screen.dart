@@ -300,8 +300,6 @@ class _EventListScreenState extends State<EventListScreen> {
               'Lucerna Music Bar',
               '20:00 - 02:00',
               '6 hours',
-              '150 CZK',
-              '89 participants',
               ['Salsa', 'Bachata', 'Kizomba'],
               false,
             ),
@@ -310,8 +308,6 @@ class _EventListScreenState extends State<EventListScreen> {
               'Dance Arena Prague',
               '19:30 - 23:30',
               '4 hours',
-              '100 CZK',
-              '54 participants',
               ['Bachata', 'Sensual'],
               true,
             ),
@@ -320,8 +316,6 @@ class _EventListScreenState extends State<EventListScreen> {
               'Studio Tance',
               '18:00 - 22:00',
               '4 hours',
-              '200 CZK',
-              '32 participants',
               ['Zouk', 'Brazilian Zouk'],
               false,
             ),
@@ -349,8 +343,6 @@ class _EventListScreenState extends State<EventListScreen> {
               'Club Lavka',
               '20:00 - 01:00',
               '5 hours',
-              '120 CZK',
-              '67 participants',
               ['Kizomba', 'Urban Kiz', 'Tarraxo'],
               false,
             ),
@@ -359,8 +351,6 @@ class _EventListScreenState extends State<EventListScreen> {
               'Café Milonga',
               '19:00 - 22:00',
               '3 hours',
-              '80 CZK',
-              '28 participants',
               ['Tango', 'Argentine Tango'],
               true,
             ),
@@ -388,8 +378,6 @@ class _EventListScreenState extends State<EventListScreen> {
               'Cross Club',
               '21:00 - 03:00',
               '6 hours',
-              '150 CZK',
-              '112 participants',
               ['Salsa', 'Bachata', 'Merengue'],
               false,
             ),
@@ -444,8 +432,6 @@ class _EventListScreenState extends State<EventListScreen> {
     String venue,
     String time,
     String duration,
-    String price,
-    String participants,
     List<String> tags,
     bool isFavorite,
   ) {
@@ -567,69 +553,7 @@ class _EventListScreenState extends State<EventListScreen> {
             runSpacing: 8,
             children: tags.map((tag) => _buildTag(tag)).toList(),
           ),
-          const SizedBox(height: 16),
-          Container(
-            height: 1,
-            color: Colors.grey[100],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.confirmation_number,
-                          size: 14,
-                          color: Colors.green[600],
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          price,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.green[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.people,
-                            size: 14,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              participants,
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.grey[400],
-                size: 20,
-              ),
-            ],
-          ),
+
         ],
       ),
     );
@@ -692,6 +616,30 @@ class _EventListScreenState extends State<EventListScreen> {
           'gradient': [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
           'border': const Color(0xFFCBD5E1),
           'text': const Color(0xFF475569),
+        };
+      case 'sensual':
+        return {
+          'gradient': [const Color(0xFFFDF2F8), const Color(0xFFFFF1F2)],
+          'border': const Color(0xFFFBCAD3),
+          'text': const Color(0xFFBE185D),
+        };
+      case 'urban kiz':
+        return {
+          'gradient': [const Color(0xFFF3E8FF), const Color(0xFFEDE9FE)],
+          'border': const Color(0xFFD8B4FE),
+          'text': const Color(0xFF7C3AED),
+        };
+      case 'tarraxo':
+        return {
+          'gradient': [const Color(0xFFF3E8FF), const Color(0xFFEDE9FE)],
+          'border': const Color(0xFFD8B4FE),
+          'text': const Color(0xFF7C3AED),
+        };
+      case 'merengue':
+        return {
+          'gradient': [const Color(0xFFFEF2F2), const Color(0xFFFFF7ED)],
+          'border': const Color(0xFFFECACA),
+          'text': const Color(0xFFB91C1C),
         };
       default:
         return {
