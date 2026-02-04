@@ -46,7 +46,6 @@ class _EventListScreenState extends State<EventListScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 
@@ -72,9 +71,7 @@ class _EventListScreenState extends State<EventListScreen> {
           final double iconInnerSize = 24.0 - (8.0 * animationProgress); // 18px -> 16px (text-lg equivalent)
           final double borderRadius = 12.0 - (4.0 * animationProgress); // 12px -> 8px (rounded-xl -> rounded-lg)
           final double titleFontSize = 32.0 - (16.0 * animationProgress); // 24px -> 16px (larger initial size)
-          final double subtitleFontSize = 12.0 - (2.0 * animationProgress); // 12px -> 10px (text-xs -> smaller)
           final double horizontalPadding = 20.0;
-          final double verticalPadding = 48.0 - (36.0 * animationProgress); // 48px -> 12px
           
           return Container(
             decoration: const BoxDecoration(
@@ -703,53 +700,5 @@ class _EventListScreenState extends State<EventListScreen> {
           'text': const Color(0xFF6B7280),
         };
     }
-  }
-
-  Widget _buildBottomNavigation() {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home, 'Home', true),
-            _buildNavItem(Icons.favorite, 'Favorites', false),
-            _buildNavItem(Icons.person, 'Profile', false),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          color: isActive ? const Color(0xFF6366F1) : Colors.grey[400],
-          size: 24,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: isActive ? const Color(0xFF6366F1) : Colors.grey[400],
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
   }
 }
