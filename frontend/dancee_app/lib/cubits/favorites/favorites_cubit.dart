@@ -111,4 +111,38 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       pastEvents: filteredPast,
     ));
   }
+
+  /// Removes a past event from favorites immediately.
+  ///
+  /// This method is used for past events to remove them instantly
+  /// when user clicks the delete icon. Updates repository in background.
+  Future<void> removePastEvent(String eventId) async {
+    final currentState = state;
+    if (currentState is! FavoritesLoaded) return;
+    
+    try {
+      // Remove from repository in background
+      await repository.toggleFavorite(eventId);
+      
+      // Remove from current state immediately
+      final updatedUpcoming = currentState.upcomingEvents;
+      final updatedPast = currentState.pastEvents
+          .where((event) => event.id != eventId)
+          .toList();
+      
+      // Check if there are any favorites left
+      if (updatedUpcoming.isEmpty && updatedPast.isEmpty) {
+        emit(const FavoritesEmpty());
+        return;
+      }
+      
+      // Emit new state without the removed event
+      emit(FavoritesLoaded(
+        upcomingEvents: updatedUpcoming,
+        pastEvents: updatedPast,
+      ));
+    } catch (e) {
+      emit(FavoritesError('Failed to remove event: ${e.toString()}'));
+    }
+  }
 }

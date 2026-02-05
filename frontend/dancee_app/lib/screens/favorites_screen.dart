@@ -300,7 +300,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     // Get gradient colors based on first dance style
     final gradientColors = _getGradientColors(event.dances.isNotEmpty ? event.dances.first : '');
     
-    return Container(
+    final cardContent = Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -450,7 +450,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: event.isFavorite ? Colors.red[50] : Colors.grey[200],
+                                color: event.isPast 
+                                    ? Colors.red[50] 
+                                    : (event.isFavorite ? Colors.red[50] : Colors.grey[200]),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Material(
@@ -458,11 +460,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(8),
                                   onTap: () {
-                                    getIt<FavoritesCubit>().toggleFavorite(event.id);
+                                    if (event.isPast) {
+                                      // For past events, remove immediately
+                                      getIt<FavoritesCubit>().removePastEvent(event.id);
+                                    } else {
+                                      // For upcoming events, toggle favorite
+                                      getIt<FavoritesCubit>().toggleFavorite(event.id);
+                                    }
                                   },
                                   child: Icon(
-                                    event.isFavorite ? Icons.favorite : Icons.favorite_border,
-                                    color: event.isFavorite ? Colors.red[600] : Colors.grey[400],
+                                    event.isPast 
+                                        ? Icons.delete 
+                                        : (event.isFavorite ? Icons.favorite : Icons.favorite_border),
+                                    color: event.isPast 
+                                        ? Colors.red[600] 
+                                        : (event.isFavorite ? Colors.red[600] : Colors.grey[400]),
                                     size: 18,
                                   ),
                                 ),
@@ -509,6 +521,34 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
       ),
     );
+
+    // Wrap past events in Dismissible for swipe-to-delete animation
+    if (event.isPast) {
+      return Dismissible(
+        key: Key(event.id),
+        direction: DismissDirection.endToStart,
+        onDismissed: (direction) {
+          getIt<FavoritesCubit>().removePastEvent(event.id);
+        },
+        background: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: Colors.red[400],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 20),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+            size: 32,
+          ),
+        ),
+        child: cardContent,
+      );
+    }
+    
+    return cardContent;
   }
 
   String _formatDate(DateTime dateTime) {
