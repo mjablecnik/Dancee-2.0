@@ -45,8 +45,9 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
   /// Toggles the favorite status of an event.
   ///
-  /// Updates the repository and updates the state locally without reloading.
-  /// This prevents the UI from flickering when toggling favorites.
+  /// Updates the repository and updates the state locally without removing the event.
+  /// The event stays visible with updated favorite status until the screen is reloaded.
+  /// This allows users to re-favorite events before leaving the screen.
   ///
   /// On error, emits [FavoritesError] without changing the current state.
   Future<void> toggleFavorite(String eventId) async {
@@ -56,7 +57,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     try {
       await repository.toggleFavorite(eventId);
       
-      // Update the event in both lists locally
+      // Update the event in both lists locally, keeping all events visible
       final updatedUpcoming = currentState.upcomingEvents.map((event) {
         if (event.id == eventId) {
           return event.copyWith(isFavorite: !event.isFavorite);
@@ -71,23 +72,43 @@ class FavoritesCubit extends Cubit<FavoritesState> {
         return event;
       }).toList();
       
-      // Remove unfavorited events from the lists
-      final filteredUpcoming = updatedUpcoming.where((e) => e.isFavorite).toList();
-      final filteredPast = updatedPast.where((e) => e.isFavorite).toList();
-      
-      // Check if there are any favorites left
-      if (filteredUpcoming.isEmpty && filteredPast.isEmpty) {
-        emit(const FavoritesEmpty());
-        return;
-      }
-      
-      // Emit new state with updated events
+      // Emit new state with updated events (keeping unfavorited ones visible)
       emit(FavoritesLoaded(
-        upcomingEvents: filteredUpcoming,
-        pastEvents: filteredPast,
+        upcomingEvents: updatedUpcoming,
+        pastEvents: updatedPast,
       ));
     } catch (e) {
       emit(FavoritesError('Failed to toggle favorite: ${e.toString()}'));
     }
+  }
+
+  /// Filters out unfavorited events from the current state.
+  ///
+  /// This method removes events where isFavorite is false from the current
+  /// displayed list without reloading from repository. Used when user navigates
+  /// away from the favorites screen to clean up the view.
+  void filterUnfavoritedEvents() {
+    final currentState = state;
+    if (currentState is! FavoritesLoaded) return;
+    
+    // Filter out events that are not favorited
+    final filteredUpcoming = currentState.upcomingEvents
+        .where((event) => event.isFavorite)
+        .toList();
+    final filteredPast = currentState.pastEvents
+        .where((event) => event.isFavorite)
+        .toList();
+    
+    // Check if there are any favorites left
+    if (filteredUpcoming.isEmpty && filteredPast.isEmpty) {
+      emit(const FavoritesEmpty());
+      return;
+    }
+    
+    // Emit new state with filtered events
+    emit(FavoritesLoaded(
+      upcomingEvents: filteredUpcoming,
+      pastEvents: filteredPast,
+    ));
   }
 }

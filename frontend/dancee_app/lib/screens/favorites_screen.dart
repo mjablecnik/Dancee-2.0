@@ -6,8 +6,36 @@ import '../cubits/favorites/favorites_state.dart';
 import '../di/service_locator.dart';
 import '../models/event.dart';
 
-class FavoritesScreen extends StatelessWidget {
-  const FavoritesScreen({super.key});
+class FavoritesScreen extends StatefulWidget {
+  final ValueNotifier<int>? reloadTrigger;
+  
+  const FavoritesScreen({super.key, this.reloadTrigger});
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load favorites when screen is first created
+    getIt<FavoritesCubit>().loadFavorites();
+    
+    // Listen to reload trigger from parent
+    widget.reloadTrigger?.addListener(_onReloadTriggered);
+  }
+
+  @override
+  void dispose() {
+    widget.reloadTrigger?.removeListener(_onReloadTriggered);
+    super.dispose();
+  }
+
+  void _onReloadTriggered() {
+    // Filter out unfavorited events when returning to this screen
+    getIt<FavoritesCubit>().filterUnfavoritedEvents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -422,17 +450,19 @@ class FavoritesScreen extends StatelessWidget {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: Colors.red[50],
+                                color: event.isFavorite ? Colors.red[50] : Colors.grey[200],
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(8),
-                                  onTap: () => _showRemoveConfirmation(context, event),
+                                  onTap: () {
+                                    getIt<FavoritesCubit>().toggleFavorite(event.id);
+                                  },
                                   child: Icon(
-                                    event.isPast ? Icons.delete : Icons.heart_broken,
-                                    color: Colors.red[600],
+                                    event.isFavorite ? Icons.favorite : Icons.favorite_border,
+                                    color: event.isFavorite ? Colors.red[600] : Colors.grey[400],
                                     size: 18,
                                   ),
                                 ),
@@ -676,150 +706,5 @@ class FavoritesScreen extends StatelessWidget {
     );
   }
 
-  void _showRemoveConfirmation(BuildContext context, Event event) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 48,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: Colors.red[100],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.heart_broken,
-                color: Colors.red[600],
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Remove from Favorites?',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'This event will be removed from your favorite items.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFDC2626), Color(0xFFB91C1C)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        getIt<FavoritesCubit>().toggleFavorite(event.id);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '✓ Removed from favorites',
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            backgroundColor: Colors.red[600],
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.delete, color: Colors.white, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Yes, Remove',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.grey[200]!, Colors.grey[300]!],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () => Navigator.pop(context),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF0F172A),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
+
 }

@@ -34,16 +34,24 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
-  
-  final List<Widget> _screens = [
-    const EventListScreen(),
-    const FavoritesScreen(),
-  ];
+  final ValueNotifier<int> _reloadTrigger = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    _reloadTrigger.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          const EventListScreen(),
+          FavoritesScreen(reloadTrigger: _reloadTrigger),
+        ],
+      ),
       bottomNavigationBar: Container(
         height: 80,
         decoration: BoxDecoration(
@@ -74,10 +82,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final bool isActive = _currentIndex == index;
     return GestureDetector(
       onTap: () {
-        if (index < _screens.length) {
+        if (index < 2) { // Only Events and Favorites are implemented
           setState(() {
             _currentIndex = index;
           });
+          // Reload favorites when switching to favorites tab
+          if (index == 1) {
+            _reloadTrigger.value++;
+          }
         }
       },
       child: SizedBox(
