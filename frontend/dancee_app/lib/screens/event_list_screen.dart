@@ -508,8 +508,7 @@ class _EventListScreenState extends State<EventListScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // Navigate to event detail
-            print('Navigate to event detail: ${event.title}');
+            // TODO: Navigate to event detail
           },
           child: Padding(
             padding: const EdgeInsets.all(16),

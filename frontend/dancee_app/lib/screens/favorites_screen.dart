@@ -6,16 +6,8 @@ import '../cubits/favorites/favorites_state.dart';
 import '../di/service_locator.dart';
 import '../models/event.dart';
 
-class FavoritesScreen extends StatefulWidget {
+class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
-
-  @override
-  State<FavoritesScreen> createState() => _FavoritesScreenState();
-}
-
-class _FavoritesScreenState extends State<FavoritesScreen>
-    with TickerProviderStateMixin {
-  String selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -117,9 +109,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     return CustomScrollView(
       slivers: [
         _buildHeader(totalEvents),
-        SliverToBoxAdapter(
-          child: _buildFilterSection(),
-        ),
+        _buildFilterSection(),
         if (upcomingEvents.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: _buildSectionHeader('Upcoming Events'),
@@ -129,7 +119,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  return _buildEventCard(upcomingEvents[index]);
+                  return _buildEventCard(context, upcomingEvents[index]);
                 },
                 childCount: upcomingEvents.length,
               ),
@@ -145,7 +135,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  return _buildEventCard(pastEvents[index]);
+                  return _buildEventCard(context, pastEvents[index]);
                 },
                 childCount: pastEvents.length,
               ),
@@ -203,64 +193,59 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Widget _buildFilterSection() {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
+    return SliverToBoxAdapter(
+      child: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
         ),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _buildFilterChip('All', selectedFilter == 'All'),
-            const SizedBox(width: 8),
-            _buildFilterChip('Today', selectedFilter == 'Today'),
-            const SizedBox(width: 8),
-            _buildFilterChip('This week', selectedFilter == 'This week'),
-            const SizedBox(width: 8),
-            _buildFilterChip('This month', selectedFilter == 'This month'),
-          ],
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFilterChip('All', true),
+              const SizedBox(width: 8),
+              _buildFilterChip('Today', false),
+              const SizedBox(width: 8),
+              _buildFilterChip('This week', false),
+              const SizedBox(width: 8),
+              _buildFilterChip('This month', false),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildFilterChip(String label, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedFilter = label;
-        });
-      },
-      child: Container(
-        height: 36,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isSelected) ...[
-              const Icon(Icons.check, color: Color(0xFF6366F1), size: 16),
-              const SizedBox(width: 4),
-            ],
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? const Color(0xFF6366F1) : Colors.white,
-              ),
-            ),
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isSelected) ...[
+            const Icon(Icons.check, color: Color(0xFF6366F1), size: 16),
+            const SizedBox(width: 4),
           ],
-        ),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? const Color(0xFF6366F1) : Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -279,7 +264,14 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     );
   }
 
-  Widget _buildEventCard(FavoriteEvent event) {
+  Widget _buildEventCard(BuildContext context, Event event) {
+    // Format date and time
+    final dateFormat = _formatDate(event.startTime);
+    final timeFormat = _formatTime(event.startTime, event.endTime);
+    
+    // Get gradient colors based on first dance style
+    final gradientColors = _getGradientColors(event.dances.isNotEmpty ? event.dances.first : '');
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -302,8 +294,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: event.isPast ? null : () {
-            // Navigate to event detail
-            print('Navigate to event detail: ${event.title}');
+            // TODO: Navigate to event detail
           },
           child: Opacity(
             opacity: event.isPast ? 0.6 : 1.0,
@@ -320,14 +311,14 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                         height: 56,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: event.gradientColors,
+                            colors: gradientColors,
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(
-                          event.iconData,
+                        child: const Icon(
+                          Icons.music_note,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -355,11 +346,14 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                   color: event.isPast ? Colors.grey[500] : Colors.grey[600],
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  event.venue,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: event.isPast ? Colors.grey[500] : Colors.grey[600],
+                                Expanded(
+                                  child: Text(
+                                    event.venue.name,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: event.isPast ? Colors.grey[500] : Colors.grey[600],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -374,7 +368,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  event.date,
+                                  dateFormat,
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -389,7 +383,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  event.time,
+                                  timeFormat,
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -435,7 +429,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                 color: Colors.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(8),
-                                  onTap: () => _showRemoveConfirmation(event),
+                                  onTap: () => _showRemoveConfirmation(context, event),
                                   child: Icon(
                                     event.isPast ? Icons.delete : Icons.heart_broken,
                                     color: Colors.red[600],
@@ -457,7 +451,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                         child: Wrap(
                           spacing: 6,
                           runSpacing: 6,
-                          children: event.tags.map((tag) => _buildTag(tag, event.isPast)).toList(),
+                          children: event.dances.map((dance) => _buildTag(dance, event.isPast)).toList(),
                         ),
                       ),
                       Row(
@@ -485,6 +479,47 @@ class _FavoritesScreenState extends State<FavoritesScreen>
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    
+    if (eventDate == today) {
+      return 'Today';
+    } else if (eventDate == today.add(const Duration(days: 1))) {
+      return 'Tomorrow';
+    } else {
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${months[dateTime.month - 1]} ${dateTime.day}';
+    }
+  }
+
+  String _formatTime(DateTime start, DateTime end) {
+    final startHour = start.hour.toString().padLeft(2, '0');
+    final startMinute = start.minute.toString().padLeft(2, '0');
+    final endHour = end.hour.toString().padLeft(2, '0');
+    final endMinute = end.minute.toString().padLeft(2, '0');
+    return '$startHour:$startMinute - $endHour:$endMinute';
+  }
+
+  List<Color> _getGradientColors(String dance) {
+    switch (dance.toLowerCase()) {
+      case 'salsa':
+        return [const Color(0xFFEF4444), const Color(0xFFDC2626)];
+      case 'bachata':
+        return [const Color(0xFFEC4899), const Color(0xFFDB2777)];
+      case 'kizomba':
+        return [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)];
+      case 'zouk':
+      case 'brazilian zouk':
+        return [const Color(0xFF14B8A6), const Color(0xFF0D9488)];
+      case 'tango':
+        return [const Color(0xFF6366F1), const Color(0xFF4F46E5)];
+      default:
+        return [const Color(0xFF6366F1), const Color(0xFF8B5CF6)];
+    }
   }
 
   Widget _buildTag(String tag, bool isPast) {
@@ -641,7 +676,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     );
   }
 
-  void _showRemoveConfirmation(FavoriteEvent event) {
+  void _showRemoveConfirmation(BuildContext context, Event event) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -713,9 +748,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        setState(() {
-                          favoriteEvents.removeWhere((e) => e.id == event.id);
-                        });
+                        getIt<FavoritesCubit>().toggleFavorite(event.id);
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

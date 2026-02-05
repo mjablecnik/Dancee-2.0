@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../repositories/event_repository.dart';
-import '../../models/event.dart';
 import 'favorites_state.dart';
 
 /// Cubit for managing favorites screen state.

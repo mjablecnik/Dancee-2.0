@@ -810,9 +810,9 @@ class EventRepository {
   /// Filters events by criteria.
   ///
   /// Supports filtering by:
-  /// - dances: List<String> - filters events that include any of the specified dances
-  /// - isPast: bool - filters events by past status
-  /// - dateRange: Map<String, DateTime> with 'start' and 'end' keys
+  /// - dances: `List<String>` - filters events that include any of the specified dances
+  /// - isPast: `bool` - filters events by past status
+  /// - dateRange: `Map<String, DateTime>` with 'start' and 'end' keys
   ///
   /// Multiple criteria can be combined.
   Future<List<Event>> filterEvents(Map<String, dynamic> criteria) async {
