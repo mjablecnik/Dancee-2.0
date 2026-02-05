@@ -81,30 +81,30 @@ This document outlines the implementation tasks for the event data architecture 
   - [x] 5.10 Implement toggleFavorite() method
   - [x] 5.11 Write cubit tests for FavoritesCubit
 
-- [~] 6. Setup Dependency Injection
-  - [~] 6.1 Create lib/di/service_locator.dart file
-  - [~] 6.2 Import get_it package
-  - [~] 6.3 Create getIt instance
-  - [~] 6.4 Create setupDependencies() function
-  - [~] 6.5 Register EventRepository as lazy singleton
-  - [~] 6.6 Register EventListCubit as lazy singleton with loadEvents() call
-  - [~] 6.7 Register FavoritesCubit as lazy singleton with loadFavorites() call
-  - [~] 6.8 Update lib/main.dart to call setupDependencies() before runApp()
-  - [~] 6.9 Remove RepositoryProvider from main.dart
-  - [ ] 6.10 Test dependency injection setup
+- [x] 6. Setup Dependency Injection
+  - [x] 6.1 Create lib/di/service_locator.dart file
+  - [x] 6.2 Import get_it package
+  - [x] 6.3 Create getIt instance
+  - [x] 6.4 Create setupDependencies() function
+  - [x] 6.5 Register EventRepository as lazy singleton
+  - [x] 6.6 Register EventListCubit as lazy singleton with loadEvents() call
+  - [x] 6.7 Register FavoritesCubit as lazy singleton with loadFavorites() call
+  - [x] 6.8 Update lib/main.dart to call setupDependencies() before runApp()
+  - [x] 6.9 Remove RepositoryProvider from main.dart
+  - [x] 6.10 Test dependency injection setup
 
-- [~] 7. Integrate EventListScreen
-  - [~] 7.1 Remove BlocProvider from EventListScreen
-  - [~] 7.2 Update BlocBuilder to use bloc: getIt<EventListCubit>()
-  - [~] 7.3 Implement loading state UI
-  - [~] 7.4 Implement error state UI with retry button
-  - [~] 7.5 Update _buildEventsList to use state.todayEvents, state.tomorrowEvents, state.upcomingEvents
-  - [~] 7.6 Remove all hardcoded event data
-  - [~] 7.7 Update search functionality to call getIt<EventListCubit>().searchEvents()
-  - [~] 7.8 Update favorite toggle to call getIt<EventListCubit>().toggleFavorite()
-  - [~] 7.9 Test EventListScreen integration
+- [x] 7. Integrate EventListScreen
+  - [x] 7.1 Remove BlocProvider from EventListScreen
+  - [x] 7.2 Update BlocBuilder to use bloc: getIt<EventListCubit>()
+  - [x] 7.3 Implement loading state UI
+  - [x] 7.4 Implement error state UI with retry button
+  - [x] 7.5 Update _buildEventsList to use state.todayEvents, state.tomorrowEvents, state.upcomingEvents
+  - [x] 7.6 Remove all hardcoded event data
+  - [x] 7.7 Update search functionality to call getIt<EventListCubit>().searchEvents()
+  - [x] 7.8 Update favorite toggle to call getIt<EventListCubit>().toggleFavorite()
+  - [x] 7.9 Test EventListScreen integration
 
-- [~] 8. Integrate FavoritesScreen
+- [x] 8. Integrate FavoritesScreen
   - [~] 8.1 Remove BlocProvider from FavoritesScreen
   - [~] 8.2 Update BlocBuilder to use bloc: getIt<FavoritesCubit>()
   - [~] 8.3 Implement loading state UI

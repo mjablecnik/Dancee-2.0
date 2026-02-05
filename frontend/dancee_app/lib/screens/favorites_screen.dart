@@ -1,31 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-class FavoriteEvent {
-  final String id;
-  final String title;
-  final String venue;
-  final String date;
-  final String time;
-  final List<String> tags;
-  final IconData iconData;
-  final List<Color> gradientColors;
-  final String? badge;
-  final bool isPast;
-
-  FavoriteEvent({
-    required this.id,
-    required this.title,
-    required this.venue,
-    required this.date,
-    required this.time,
-    required this.tags,
-    required this.iconData,
-    required this.gradientColors,
-    this.badge,
-    this.isPast = false,
-  });
-}
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubits/favorites/favorites_cubit.dart';
+import '../cubits/favorites/favorites_state.dart';
+import '../di/service_locator.dart';
+import '../models/event.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -38,132 +17,106 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     with TickerProviderStateMixin {
   String selectedFilter = 'All';
 
-  List<FavoriteEvent> favoriteEvents = [
-    FavoriteEvent(
-      id: '1',
-      title: 'Salsa & Bachata Night Prague',
-      venue: 'Dance Club Central',
-      date: 'Fri 4. February',
-      time: '20:00',
-      tags: ['Salsa', 'Bachata', 'Kizomba'],
-      iconData: Icons.local_fire_department,
-      gradientColors: [const Color(0xFFEF4444), const Color(0xFFF97316)],
-      badge: 'TODAY',
-    ),
-    FavoriteEvent(
-      id: '2',
-      title: 'Bachata Sensual Workshop',
-      venue: 'Studio Rytmus',
-      date: 'Sun 6. February',
-      time: '18:00',
-      tags: ['Bachata', 'Sensual'],
-      iconData: Icons.favorite,
-      gradientColors: [const Color(0xFFEC4899), const Color(0xFFF43F5E)],
-      badge: 'IN 2 DAYS',
-    ),
-    FavoriteEvent(
-      id: '3',
-      title: 'Kizomba Fusion Party',
-      venue: 'Karlín Hall',
-      date: 'Fri 11. February',
-      time: '21:00',
-      tags: ['Kizomba', 'Urban Kiz', 'Tarraxo'],
-      iconData: Icons.nightlight_round,
-      gradientColors: [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)],
-    ),
-    FavoriteEvent(
-      id: '4',
-      title: 'Zouk Social Dance',
-      venue: 'Dance Factory',
-      date: 'Sat 12. February',
-      time: '19:30',
-      tags: ['Zouk', 'Brazilian Zouk'],
-      iconData: Icons.water_drop,
-      gradientColors: [const Color(0xFF14B8A6), const Color(0xFF06B6D4)],
-    ),
-    FavoriteEvent(
-      id: '5',
-      title: 'Salsa On2 Masterclass',
-      venue: 'Dance Club Central',
-      date: 'Sun 13. February',
-      time: '16:00',
-      tags: ['Salsa', 'On2'],
-      iconData: Icons.wb_sunny,
-      gradientColors: [const Color(0xFFF59E0B), const Color(0xFFEAB308)],
-    ),
-    FavoriteEvent(
-      id: '6',
-      title: 'Samba de Gafieira Evening',
-      venue: 'Rio Dance Studio',
-      date: 'Thu 17. February',
-      time: '20:00',
-      tags: ['Samba', 'Gafieira'],
-      iconData: Icons.eco,
-      gradientColors: [const Color(0xFF10B981), const Color(0xFF059669)],
-    ),
-    FavoriteEvent(
-      id: '7',
-      title: 'Latin Night Mix',
-      venue: 'Lucerna Music Bar',
-      date: 'Fri 18. February',
-      time: '22:00',
-      tags: ['Salsa', 'Bachata', 'Merengue', 'Reggaeton'],
-      iconData: Icons.celebration,
-      gradientColors: [const Color(0xFF3B82F6), const Color(0xFF6366F1)],
-    ),
-    FavoriteEvent(
-      id: '8',
-      title: 'Bachata Romántica Night',
-      venue: 'Dance Club Central',
-      date: 'Sat 19. February',
-      time: '20:30',
-      tags: ['Bachata', 'Romántica'],
-      iconData: Icons.monitor_heart,
-      gradientColors: [const Color(0xFFF43F5E), const Color(0xFFEC4899)],
-    ),
-    // Past events
-    FavoriteEvent(
-      id: '9',
-      title: 'Salsa Cubana Workshop',
-      venue: 'Studio Rytmus',
-      date: 'Sat 28. January',
-      time: '17:00',
-      tags: ['Salsa', 'Cubana'],
-      iconData: Icons.event_busy,
-      gradientColors: [const Color(0xFF9CA3AF), const Color(0xFF6B7280)],
-      badge: 'FINISHED',
-      isPast: true,
-    ),
-    FavoriteEvent(
-      id: '10',
-      title: 'Kizomba Ladies Styling',
-      venue: 'Karlín Hall',
-      date: 'Sun 22. January',
-      time: '15:00',
-      tags: ['Kizomba', 'Ladies'],
-      iconData: Icons.event_busy,
-      gradientColors: [const Color(0xFF9CA3AF), const Color(0xFF6B7280)],
-      badge: 'FINISHED',
-      isPast: true,
-    ),
-  ];
-  List<FavoriteEvent> get upcomingEvents => favoriteEvents.where((event) => !event.isPast).toList();
-  List<FavoriteEvent> get pastEvents => favoriteEvents.where((event) => event.isPast).toList();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: favoriteEvents.isEmpty ? _buildEmptyState() : _buildFavoritesList(),
+        child: BlocBuilder<FavoritesCubit, FavoritesState>(
+          bloc: getIt<FavoritesCubit>(),
+          builder: (context, state) {
+            if (state is FavoritesLoading) {
+              return _buildLoadingState();
+            }
+            
+            if (state is FavoritesEmpty) {
+              return _buildEmptyState();
+            }
+            
+            if (state is FavoritesError) {
+              return _buildErrorState(state.message);
+            }
+            
+            if (state is FavoritesLoaded) {
+              return _buildFavoritesList(state);
+            }
+            
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildFavoritesList() {
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Error Loading Favorites',
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => getIt<FavoritesCubit>().loadFavorites(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6366F1),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Retry',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFavoritesList(FavoritesLoaded state) {
+    final upcomingEvents = state.upcomingEvents;
+    final pastEvents = state.pastEvents;
+    final totalEvents = upcomingEvents.length + pastEvents.length;
+    
     return CustomScrollView(
       slivers: [
-        _buildHeader(),
+        _buildHeader(totalEvents),
         SliverToBoxAdapter(
           child: _buildFilterSection(),
         ),
@@ -203,7 +156,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(int totalEvents) {
     return SliverAppBar(
       expandedHeight: 140.0,
       collapsedHeight: 80,
@@ -235,7 +188,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${favoriteEvents.length} saved events',
+                  '$totalEvents saved events',
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: Colors.white.withValues(alpha: 0.8),

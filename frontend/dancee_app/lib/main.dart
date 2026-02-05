@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'screens/event_list_screen.dart';
 import 'screens/favorites_screen.dart';
+import 'di/service_locator.dart';
 
 void main() {
+  setupDependencies();
   runApp(const MyApp());
 }
 

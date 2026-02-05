@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubits/event_list/event_list_cubit.dart';
+import '../cubits/event_list/event_list_state.dart';
+import '../di/service_locator.dart';
+import '../models/event.dart';
 
 class EventListScreen extends StatefulWidget {
   const EventListScreen({super.key});
@@ -19,6 +24,13 @@ class _EventListScreenState extends State<EventListScreen> {
       setState(() {
         _showClearButton = _searchController.text.isNotEmpty;
       });
+      
+      // Trigger search when text changes
+      if (_searchController.text.isEmpty) {
+        getIt<EventListCubit>().loadEvents();
+      } else {
+        getIt<EventListCubit>().searchEvents(_searchController.text);
+      }
     });
   }
 
@@ -33,19 +45,101 @@ class _EventListScreenState extends State<EventListScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            _buildAnimatedHeader(),
-            SliverToBoxAdapter(
-              child: _buildSearchAndFilters(),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
-              sliver: _buildEventsSliverList(),
-            ),
-          ],
+        child: BlocBuilder<EventListCubit, EventListState>(
+          bloc: getIt<EventListCubit>(),
+          builder: (context, state) {
+            if (state is EventListLoading) {
+              return _buildLoadingState();
+            }
+            
+            if (state is EventListError) {
+              return _buildErrorState(state.message);
+            }
+            
+            if (state is EventListLoaded) {
+              return _buildLoadedState(state);
+            }
+            
+            return const SizedBox.shrink();
+          },
         ),
       ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Error Loading Events',
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => getIt<EventListCubit>().loadEvents(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6366F1),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Retry',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadedState(EventListLoaded state) {
+    return CustomScrollView(
+      slivers: [
+        _buildAnimatedHeader(),
+        SliverToBoxAdapter(
+          child: _buildSearchAndFilters(),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
+          sliver: _buildEventsSliverList(state),
+        ),
+      ],
     );
   }
 
@@ -270,118 +364,73 @@ class _EventListScreenState extends State<EventListScreen> {
       ),
     );
   }
-  Widget _buildEventsSliverList() {
+  Widget _buildEventsSliverList(EventListLoaded state) {
     return SliverList(
       delegate: SliverChildListDelegate([
-        _buildTodaySection(),
-        const SizedBox(height: 24),
-        _buildTomorrowSection(),
-        const SizedBox(height: 24),
-        _buildUpcomingSection(),
+        if (state.todayEvents.isNotEmpty) ...[
+          _buildTodaySection(state.todayEvents),
+          const SizedBox(height: 24),
+        ],
+        if (state.tomorrowEvents.isNotEmpty) ...[
+          _buildTomorrowSection(state.tomorrowEvents),
+          const SizedBox(height: 24),
+        ],
+        if (state.upcomingEvents.isNotEmpty) ...[
+          _buildUpcomingSection(state.upcomingEvents),
+        ],
       ]),
     );
   }
 
-  Widget _buildTodaySection() {
+  Widget _buildTodaySection(List<Event> events) {
     return Column(
       children: [
         _buildSectionHeader(
           'Today',
           '(Tuesday 4.2.2025)',
-          '3 events',
+          '${events.length} events',
           Icons.calendar_today,
           const Color(0xFF6366F1),
         ),
         const SizedBox(height: 16),
         Column(
-          children: [
-            _buildEventCard(
-              'Salsa Social Night',
-              'Lucerna Music Bar',
-              '20:00 - 02:00',
-              '6 hours',
-              ['Salsa', 'Bachata', 'Kizomba'],
-              false,
-            ),
-            _buildEventCard(
-              'Bachata Tuesdays',
-              'Dance Arena Prague',
-              '19:30 - 23:30',
-              '4 hours',
-              ['Bachata', 'Sensual'],
-              true,
-            ),
-            _buildEventCard(
-              'Zouk Workshop & Party',
-              'Studio Tance',
-              '18:00 - 22:00',
-              '4 hours',
-              ['Zouk', 'Brazilian Zouk'],
-              false,
-            ),
-          ],
+          children: events.map((event) => _buildEventCard(event)).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildTomorrowSection() {
+  Widget _buildTomorrowSection(List<Event> events) {
     return Column(
       children: [
         _buildSectionHeader(
           'Tomorrow',
           '(Wednesday 5.2.2025)',
-          '5 events',
+          '${events.length} events',
           Icons.calendar_month,
           const Color(0xFF8B5CF6),
         ),
         const SizedBox(height: 16),
         Column(
-          children: [
-            _buildEventCard(
-              'Kizomba Wednesday',
-              'Club Lavka',
-              '20:00 - 01:00',
-              '5 hours',
-              ['Kizomba', 'Urban Kiz', 'Tarraxo'],
-              false,
-            ),
-            _buildEventCard(
-              'Tango Practica',
-              'Café Milonga',
-              '19:00 - 22:00',
-              '3 hours',
-              ['Tango', 'Argentine Tango'],
-              true,
-            ),
-          ],
+          children: events.map((event) => _buildEventCard(event)).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildUpcomingSection() {
+  Widget _buildUpcomingSection(List<Event> events) {
     return Column(
       children: [
         _buildSectionHeader(
           'This week',
           '',
-          '16 events',
+          '${events.length} events',
           Icons.calendar_view_week,
           const Color(0xFFEC4899),
         ),
         const SizedBox(height: 16),
         Column(
-          children: [
-            _buildEventCard(
-              'Latin Mix Party',
-              'Cross Club',
-              '21:00 - 03:00',
-              '6 hours',
-              ['Salsa', 'Bachata', 'Merengue'],
-              false,
-            ),
-          ],
+          children: events.map((event) => _buildEventCard(event)).toList(),
         ),
       ],
     );
@@ -427,14 +476,16 @@ class _EventListScreenState extends State<EventListScreen> {
     );
   }
 
-  Widget _buildEventCard(
-    String title,
-    String venue,
-    String time,
-    String duration,
-    List<String> tags,
-    bool isFavorite,
-  ) {
+  Widget _buildEventCard(Event event) {
+    // Format time
+    final startTime = '${event.startTime.hour.toString().padLeft(2, '0')}:${event.startTime.minute.toString().padLeft(2, '0')}';
+    final endTime = '${event.endTime.hour.toString().padLeft(2, '0')}:${event.endTime.minute.toString().padLeft(2, '0')}';
+    final timeString = '$startTime - $endTime';
+    
+    // Format duration
+    final hours = event.duration.inHours;
+    final durationString = '$hours hours';
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -458,7 +509,7 @@ class _EventListScreenState extends State<EventListScreen> {
           borderRadius: BorderRadius.circular(12),
           onTap: () {
             // Navigate to event detail
-            print('Navigate to event detail: $title');
+            print('Navigate to event detail: ${event.title}');
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -473,14 +524,14 @@ class _EventListScreenState extends State<EventListScreen> {
                       height: 56,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: _getEventIconGradient(tags),
+                          colors: _getEventIconGradient(event.dances),
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        _getEventIcon(tags),
+                        _getEventIcon(event.dances),
                         color: Colors.white,
                         size: 24,
                       ),
@@ -491,7 +542,7 @@ class _EventListScreenState extends State<EventListScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            event.title,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -509,7 +560,7 @@ class _EventListScreenState extends State<EventListScreen> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                venue,
+                                event.venue.name,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   color: Colors.grey[600],
@@ -527,7 +578,7 @@ class _EventListScreenState extends State<EventListScreen> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                time,
+                                timeString,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -545,7 +596,7 @@ class _EventListScreenState extends State<EventListScreen> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                duration,
+                                durationString,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -564,7 +615,7 @@ class _EventListScreenState extends State<EventListScreen> {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: isFavorite ? Colors.red[50] : Colors.grey[100],
+                            color: event.isFavorite ? Colors.red[50] : Colors.grey[100],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Material(
@@ -573,11 +624,11 @@ class _EventListScreenState extends State<EventListScreen> {
                               borderRadius: BorderRadius.circular(8),
                               onTap: () {
                                 // Toggle favorite status
-                                print('Toggle favorite for: $title');
+                                getIt<EventListCubit>().toggleFavorite(event.id);
                               },
                               child: Icon(
-                                isFavorite ? Icons.favorite : Icons.favorite_border,
-                                color: isFavorite ? Colors.red[600] : Colors.grey[400],
+                                event.isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: event.isFavorite ? Colors.red[600] : Colors.grey[400],
                                 size: 18,
                               ),
                             ),
@@ -595,7 +646,7 @@ class _EventListScreenState extends State<EventListScreen> {
                       child: Wrap(
                         spacing: 6,
                         runSpacing: 6,
-                        children: tags.map((tag) => _buildTag(tag)).toList(),
+                        children: event.dances.map((tag) => _buildTag(tag)).toList(),
                       ),
                     ),
                     Row(
