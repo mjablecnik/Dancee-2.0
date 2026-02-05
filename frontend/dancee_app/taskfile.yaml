@@ -48,3 +48,11 @@ tasks:
   build-runner-clean:
     desc: Clean build runner generated files
     cmd: flutter packages pub run build_runner clean
+
+  test:
+    desc: Run all Flutter tests
+    cmd: flutter test
+
+  test-coverage:
+    desc: Run all Flutter tests with coverage report
+    cmd: flutter test --coverage
