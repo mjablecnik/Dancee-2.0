@@ -33,7 +33,7 @@ This document outlines the implementation tasks for the event data architecture 
   - [ ] 2.19 Implement EventPart copyWith method
   - [ ] 2.20 Implement EventPart equality comparison (using Equatable)
   - [ ] 2.21 Create Event model class in lib/models/event.dart
-  - [ ] 2.22 Implement Event fields (id, title, description, organizer, venue, startTime, endTime, duration, dances, price, info, parts, isFavorite, isPast, badge)
+  - [ ] 2.22 Implement Event fields (id, title, description, organizer, venue, startTime, endTime, duration, dances, info, parts, isFavorite, isPast, badge)
   - [ ] 2.23 Implement Event copyWith method
   - [ ] 2.24 Implement Event equality comparison (using Equatable)
   - [ ] 2.25 Write unit tests for Address model
@@ -372,7 +372,6 @@ class Event extends Equatable {
   final DateTime endTime;
   final Duration duration;
   final List<String> dances;
-  final int price;
   final List<EventInfo> info;
   final List<EventPart> parts;
   final bool isFavorite;
@@ -389,7 +388,6 @@ class Event extends Equatable {
     required this.endTime,
     required this.duration,
     required this.dances,
-    required this.price,
     this.info = const [],
     this.parts = const [],
     this.isFavorite = false,
@@ -407,7 +405,6 @@ class Event extends Equatable {
     DateTime? endTime,
     Duration? duration,
     List<String>? dances,
-    int? price,
     List<EventInfo>? info,
     List<EventPart>? parts,
     bool? isFavorite,
@@ -424,7 +421,6 @@ class Event extends Equatable {
       endTime: endTime ?? this.endTime,
       duration: duration ?? this.duration,
       dances: dances ?? this.dances,
-      price: price ?? this.price,
       info: info ?? this.info,
       parts: parts ?? this.parts,
       isFavorite: isFavorite ?? this.isFavorite,
@@ -436,7 +432,7 @@ class Event extends Equatable {
   @override
   List<Object?> get props => [
     id, title, description, organizer, venue, startTime, endTime,
-    duration, dances, price, info, parts, isFavorite, isPast, badge
+    duration, dances, info, parts, isFavorite, isPast, badge
   ];
 }
 ```

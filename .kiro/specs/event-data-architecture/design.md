@@ -218,7 +218,6 @@ class Event {
   final DateTime endTime;
   final Duration duration;
   final List<String> dances;
-  final int price;
   final List<EventInfo> info;
   final List<EventPart> parts;
   final bool isFavorite;
@@ -235,7 +234,6 @@ class Event {
     required this.endTime,
     required this.duration,
     required this.dances,
-    required this.price,
     this.info = const [],
     this.parts = const [],
     this.isFavorite = false,
@@ -253,7 +251,6 @@ class Event {
     DateTime? endTime,
     Duration? duration,
     List<String>? dances,
-    int? price,
     List<EventInfo>? info,
     List<EventPart>? parts,
     bool? isFavorite,
@@ -268,7 +265,6 @@ class Event {
 - copyWith method for creating modified copies (especially for favorite toggle)
 - All fields use English names per requirements
 - Optional badge field for "TODAY", "IN 2 DAYS", "FINISHED" labels
-- Price stored as integer (in currency units)
 - DateTime for startTime and endTime for proper date/time handling
 - Duration object for event duration (calculated from start/end)
 - dances instead of tags for clarity
@@ -278,6 +274,7 @@ class Event {
 - info list for flexible additional information (URLs, prices, text)
 - parts list for event schedule (workshops, parties, lessons)
 - Default empty lists for info and parts
+- Price removed - managed via EventInfo objects with type=price
 
 ### 2. Repository Layer
 
@@ -320,8 +317,12 @@ class EventRepository {
         endTime: today.add(Duration(hours: 26)), // 2:00 next day
         duration: Duration(hours: 6),
         dances: ['Salsa', 'Bachata', 'Kizomba'],
-        price: 150,
         info: [
+          EventInfo(
+            type: EventInfoType.price,
+            key: 'Entry Fee',
+            value: '150 Kč',
+          ),
           EventInfo(
             type: EventInfoType.url,
             key: 'Facebook Event',
@@ -366,8 +367,12 @@ class EventRepository {
         endTime: today.add(Duration(hours: 23, minutes: 30)),
         duration: Duration(hours: 4),
         dances: ['Bachata', 'Sensual'],
-        price: 100,
         info: [
+          EventInfo(
+            type: EventInfoType.price,
+            key: 'Full Event',
+            value: '100 Kč',
+          ),
           EventInfo(
             type: EventInfoType.price,
             key: 'Workshop Only',

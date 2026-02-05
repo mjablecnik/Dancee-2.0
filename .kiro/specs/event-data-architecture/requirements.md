@@ -53,9 +53,9 @@ This document specifies the requirements for implementing a data architecture wi
 14. THE EventPart_Model SHALL be immutable using const constructor
 15. THE Event_Model SHALL include fields for id, title, description, organizer, venue (Venue object), startTime (DateTime), endTime (DateTime), and duration (Duration)
 16. THE Event_Model SHALL include a dances field as a list of strings representing dance styles
-17. THE Event_Model SHALL include a price field as integer
-18. THE Event_Model SHALL include an info field as list of EventInfo objects
-19. THE Event_Model SHALL include a parts field as list of EventPart objects
+17. THE Event_Model SHALL include an info field as list of EventInfo objects
+18. THE Event_Model SHALL include a parts field as list of EventPart objects
+19. THE Event_Model SHALL NOT include a price field (prices managed via EventInfo)
 20. THE Event_Model SHALL include an isFavorite boolean flag
 21. THE Event_Model SHALL include an isPast boolean flag for historical events
 22. THE Event_Model SHALL follow Dart naming conventions with camelCase for properties
