@@ -131,13 +131,53 @@ class EventListCubit extends Cubit<EventListState> {
 
   /// Toggles the favorite status of an event.
   ///
-  /// Updates the repository and reloads all events to reflect the change.
+  /// Updates the repository and updates the state locally without reloading.
+  /// This prevents the UI from flickering when toggling favorites.
   ///
   /// On error, emits [EventListError] without changing the current state.
   Future<void> toggleFavorite(String eventId) async {
+    final currentState = state;
+    if (currentState is! EventListLoaded) return;
+    
     try {
       await repository.toggleFavorite(eventId);
-      await loadEvents(); // Reload to reflect changes
+      
+      // Update the event in all lists locally
+      final updatedAllEvents = currentState.allEvents.map((event) {
+        if (event.id == eventId) {
+          return event.copyWith(isFavorite: !event.isFavorite);
+        }
+        return event;
+      }).toList();
+      
+      final updatedTodayEvents = currentState.todayEvents.map((event) {
+        if (event.id == eventId) {
+          return event.copyWith(isFavorite: !event.isFavorite);
+        }
+        return event;
+      }).toList();
+      
+      final updatedTomorrowEvents = currentState.tomorrowEvents.map((event) {
+        if (event.id == eventId) {
+          return event.copyWith(isFavorite: !event.isFavorite);
+        }
+        return event;
+      }).toList();
+      
+      final updatedUpcomingEvents = currentState.upcomingEvents.map((event) {
+        if (event.id == eventId) {
+          return event.copyWith(isFavorite: !event.isFavorite);
+        }
+        return event;
+      }).toList();
+      
+      // Emit new state with updated events
+      emit(EventListLoaded(
+        allEvents: updatedAllEvents,
+        todayEvents: updatedTodayEvents,
+        tomorrowEvents: updatedTomorrowEvents,
+        upcomingEvents: updatedUpcomingEvents,
+      ));
     } catch (e) {
       emit(EventListError('Failed to toggle favorite: ${e.toString()}'));
     }
