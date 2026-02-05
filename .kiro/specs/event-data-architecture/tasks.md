@@ -5,136 +5,136 @@ This document outlines the implementation tasks for the event data architecture 
 
 ## Task List
 
-- [ ] 1. Setup Dependencies
-  - [ ] 1.1 Add flutter_bloc package to pubspec.yaml
-  - [ ] 1.2 Add equatable package to pubspec.yaml
-  - [ ] 1.3 Add get_it package to pubspec.yaml
-  - [ ] 1.4 Run task get-deps to install dependencies
+- [x] 1. Setup Dependencies
+  - [x] 1.1 Add flutter_bloc package to pubspec.yaml
+  - [x] 1.2 Add equatable package to pubspec.yaml
+  - [x] 1.3 Add get_it package to pubspec.yaml
+  - [x] 1.4 Run task get-deps to install dependencies
 
-- [ ] 2. Create Data Models
-  - [ ] 2.1 Create lib/models directory
-  - [ ] 2.2 Create Address model class in lib/models/address.dart
-  - [ ] 2.3 Implement Address fields (street, city, postalCode, country)
-  - [ ] 2.4 Implement Address copyWith method
-  - [ ] 2.5 Implement Address fullAddress getter
-  - [ ] 2.6 Implement Address equality comparison (using Equatable)
-  - [ ] 2.7 Create Venue model class in lib/models/venue.dart
-  - [ ] 2.8 Implement Venue fields (name, address, description, latitude, longitude)
-  - [ ] 2.9 Implement Venue copyWith method
-  - [ ] 2.10 Implement Venue equality comparison (using Equatable)
-  - [ ] 2.11 Create EventInfo model and enum in lib/models/event_info.dart
-  - [ ] 2.12 Implement EventInfoType enum (text, url, price)
-  - [ ] 2.13 Implement EventInfo fields (type, key, value)
-  - [ ] 2.14 Implement EventInfo copyWith method
-  - [ ] 2.15 Implement EventInfo equality comparison (using Equatable)
-  - [ ] 2.16 Create EventPart model and enum in lib/models/event_part.dart
-  - [ ] 2.17 Implement EventPartType enum (party, workshop, openLesson)
-  - [ ] 2.18 Implement EventPart fields (name, description, type, startTime, endTime, lectors, djs)
-  - [ ] 2.19 Implement EventPart copyWith method
-  - [ ] 2.20 Implement EventPart equality comparison (using Equatable)
-  - [ ] 2.21 Create Event model class in lib/models/event.dart
-  - [ ] 2.22 Implement Event fields (id, title, description, organizer, venue, startTime, endTime, duration, dances, info, parts, isFavorite, isPast, badge)
-  - [ ] 2.23 Implement Event copyWith method
-  - [ ] 2.24 Implement Event equality comparison (using Equatable)
-  - [ ] 2.25 Write unit tests for Address model
-  - [ ] 2.26 Write unit tests for Venue model
-  - [ ] 2.27 Write unit tests for EventInfo model
-  - [ ] 2.28 Write unit tests for EventPart model
-  - [ ] 2.29 Write unit tests for Event model
+- [x] 2. Create Data Models
+  - [x] 2.1 Create lib/models directory
+  - [x] 2.2 Create Address model class in lib/models/address.dart
+  - [x] 2.3 Implement Address fields (street, city, postalCode, country)
+  - [x] 2.4 Implement Address copyWith method
+  - [x] 2.5 Implement Address fullAddress getter
+  - [x] 2.6 Implement Address equality comparison (using Equatable)
+  - [x] 2.7 Create Venue model class in lib/models/venue.dart
+  - [x] 2.8 Implement Venue fields (name, address, description, latitude, longitude)
+  - [x] 2.9 Implement Venue copyWith method
+  - [x] 2.10 Implement Venue equality comparison (using Equatable)
+  - [x] 2.11 Create EventInfo model and enum in lib/models/event_info.dart
+  - [x] 2.12 Implement EventInfoType enum (text, url, price)
+  - [x] 2.13 Implement EventInfo fields (type, key, value)
+  - [x] 2.14 Implement EventInfo copyWith method
+  - [x] 2.15 Implement EventInfo equality comparison (using Equatable)
+  - [x] 2.16 Create EventPart model and enum in lib/models/event_part.dart
+  - [x] 2.17 Implement EventPartType enum (party, workshop, openLesson)
+  - [x] 2.18 Implement EventPart fields (name, description, type, startTime, endTime, lectors, djs)
+  - [x] 2.19 Implement EventPart copyWith method
+  - [x] 2.20 Implement EventPart equality comparison (using Equatable)
+  - [x] 2.21 Create Event model class in lib/models/event.dart
+  - [x] 2.22 Implement Event fields (id, title, description, organizer, venue, startTime, endTime, duration, dances, info, parts, isFavorite, isPast, badge)
+  - [x] 2.23 Implement Event copyWith method
+  - [x] 2.24 Implement Event equality comparison (using Equatable)
+  - [x] 2.25 Write unit tests for Address model
+  - [x] 2.26 Write unit tests for Venue model
+  - [x] 2.27 Write unit tests for EventInfo model
+  - [x] 2.28 Write unit tests for EventPart model
+  - [x] 2.29 Write unit tests for Event model
 
-- [ ] 3. Create EventRepository
-  - [ ] 3.1 Create lib/repositories directory
-  - [ ] 3.2 Create EventRepository class in lib/repositories/event_repository.dart
-  - [ ] 3.3 Implement _initializeEvents() with hardcoded data from EventListScreen
-  - [ ] 3.4 Add hardcoded data from FavoritesScreen
-  - [ ] 3.5 Implement getAllEvents() method
-  - [ ] 3.6 Implement getFavoriteEvents() method
-  - [ ] 3.7 Implement getEventsByDate() method
-  - [ ] 3.8 Implement toggleFavorite() method
-  - [ ] 3.9 Implement searchEvents() method
-  - [ ] 3.10 Implement filterEvents() method
-  - [ ] 3.11 Write unit tests for EventRepository
+- [x] 3. Create EventRepository
+  - [x] 3.1 Create lib/repositories directory
+  - [x] 3.2 Create EventRepository class in lib/repositories/event_repository.dart
+  - [x] 3.3 Implement _initializeEvents() with hardcoded data from EventListScreen
+  - [x] 3.4 Add hardcoded data from FavoritesScreen
+  - [x] 3.5 Implement getAllEvents() method
+  - [x] 3.6 Implement getFavoriteEvents() method
+  - [x] 3.7 Implement getEventsByDate() method
+  - [x] 3.8 Implement toggleFavorite() method
+  - [x] 3.9 Implement searchEvents() method
+  - [x] 3.10 Implement filterEvents() method
+  - [x] 3.11 Write unit tests for EventRepository
 
-- [ ] 4. Create EventListCubit
-  - [ ] 4.1 Create lib/cubits/event_list directory
-  - [ ] 4.2 Create EventListState classes in lib/cubits/event_list/event_list_state.dart
-  - [ ] 4.3 Implement EventListInitial state
-  - [ ] 4.4 Implement EventListLoading state
-  - [ ] 4.5 Implement EventListLoaded state with grouped events
-  - [ ] 4.6 Implement EventListError state
-  - [ ] 4.7 Create EventListCubit in lib/cubits/event_list/event_list_cubit.dart
-  - [ ] 4.8 Implement loadEvents() method
-  - [ ] 4.9 Implement searchEvents() method
-  - [ ] 4.10 Implement toggleFavorite() method
-  - [ ] 4.11 Write cubit tests for EventListCubit
+- [x] 4. Create EventListCubit
+  - [x] 4.1 Create lib/cubits/event_list directory
+  - [x] 4.2 Create EventListState classes in lib/cubits/event_list/event_list_state.dart
+  - [x] 4.3 Implement EventListInitial state
+  - [x] 4.4 Implement EventListLoading state
+  - [x] 4.5 Implement EventListLoaded state with grouped events
+  - [x] 4.6 Implement EventListError state
+  - [x] 4.7 Create EventListCubit in lib/cubits/event_list/event_list_cubit.dart
+  - [x] 4.8 Implement loadEvents() method
+  - [x] 4.9 Implement searchEvents() method
+  - [x] 4.10 Implement toggleFavorite() method
+  - [x] 4.11 Write cubit tests for EventListCubit
 
-- [ ] 5. Create FavoritesCubit
-  - [ ] 5.1 Create lib/cubits/favorites directory
-  - [ ] 5.2 Create FavoritesState classes in lib/cubits/favorites/favorites_state.dart
-  - [ ] 5.3 Implement FavoritesInitial state
-  - [ ] 5.4 Implement FavoritesLoading state
-  - [ ] 5.5 Implement FavoritesEmpty state
-  - [ ] 5.6 Implement FavoritesLoaded state with separated events
-  - [ ] 5.7 Implement FavoritesError state
-  - [ ] 5.8 Create FavoritesCubit in lib/cubits/favorites/favorites_cubit.dart
-  - [ ] 5.9 Implement loadFavorites() method
-  - [ ] 5.10 Implement toggleFavorite() method
-  - [ ] 5.11 Write cubit tests for FavoritesCubit
+- [x] 5. Create FavoritesCubit
+  - [x] 5.1 Create lib/cubits/favorites directory
+  - [x] 5.2 Create FavoritesState classes in lib/cubits/favorites/favorites_state.dart
+  - [x] 5.3 Implement FavoritesInitial state
+  - [x] 5.4 Implement FavoritesLoading state
+  - [x] 5.5 Implement FavoritesEmpty state
+  - [x] 5.6 Implement FavoritesLoaded state with separated events
+  - [x] 5.7 Implement FavoritesError state
+  - [x] 5.8 Create FavoritesCubit in lib/cubits/favorites/favorites_cubit.dart
+  - [x] 5.9 Implement loadFavorites() method
+  - [x] 5.10 Implement toggleFavorite() method
+  - [x] 5.11 Write cubit tests for FavoritesCubit
 
-- [ ] 6. Setup Dependency Injection
-  - [ ] 6.1 Create lib/di/service_locator.dart file
-  - [ ] 6.2 Import get_it package
-  - [ ] 6.3 Create getIt instance
-  - [ ] 6.4 Create setupDependencies() function
-  - [ ] 6.5 Register EventRepository as lazy singleton
-  - [ ] 6.6 Register EventListCubit as lazy singleton with loadEvents() call
-  - [ ] 6.7 Register FavoritesCubit as lazy singleton with loadFavorites() call
-  - [ ] 6.8 Update lib/main.dart to call setupDependencies() before runApp()
-  - [ ] 6.9 Remove RepositoryProvider from main.dart
+- [~] 6. Setup Dependency Injection
+  - [~] 6.1 Create lib/di/service_locator.dart file
+  - [~] 6.2 Import get_it package
+  - [~] 6.3 Create getIt instance
+  - [~] 6.4 Create setupDependencies() function
+  - [~] 6.5 Register EventRepository as lazy singleton
+  - [~] 6.6 Register EventListCubit as lazy singleton with loadEvents() call
+  - [~] 6.7 Register FavoritesCubit as lazy singleton with loadFavorites() call
+  - [~] 6.8 Update lib/main.dart to call setupDependencies() before runApp()
+  - [~] 6.9 Remove RepositoryProvider from main.dart
   - [ ] 6.10 Test dependency injection setup
 
-- [ ] 7. Integrate EventListScreen
-  - [ ] 7.1 Remove BlocProvider from EventListScreen
-  - [ ] 7.2 Update BlocBuilder to use bloc: getIt<EventListCubit>()
-  - [ ] 7.3 Implement loading state UI
-  - [ ] 7.4 Implement error state UI with retry button
-  - [ ] 7.5 Update _buildEventsList to use state.todayEvents, state.tomorrowEvents, state.upcomingEvents
-  - [ ] 7.6 Remove all hardcoded event data
-  - [ ] 7.7 Update search functionality to call getIt<EventListCubit>().searchEvents()
-  - [ ] 7.8 Update favorite toggle to call getIt<EventListCubit>().toggleFavorite()
-  - [ ] 7.9 Test EventListScreen integration
+- [~] 7. Integrate EventListScreen
+  - [~] 7.1 Remove BlocProvider from EventListScreen
+  - [~] 7.2 Update BlocBuilder to use bloc: getIt<EventListCubit>()
+  - [~] 7.3 Implement loading state UI
+  - [~] 7.4 Implement error state UI with retry button
+  - [~] 7.5 Update _buildEventsList to use state.todayEvents, state.tomorrowEvents, state.upcomingEvents
+  - [~] 7.6 Remove all hardcoded event data
+  - [~] 7.7 Update search functionality to call getIt<EventListCubit>().searchEvents()
+  - [~] 7.8 Update favorite toggle to call getIt<EventListCubit>().toggleFavorite()
+  - [~] 7.9 Test EventListScreen integration
 
-- [ ] 8. Integrate FavoritesScreen
-  - [ ] 8.1 Remove BlocProvider from FavoritesScreen
-  - [ ] 8.2 Update BlocBuilder to use bloc: getIt<FavoritesCubit>()
-  - [ ] 8.3 Implement loading state UI
-  - [ ] 8.4 Implement empty state UI (reuse existing _buildEmptyState)
-  - [ ] 8.5 Implement error state UI with retry button
-  - [ ] 8.6 Update _buildFavoritesList to use state.upcomingEvents and state.pastEvents
-  - [ ] 8.7 Remove all hardcoded FavoriteEvent data
-  - [ ] 8.8 Remove FavoriteEvent class (use Event model instead)
-  - [ ] 8.9 Update favorite toggle to call getIt<FavoritesCubit>().toggleFavorite()
-  - [ ] 8.10 Test FavoritesScreen integration
+- [~] 8. Integrate FavoritesScreen
+  - [~] 8.1 Remove BlocProvider from FavoritesScreen
+  - [~] 8.2 Update BlocBuilder to use bloc: getIt<FavoritesCubit>()
+  - [~] 8.3 Implement loading state UI
+  - [~] 8.4 Implement empty state UI (reuse existing _buildEmptyState)
+  - [~] 8.5 Implement error state UI with retry button
+  - [~] 8.6 Update _buildFavoritesList to use state.upcomingEvents and state.pastEvents
+  - [~] 8.7 Remove all hardcoded FavoriteEvent data
+  - [~] 8.8 Remove FavoriteEvent class (use Event model instead)
+  - [~] 8.9 Update favorite toggle to call getIt<FavoritesCubit>().toggleFavorite()
+  - [~] 8.10 Test FavoritesScreen integration
 
-- [ ] 9. Testing and Validation
-  - [ ] 9.1 Run all unit tests
-  - [ ] 9.2 Run all cubit tests
-  - [ ] 9.3 Write widget tests for EventListScreen
-  - [ ] 9.4 Write widget tests for FavoritesScreen
-  - [ ] 9.5 Test favorite toggle across both screens
-  - [ ] 9.6 Test search functionality
-  - [ ] 9.7 Test error handling and retry functionality
-  - [ ] 9.8 Test loading states
-  - [ ] 9.9 Test empty state on FavoritesScreen
-  - [ ] 9.10 Verify no hardcoded data remains in UI
+- [~] 9. Testing and Validation
+  - [~] 9.1 Run all unit tests
+  - [~] 9.2 Run all cubit tests
+  - [~] 9.3 Write widget tests for EventListScreen
+  - [~] 9.4 Write widget tests for FavoritesScreen
+  - [~] 9.5 Test favorite toggle across both screens
+  - [~] 9.6 Test search functionality
+  - [~] 9.7 Test error handling and retry functionality
+  - [~] 9.8 Test loading states
+  - [~] 9.9 Test empty state on FavoritesScreen
+  - [~] 9.10 Verify no hardcoded data remains in UI
 
-- [ ] 10. Code Quality and Documentation
-  - [ ] 10.1 Verify all code uses English (variables, comments, strings)
-  - [ ] 10.2 Add documentation comments to public APIs
-  - [ ] 10.3 Run task build-runner if using code generation
-  - [ ] 10.4 Fix any linting issues
-  - [ ] 10.5 Update README if needed
-  - [ ] 10.6 Remove any print statements (use logging framework)
+- [~] 10. Code Quality and Documentation
+  - [~] 10.1 Verify all code uses English (variables, comments, strings)
+  - [~] 10.2 Add documentation comments to public APIs
+  - [~] 10.3 Run task build-runner if using code generation
+  - [~] 10.4 Fix any linting issues
+  - [~] 10.5 Update README if needed
+  - [~] 10.6 Remove any print statements (use logging framework)
 
 ## Task Details
 
