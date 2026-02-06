@@ -49,6 +49,10 @@ dependencies:
   
   # Dependency injection
   get_it: ^7.6.0
+  
+  # Shared models and utilities
+  dancee_shared:
+    path: ../../shared/dancee_shared
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +78,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

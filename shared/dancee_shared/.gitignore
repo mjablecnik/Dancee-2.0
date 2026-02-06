@@ -1,0 +1,19 @@
+# Dart/Pub
+.dart_tool/
+.packages
+pubspec.lock
+build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Test coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db

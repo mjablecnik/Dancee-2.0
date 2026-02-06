@@ -4,9 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:dancee_app/cubits/event_list/event_list_cubit.dart';
 import 'package:dancee_app/cubits/event_list/event_list_state.dart';
 import 'package:dancee_app/repositories/event_repository.dart';
-import 'package:dancee_app/models/event.dart';
-import 'package:dancee_app/models/venue.dart';
-import 'package:dancee_app/models/address.dart';
+import 'package:dancee_shared/dancee_shared.dart';
 
 // Mock class for EventRepository
 class MockEventRepository extends Mock implements EventRepository {}

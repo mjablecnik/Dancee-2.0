@@ -1,8 +1,4 @@
-import '../models/event.dart';
-import '../models/venue.dart';
-import '../models/address.dart';
-import '../models/event_info.dart';
-import '../models/event_part.dart';
+import 'package:dancee_shared/dancee_shared.dart';
 
 /// Repository for managing event data.
 ///

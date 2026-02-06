@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/event_list/event_list_cubit.dart';
 import '../cubits/event_list/event_list_state.dart';
 import '../di/service_locator.dart';
-import '../models/event.dart';
+import 'package:dancee_shared/dancee_shared.dart';
 import '../i18n/translations.g.dart';
 
 class EventListScreen extends StatefulWidget {
