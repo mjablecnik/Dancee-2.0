@@ -34,6 +34,91 @@ Examples:
 - ✅ `// Calculate user score`
 - ❌ `// Vypočítej skóre uživatele`
 
+### 🌐 Internationalization (i18n) Requirements
+
+**CRITICAL**: The app supports multiple languages and ALL user-facing strings MUST be translated.
+
+#### Supported Languages:
+- **English (en)** - Base locale
+- **Czech (cs)** - Primary target audience
+- **Spanish (es)** - Additional language
+
+#### Localization System:
+The app uses **slang_flutter** for type-safe translations.
+
+**NEVER hardcode user-facing strings in code!**
+
+❌ **WRONG:**
+```dart
+Text('Events')  // Hardcoded string
+Text('${count} events')  // Hardcoded with interpolation
+```
+
+✅ **CORRECT:**
+```dart
+Text(t.events)  // Using slang translation
+Text(t.eventsCount(count: count))  // With parameters
+```
+
+#### Adding New Translations:
+
+1. **Add to all language files** in `lib/i18n/`:
+   - `strings.i18n.json` (English - base)
+   - `strings_cs.i18n.json` (Czech)
+   - `strings_es.i18n.json` (Spanish)
+
+2. **Simple string:**
+```json
+{
+  "myNewKey": "My new text"
+}
+```
+
+3. **String with parameters** (use `{paramName}` syntax):
+```json
+{
+  "welcomeUser": "Welcome, {name}!",
+  "itemCount": "{count} items"
+}
+```
+
+4. **Generate translations:**
+```bash
+task slang
+```
+
+5. **Use in code:**
+```dart
+import '../i18n/translations.g.dart';
+
+// Simple string
+Text(t.myNewKey)
+
+// With parameters (named parameters required)
+Text(t.welcomeUser(name: userName))
+Text(t.itemCount(count: items.length))
+```
+
+#### Translation Tasks:
+- `task slang` - Generate translations from JSON files
+- `task slang-watch` - Auto-regenerate on file changes (use during development)
+- `task slang-analyze` - Check for missing translation keys
+
+#### Important Rules:
+1. **Always add translations to ALL language files** (en, cs, es)
+2. **Never hardcode user-facing strings** in Dart code
+3. **Use named parameters** for parameterized strings: `t.method(param: value)`
+4. **Run `task slang`** after modifying translation files
+5. **Import translations**: `import '../i18n/translations.g.dart';`
+6. **Access via global `t`**: No need for `context` or `of(context)`
+
+#### Common Mistakes to Avoid:
+❌ Hardcoding strings: `Text('Hello')`
+❌ Missing language: Only adding to English file
+❌ Wrong parameter syntax: `t.eventsCount(5)` instead of `t.eventsCount(count: 5)`
+❌ Forgetting to regenerate: Not running `task slang` after changes
+❌ Using old system: `AppLocalizations.of(context)` (deprecated)
+
 ### 🛠️ Task Management
 
 This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands when suggesting or running commands:
@@ -56,6 +141,11 @@ This project uses **Taskfile** for automation. Always use tasks instead of direc
 - `task build-runner-watch` - Run in watch mode
 - `task build-runner-clean` - Clean generated files
 
+#### Translation Tasks:
+- `task slang` - Generate translations from JSON files
+- `task slang-watch` - Watch and auto-regenerate translations
+- `task slang-analyze` - Analyze translations for missing keys
+
 ### 📱 Platform Support
 
 The app supports three platforms:
@@ -70,8 +160,9 @@ When working with this project:
 1. **Setup**: Always suggest `task get-deps` to install dependencies
 2. **Development**: Recommend `task run-web` for quick testing
 3. **Code Generation**: Use `task build-runner-watch` when working with generated code
-4. **Testing**: Suggest testing on multiple platforms when relevant
-5. **Build**: Use appropriate build tasks for production builds
+4. **Translations**: Use `task slang-watch` when working with translations
+5. **Testing**: Suggest testing on multiple platforms when relevant
+6. **Build**: Use appropriate build tasks for production builds
 
 ### 📋 Code Standards for AI
 
@@ -82,15 +173,21 @@ When generating or modifying code:
 - Ensure cross-platform compatibility
 - Use proper state management patterns
 - Never use Czech language in any code elements
+- **ALWAYS use slang translations for user-facing strings** - never hardcode text
+- **Add translations to ALL language files** (en, cs, es) when creating new strings
+- **Run `task slang`** after modifying translation files
 
 ### 🚨 Before Making Changes
 
 As Kiro AI, always:
 1. Check current taskfile.yaml for available commands
 2. Ensure all new code follows English-only rule
-3. Consider cross-platform implications
-4. Use build runner tasks for code generation needs
-5. Suggest appropriate task commands instead of direct Flutter commands
+3. **Ensure all user-facing strings use slang translations** (never hardcode)
+4. **Add translations to ALL language files** when creating new strings
+5. Consider cross-platform implications
+6. Use build runner tasks for code generation needs
+7. **Run `task slang`** after modifying translation files
+8. Suggest appropriate task commands instead of direct Flutter commands
 
 ### 📞 Quick Commands Reference
 
@@ -104,6 +201,11 @@ task run-web
 # Code generation
 task build-runner-watch
 
+# Translations
+task slang              # Generate translations
+task slang-watch        # Auto-regenerate translations
+task slang-analyze      # Check for missing keys
+
 # Build for production
 task build-web
 task build-android
@@ -113,10 +215,14 @@ task build-ios
 ### 🤖 AI-Specific Instructions
 
 - Always prioritize English language usage in all generated content
+- **CRITICAL: Never hardcode user-facing strings** - always use slang translations
+- **When adding new UI text**: Add to all 3 language files (en, cs, es) and run `task slang`
 - Utilize taskfile commands in all suggestions
 - Consider Flutter best practices and cross-platform compatibility
 - When creating new files, ensure they follow the project structure
 - Suggest appropriate testing strategies for multi-platform development
 - Be aware of Flutter-specific patterns and state management approaches
+- **Import translations**: Always include `import '../i18n/translations.g.dart';` in UI files
+- **Use global `t` variable** for translations: `t.keyName` or `t.method(param: value)`
 
 Remember: This guide ensures consistency and maintainability for international development teams working on the Dancee App project.

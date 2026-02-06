@@ -4,6 +4,7 @@ A beautiful Flutter mobile app for discovering and browsing dance events in Czec
 
 ## Features
 
+- **Multi-language Support** - English, Czech, and Spanish
 - **Beautiful Gradient Header** - Eye-catching purple-to-pink gradient design
 - **Search Functionality** - Search for dance events with real-time filtering
 - **Event Filtering** - Filter by dance style, location, and date
@@ -55,7 +56,12 @@ A beautiful Flutter mobile app for discovering and browsing dance events in Czec
    task get-deps
    ```
 
-4. Run the app:
+4. Generate translations (if needed):
+   ```bash
+   task slang
+   ```
+
+5. Run the app:
    ```bash
    # For web (recommended for development)
    task run-web
@@ -74,6 +80,11 @@ lib/
 ├── main.dart                    # App entry point
 ├── di/
 │   └── service_locator.dart     # Dependency injection setup
+├── i18n/
+│   ├── strings.i18n.json        # English translations (base)
+│   ├── strings_cs.i18n.json     # Czech translations
+│   ├── strings_es.i18n.json     # Spanish translations
+│   └── translations.g.dart      # Generated translation code (do not edit)
 ├── models/
 │   ├── address.dart             # Address model
 │   ├── venue.dart               # Venue model
@@ -102,6 +113,74 @@ lib/
 - `equatable`: Value equality for models
 - `get_it`: Dependency injection
 - `cupertino_icons`: iOS-style icons
+- `slang`: Type-safe internationalization
+- `slang_flutter`: Flutter integration for slang
+- `intl`: Internationalization utilities
+
+## Internationalization (i18n)
+
+The app supports multiple languages using **slang_flutter** for type-safe translations.
+
+### Supported Languages
+
+- **English (en)** - Base locale
+- **Czech (cs)** - Primary target audience  
+- **Spanish (es)** - Additional language
+
+### Adding New Translations
+
+1. **Add to all language files** in `lib/i18n/`:
+   - `strings.i18n.json` (English)
+   - `strings_cs.i18n.json` (Czech)
+   - `strings_es.i18n.json` (Spanish)
+
+2. **Simple string:**
+   ```json
+   {
+     "myNewKey": "My new text"
+   }
+   ```
+
+3. **String with parameters:**
+   ```json
+   {
+     "welcomeUser": "Welcome, {name}!",
+     "itemCount": "{count} items"
+   }
+   ```
+
+4. **Generate translations:**
+   ```bash
+   task slang
+   ```
+
+5. **Use in code:**
+   ```dart
+   import '../i18n/translations.g.dart';
+   
+   // Simple string
+   Text(t.myNewKey)
+   
+   // With parameters (named parameters required)
+   Text(t.welcomeUser(name: userName))
+   Text(t.itemCount(count: items.length))
+   ```
+
+### Translation Commands
+
+```bash
+task slang              # Generate translations
+task slang-watch        # Auto-regenerate on file changes
+task slang-analyze      # Check for missing keys
+```
+
+### Important Rules
+
+- ✅ **Always use translations**: `Text(t.events)` 
+- ❌ **Never hardcode strings**: `Text('Events')`
+- ✅ **Add to ALL language files** (en, cs, es)
+- ✅ **Use named parameters**: `t.eventsCount(count: 5)`
+- ✅ **Run `task slang`** after modifying translation files
 
 ## Design
 
@@ -110,7 +189,7 @@ The app follows the design from `design/event-list.html` with:
 - Clean card-based layout
 - Intuitive filtering system
 - Responsive design for mobile devices
-- Czech language interface
+- Multi-language support (English, Czech, Spanish)
 
 ## Architecture
 
@@ -134,8 +213,21 @@ The app is built with Flutter and uses:
 - Google Fonts (Inter)
 - Cubit for state management
 - Repository pattern for data access
+- **slang_flutter** for type-safe internationalization
 - Custom color schemes for dance style tags
 - Taskfile for automation
+
+### Development Workflow
+
+For active development with translations:
+
+```bash
+# Terminal 1: Watch translations
+task slang-watch
+
+# Terminal 2: Run app
+task run-web
+```
 
 ## Running the App
 
