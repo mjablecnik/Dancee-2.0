@@ -106,6 +106,54 @@ class Event extends Equatable {
     );
   }
 
+  /// Converts this Event to a JSON map.
+  /// Dates are serialized as ISO 8601 strings.
+  /// Duration is serialized as total seconds (integer).
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'organizer': organizer,
+      'venue': venue.toJson(),
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime.toIso8601String(),
+      'duration': duration.inSeconds,
+      'dances': dances,
+      'info': info.map((i) => i.toJson()).toList(),
+      'parts': parts.map((p) => p.toJson()).toList(),
+      'isFavorite': isFavorite,
+      'isPast': isPast,
+      'badge': badge,
+    };
+  }
+
+  /// Creates an Event from a JSON map.
+  /// ISO 8601 date strings are converted back to DateTime objects.
+  /// Duration in seconds is converted back to a Duration object.
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      organizer: json['organizer'] as String,
+      venue: Venue.fromJson(json['venue'] as Map<String, dynamic>),
+      startTime: DateTime.parse(json['startTime'] as String),
+      endTime: DateTime.parse(json['endTime'] as String),
+      duration: Duration(seconds: json['duration'] as int),
+      dances: (json['dances'] as List<dynamic>).cast<String>(),
+      info: (json['info'] as List<dynamic>)
+          .map((i) => EventInfo.fromJson(i as Map<String, dynamic>))
+          .toList(),
+      parts: (json['parts'] as List<dynamic>)
+          .map((p) => EventPart.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      isPast: json['isPast'] as bool? ?? false,
+      badge: json['badge'] as String?,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

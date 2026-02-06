@@ -6,7 +6,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
 
 ## Tasks
 
-- [ ] 1. Add JSON serialization to shared models
+- [x] 1. Add JSON serialization to shared models
   - Navigate to shared/dancee_shared package
   - Verify Event, Venue, Address, EventPart, EventInfo models exist
   - Add toJson() and fromJson() methods to all models if not present
@@ -23,7 +23,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
   - **Property 8: Enum Serialization to Strings**
   - **Validates: Requirements 8.3**
 
-- [ ] 2. Update dancee_event_service dependencies
+- [x] 2. Update dancee_event_service dependencies
   - Add dancee_shared as path dependency in pubspec.yaml (path: ../../shared/dancee_shared)
   - Add dart:convert for JSON handling
   - Verify all dependencies are compatible
@@ -31,7 +31,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
   - _Requirements: 11.5_
 
 - [ ] 3. Implement repository layer
-  - [ ] 3.1 Create EventRepository with in-memory storage
+  - [x] 3.1 Create EventRepository with in-memory storage
     - Create lib/repositories/event_repository.dart
     - Implement List<Event> storage
     - Implement getAllEvents(), eventExists(), getEventById()
@@ -45,7 +45,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - Test getEventById returns correct event
     - _Requirements: 7.1, 7.3_
   
-  - [ ] 3.3 Create FavoritesRepository with in-memory storage
+  - [x] 3.3 Create FavoritesRepository with in-memory storage
     - Create lib/repositories/favorites_repository.dart
     - Implement Map<String, List<Event>> storage
     - Implement getFavorites(), addFavorite(), removeFavorite()
@@ -61,12 +61,12 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - _Requirements: 7.2_
 
 - [ ] 4. Implement service layer
-  - [ ] 4.1 Create ServiceResult class
+  - [x] 4.1 Create ServiceResult class
     - Create lib/models/service_result.dart
     - Implement success and error factory constructors
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [ ] 4.2 Create EventService
+  - [x] 4.2 Create EventService
     - Create lib/services/event_service.dart
     - Implement getAllEvents() method
     - Wire to EventRepository
@@ -76,7 +76,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - Test getAllEvents returns all events from repository
     - _Requirements: 1.1_
   
-  - [ ] 4.4 Create FavoritesService
+  - [x] 4.4 Create FavoritesService
     - Create lib/services/favorites_service.dart
     - Implement getFavorites(), addFavorite(), removeFavorite()
     - Validate eventId exists before adding/removing
@@ -91,12 +91,12 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - Test removeFavorite with invalid eventId returns 404 error
     - _Requirements: 2.1, 3.1, 3.4, 4.1, 4.5_
 
-- [ ] 5. Checkpoint - Ensure all tests pass
+- [x] 5. Checkpoint - Ensure all tests pass
   - Run dart test to verify all unit and property tests pass
   - Ensure all tests pass, ask the user if questions arise
 
 - [ ] 6. Implement API handlers
-  - [ ] 6.1 Create EventsHandler
+  - [x] 6.1 Create EventsHandler
     - Create lib/handlers/events_handler.dart
     - Implement listEvents() method
     - Return JSON array of events with 200 status
@@ -108,7 +108,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - Test error handling returns 500 with error JSON
     - _Requirements: 1.1, 1.6, 6.4, 6.5_
   
-  - [ ] 6.3 Create FavoritesHandler
+  - [x] 6.3 Create FavoritesHandler
     - Create lib/handlers/favorites_handler.dart
     - Implement listFavorites() - validate userId, return favorites array
     - Implement addFavorite() - validate body, return 201 or error
@@ -129,7 +129,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - Test removeFavorite with non-existent eventId returns 404
     - _Requirements: 2.1, 2.2, 2.3, 3.1, 3.2, 3.4, 3.5, 4.1, 4.2, 4.4, 6.2, 6.3, 6.5, 8.5_
   
-  - [ ] 6.5 Create HealthHandler
+  - [x] 6.5 Create HealthHandler
     - Create lib/handlers/health_handler.dart
     - Implement healthHandler() function
     - Return 200 with JSON containing status and service name
@@ -140,7 +140,7 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - _Requirements: 9.1, 9.2, 9.3_
 
 - [ ] 7. Implement CORS middleware
-  - [ ] 7.1 Create CORS middleware
+  - [x] 7.1 Create CORS middleware
     - Create lib/middleware/cors_middleware.dart
     - Implement corsMiddleware() function
     - Handle OPTIONS preflight requests with 200
@@ -153,14 +153,14 @@ This implementation plan breaks down the REST API Event Service into discrete co
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [ ] 8. Implement router and server setup
-  - [ ] 8.1 Create router configuration
+  - [x] 8.1 Create router configuration
     - Create lib/router.dart
     - Implement configureRoutes() function
     - Define all API routes (GET /api/events, GET/POST/DELETE /api/favorites, GET /health)
     - Wire handlers to routes
     - _Requirements: 1.1, 2.1, 3.1, 4.1, 9.1_
   
-  - [ ] 8.2 Update bin/server.dart with complete setup
+  - [x] 8.2 Update bin/server.dart with complete setup
     - Initialize all repositories, services, and handlers
     - Configure router with all routes
     - Set up pipeline with logRequests and CORS middleware

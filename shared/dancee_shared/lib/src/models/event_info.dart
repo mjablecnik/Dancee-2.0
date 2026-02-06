@@ -53,6 +53,28 @@ class EventInfo extends Equatable {
     );
   }
 
+  /// Converts this EventInfo to a JSON map.
+  /// The enum type is serialized as a string.
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.name,
+      'key': key,
+      'value': value,
+    };
+  }
+
+  /// Creates an EventInfo from a JSON map.
+  /// The type string is converted back to an EventInfoType enum.
+  factory EventInfo.fromJson(Map<String, dynamic> json) {
+    return EventInfo(
+      type: EventInfoType.values.firstWhere(
+        (e) => e.name == json['type'],
+      ),
+      key: json['key'] as String,
+      value: json['value'] as String,
+    );
+  }
+
   @override
   List<Object?> get props => [type, key, value];
 }

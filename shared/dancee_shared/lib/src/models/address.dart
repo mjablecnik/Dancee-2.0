@@ -45,6 +45,26 @@ class Address extends Equatable {
   /// Example: "Vodičkova 36, 110 00 Prague, Czech Republic"
   String get fullAddress => '$street, $postalCode $city, $country';
 
+  /// Converts this Address to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'street': street,
+      'city': city,
+      'postalCode': postalCode,
+      'country': country,
+    };
+  }
+
+  /// Creates an Address from a JSON map.
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      street: json['street'] as String,
+      city: json['city'] as String,
+      postalCode: json['postalCode'] as String,
+      country: json['country'] as String,
+    );
+  }
+
   @override
   List<Object?> get props => [street, city, postalCode, country];
 }

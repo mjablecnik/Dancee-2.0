@@ -46,6 +46,28 @@ class Venue extends Equatable {
     );
   }
 
+  /// Converts this Venue to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'address': address.toJson(),
+      'description': description,
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+  }
+
+  /// Creates a Venue from a JSON map.
+  factory Venue.fromJson(Map<String, dynamic> json) {
+    return Venue(
+      name: json['name'] as String,
+      address: Address.fromJson(json['address'] as Map<String, dynamic>),
+      description: json['description'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+    );
+  }
+
   @override
   List<Object?> get props => [name, address, description, latitude, longitude];
 }

@@ -72,6 +72,38 @@ class EventPart extends Equatable {
     );
   }
 
+  /// Converts this EventPart to a JSON map.
+  /// Dates are serialized as ISO 8601 strings.
+  /// The enum type is serialized as a string.
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'type': type.name,
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime.toIso8601String(),
+      'lectors': lectors,
+      'djs': djs,
+    };
+  }
+
+  /// Creates an EventPart from a JSON map.
+  /// ISO 8601 date strings are converted back to DateTime objects.
+  /// The type string is converted back to an EventPartType enum.
+  factory EventPart.fromJson(Map<String, dynamic> json) {
+    return EventPart(
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      type: EventPartType.values.firstWhere(
+        (e) => e.name == json['type'],
+      ),
+      startTime: DateTime.parse(json['startTime'] as String),
+      endTime: DateTime.parse(json['endTime'] as String),
+      lectors: (json['lectors'] as List<dynamic>?)?.cast<String>(),
+      djs: (json['djs'] as List<dynamic>?)?.cast<String>(),
+    );
+  }
+
   @override
   List<Object?> get props => [name, description, type, startTime, endTime, lectors, djs];
 }
