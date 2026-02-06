@@ -20,8 +20,74 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 │       ├── test/            # Test files
 │       ├── taskfile.yaml    # Task automation file
 │       └── pubspec.yaml     # Flutter dependencies
-└── backend/                 # Backend services (if applicable)
+├── backend/
+│   └── dancee_event_service/ # Backend services
+└── shared/
+    └── dancee_shared/       # Shared code between frontend and backend
+        └── lib/
+            └── src/
+                └── models/  # Shared data models
 ```
+
+### 📦 Shared Code Package (`dancee_shared`)
+
+**CRITICAL**: When code needs to be used by BOTH frontend and backend, it MUST be placed in the `dancee_shared` package.
+
+#### Purpose:
+The `dancee_shared` package serves as a common library for code that is shared between the frontend Flutter app and the backend Dart services.
+
+#### What Goes in `dancee_shared`:
+- **Data models** (e.g., Event, Venue, Address, EventInfo, EventPart)
+- **DTOs** (Data Transfer Objects) used in API communication
+- **Shared utilities** and helper functions
+- **Constants** used across frontend and backend
+- **Validation logic** that needs to be consistent
+- **Serialization/deserialization** code
+
+#### What Does NOT Go in `dancee_shared`:
+- UI components (frontend-only)
+- State management (frontend-only)
+- Server-specific logic (backend-only)
+- Platform-specific code
+
+#### Usage:
+
+**In Frontend (`frontend/dancee_app/pubspec.yaml`):**
+```yaml
+dependencies:
+  dancee_shared:
+    path: ../../shared/dancee_shared
+```
+
+**In Backend (`backend/dancee_event_service/pubspec.yaml`):**
+```yaml
+dependencies:
+  dancee_shared:
+    path: ../../shared/dancee_shared
+```
+
+**Importing in Code:**
+```dart
+import 'package:dancee_shared/dancee_shared.dart';
+```
+
+#### Important Rules:
+1. **Always check if code should be shared** before placing it in frontend or backend
+2. **Models used in API contracts MUST be in `dancee_shared`**
+3. **Keep `dancee_shared` dependency-light** - avoid heavy dependencies
+4. **No Flutter dependencies** in `dancee_shared` (it's pure Dart)
+5. **Document shared models** thoroughly since they're used in multiple places
+6. **Version carefully** - changes affect both frontend and backend
+
+#### Example:
+If you're creating an `Event` model that the backend returns via API and the frontend consumes, it MUST go in:
+```
+shared/dancee_shared/lib/src/models/event.dart
+```
+
+Not in:
+- ❌ `frontend/dancee_app/lib/models/event.dart`
+- ❌ `backend/dancee_event_service/lib/models/event.dart`
 
 ## Critical Development Guidelines for Kiro AI
 
@@ -217,6 +283,7 @@ task build-ios
 - Always prioritize English language usage in all generated content
 - **CRITICAL: Never hardcode user-facing strings** - always use slang translations
 - **When adding new UI text**: Add to all 3 language files (en, cs, es) and run `task slang`
+- **Check if code should be shared**: If models or logic are used by both frontend and backend, place them in `dancee_shared`
 - Utilize taskfile commands in all suggestions
 - Consider Flutter best practices and cross-platform compatibility
 - When creating new files, ensure they follow the project structure
@@ -224,5 +291,6 @@ task build-ios
 - Be aware of Flutter-specific patterns and state management approaches
 - **Import translations**: Always include `import '../i18n/translations.g.dart';` in UI files
 - **Use global `t` variable** for translations: `t.keyName` or `t.method(param: value)`
+- **Keep `dancee_shared` pure Dart** - no Flutter dependencies allowed
 
 Remember: This guide ensures consistency and maintainability for international development teams working on the Dancee App project.
