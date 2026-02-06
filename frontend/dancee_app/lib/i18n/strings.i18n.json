@@ -26,5 +26,10 @@
   "errorLoadingFavorites": "Error Loading Favorites",
   "dancee": "Dancee",
   "tuesdayDate": "(Tuesday {date})",
-  "wednesdayDate": "(Wednesday {date})"
+  "wednesdayDate": "(Wednesday {date})",
+  "apiErrorNetwork": "Connection error. Please check your internet connection.",
+  "apiErrorTimeout": "Request timeout. Please try again.",
+  "apiErrorServer": "Server error occurred. Please try again later.",
+  "apiErrorParsing": "Failed to process server response.",
+  "apiErrorGeneric": "An unexpected error occurred. Please try again."
 }

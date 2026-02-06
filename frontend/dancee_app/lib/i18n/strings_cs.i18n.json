@@ -26,5 +26,10 @@
   "errorLoadingFavorites": "Chyba při načítání oblíbených",
   "dancee": "Dancee",
   "tuesdayDate": "(Úterý {date})",
-  "wednesdayDate": "(Středa {date})"
+  "wednesdayDate": "(Středa {date})",
+  "apiErrorNetwork": "Chyba připojení. Zkontrolujte prosím své internetové připojení.",
+  "apiErrorTimeout": "Vypršel časový limit požadavku. Zkuste to prosím znovu.",
+  "apiErrorServer": "Došlo k chybě serveru. Zkuste to prosím později.",
+  "apiErrorParsing": "Nepodařilo se zpracovat odpověď serveru.",
+  "apiErrorGeneric": "Došlo k neočekávané chybě. Zkuste to prosím znovu."
 }

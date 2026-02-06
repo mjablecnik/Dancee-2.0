@@ -50,6 +50,9 @@ dependencies:
   # Dependency injection
   get_it: ^7.6.0
   
+  # HTTP client
+  dio: ^5.4.0
+  
   # Shared models and utilities
   dancee_shared:
     path: ../../shared/dancee_shared
