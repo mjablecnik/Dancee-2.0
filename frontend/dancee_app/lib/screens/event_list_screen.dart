@@ -5,6 +5,7 @@ import '../cubits/event_list/event_list_cubit.dart';
 import '../cubits/event_list/event_list_state.dart';
 import '../di/service_locator.dart';
 import '../models/event.dart';
+import '../l10n/app_localizations.dart';
 
 class EventListScreen extends StatefulWidget {
   const EventListScreen({super.key});
@@ -85,7 +86,7 @@ class _EventListScreenState extends State<EventListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Error Loading Events',
+            AppLocalizations.of(context)!.errorLoadingEvents,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -115,7 +116,7 @@ class _EventListScreenState extends State<EventListScreen> {
               ),
             ),
             child: Text(
-              'Retry',
+              AppLocalizations.of(context)!.retry,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -210,7 +211,7 @@ class _EventListScreenState extends State<EventListScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Dancee',
+                            AppLocalizations.of(context)!.dancee,
                             style: GoogleFonts.inter(
                               fontSize: titleFontSize,
                               fontWeight: FontWeight.bold, // font-bold
@@ -275,7 +276,7 @@ class _EventListScreenState extends State<EventListScreen> {
           color: const Color(0xFF0F172A),
         ),
         decoration: InputDecoration(
-          hintText: 'Search events...',
+          hintText: AppLocalizations.of(context)!.searchEvents,
           hintStyle: GoogleFonts.inter(
             color: Colors.grey[400],
           ),
@@ -306,11 +307,11 @@ class _EventListScreenState extends State<EventListScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFilterChip('Filters', hasNotification: true, notificationCount: 2),
+          _buildFilterChip(AppLocalizations.of(context)!.filters, hasNotification: true, notificationCount: 2),
           const SizedBox(width: 8),
-          _buildFilterChip('Today', icon: Icons.calendar_today),
+          _buildFilterChip(AppLocalizations.of(context)!.today, icon: Icons.calendar_today),
           const SizedBox(width: 8),
-          _buildFilterChip('Prague', icon: Icons.location_on),
+          _buildFilterChip(AppLocalizations.of(context)!.prague, icon: Icons.location_on),
         ],
       ),
     );
@@ -386,9 +387,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Today',
-          '(Tuesday 4.2.2025)',
-          '${events.length} events',
+          AppLocalizations.of(context)!.today,
+          AppLocalizations.of(context)!.tuesdayDate('4.2.2025'),
+          AppLocalizations.of(context)!.eventsCount(events.length),
           Icons.calendar_today,
           const Color(0xFF6366F1),
         ),
@@ -404,9 +405,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Tomorrow',
-          '(Wednesday 5.2.2025)',
-          '${events.length} events',
+          AppLocalizations.of(context)!.tomorrow,
+          AppLocalizations.of(context)!.wednesdayDate('5.2.2025'),
+          AppLocalizations.of(context)!.eventsCount(events.length),
           Icons.calendar_month,
           const Color(0xFF8B5CF6),
         ),
@@ -422,9 +423,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'This week',
+          AppLocalizations.of(context)!.thisWeek,
           '',
-          '${events.length} events',
+          AppLocalizations.of(context)!.eventsCount(events.length),
           Icons.calendar_view_week,
           const Color(0xFFEC4899),
         ),
@@ -651,7 +652,7 @@ class _EventListScreenState extends State<EventListScreen> {
                     Row(
                       children: [
                         Text(
-                          "Detail",
+                          AppLocalizations.of(context)!.detail,
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: Colors.grey[600],

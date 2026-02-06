@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/event_list_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'di/service_locator.dart';
+import 'l10n/app_localizations.dart';
 
 void main() {
   setupDependencies();
@@ -15,6 +17,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Dancee App',
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('cs'),
+        Locale('es'),
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6366F1)),
         useMaterial3: true,
@@ -68,9 +81,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.calendar_today, 'Events', 0),
-              _buildNavItem(Icons.favorite, 'Favorites', 1),
-              _buildNavItem(Icons.settings, 'Settings', 2),
+              _buildNavItem(Icons.calendar_today, (ctx) => AppLocalizations.of(ctx)!.events, 0),
+              _buildNavItem(Icons.favorite, (ctx) => AppLocalizations.of(ctx)!.favorites, 1),
+              _buildNavItem(Icons.settings, (ctx) => AppLocalizations.of(ctx)!.settings, 2),
             ],
           ),
         ),
@@ -78,7 +91,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(IconData icon, String Function(BuildContext) labelBuilder, int index) {
     final bool isActive = _currentIndex == index;
     return GestureDetector(
       onTap: () {
@@ -103,7 +116,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              label,
+              labelBuilder(context),
               style: TextStyle(
                 fontSize: 12,
                 color: isActive ? const Color(0xFF6366F1) : Colors.grey[400],

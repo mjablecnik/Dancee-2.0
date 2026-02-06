@@ -46,3 +46,6 @@ app.*.map.json
 
 *.g.dart
 *.freezed.dart
+
+# Generated localization files
+lib/l10n/

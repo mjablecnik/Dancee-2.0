@@ -1,0 +1,168 @@
+{
+  "@@locale": "en",
+  
+  "appTitle": "Dancee App",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "events": "Events",
+  "@events": {
+    "description": "Events tab label"
+  },
+  
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Favorites tab label"
+  },
+  
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings tab label"
+  },
+  
+  "searchEvents": "Search events...",
+  "@searchEvents": {
+    "description": "Search bar placeholder text"
+  },
+  
+  "filters": "Filters",
+  "@filters": {
+    "description": "Filters button label"
+  },
+  
+  "today": "Today",
+  "@today": {
+    "description": "Today filter label"
+  },
+  
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "Tomorrow label"
+  },
+  
+  "thisWeek": "This week",
+  "@thisWeek": {
+    "description": "This week label"
+  },
+  
+  "thisMonth": "This month",
+  "@thisMonth": {
+    "description": "This month label"
+  },
+  
+  "prague": "Prague",
+  "@prague": {
+    "description": "Prague city name"
+  },
+  
+  "eventsCount": "{count} events",
+  "@eventsCount": {
+    "description": "Number of events",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "detail": "Detail",
+  "@detail": {
+    "description": "Detail button label"
+  },
+  
+  "hours": "{count} hours",
+  "@hours": {
+    "description": "Duration in hours",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "errorLoadingEvents": "Error Loading Events",
+  "@errorLoadingEvents": {
+    "description": "Error message title when events fail to load"
+  },
+  
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  
+  "favoriteEvents": "Favorite Events",
+  "@favoriteEvents": {
+    "description": "Favorite events screen title"
+  },
+  
+  "savedEvents": "{count} saved events",
+  "@savedEvents": {
+    "description": "Number of saved events",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "all": "All",
+  "@all": {
+    "description": "All filter label"
+  },
+  
+  "upcomingEvents": "Upcoming Events",
+  "@upcomingEvents": {
+    "description": "Upcoming events section title"
+  },
+  
+  "pastEvents": "Past Events",
+  "@pastEvents": {
+    "description": "Past events section title"
+  },
+  
+  "noFavoriteEvents": "No Favorite Events",
+  "@noFavoriteEvents": {
+    "description": "Empty state title for favorites"
+  },
+  
+  "noFavoriteEventsDescription": "You haven't saved any favorite events yet. Start exploring dance events and save the ones that interest you.",
+  "@noFavoriteEventsDescription": {
+    "description": "Empty state description for favorites"
+  },
+  
+  "browseEvents": "Browse Events",
+  "@browseEvents": {
+    "description": "Browse events button label"
+  },
+  
+  "errorLoadingFavorites": "Error Loading Favorites",
+  "@errorLoadingFavorites": {
+    "description": "Error message title when favorites fail to load"
+  },
+  
+  "dancee": "Dancee",
+  "@dancee": {
+    "description": "App name in header"
+  },
+  
+  "tuesdayDate": "(Tuesday {date})",
+  "@tuesdayDate": {
+    "description": "Tuesday with date",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "wednesdayDate": "(Wednesday {date})",
+  "@wednesdayDate": {
+    "description": "Wednesday with date",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
+}
