@@ -5,7 +5,7 @@ import '../cubits/event_list/event_list_cubit.dart';
 import '../cubits/event_list/event_list_state.dart';
 import '../di/service_locator.dart';
 import '../models/event.dart';
-import '../l10n/app_localizations.dart';
+import '../i18n/translations.g.dart';
 
 class EventListScreen extends StatefulWidget {
   const EventListScreen({super.key});
@@ -86,7 +86,7 @@ class _EventListScreenState extends State<EventListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            AppLocalizations.of(context)!.errorLoadingEvents,
+            t.errorLoadingEvents,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -116,7 +116,7 @@ class _EventListScreenState extends State<EventListScreen> {
               ),
             ),
             child: Text(
-              AppLocalizations.of(context)!.retry,
+              t.retry,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -211,7 +211,7 @@ class _EventListScreenState extends State<EventListScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppLocalizations.of(context)!.dancee,
+                            t.dancee,
                             style: GoogleFonts.inter(
                               fontSize: titleFontSize,
                               fontWeight: FontWeight.bold, // font-bold
@@ -276,7 +276,7 @@ class _EventListScreenState extends State<EventListScreen> {
           color: const Color(0xFF0F172A),
         ),
         decoration: InputDecoration(
-          hintText: AppLocalizations.of(context)!.searchEvents,
+          hintText: t.searchEvents,
           hintStyle: GoogleFonts.inter(
             color: Colors.grey[400],
           ),
@@ -307,11 +307,11 @@ class _EventListScreenState extends State<EventListScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFilterChip(AppLocalizations.of(context)!.filters, hasNotification: true, notificationCount: 2),
+          _buildFilterChip(t.filters, hasNotification: true, notificationCount: 2),
           const SizedBox(width: 8),
-          _buildFilterChip(AppLocalizations.of(context)!.today, icon: Icons.calendar_today),
+          _buildFilterChip(t.today, icon: Icons.calendar_today),
           const SizedBox(width: 8),
-          _buildFilterChip(AppLocalizations.of(context)!.prague, icon: Icons.location_on),
+          _buildFilterChip(t.prague, icon: Icons.location_on),
         ],
       ),
     );
@@ -387,9 +387,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          AppLocalizations.of(context)!.today,
-          AppLocalizations.of(context)!.tuesdayDate('4.2.2025'),
-          AppLocalizations.of(context)!.eventsCount(events.length),
+          t.today,
+          t.tuesdayDate(date: '4.2.2025'),
+          t.eventsCount(count: events.length),
           Icons.calendar_today,
           const Color(0xFF6366F1),
         ),
@@ -405,9 +405,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          AppLocalizations.of(context)!.tomorrow,
-          AppLocalizations.of(context)!.wednesdayDate('5.2.2025'),
-          AppLocalizations.of(context)!.eventsCount(events.length),
+          t.tomorrow,
+          t.wednesdayDate(date: '5.2.2025'),
+          t.eventsCount(count: events.length),
           Icons.calendar_month,
           const Color(0xFF8B5CF6),
         ),
@@ -423,9 +423,9 @@ class _EventListScreenState extends State<EventListScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          AppLocalizations.of(context)!.thisWeek,
+          t.thisWeek,
           '',
-          AppLocalizations.of(context)!.eventsCount(events.length),
+          t.eventsCount(count: events.length),
           Icons.calendar_view_week,
           const Color(0xFFEC4899),
         ),
@@ -652,7 +652,7 @@ class _EventListScreenState extends State<EventListScreen> {
                     Row(
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.detail,
+                          t.detail,
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: Colors.grey[600],

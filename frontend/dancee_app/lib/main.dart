@@ -3,11 +3,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/event_list_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'di/service_locator.dart';
-import 'l10n/app_localizations.dart';
+import 'i18n/translations.g.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  LocaleSettings.useDeviceLocale(); // Initialize slang with device locale
   setupDependencies();
-  runApp(const MyApp());
+  runApp(TranslationProvider(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,17 +19,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Dancee App',
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('cs'),
-        Locale('es'),
-      ],
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6366F1)),
         useMaterial3: true,
@@ -81,9 +75,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.calendar_today, (ctx) => AppLocalizations.of(ctx)!.events, 0),
-              _buildNavItem(Icons.favorite, (ctx) => AppLocalizations.of(ctx)!.favorites, 1),
-              _buildNavItem(Icons.settings, (ctx) => AppLocalizations.of(ctx)!.settings, 2),
+              _buildNavItem(Icons.calendar_today, (ctx) => t.events, 0),
+              _buildNavItem(Icons.favorite, (ctx) => t.favorites, 1),
+              _buildNavItem(Icons.settings, (ctx) => t.settings, 2),
             ],
           ),
         ),

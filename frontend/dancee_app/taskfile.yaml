@@ -49,6 +49,18 @@ tasks:
     desc: Clean build runner generated files
     cmd: flutter packages pub run build_runner clean
 
+  slang:
+    desc: Generate translations with slang
+    cmd: dart run slang
+
+  slang-watch:
+    desc: Watch and generate translations with slang
+    cmd: dart run slang watch
+
+  slang-analyze:
+    desc: Analyze translations for missing keys
+    cmd: dart run slang analyze
+
   test:
     desc: Run all Flutter tests
     cmd: flutter test

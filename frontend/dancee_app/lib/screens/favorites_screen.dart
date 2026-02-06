@@ -5,7 +5,7 @@ import '../cubits/favorites/favorites_cubit.dart';
 import '../cubits/favorites/favorites_state.dart';
 import '../di/service_locator.dart';
 import '../models/event.dart';
-import '../l10n/app_localizations.dart';
+import '../i18n/translations.g.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final ValueNotifier<int>? reloadTrigger;
@@ -87,7 +87,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            AppLocalizations.of(context)!.errorLoadingFavorites,
+            t.errorLoadingFavorites,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -117,7 +117,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               ),
             ),
             child: Text(
-              AppLocalizations.of(context)!.retry,
+              t.retry,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -141,7 +141,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         _buildFilterSection(),
         if (upcomingEvents.isNotEmpty) ...[
           SliverToBoxAdapter(
-            child: _buildSectionHeader(AppLocalizations.of(context)!.upcomingEvents),
+            child: _buildSectionHeader(t.upcomingEvents),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -157,7 +157,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ],
         if (pastEvents.isNotEmpty) ...[
           SliverToBoxAdapter(
-            child: _buildSectionHeader(AppLocalizations.of(context)!.pastEvents),
+            child: _buildSectionHeader(t.pastEvents),
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
@@ -198,7 +198,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  AppLocalizations.of(context)!.favoriteEvents,
+                  t.favoriteEvents,
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -207,7 +207,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  AppLocalizations.of(context)!.savedEvents(totalEvents),
+                  t.savedEvents(count: totalEvents),
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: Colors.white.withValues(alpha: 0.8),
@@ -237,13 +237,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildFilterChip(AppLocalizations.of(context)!.all, true),
+              _buildFilterChip(t.all, true),
               const SizedBox(width: 8),
-              _buildFilterChip(AppLocalizations.of(context)!.today, false),
+              _buildFilterChip(t.today, false),
               const SizedBox(width: 8),
-              _buildFilterChip(AppLocalizations.of(context)!.thisWeek, false),
+              _buildFilterChip(t.thisWeek, false),
               const SizedBox(width: 8),
-              _buildFilterChip(AppLocalizations.of(context)!.thisMonth, false),
+              _buildFilterChip(t.thisMonth, false),
             ],
           ),
         ),
@@ -500,7 +500,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       Row(
                         children: [
                           Text(
-                            AppLocalizations.of(context)!.detail,
+                            t.detail,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: event.isPast ? Colors.grey[500] : Colors.grey[600],
@@ -558,9 +558,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final eventDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
     
     if (eventDate == today) {
-      return AppLocalizations.of(context)!.today;
+      return t.today;
     } else if (eventDate == today.add(const Duration(days: 1))) {
-      return AppLocalizations.of(context)!.tomorrow;
+      return t.tomorrow;
     } else {
       final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       return '${months[dateTime.month - 1]} ${dateTime.day}';
@@ -687,7 +687,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              AppLocalizations.of(context)!.noFavoriteEvents,
+              t.noFavoriteEvents,
               style: GoogleFonts.inter(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -696,7 +696,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              AppLocalizations.of(context)!.noFavoriteEventsDescription,
+              t.noFavoriteEventsDescription,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
@@ -729,7 +729,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       const Icon(Icons.explore, color: Colors.white, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        AppLocalizations.of(context)!.browseEvents,
+                        t.browseEvents,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
