@@ -469,14 +469,9 @@ class _EventListScreenState extends State<EventListScreen> {
   }
 
   Widget _buildEventCard(Event event) {
-    // Format time
-    final startTime = '${event.startTime.hour.toString().padLeft(2, '0')}:${event.startTime.minute.toString().padLeft(2, '0')}';
-    final endTime = '${event.endTime.hour.toString().padLeft(2, '0')}:${event.endTime.minute.toString().padLeft(2, '0')}';
-    final timeString = '$startTime - $endTime';
-    
-    // Format duration
-    final hours = event.duration.inHours;
-    final durationString = '$hours hours';
+    // Format date and time
+    final dateFormat = _formatDate(event.startTime);
+    final timeFormat = _formatTime(event.startTime, event.endTime);
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -563,13 +558,13 @@ class _EventListScreenState extends State<EventListScreen> {
                           Row(
                             children: [
                               Icon(
-                                Icons.access_time,
+                                Icons.calendar_today,
                                 size: 12,
                                 color: const Color(0xFF6366F1),
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                timeString,
+                                dateFormat,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -577,17 +572,14 @@ class _EventListScreenState extends State<EventListScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              Container(
-                                width: 4,
-                                height: 4,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  shape: BoxShape.circle,
-                                ),
+                              Icon(
+                                Icons.access_time,
+                                size: 12,
+                                color: const Color(0xFF8B5CF6),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 4),
                               Text(
-                                durationString,
+                                timeFormat,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -754,5 +746,28 @@ class _EventListScreenState extends State<EventListScreen> {
       default:
         return Icons.music_note;
     }
+  }
+
+  String _formatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    
+    if (eventDate == today) {
+      return t.today;
+    } else if (eventDate == today.add(const Duration(days: 1))) {
+      return t.tomorrow;
+    } else {
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${months[dateTime.month - 1]} ${dateTime.day}';
+    }
+  }
+
+  String _formatTime(DateTime start, DateTime end) {
+    final startHour = start.hour.toString().padLeft(2, '0');
+    final startMinute = start.minute.toString().padLeft(2, '0');
+    final endHour = end.hour.toString().padLeft(2, '0');
+    final endMinute = end.minute.toString().padLeft(2, '0');
+    return '$startHour:$startMinute - $endHour:$endMinute';
   }
 }
