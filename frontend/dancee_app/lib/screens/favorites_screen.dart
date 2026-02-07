@@ -9,8 +9,9 @@ import '../i18n/translations.g.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final ValueNotifier<int>? reloadTrigger;
+  final VoidCallback? onNavigateToEvents;
   
-  const FavoritesScreen({super.key, this.reloadTrigger});
+  const FavoritesScreen({super.key, this.reloadTrigger, this.onNavigateToEvents});
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
@@ -711,9 +712,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () {
-                    // Navigate to events list
-                  },
+                  onTap: widget.onNavigateToEvents,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

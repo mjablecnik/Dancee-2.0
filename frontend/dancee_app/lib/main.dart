@@ -56,7 +56,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         index: _currentIndex,
         children: [
           const EventListScreen(),
-          FavoritesScreen(reloadTrigger: _reloadTrigger),
+          FavoritesScreen(
+            reloadTrigger: _reloadTrigger,
+            onNavigateToEvents: () {
+              setState(() {
+                _currentIndex = 0;
+              });
+            },
+          ),
         ],
       ),
       bottomNavigationBar: Container(
