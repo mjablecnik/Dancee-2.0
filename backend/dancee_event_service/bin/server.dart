@@ -17,7 +17,7 @@ void main(List<String> args) async {
   final eventRepository = EventRepository();
   final favoritesRepository = FavoritesRepository();
 
-  final eventService = EventService(eventRepository);
+  final eventService = EventService(eventRepository, favoritesRepository);
   final favoritesService = FavoritesService(favoritesRepository, eventRepository);
 
   final eventsHandler = EventsHandler(eventService);
@@ -37,7 +37,7 @@ void main(List<String> args) async {
   print('Server listening on port ${server.port}');
   print('Available endpoints:');
   print('  GET    /health                      - Health check');
-  print('  GET    /api/events                  - List all dance events');
+  print('  GET    /api/events?userId=<id>      - List all dance events (userId optional, marks favorites)');
   print('  GET    /api/favorites?userId=<id>   - List user\'s favorite events');
   print('  POST   /api/favorites               - Add event to favorites');
   print('  DELETE /api/favorites/<eventId>?userId=<id> - Remove event from favorites');

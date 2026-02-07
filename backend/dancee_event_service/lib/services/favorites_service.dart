@@ -26,7 +26,9 @@ class FavoritesService {
       );
     }
 
-    await _favoritesRepository.addFavorite(userId, event);
+    // Mark event as favorite before storing
+    final favoriteEvent = event.copyWith(isFavorite: true);
+    await _favoritesRepository.addFavorite(userId, favoriteEvent);
     return ServiceResult.success(statusCode: 201);
   }
 

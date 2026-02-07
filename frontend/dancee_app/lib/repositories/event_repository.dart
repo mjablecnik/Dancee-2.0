@@ -16,11 +16,15 @@ class EventRepository {
 
   /// Returns all events from the backend API.
   ///
-  /// Makes a GET request to /api/events and parses the response.
+  /// Makes a GET request to /api/events with userId query parameter
+  /// to mark favorite events. Parses the response.
   /// Throws ApiException on failure.
   Future<List<Event>> getAllEvents() async {
     try {
-      final response = await _apiClient.get('/api/events');
+      final response = await _apiClient.get(
+        '/api/events',
+        queryParameters: {'userId': ApiConfig.userId},
+      );
       
       if (response is! List) {
         throw ApiException(message: 'Invalid response format');

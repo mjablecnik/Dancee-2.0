@@ -11,9 +11,11 @@ class EventsHandler {
   EventsHandler(this._eventService);
 
   /// Handles GET /api/events requests to list all dance events.
+  /// Optionally accepts 'userId' query parameter to mark favorite events.
   Future<Response> listEvents(Request request) async {
     try {
-      final events = await _eventService.getAllEvents();
+      final userId = request.url.queryParameters['userId'];
+      final events = await _eventService.getAllEvents(userId: userId);
       final jsonEvents = events.map((event) => event.toJson()).toList();
       
       return Response.ok(
