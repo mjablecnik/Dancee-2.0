@@ -91,6 +91,49 @@ Not in:
 
 ## Critical Development Guidelines for Kiro AI
 
+### 💻 Development Environment
+
+**CRITICAL**: This project is developed in **WSL (Windows Subsystem for Linux)** running Ubuntu.
+
+#### Environment Requirements:
+- **Operating System**: Ubuntu on WSL
+- **Shell**: zsh-compatible commands
+- **Command Compatibility**: All terminal commands MUST be Linux/Unix compatible
+
+#### Command Guidelines:
+When suggesting or running terminal commands:
+- ✅ Use Linux/Unix commands: `ls`, `cp`, `rm`, `mkdir`, `cat`, etc.
+- ✅ Use forward slashes for paths: `lib/models/event.dart`
+- ✅ Use bash/zsh syntax: `&&`, `||`, `|`, etc.
+- ❌ Never use Windows CMD commands: `dir`, `copy`, `del`, etc.
+- ❌ Never use Windows PowerShell cmdlets: `Get-ChildItem`, `Copy-Item`, etc.
+- ❌ Never use backslashes for paths: `lib\models\event.dart`
+
+#### Examples:
+```bash
+# ✅ CORRECT (Linux/WSL)
+ls -la
+cp source.dart destination.dart
+rm -rf build/
+mkdir -p lib/models
+cat pubspec.yaml
+
+# ❌ WRONG (Windows)
+dir
+copy source.dart destination.dart
+del /f /q build\*
+mkdir lib\models
+type pubspec.yaml
+```
+
+#### Task Commands:
+All `task` commands work seamlessly in WSL:
+```bash
+task get-deps
+task run-web
+task slang
+```
+
 ### 🌍 Language Requirements
 **MANDATORY**: All code, comments, strings, variable names, function names, and documentation MUST be written in English only. This is non-negotiable because international developers who don't speak Czech may work on this project.
 
@@ -235,9 +278,9 @@ class ApiConfig {
 
 #### Setup for New Developers:
 ```bash
-# Copy the example file
-copy lib\app_config.example.dart lib\app_config.dart
-# Edit lib\app_config.dart with actual values
+# Copy the example file (Linux/WSL)
+cp lib/app_config.example.dart lib/app_config.dart
+# Edit lib/app_config.dart with actual values
 ```
 
 #### Important Rules:
