@@ -1,16 +1,14 @@
+import '../../app_config.dart';
+
 /// API configuration constants.
 ///
 /// This file contains all API-related configuration.
-/// Future configurations (app settings, feature flags, etc.) can be added
-/// to the core/config/ directory.
+/// Sensitive values (like baseUrl) are imported from app_config.dart.
 class ApiConfig {
   /// Base URL for the backend API service.
   /// 
-  /// Change this value for different environments:
-  /// - Development: http://localhost:8080
-  /// - Staging: https://staging-api.dancee.app
-  /// - Production: https://api.dancee.app
-  static const String baseUrl = 'http://172.18.86.68:8080';
+  /// Imported from AppConfig (app_config.dart) - environment-specific.
+  static const String baseUrl = AppConfig.baseUrl;
   
   /// Hardcoded user ID for initial implementation.
   /// 

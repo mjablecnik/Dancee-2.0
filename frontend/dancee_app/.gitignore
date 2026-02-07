@@ -49,3 +49,6 @@ app.*.map.json
 
 # Generated localization files
 lib/l10n/
+
+# Environment-specific configuration
+lib/app_config.dart

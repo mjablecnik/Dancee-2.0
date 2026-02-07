@@ -185,6 +185,68 @@ Text(t.itemCount(count: items.length))
 ❌ Forgetting to regenerate: Not running `task slang` after changes
 ❌ Using old system: `AppLocalizations.of(context)` (deprecated)
 
+### 🔐 Sensitive Configuration Management
+
+**CRITICAL**: Sensitive configuration values MUST be stored in `app_config.dart`, which is excluded from version control.
+
+#### Configuration Files:
+- **`lib/app_config.dart`** - Contains sensitive values (in .gitignore, NOT committed)
+- **`lib/app_config.example.dart`** - Template file (committed to git)
+- **`lib/core/config/api_config.dart`** - Public configuration that imports from AppConfig
+
+#### What Goes in `app_config.dart` (Sensitive):
+- **API URLs** (baseUrl for different environments)
+- **API Keys** and tokens
+- **Secret keys** and credentials
+- **OAuth client IDs/secrets**
+- **Third-party service credentials**
+- Any environment-specific sensitive data
+
+#### What Goes in `api_config.dart` (Public):
+- **Timeout values** (connectTimeout, receiveTimeout, sendTimeout)
+- **Default user IDs** for development
+- **Public constants** that don't expose security risks
+- **Feature flags** and non-sensitive settings
+
+#### Usage Pattern:
+
+**app_config.dart** (gitignored):
+```dart
+class AppConfig {
+  static const String baseUrl = 'https://api.production.com';
+  static const String apiKey = 'secret-key-here';
+}
+```
+
+**api_config.dart** (public):
+```dart
+import '../../app_config.dart';
+
+class ApiConfig {
+  // Import sensitive values
+  static const String baseUrl = AppConfig.baseUrl;
+  static const String apiKey = AppConfig.apiKey;
+  
+  // Public non-sensitive values
+  static const String userId = 'user123';
+  static const int connectTimeout = 10000;
+}
+```
+
+#### Setup for New Developers:
+```bash
+# Copy the example file
+copy lib\app_config.example.dart lib\app_config.dart
+# Edit lib\app_config.dart with actual values
+```
+
+#### Important Rules:
+1. **NEVER commit `app_config.dart`** - it's in .gitignore
+2. **Always update `app_config.example.dart`** when adding new sensitive fields
+3. **Use placeholder values** in example file (e.g., 'YOUR_API_KEY_HERE')
+4. **Document all fields** with comments explaining their purpose
+5. **Keep sensitive data separate** - don't mix with public config
+
 ### 🛠️ Task Management
 
 This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands when suggesting or running commands:
@@ -250,10 +312,11 @@ As Kiro AI, always:
 2. Ensure all new code follows English-only rule
 3. **Ensure all user-facing strings use slang translations** (never hardcode)
 4. **Add translations to ALL language files** when creating new strings
-5. Consider cross-platform implications
-6. Use build runner tasks for code generation needs
-7. **Run `task slang`** after modifying translation files
-8. Suggest appropriate task commands instead of direct Flutter commands
+5. **Store sensitive values in `app_config.dart`** (API URLs, keys, tokens)
+6. Consider cross-platform implications
+7. Use build runner tasks for code generation needs
+8. **Run `task slang`** after modifying translation files
+9. Suggest appropriate task commands instead of direct Flutter commands
 
 ### 📞 Quick Commands Reference
 
@@ -284,6 +347,7 @@ task build-ios
 - **CRITICAL: Never hardcode user-facing strings** - always use slang translations
 - **When adding new UI text**: Add to all 3 language files (en, cs, es) and run `task slang`
 - **Check if code should be shared**: If models or logic are used by both frontend and backend, place them in `dancee_shared`
+- **Store sensitive config in `app_config.dart`**: API URLs, keys, tokens, credentials
 - Utilize taskfile commands in all suggestions
 - Consider Flutter best practices and cross-platform compatibility
 - When creating new files, ensure they follow the project structure
@@ -292,5 +356,6 @@ task build-ios
 - **Import translations**: Always include `import '../i18n/translations.g.dart';` in UI files
 - **Use global `t` variable** for translations: `t.keyName` or `t.method(param: value)`
 - **Keep `dancee_shared` pure Dart** - no Flutter dependencies allowed
+- **Never commit sensitive values** - always use `app_config.dart` for environment-specific data
 
 Remember: This guide ensures consistency and maintainability for international development teams working on the Dancee App project.
