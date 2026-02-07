@@ -31,5 +31,15 @@
   "apiErrorTimeout": "Request timeout. Please try again.",
   "apiErrorServer": "Server error occurred. Please try again later.",
   "apiErrorParsing": "Failed to process server response.",
-  "apiErrorGeneric": "An unexpected error occurred. Please try again."
+  "apiErrorGeneric": "An unexpected error occurred. Please try again.",
+  "errors": {
+    "networkError": "Connection error. Please check your internet connection.",
+    "timeoutError": "Request timeout. Please try again.",
+    "serverError": "Server error occurred. Please try again later.",
+    "parsingError": "Failed to process server response.",
+    "genericError": "An unexpected error occurred.",
+    "loadEventsError": "Failed to load events.",
+    "loadFavoritesError": "Failed to load favorites.",
+    "toggleFavoriteError": "Failed to update favorite."
+  }
 }

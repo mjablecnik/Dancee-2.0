@@ -2,189 +2,140 @@ import 'package:dio/dio.dart';
 import '../config/api_config.dart';
 import '../exceptions/api_exception.dart';
 
-/// HTTP client wrapper for making API calls to the backend service
-/// 
-/// This class wraps Dio and provides a consistent interface for making
-/// HTTP requests with proper error handling, logging, and configuration.
+/// HTTP client wrapper for making API calls to the backend service.
+///
+/// This class wraps Dio functionality and provides a clean interface
+/// for making HTTP requests with proper error handling, logging, and
+/// configuration.
 class ApiClient {
   final Dio _dio;
-
-  ApiClient({String? baseUrl}) : _dio = Dio() {
-    // Configure Dio with base URL and timeouts
-    _dio.options.baseUrl = baseUrl ?? ApiConfig.baseUrl;
-    _dio.options.connectTimeout = const Duration(milliseconds: ApiConfig.connectionTimeout);
-    _dio.options.receiveTimeout = const Duration(milliseconds: ApiConfig.receiveTimeout);
-    _dio.options.sendTimeout = const Duration(milliseconds: ApiConfig.sendTimeout);
+  
+  /// Creates an ApiClient with the specified base URL.
+  ///
+  /// Configures Dio with timeouts, interceptors, and default headers.
+  ApiClient({required String baseUrl}) : _dio = Dio() {
+    _dio.options.baseUrl = baseUrl;
+    _dio.options.connectTimeout = Duration(milliseconds: ApiConfig.connectTimeout);
+    _dio.options.receiveTimeout = Duration(milliseconds: ApiConfig.receiveTimeout);
+    _dio.options.sendTimeout = Duration(milliseconds: ApiConfig.sendTimeout);
     _dio.options.headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-
-    // Add logging interceptor for debugging
-    _dio.interceptors.add(
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        error: true,
-        logPrint: (obj) => print('[API] $obj'),
-      ),
-    );
-
-    // Add error interceptor for consistent error handling
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onError: (error, handler) {
-          // Convert DioException to ApiException
-          final apiException = _handleDioError(error);
-          handler.reject(
-            DioException(
-              requestOptions: error.requestOptions,
-              error: apiException,
-              type: error.type,
-            ),
-          );
-        },
-      ),
-    );
+    
+    // Add logging interceptor
+    _dio.interceptors.add(LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+      error: true,
+      logPrint: (obj) => print('[API] $obj'),
+    ));
+    
+    // Add error interceptor
+    _dio.interceptors.add(InterceptorsWrapper(
+      onError: (error, handler) {
+        _handleError(error);
+        handler.next(error);
+      },
+    ));
   }
-
-  /// Make a GET request
-  /// 
-  /// [path] - API endpoint path (e.g., '/api/events')
-  /// [queryParameters] - Optional query parameters
-  /// 
-  /// Returns the response data
-  /// Throws [ApiException] on error
-  Future<dynamic> get(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-  }) async {
+  
+  /// Makes a GET request to the specified path.
+  ///
+  /// Returns the response data on success.
+  /// Throws ApiException on failure.
+  Future<dynamic> get(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
-      final response = await _dio.get(
-        path,
-        queryParameters: queryParameters,
-      );
+      final response = await _dio.get(path, queryParameters: queryParameters);
       return response.data;
     } on DioException catch (e) {
-      if (e.error is ApiException) {
-        throw e.error as ApiException;
-      }
-      throw _handleDioError(e);
+      throw _convertDioException(e);
     }
   }
-
-  /// Make a POST request
-  /// 
-  /// [path] - API endpoint path (e.g., '/api/favorites')
-  /// [data] - Request body data
-  /// 
-  /// Returns the response data
-  /// Throws [ApiException] on error
-  Future<dynamic> post(
-    String path, {
-    dynamic data,
-  }) async {
+  
+  /// Makes a POST request to the specified path.
+  ///
+  /// Returns the response data on success.
+  /// Throws ApiException on failure.
+  Future<dynamic> post(String path, {dynamic data}) async {
     try {
-      final response = await _dio.post(
-        path,
-        data: data,
-      );
+      final response = await _dio.post(path, data: data);
       return response.data;
     } on DioException catch (e) {
-      if (e.error is ApiException) {
-        throw e.error as ApiException;
-      }
-      throw _handleDioError(e);
+      throw _convertDioException(e);
     }
   }
-
-  /// Make a DELETE request
-  /// 
-  /// [path] - API endpoint path (e.g., '/api/favorites/123')
-  /// [queryParameters] - Optional query parameters
-  /// 
-  /// Returns the response data
-  /// Throws [ApiException] on error
-  Future<dynamic> delete(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-  }) async {
+  
+  /// Makes a DELETE request to the specified path.
+  ///
+  /// Returns the response data on success.
+  /// Throws ApiException on failure.
+  Future<dynamic> delete(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
-      final response = await _dio.delete(
-        path,
-        queryParameters: queryParameters,
-      );
+      final response = await _dio.delete(path, queryParameters: queryParameters);
       return response.data;
     } on DioException catch (e) {
-      if (e.error is ApiException) {
-        throw e.error as ApiException;
-      }
-      throw _handleDioError(e);
+      throw _convertDioException(e);
     }
   }
-
-  /// Check backend health
-  /// 
-  /// Returns true if backend is available, false otherwise
+  
+  /// Checks if the backend service is available.
+  ///
+  /// Returns true if the health check succeeds, false otherwise.
   Future<bool> checkHealth() async {
     try {
-      await _dio.get(ApiConfig.healthEndpoint);
-      return true;
+      final response = await _dio.get('/health');
+      return response.statusCode == 200;
     } catch (e) {
       return false;
     }
   }
-
-  /// Convert DioException to ApiException with user-friendly messages
-  ApiException _handleDioError(DioException error) {
-    switch (error.type) {
+  
+  /// Handles Dio errors and logs them.
+  void _handleError(DioException error) {
+    print('[API Error] ${error.type}: ${error.message}');
+    if (error.response != null) {
+      print('[API Error] Status: ${error.response?.statusCode}');
+      print('[API Error] Data: ${error.response?.data}');
+    }
+  }
+  
+  /// Converts DioException to ApiException.
+  ApiException _convertDioException(DioException e) {
+    switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         return ApiException(
-          message: 'Request timeout. Please check your internet connection.',
-          error: error,
-          stackTrace: error.stackTrace,
+          message: 'Request timeout. Please check your connection.',
+          originalError: e,
         );
-
+      
       case DioExceptionType.connectionError:
         return ApiException(
           message: 'Connection error. Please check your internet connection.',
-          error: error,
-          stackTrace: error.stackTrace,
+          originalError: e,
         );
-
+      
       case DioExceptionType.badResponse:
-        final statusCode = error.response?.statusCode;
-        final responseData = error.response?.data;
-        
-        String message = 'Server error occurred.';
-        if (responseData is Map && responseData.containsKey('error')) {
-          message = responseData['error'].toString();
-        } else if (statusCode != null) {
-          message = 'Server error: HTTP $statusCode';
-        }
-
+        final statusCode = e.response?.statusCode;
+        final errorMessage = e.response?.data?['error'] ?? 'Server error occurred';
         return ApiException(
-          message: message,
-          error: error,
-          stackTrace: error.stackTrace,
+          message: errorMessage,
           statusCode: statusCode,
+          originalError: e,
         );
-
+      
       case DioExceptionType.cancel:
         return ApiException(
-          message: 'Request was cancelled.',
-          error: error,
-          stackTrace: error.stackTrace,
+          message: 'Request was cancelled',
+          originalError: e,
         );
-
-      case DioExceptionType.unknown:
+      
       default:
         return ApiException(
-          message: 'An unexpected error occurred. Please try again.',
-          error: error,
-          stackTrace: error.stackTrace,
+          message: 'An unexpected error occurred',
+          originalError: e,
         );
     }
   }

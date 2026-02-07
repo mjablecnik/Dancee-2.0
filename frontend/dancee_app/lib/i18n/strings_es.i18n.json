@@ -31,5 +31,15 @@
   "apiErrorTimeout": "Tiempo de espera agotado. Por favor, inténtalo de nuevo.",
   "apiErrorServer": "Error del servidor. Por favor, inténtalo más tarde.",
   "apiErrorParsing": "Error al procesar la respuesta del servidor.",
-  "apiErrorGeneric": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+  "apiErrorGeneric": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
+  "errors": {
+    "networkError": "Error de conexión. Por favor, verifica tu conexión a internet.",
+    "timeoutError": "Tiempo de espera agotado. Por favor, inténtalo de nuevo.",
+    "serverError": "Error del servidor. Por favor, inténtalo más tarde.",
+    "parsingError": "Error al procesar la respuesta del servidor.",
+    "genericError": "Ocurrió un error inesperado.",
+    "loadEventsError": "Error al cargar eventos.",
+    "loadFavoritesError": "Error al cargar favoritos.",
+    "toggleFavoriteError": "Error al actualizar favorito."
+  }
 }

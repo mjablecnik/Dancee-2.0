@@ -82,31 +82,22 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         children: [
           Icon(
             Icons.error_outline,
-            size: 64,
-            color: Colors.red[400],
+            size: 48,
+            color: Colors.red,
           ),
           const SizedBox(height: 16),
-          Text(
-            t.errorLoadingFavorites,
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.grey[600],
+                fontSize: 16,
+                color: const Color(0xFF0F172A),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => getIt<FavoritesCubit>().loadFavorites(),
             style: ElevatedButton.styleFrom(
@@ -637,7 +628,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         return {'background': Colors.amber[100]!, 'text': Colors.amber[700]!};
       case 'reggaeton':
         return {'background': Colors.green[100]!, 'text': Colors.green[700]!};
-      case 'romántica':
+      case 'romantica':
         return {'background': Colors.pink[100]!, 'text': Colors.pink[700]!};
       case 'cubana':
         return {'background': Colors.red[100]!, 'text': Colors.red[700]!};

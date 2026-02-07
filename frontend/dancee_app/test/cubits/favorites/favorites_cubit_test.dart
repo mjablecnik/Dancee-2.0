@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:dancee_app/cubits/favorites/favorites_cubit.dart';
 import 'package:dancee_app/cubits/favorites/favorites_state.dart';
 import 'package:dancee_app/repositories/event_repository.dart';
+import 'package:dancee_app/core/exceptions/api_exception.dart';
 import 'package:dancee_shared/dancee_shared.dart';
 
 // Mock class for EventRepository
@@ -96,6 +97,10 @@ void main() {
     setUp(() {
       mockRepository = MockEventRepository();
       cubit = FavoritesCubit(mockRepository);
+      
+      // Register fallback values for mocktail
+      registerFallbackValue('');
+      registerFallbackValue(false);
     });
 
     tearDown(() {
@@ -172,7 +177,7 @@ void main() {
         'emits [loading, error] when loadFavorites fails',
         build: () {
           when(() => mockRepository.getFavoriteEvents())
-              .thenThrow(Exception('Network error'));
+              .thenThrow(ApiException(message: 'Network error'));
           return cubit;
         },
         act: (cubit) => cubit.loadFavorites(),
@@ -239,15 +244,19 @@ void main() {
       blocTest<FavoritesCubit, FavoritesState>(
         'calls repository toggleFavorite and reloads favorites',
         build: () {
-          when(() => mockRepository.toggleFavorite('1'))
+          when(() => mockRepository.toggleFavorite(any(), any()))
               .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => allFavorites);
           return cubit;
         },
+        seed: () => FavoritesLoaded(
+          upcomingEvents: upcomingFavorites,
+          pastEvents: pastFavorites,
+        ),
         act: (cubit) => cubit.toggleFavorite('1'),
         verify: (_) {
-          verify(() => mockRepository.toggleFavorite('1')).called(1);
+          verify(() => mockRepository.toggleFavorite('1', true)).called(1);
           verify(() => mockRepository.getFavoriteEvents()).called(1);
         },
       );
@@ -255,12 +264,16 @@ void main() {
       blocTest<FavoritesCubit, FavoritesState>(
         'emits loaded state after successful toggle',
         build: () {
-          when(() => mockRepository.toggleFavorite('1'))
+          when(() => mockRepository.toggleFavorite(any(), any()))
               .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => allFavorites);
           return cubit;
         },
+        seed: () => FavoritesLoaded(
+          upcomingEvents: upcomingFavorites,
+          pastEvents: pastFavorites,
+        ),
         act: (cubit) => cubit.toggleFavorite('1'),
         expect: () => [
           isA<FavoritesLoading>(),
@@ -271,12 +284,16 @@ void main() {
       blocTest<FavoritesCubit, FavoritesState>(
         'emits empty state when last favorite is removed',
         build: () {
-          when(() => mockRepository.toggleFavorite('1'))
+          when(() => mockRepository.toggleFavorite(any(), any()))
               .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => []);
           return cubit;
         },
+        seed: () => FavoritesLoaded(
+          upcomingEvents: [upcomingEvent1],
+          pastEvents: [],
+        ),
         act: (cubit) => cubit.toggleFavorite('1'),
         expect: () => [
           isA<FavoritesLoading>(),
@@ -287,31 +304,38 @@ void main() {
       blocTest<FavoritesCubit, FavoritesState>(
         'emits error when toggleFavorite fails',
         build: () {
-          when(() => mockRepository.toggleFavorite('1'))
-              .thenThrow(Exception('Toggle error'));
+          when(() => mockRepository.toggleFavorite(any(), any()))
+              .thenThrow(ApiException(message: 'Toggle error'));
           return cubit;
         },
+        seed: () => FavoritesLoaded(
+          upcomingEvents: upcomingFavorites,
+          pastEvents: pastFavorites,
+        ),
         act: (cubit) => cubit.toggleFavorite('1'),
         expect: () => [
           isA<FavoritesError>()
-              .having((state) => state.message, 'message', contains('Failed to toggle favorite')),
+              .having((state) => state.message, 'message', contains('Failed to update favorite')),
         ],
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
         'handles toggle for non-existent event gracefully',
         build: () {
-          when(() => mockRepository.toggleFavorite('999'))
+          when(() => mockRepository.toggleFavorite(any(), any()))
               .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => allFavorites);
           return cubit;
         },
+        seed: () => FavoritesLoaded(
+          upcomingEvents: upcomingFavorites,
+          pastEvents: pastFavorites,
+        ),
         act: (cubit) => cubit.toggleFavorite('999'),
-        verify: (_) {
-          verify(() => mockRepository.toggleFavorite('999')).called(1);
-          verify(() => mockRepository.getFavoriteEvents()).called(1);
-        },
+        expect: () => [
+          isA<FavoritesError>(),
+        ],
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
@@ -319,7 +343,7 @@ void main() {
         build: () {
           // First call returns all favorites, second call returns without the toggled event
           var callCount = 0;
-          when(() => mockRepository.toggleFavorite('1'))
+          when(() => mockRepository.toggleFavorite(any(), any()))
               .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
             callCount++;
@@ -347,7 +371,7 @@ void main() {
         build: () {
           // First call returns all favorites, second call returns without the toggled event
           var callCount = 0;
-          when(() => mockRepository.toggleFavorite('3'))
+          when(() => mockRepository.toggleFavorite(any(), any()))
               .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
             callCount++;
@@ -376,7 +400,7 @@ void main() {
         'maintains state after error until next action',
         build: () {
           when(() => mockRepository.getFavoriteEvents())
-              .thenThrow(Exception('Error'));
+              .thenThrow(ApiException(message: 'Error'));
           return cubit;
         },
         act: (cubit) => cubit.loadFavorites(),
@@ -392,7 +416,7 @@ void main() {
           when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
             callCount++;
             if (callCount == 1) {
-              throw Exception('Error');
+              throw ApiException(message: 'Error');
             }
             return allFavorites;
           });

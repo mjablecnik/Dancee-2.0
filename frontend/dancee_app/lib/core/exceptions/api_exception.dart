@@ -1,33 +1,19 @@
-/// Custom exception for API-related errors
-/// 
-/// This exception is thrown when API calls fail due to network errors,
-/// timeouts, HTTP errors, or parsing errors. It provides a user-friendly
-/// message and optional error details for debugging.
+/// Exception thrown when API calls fail.
+///
+/// This is part of the core exceptions module.
+/// Future exception types (ValidationException, BusinessLogicException, etc.)
+/// can be added to the core/exceptions/ directory.
 class ApiException implements Exception {
-  /// User-friendly error message
   final String message;
-
-  /// Optional error details for debugging
-  final dynamic error;
-
-  /// Optional stack trace for debugging
-  final StackTrace? stackTrace;
-
-  /// HTTP status code (if applicable)
   final int? statusCode;
-
+  final dynamic originalError;
+  
   ApiException({
     required this.message,
-    this.error,
-    this.stackTrace,
     this.statusCode,
+    this.originalError,
   });
-
+  
   @override
-  String toString() {
-    if (error != null) {
-      return 'ApiException: $message (Error: $error)';
-    }
-    return 'ApiException: $message';
-  }
+  String toString() => 'ApiException: $message (status: $statusCode)';
 }

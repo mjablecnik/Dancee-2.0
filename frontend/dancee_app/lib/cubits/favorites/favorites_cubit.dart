@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dancee_shared/dancee_shared.dart';
 import '../../repositories/event_repository.dart';
+import '../../core/exceptions/api_exception.dart';
+import '../../i18n/translations.g.dart';
 import 'favorites_state.dart';
 
 /// Cubit for managing favorites screen state.
@@ -38,47 +41,47 @@ class FavoritesCubit extends Cubit<FavoritesState> {
         upcomingEvents: upcoming,
         pastEvents: past,
       ));
+    } on ApiException {
+      emit(FavoritesError(t.errors.loadFavoritesError));
     } catch (e) {
-      emit(FavoritesError('Failed to load favorites: ${e.toString()}'));
+      emit(FavoritesError(t.errors.genericError));
     }
   }
 
   /// Toggles the favorite status of an event.
   ///
-  /// Updates the repository and updates the state locally without removing the event.
-  /// The event stays visible with updated favorite status until the screen is reloaded.
-  /// This allows users to re-favorite events before leaving the screen.
+  /// Gets the event from state to determine currentIsFavorite,
+  /// calls repository.toggleFavorite(eventId, currentIsFavorite),
+  /// and reloads favorites from API to ensure consistency.
   ///
-  /// On error, emits [FavoritesError] without changing the current state.
+  /// On error, emits [FavoritesError] with translated error message.
   Future<void> toggleFavorite(String eventId) async {
     final currentState = state;
     if (currentState is! FavoritesLoaded) return;
     
     try {
-      await repository.toggleFavorite(eventId);
+      // Find the event in state to determine current favorite status
+      final event = currentState.upcomingEvents
+          .cast<Event?>()
+          .firstWhere((e) => e?.id == eventId, orElse: () => null) ??
+          currentState.pastEvents
+          .cast<Event?>()
+          .firstWhere((e) => e?.id == eventId, orElse: () => null);
       
-      // Update the event in both lists locally, keeping all events visible
-      final updatedUpcoming = currentState.upcomingEvents.map((event) {
-        if (event.id == eventId) {
-          return event.copyWith(isFavorite: !event.isFavorite);
-        }
-        return event;
-      }).toList();
+      if (event == null) {
+        emit(FavoritesError(t.errors.genericError));
+        return;
+      }
       
-      final updatedPast = currentState.pastEvents.map((event) {
-        if (event.id == eventId) {
-          return event.copyWith(isFavorite: !event.isFavorite);
-        }
-        return event;
-      }).toList();
+      // Call repository with current favorite status
+      await repository.toggleFavorite(eventId, event.isFavorite);
       
-      // Emit new state with updated events (keeping unfavorited ones visible)
-      emit(FavoritesLoaded(
-        upcomingEvents: updatedUpcoming,
-        pastEvents: updatedPast,
-      ));
+      // Reload favorites from API to ensure consistency
+      await loadFavorites();
+    } on ApiException {
+      emit(FavoritesError(t.errors.toggleFavoriteError));
     } catch (e) {
-      emit(FavoritesError('Failed to toggle favorite: ${e.toString()}'));
+      emit(FavoritesError(t.errors.genericError));
     }
   }
 
@@ -121,8 +124,18 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     if (currentState is! FavoritesLoaded) return;
     
     try {
-      // Remove from repository in background
-      await repository.toggleFavorite(eventId);
+      // Find the event in state to determine current favorite status
+      final event = currentState.pastEvents
+          .cast<Event?>()
+          .firstWhere((e) => e?.id == eventId, orElse: () => null);
+      
+      if (event == null) {
+        emit(FavoritesError(t.errors.genericError));
+        return;
+      }
+      
+      // Remove from repository with current favorite status
+      await repository.toggleFavorite(eventId, event.isFavorite);
       
       // Remove from current state immediately
       final updatedUpcoming = currentState.upcomingEvents;
@@ -141,8 +154,10 @@ class FavoritesCubit extends Cubit<FavoritesState> {
         upcomingEvents: updatedUpcoming,
         pastEvents: updatedPast,
       ));
+    } on ApiException {
+      emit(FavoritesError(t.errors.toggleFavoriteError));
     } catch (e) {
-      emit(FavoritesError('Failed to remove event: ${e.toString()}'));
+      emit(FavoritesError(t.errors.genericError));
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import '../core/clients/api_client.dart';
+import '../core/config/api_config.dart';
 import '../repositories/event_repository.dart';
 import '../cubits/event_list/event_list_cubit.dart';
 import '../cubits/favorites/favorites_cubit.dart';
@@ -9,7 +10,7 @@ final getIt = GetIt.instance;
 void setupDependencies() {
   // Register ApiClient as lazy singleton
   getIt.registerLazySingleton<ApiClient>(
-    () => ApiClient(),
+    () => ApiClient(baseUrl: ApiConfig.baseUrl),
   );
 
   // Register repository as lazy singleton with ApiClient dependency

@@ -17,83 +17,63 @@ class EventRepository {
   /// Returns all events from the backend API.
   ///
   /// Makes a GET request to /api/events and parses the response.
-  /// Throws [ApiException] on error.
+  /// Throws ApiException on failure.
   Future<List<Event>> getAllEvents() async {
     try {
-      final response = await _apiClient.get(ApiConfig.eventsEndpoint);
-
-      // Validate response is a List
+      final response = await _apiClient.get('/api/events');
+      
       if (response is! List) {
-        throw ApiException(
-          message: 'Invalid response format: expected List, got ${response.runtimeType}',
-        );
+        throw ApiException(message: 'Invalid response format');
       }
-
-      // Parse JSON response into List<Event>
-      try {
-        return response
-            .map((json) => Event.fromJson(json as Map<String, dynamic>))
-            .toList();
-      } on FormatException catch (e, stackTrace) {
-        throw ApiException(
-          message: 'Failed to parse event data',
-          error: e,
-          stackTrace: stackTrace,
-        );
-      }
+      
+      return response
+          .map((json) => Event.fromJson(json as Map<String, dynamic>))
+          .toList();
     } on ApiException {
       rethrow;
-    } catch (e, stackTrace) {
+    } on FormatException catch (e) {
       throw ApiException(
-        message: 'Failed to fetch events',
-        error: e,
-        stackTrace: stackTrace,
+        message: 'Failed to parse events response',
+        originalError: e,
+      );
+    } catch (e) {
+      throw ApiException(
+        message: 'Failed to load events',
+        originalError: e,
       );
     }
   }
 
-  /// Returns favorite events for the current user from the backend API.
+  /// Returns only favorite events from the backend API.
   ///
   /// Makes a GET request to /api/favorites with userId query parameter.
-  /// Throws [ApiException] on error.
+  /// Returns an empty list if the API returns an empty array.
+  /// Throws ApiException on failure.
   Future<List<Event>> getFavoriteEvents() async {
     try {
       final response = await _apiClient.get(
-        ApiConfig.favoritesEndpoint,
+        '/api/favorites',
         queryParameters: {'userId': ApiConfig.userId},
       );
-
-      // Validate response is a List
+      
       if (response is! List) {
-        throw ApiException(
-          message: 'Invalid response format: expected List, got ${response.runtimeType}',
-        );
+        throw ApiException(message: 'Invalid response format');
       }
-
-      // Handle empty array
-      if (response.isEmpty) {
-        return [];
-      }
-
-      // Parse JSON response into List<Event>
-      try {
-        return response
-            .map((json) => Event.fromJson(json as Map<String, dynamic>))
-            .toList();
-      } on FormatException catch (e, stackTrace) {
-        throw ApiException(
-          message: 'Failed to parse favorite event data',
-          error: e,
-          stackTrace: stackTrace,
-        );
-      }
+      
+      return response
+          .map((json) => Event.fromJson(json as Map<String, dynamic>))
+          .toList();
     } on ApiException {
       rethrow;
-    } catch (e, stackTrace) {
+    } on FormatException catch (e) {
       throw ApiException(
-        message: 'Failed to fetch favorite events',
-        error: e,
-        stackTrace: stackTrace,
+        message: 'Failed to parse favorite events response',
+        originalError: e,
+      );
+    } catch (e) {
+      throw ApiException(
+        message: 'Failed to load favorite events',
+        originalError: e,
       );
     }
   }
@@ -101,11 +81,12 @@ class EventRepository {
   /// Adds an event to the user's favorites.
   ///
   /// Makes a POST request to /api/favorites with userId and eventId.
-  /// Throws [ApiException] on error.
+  /// The Cubit is responsible for updating the cache after this call.
+  /// Throws ApiException on failure.
   Future<void> addFavorite(String eventId) async {
     try {
       await _apiClient.post(
-        ApiConfig.favoritesEndpoint,
+        '/api/favorites',
         data: {
           'userId': ApiConfig.userId,
           'eventId': eventId,
@@ -113,11 +94,10 @@ class EventRepository {
       );
     } on ApiException {
       rethrow;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw ApiException(
-        message: 'Failed to add event to favorites',
-        error: e,
-        stackTrace: stackTrace,
+        message: 'Failed to add favorite',
+        originalError: e,
       );
     }
   }
@@ -125,33 +105,30 @@ class EventRepository {
   /// Removes an event from the user's favorites.
   ///
   /// Makes a DELETE request to /api/favorites/:eventId with userId query parameter.
-  /// Throws [ApiException] on error.
+  /// The Cubit is responsible for updating the cache after this call.
+  /// Throws ApiException on failure.
   Future<void> removeFavorite(String eventId) async {
     try {
       await _apiClient.delete(
-        '${ApiConfig.favoritesEndpoint}/$eventId',
+        '/api/favorites/$eventId',
         queryParameters: {'userId': ApiConfig.userId},
       );
     } on ApiException {
       rethrow;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw ApiException(
-        message: 'Failed to remove event from favorites',
-        error: e,
-        stackTrace: stackTrace,
+        message: 'Failed to remove favorite',
+        originalError: e,
       );
     }
   }
 
   /// Toggles the favorite status of an event.
   ///
-  /// This is a helper method that decides whether to add or remove
-  /// the event from favorites based on the current favorite status.
-  ///
-  /// [eventId] - The ID of the event to toggle
-  /// [currentIsFavorite] - The current favorite status of the event
-  ///
-  /// Throws [ApiException] on error.
+  /// If currentIsFavorite is true, removes the event from favorites.
+  /// If currentIsFavorite is false, adds the event to favorites.
+  /// The Cubit passes the current favorite status from its cached state.
+  /// Throws ApiException on failure.
   Future<void> toggleFavorite(String eventId, bool currentIsFavorite) async {
     if (currentIsFavorite) {
       await removeFavorite(eventId);

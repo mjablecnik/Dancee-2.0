@@ -81,31 +81,22 @@ class _EventListScreenState extends State<EventListScreen> {
         children: [
           Icon(
             Icons.error_outline,
-            size: 64,
-            color: Colors.red[400],
+            size: 48,
+            color: Colors.red,
           ),
           const SizedBox(height: 16),
-          Text(
-            t.errorLoadingEvents,
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.grey[600],
+                fontSize: 16,
+                color: const Color(0xFF0F172A),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => getIt<EventListCubit>().loadEvents(),
             style: ElevatedButton.styleFrom(

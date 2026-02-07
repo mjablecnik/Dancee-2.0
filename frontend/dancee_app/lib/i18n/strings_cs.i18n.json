@@ -31,5 +31,15 @@
   "apiErrorTimeout": "Vypršel časový limit požadavku. Zkuste to prosím znovu.",
   "apiErrorServer": "Došlo k chybě serveru. Zkuste to prosím později.",
   "apiErrorParsing": "Nepodařilo se zpracovat odpověď serveru.",
-  "apiErrorGeneric": "Došlo k neočekávané chybě. Zkuste to prosím znovu."
+  "apiErrorGeneric": "Došlo k neočekávané chybě. Zkuste to prosím znovu.",
+  "errors": {
+    "networkError": "Chyba připojení. Zkontrolujte prosím své internetové připojení.",
+    "timeoutError": "Vypršel časový limit požadavku. Zkuste to prosím znovu.",
+    "serverError": "Došlo k chybě serveru. Zkuste to prosím později.",
+    "parsingError": "Nepodařilo se zpracovat odpověď serveru.",
+    "genericError": "Došlo k neočekávané chybě.",
+    "loadEventsError": "Nepodařilo se načíst události.",
+    "loadFavoritesError": "Nepodařilo se načíst oblíbené.",
+    "toggleFavoriteError": "Nepodařilo se aktualizovat oblíbené."
+  }
 }
