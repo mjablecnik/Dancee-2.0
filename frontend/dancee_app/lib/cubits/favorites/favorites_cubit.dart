@@ -3,6 +3,8 @@ import 'package:dancee_shared/dancee_shared.dart';
 import '../../repositories/event_repository.dart';
 import '../../core/exceptions/api_exception.dart';
 import '../../i18n/translations.g.dart';
+import '../../di/service_locator.dart';
+import '../event_list/event_list_cubit.dart';
 import 'favorites_state.dart';
 
 /// Cubit for managing favorites screen state.
@@ -50,9 +52,9 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
   /// Toggles the favorite status of an event.
   ///
-  /// Gets the event from state to determine currentIsFavorite,
-  /// calls repository.toggleFavorite(eventId, currentIsFavorite),
-  /// and reloads favorites from API to ensure consistency.
+  /// Updates the event's isFavorite status locally without removing it from view.
+  /// The event stays visible with grayed-out heart until user navigates away.
+  /// Calls repository to update backend and notifies EventListCubit.
   ///
   /// On error, emits [FavoritesError] with translated error message.
   Future<void> toggleFavorite(String eventId) async {
@@ -76,8 +78,29 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       // Call repository with current favorite status
       await repository.toggleFavorite(eventId, event.isFavorite);
       
-      // Reload favorites from API to ensure consistency
-      await loadFavorites();
+      // Update the event locally without removing it from view
+      final updatedUpcomingEvents = currentState.upcomingEvents.map((e) {
+        if (e.id == eventId) {
+          return e.copyWith(isFavorite: !e.isFavorite);
+        }
+        return e;
+      }).toList();
+      
+      final updatedPastEvents = currentState.pastEvents.map((e) {
+        if (e.id == eventId) {
+          return e.copyWith(isFavorite: !e.isFavorite);
+        }
+        return e;
+      }).toList();
+      
+      // Emit new state with updated event (still visible)
+      emit(FavoritesLoaded(
+        upcomingEvents: updatedUpcomingEvents,
+        pastEvents: updatedPastEvents,
+      ));
+      
+      // Notify EventListCubit to reload its data
+      getIt<EventListCubit>().loadEvents();
     } on ApiException {
       emit(FavoritesError(t.errors.toggleFavoriteError));
     } catch (e) {
@@ -119,6 +142,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   ///
   /// This method is used for past events to remove them instantly
   /// when user clicks the delete icon. Updates repository in background.
+  /// Also notifies EventListCubit to reload its data.
   Future<void> removePastEvent(String eventId) async {
     final currentState = state;
     if (currentState is! FavoritesLoaded) return;
@@ -146,14 +170,16 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       // Check if there are any favorites left
       if (updatedUpcoming.isEmpty && updatedPast.isEmpty) {
         emit(const FavoritesEmpty());
-        return;
+      } else {
+        // Emit new state without the removed event
+        emit(FavoritesLoaded(
+          upcomingEvents: updatedUpcoming,
+          pastEvents: updatedPast,
+        ));
       }
       
-      // Emit new state without the removed event
-      emit(FavoritesLoaded(
-        upcomingEvents: updatedUpcoming,
-        pastEvents: updatedPast,
-      ));
+      // Notify EventListCubit to reload its data
+      getIt<EventListCubit>().loadEvents();
     } on ApiException {
       emit(FavoritesError(t.errors.toggleFavoriteError));
     } catch (e) {

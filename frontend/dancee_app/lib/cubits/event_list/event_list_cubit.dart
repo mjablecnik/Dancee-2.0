@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../repositories/event_repository.dart';
 import '../../core/exceptions/api_exception.dart';
 import '../../i18n/translations.g.dart';
+import '../../di/service_locator.dart';
+import '../favorites/favorites_cubit.dart';
 import 'event_list_state.dart';
 
 /// Cubit for managing event list screen state.
@@ -144,6 +146,7 @@ class EventListCubit extends Cubit<EventListState> {
   ///
   /// Updates the repository and updates the state locally without reloading.
   /// This prevents the UI from flickering when toggling favorites.
+  /// Also notifies FavoritesCubit to reload its data.
   ///
   /// On error, emits [EventListError] without changing the current state.
   Future<void> toggleFavorite(String eventId) async {
@@ -196,6 +199,9 @@ class EventListCubit extends Cubit<EventListState> {
         tomorrowEvents: updatedTomorrowEvents,
         upcomingEvents: updatedUpcomingEvents,
       ));
+      
+      // Notify FavoritesCubit to reload its data
+      getIt<FavoritesCubit>().loadFavorites();
     } on ApiException catch (e) {
       emit(EventListError(t.errors.toggleFavoriteError));
     } catch (e) {
