@@ -102,8 +102,8 @@ class EventCard extends StatelessWidget {
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                          Icons.music_note,
+                        child: Icon(
+                          _getEventIcon(event.dances),
                           color: Colors.white,
                           size: 24,
                         ),
@@ -378,6 +378,32 @@ class EventCard extends StatelessWidget {
         return Colors.grey[400]!;
       default:
         return Colors.grey[400]!;
+    }
+  }
+
+  IconData _getEventIcon(List<String> dances) {
+    if (dances.isEmpty) return Icons.music_note;
+
+    final primaryDance = dances.first.toLowerCase();
+    switch (primaryDance) {
+      case 'salsa':
+        return Icons.local_fire_department;
+      case 'bachata':
+        return Icons.favorite;
+      case 'kizomba':
+        return Icons.nightlight_round;
+      case 'zouk':
+      case 'brazilian zouk':
+        return Icons.water_drop;
+      case 'tango':
+      case 'argentine tango':
+        return Icons.wb_sunny;
+      case 'merengue':
+        return Icons.celebration;
+      case 'reggaeton':
+        return Icons.music_note;
+      default:
+        return Icons.music_note;
     }
   }
 }
