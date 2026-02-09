@@ -1,321 +1,219 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:dancee_app/repositories/event_repository.dart';
+import 'package:dancee_app/core/clients/api_client.dart';
+import 'package:dancee_app/core/exceptions/api_exception.dart';
+import 'package:dancee_shared/dancee_shared.dart';
+
+// Mock class for ApiClient
+class MockApiClient extends Mock implements ApiClient {}
 
 void main() {
   group('EventRepository', () {
+    late MockApiClient mockApiClient;
     late EventRepository repository;
 
+    final testVenue = Venue(
+      name: 'Test Venue',
+      address: Address(
+        street: 'Test Street 1',
+        city: 'Prague',
+        postalCode: '110 00',
+        country: 'Czech Republic',
+      ),
+      description: 'Test venue description',
+      latitude: 50.0,
+      longitude: 14.0,
+    );
+
+    final testEvent = Event(
+      id: '1',
+      title: 'Test Event',
+      description: 'Test description',
+      organizer: 'Test Organizer',
+      venue: testVenue,
+      startTime: DateTime.now().add(const Duration(days: 1)),
+      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
+      duration: const Duration(hours: 3),
+      dances: ['Salsa'],
+      isFavorite: false,
+      isPast: false,
+    );
+
     setUp(() {
-      repository = EventRepository();
+      mockApiClient = MockApiClient();
+      repository = EventRepository(mockApiClient);
     });
 
     group('getAllEvents', () {
-      test('returns all events', () async {
+      test('returns list of events from API', () async {
+        when(() => mockApiClient.get(
+              '/api/events',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => [testEvent.toJson()]);
+
         final events = await repository.getAllEvents();
-        
+
         expect(events, isNotEmpty);
-        expect(events.length, greaterThan(0));
+        expect(events.length, 1);
+        expect(events.first.id, testEvent.id);
+        verify(() => mockApiClient.get(
+              '/api/events',
+              queryParameters: any(named: 'queryParameters'),
+            )).called(1);
       });
 
-      test('returns unmodifiable list', () async {
-        final events = await repository.getAllEvents();
-        
-        expect(() => events.add(events.first), throwsUnsupportedError);
+      test('throws ApiException when API returns invalid format', () async {
+        when(() => mockApiClient.get(
+              '/api/events',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => 'invalid');
+
+        expect(
+          () => repository.getAllEvents(),
+          throwsA(isA<ApiException>()),
+        );
       });
 
-      test('includes events from EventListScreen', () async {
-        final events = await repository.getAllEvents();
-        
-        final titles = events.map((e) => e.title).toList();
-        expect(titles, contains('Salsa Social Night'));
-        expect(titles, contains('Bachata Tuesdays'));
-        expect(titles, contains('Zouk Workshop & Party'));
-        expect(titles, contains('Kizomba Wednesday'));
-        expect(titles, contains('Tango Practica'));
-        expect(titles, contains('Latin Mix Party'));
-      });
+      test('throws ApiException when API call fails', () async {
+        when(() => mockApiClient.get(
+              '/api/events',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenThrow(Exception('Network error'));
 
-      test('includes favorite events from FavoritesScreen', () async {
-        final events = await repository.getAllEvents();
-        
-        final titles = events.map((e) => e.title).toList();
-        expect(titles, contains('Salsa & Bachata Night Prague'));
-        expect(titles, contains('Bachata Sensual Workshop'));
-        expect(titles, contains('Kizomba Fusion Party'));
-        expect(titles, contains('Salsa Cubana Workshop'));
-        expect(titles, contains('Kizomba Ladies Styling'));
+        expect(
+          () => repository.getAllEvents(),
+          throwsA(isA<ApiException>()),
+        );
       });
     });
 
     group('getFavoriteEvents', () {
-      test('returns only favorite events', () async {
-        final favorites = await repository.getFavoriteEvents();
-        
-        expect(favorites, isNotEmpty);
-        for (final event in favorites) {
-          expect(event.isFavorite, isTrue);
-        }
+      test('returns list of favorite events from API', () async {
+        final favoriteEvent = testEvent.copyWith(isFavorite: true);
+        when(() => mockApiClient.get(
+              '/api/favorites',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => [favoriteEvent.toJson()]);
+
+        final events = await repository.getFavoriteEvents();
+
+        expect(events, isNotEmpty);
+        expect(events.length, 1);
+        expect(events.first.isFavorite, isTrue);
+        verify(() => mockApiClient.get(
+              '/api/favorites',
+              queryParameters: any(named: 'queryParameters'),
+            )).called(1);
       });
 
-      test('includes Bachata Tuesdays as favorite', () async {
-        final favorites = await repository.getFavoriteEvents();
-        
-        final titles = favorites.map((e) => e.title).toList();
-        expect(titles, contains('Bachata Tuesdays'));
-      });
+      test('returns empty list when no favorites', () async {
+        when(() => mockApiClient.get(
+              '/api/favorites',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => []);
 
-      test('includes Tango Practica as favorite', () async {
-        final favorites = await repository.getFavoriteEvents();
-        
-        final titles = favorites.map((e) => e.title).toList();
-        expect(titles, contains('Tango Practica'));
-      });
+        final events = await repository.getFavoriteEvents();
 
-      test('includes past favorite events', () async {
-        final favorites = await repository.getFavoriteEvents();
-        
-        final pastFavorites = favorites.where((e) => e.isPast).toList();
-        expect(pastFavorites, isNotEmpty);
-      });
-    });
-
-    group('getEventsByDate', () {
-      test('returns events for specific date', () async {
-        final now = DateTime.now();
-        final today = DateTime(now.year, now.month, now.day);
-        
-        final todayEvents = await repository.getEventsByDate(today);
-        
-        for (final event in todayEvents) {
-          final eventDate = DateTime(
-            event.startTime.year,
-            event.startTime.month,
-            event.startTime.day,
-          );
-          expect(eventDate, equals(today));
-        }
-      });
-
-      test('returns empty list for date with no events', () async {
-        final futureDate = DateTime.now().add(const Duration(days: 365));
-        
-        final events = await repository.getEventsByDate(futureDate);
-        
         expect(events, isEmpty);
       });
 
-      test('returns multiple events for same date', () async {
-        final now = DateTime.now();
-        final today = DateTime(now.year, now.month, now.day);
-        
-        final todayEvents = await repository.getEventsByDate(today);
-        
-        // Today should have multiple events
-        expect(todayEvents.length, greaterThan(1));
+      test('throws ApiException when API returns invalid format', () async {
+        when(() => mockApiClient.get(
+              '/api/favorites',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => 'invalid');
+
+        expect(
+          () => repository.getFavoriteEvents(),
+          throwsA(isA<ApiException>()),
+        );
+      });
+    });
+
+    group('addFavorite', () {
+      test('calls API to add favorite', () async {
+        when(() => mockApiClient.post(
+              '/api/favorites',
+              data: any(named: 'data'),
+            )).thenAnswer((_) async => {});
+
+        await repository.addFavorite('1');
+
+        verify(() => mockApiClient.post(
+              '/api/favorites',
+              data: any(named: 'data'),
+            )).called(1);
+      });
+
+      test('throws ApiException when API call fails', () async {
+        when(() => mockApiClient.post(
+              '/api/favorites',
+              data: any(named: 'data'),
+            )).thenThrow(Exception('Network error'));
+
+        expect(
+          () => repository.addFavorite('1'),
+          throwsA(isA<ApiException>()),
+        );
+      });
+    });
+
+    group('removeFavorite', () {
+      test('calls API to remove favorite', () async {
+        when(() => mockApiClient.delete(
+              '/api/favorites/1',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => {});
+
+        await repository.removeFavorite('1');
+
+        verify(() => mockApiClient.delete(
+              '/api/favorites/1',
+              queryParameters: any(named: 'queryParameters'),
+            )).called(1);
+      });
+
+      test('throws ApiException when API call fails', () async {
+        when(() => mockApiClient.delete(
+              '/api/favorites/1',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenThrow(Exception('Network error'));
+
+        expect(
+          () => repository.removeFavorite('1'),
+          throwsA(isA<ApiException>()),
+        );
       });
     });
 
     group('toggleFavorite', () {
-      test('toggles favorite status from false to true', () async {
-        final events = await repository.getAllEvents();
-        final nonFavorite = events.firstWhere((e) => !e.isFavorite);
-        
-        await repository.toggleFavorite(nonFavorite.id);
-        
-        final updatedEvents = await repository.getAllEvents();
-        final updatedEvent = updatedEvents.firstWhere((e) => e.id == nonFavorite.id);
-        expect(updatedEvent.isFavorite, isTrue);
+      test('calls removeFavorite when currentIsFavorite is true', () async {
+        when(() => mockApiClient.delete(
+              '/api/favorites/1',
+              queryParameters: any(named: 'queryParameters'),
+            )).thenAnswer((_) async => {});
+
+        await repository.toggleFavorite('1', true);
+
+        verify(() => mockApiClient.delete(
+              '/api/favorites/1',
+              queryParameters: any(named: 'queryParameters'),
+            )).called(1);
       });
 
-      test('toggles favorite status from true to false', () async {
-        final events = await repository.getAllEvents();
-        final favorite = events.firstWhere((e) => e.isFavorite);
-        
-        await repository.toggleFavorite(favorite.id);
-        
-        final updatedEvents = await repository.getAllEvents();
-        final updatedEvent = updatedEvents.firstWhere((e) => e.id == favorite.id);
-        expect(updatedEvent.isFavorite, isFalse);
-      });
+      test('calls addFavorite when currentIsFavorite is false', () async {
+        when(() => mockApiClient.post(
+              '/api/favorites',
+              data: any(named: 'data'),
+            )).thenAnswer((_) async => {});
 
-      test('maintains state across multiple calls', () async {
-        final events = await repository.getAllEvents();
-        final event = events.first;
-        final initialStatus = event.isFavorite;
-        
-        // Toggle twice
-        await repository.toggleFavorite(event.id);
-        await repository.toggleFavorite(event.id);
-        
-        final updatedEvents = await repository.getAllEvents();
-        final updatedEvent = updatedEvents.firstWhere((e) => e.id == event.id);
-        expect(updatedEvent.isFavorite, equals(initialStatus));
-      });
+        await repository.toggleFavorite('1', false);
 
-      test('does nothing for non-existent event ID', () async {
-        final eventsBefore = await repository.getAllEvents();
-        
-        await repository.toggleFavorite('non-existent-id');
-        
-        final eventsAfter = await repository.getAllEvents();
-        expect(eventsAfter.length, equals(eventsBefore.length));
-      });
-    });
-
-    group('searchEvents', () {
-      test('returns all events for empty query', () async {
-        final allEvents = await repository.getAllEvents();
-        
-        final searchResults = await repository.searchEvents('');
-        
-        expect(searchResults.length, equals(allEvents.length));
-      });
-
-      test('searches by event title', () async {
-        final results = await repository.searchEvents('Salsa');
-        
-        expect(results, isNotEmpty);
-        for (final event in results) {
-          final matchesTitle = event.title.toLowerCase().contains('salsa');
-          final matchesVenue = event.venue.name.toLowerCase().contains('salsa');
-          final matchesDescription = event.description.toLowerCase().contains('salsa');
-          expect(
-            matchesTitle || matchesVenue || matchesDescription,
-            isTrue,
-          );
-        }
-      });
-
-      test('searches by venue name', () async {
-        final results = await repository.searchEvents('Lucerna');
-        
-        expect(results, isNotEmpty);
-        for (final event in results) {
-          expect(
-            event.venue.name.toLowerCase().contains('lucerna'),
-            isTrue,
-          );
-        }
-      });
-
-      test('searches by description', () async {
-        final results = await repository.searchEvents('workshop');
-        
-        expect(results, isNotEmpty);
-        for (final event in results) {
-          final matchesTitle = event.title.toLowerCase().contains('workshop');
-          final matchesVenue = event.venue.name.toLowerCase().contains('workshop');
-          final matchesDescription = event.description.toLowerCase().contains('workshop');
-          expect(
-            matchesTitle || matchesVenue || matchesDescription,
-            isTrue,
-          );
-        }
-      });
-
-      test('is case-insensitive', () async {
-        final lowerResults = await repository.searchEvents('salsa');
-        final upperResults = await repository.searchEvents('SALSA');
-        final mixedResults = await repository.searchEvents('SaLsA');
-        
-        expect(lowerResults.length, equals(upperResults.length));
-        expect(lowerResults.length, equals(mixedResults.length));
-      });
-
-      test('returns empty list for non-matching query', () async {
-        final results = await repository.searchEvents('NonExistentEvent12345');
-        
-        expect(results, isEmpty);
-      });
-    });
-
-    group('filterEvents', () {
-      test('filters by dance style', () async {
-        final results = await repository.filterEvents({
-          'dances': ['Bachata'],
-        });
-        
-        expect(results, isNotEmpty);
-        for (final event in results) {
-          expect(event.dances, contains('Bachata'));
-        }
-      });
-
-      test('filters by multiple dance styles', () async {
-        final results = await repository.filterEvents({
-          'dances': ['Salsa', 'Kizomba'],
-        });
-        
-        expect(results, isNotEmpty);
-        for (final event in results) {
-          final hasSalsa = event.dances.contains('Salsa');
-          final hasKizomba = event.dances.contains('Kizomba');
-          expect(hasSalsa || hasKizomba, isTrue);
-        }
-      });
-
-      test('filters by isPast status', () async {
-        final pastEvents = await repository.filterEvents({
-          'isPast': true,
-        });
-        
-        expect(pastEvents, isNotEmpty);
-        for (final event in pastEvents) {
-          expect(event.isPast, isTrue);
-        }
-      });
-
-      test('filters upcoming events', () async {
-        final upcomingEvents = await repository.filterEvents({
-          'isPast': false,
-        });
-        
-        expect(upcomingEvents, isNotEmpty);
-        for (final event in upcomingEvents) {
-          expect(event.isPast, isFalse);
-        }
-      });
-
-      test('filters by date range', () async {
-        final now = DateTime.now();
-        final start = now.subtract(const Duration(days: 1));
-        final end = now.add(const Duration(days: 2));
-        
-        final results = await repository.filterEvents({
-          'dateRange': {'start': start, 'end': end},
-        });
-        
-        for (final event in results) {
-          expect(event.startTime.isAfter(start), isTrue);
-          expect(event.startTime.isBefore(end), isTrue);
-        }
-      });
-
-      test('combines multiple filter criteria', () async {
-        final now = DateTime.now();
-        final start = now.subtract(const Duration(days: 1));
-        final end = now.add(const Duration(days: 30));
-        
-        final results = await repository.filterEvents({
-          'dances': ['Bachata'],
-          'isPast': false,
-          'dateRange': {'start': start, 'end': end},
-        });
-        
-        for (final event in results) {
-          expect(event.dances, contains('Bachata'));
-          expect(event.isPast, isFalse);
-          expect(event.startTime.isAfter(start), isTrue);
-          expect(event.startTime.isBefore(end), isTrue);
-        }
-      });
-
-      test('returns all events for empty criteria', () async {
-        final allEvents = await repository.getAllEvents();
-        
-        final results = await repository.filterEvents({});
-        
-        expect(results.length, equals(allEvents.length));
+        verify(() => mockApiClient.post(
+              '/api/favorites',
+              data: any(named: 'data'),
+            )).called(1);
       });
     });
   });

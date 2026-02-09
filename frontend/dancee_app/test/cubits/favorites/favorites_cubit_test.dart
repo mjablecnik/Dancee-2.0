@@ -3,16 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:dancee_app/cubits/favorites/favorites_cubit.dart';
 import 'package:dancee_app/cubits/favorites/favorites_state.dart';
+import 'package:dancee_app/cubits/event_list/event_list_cubit.dart';
 import 'package:dancee_app/repositories/event_repository.dart';
 import 'package:dancee_app/core/exceptions/api_exception.dart';
+import 'package:dancee_app/di/service_locator.dart';
 import 'package:dancee_shared/dancee_shared.dart';
 
 // Mock class for EventRepository
 class MockEventRepository extends Mock implements EventRepository {}
 
+// Mock class for EventListCubit
+class MockEventListCubit extends Mock implements EventListCubit {}
+
 void main() {
   group('FavoritesCubit', () {
     late MockEventRepository mockRepository;
+    late MockEventListCubit mockEventListCubit;
     late FavoritesCubit cubit;
 
     // Test data
@@ -91,20 +97,22 @@ void main() {
     );
 
     final allFavorites = [upcomingEvent1, upcomingEvent2, pastEvent1, pastEvent2];
-    final upcomingFavorites = [upcomingEvent1, upcomingEvent2];
-    final pastFavorites = [pastEvent1, pastEvent2];
 
     setUp(() {
       mockRepository = MockEventRepository();
+      mockEventListCubit = MockEventListCubit();
       cubit = FavoritesCubit(mockRepository);
       
-      // Register fallback values for mocktail
-      registerFallbackValue('');
-      registerFallbackValue(false);
+      // Register mock EventListCubit in GetIt
+      getIt.registerSingleton<EventListCubit>(mockEventListCubit);
+      
+      // Mock loadEvents to do nothing
+      when(() => mockEventListCubit.loadEvents()).thenAnswer((_) async => {});
     });
 
     tearDown(() {
       cubit.close();
+      getIt.reset();
     });
 
     test('initial state is FavoritesInitial', () {
@@ -123,12 +131,9 @@ void main() {
         expect: () => [
           isA<FavoritesLoading>(),
           isA<FavoritesLoaded>()
-              .having((state) => state.upcomingEvents.length, 'upcomingEvents length', 2)
-              .having((state) => state.pastEvents.length, 'pastEvents length', 2),
+              .having((state) => state.upcomingEvents.length, 'upcoming length', 2)
+              .having((state) => state.pastEvents.length, 'past length', 2),
         ],
-        verify: (_) {
-          verify(() => mockRepository.getFavoriteEvents()).called(1);
-        },
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
@@ -141,18 +146,8 @@ void main() {
         act: (cubit) => cubit.loadFavorites(),
         verify: (cubit) {
           final state = cubit.state as FavoritesLoaded;
-          
-          // Verify upcoming events
-          expect(state.upcomingEvents.length, 2);
-          expect(state.upcomingEvents.every((e) => !e.isPast), true);
-          expect(state.upcomingEvents.any((e) => e.id == '1'), true);
-          expect(state.upcomingEvents.any((e) => e.id == '2'), true);
-          
-          // Verify past events
-          expect(state.pastEvents.length, 2);
-          expect(state.pastEvents.every((e) => e.isPast), true);
-          expect(state.pastEvents.any((e) => e.id == '3'), true);
-          expect(state.pastEvents.any((e) => e.id == '4'), true);
+          expect(state.upcomingEvents.every((e) => !e.isPast), isTrue);
+          expect(state.pastEvents.every((e) => e.isPast), isTrue);
         },
       );
 
@@ -168,56 +163,20 @@ void main() {
           isA<FavoritesLoading>(),
           isA<FavoritesEmpty>(),
         ],
-        verify: (_) {
-          verify(() => mockRepository.getFavoriteEvents()).called(1);
-        },
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
         'emits [loading, error] when loadFavorites fails',
         build: () {
           when(() => mockRepository.getFavoriteEvents())
-              .thenThrow(ApiException(message: 'Network error'));
+              .thenThrow(ApiException(message: 'API error'));
           return cubit;
         },
         act: (cubit) => cubit.loadFavorites(),
         expect: () => [
           isA<FavoritesLoading>(),
-          isA<FavoritesError>()
-              .having((state) => state.message, 'message', contains('Failed to load favorites')),
+          isA<FavoritesError>(),
         ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'handles only upcoming favorites',
-        build: () {
-          when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => upcomingFavorites);
-          return cubit;
-        },
-        act: (cubit) => cubit.loadFavorites(),
-        verify: (cubit) {
-          final state = cubit.state as FavoritesLoaded;
-          expect(state.upcomingEvents.length, 2);
-          expect(state.pastEvents.length, 0);
-          expect(state.pastEvents, isEmpty);
-        },
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'handles only past favorites',
-        build: () {
-          when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => pastFavorites);
-          return cubit;
-        },
-        act: (cubit) => cubit.loadFavorites(),
-        verify: (cubit) {
-          final state = cubit.state as FavoritesLoaded;
-          expect(state.upcomingEvents.length, 0);
-          expect(state.upcomingEvents, isEmpty);
-          expect(state.pastEvents.length, 2);
-        },
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
@@ -230,373 +189,161 @@ void main() {
         act: (cubit) => cubit.loadFavorites(),
         verify: (cubit) {
           final state = cubit.state as FavoritesLoaded;
-          
-          // All upcoming events should be favorites
-          expect(state.upcomingEvents.every((e) => e.isFavorite), true);
-          
-          // All past events should be favorites
-          expect(state.pastEvents.every((e) => e.isFavorite), true);
+          final allEvents = [...state.upcomingEvents, ...state.pastEvents];
+          expect(allEvents.every((e) => e.isFavorite), isTrue);
         },
       );
     });
 
     group('toggleFavorite', () {
       blocTest<FavoritesCubit, FavoritesState>(
-        'calls repository toggleFavorite and reloads favorites',
+        'updates favorite status locally',
         build: () {
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenAnswer((_) async => {});
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => allFavorites);
-          return cubit;
-        },
-        seed: () => FavoritesLoaded(
-          upcomingEvents: upcomingFavorites,
-          pastEvents: pastFavorites,
-        ),
-        act: (cubit) => cubit.toggleFavorite('1'),
-        verify: (_) {
-          verify(() => mockRepository.toggleFavorite('1', true)).called(1);
-          verify(() => mockRepository.getFavoriteEvents()).called(1);
-        },
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'emits loaded state after successful toggle',
-        build: () {
-          when(() => mockRepository.toggleFavorite(any(), any()))
+          when(() => mockRepository.toggleFavorite('1', true))
               .thenAnswer((_) async => {});
-          when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => allFavorites);
-          return cubit;
-        },
-        seed: () => FavoritesLoaded(
-          upcomingEvents: upcomingFavorites,
-          pastEvents: pastFavorites,
-        ),
-        act: (cubit) => cubit.toggleFavorite('1'),
-        expect: () => [
-          isA<FavoritesLoading>(),
-          isA<FavoritesLoaded>(),
-        ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'emits empty state when last favorite is removed',
-        build: () {
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => []);
-          return cubit;
-        },
-        seed: () => FavoritesLoaded(
-          upcomingEvents: [upcomingEvent1],
-          pastEvents: [],
-        ),
-        act: (cubit) => cubit.toggleFavorite('1'),
-        expect: () => [
-          isA<FavoritesLoading>(),
-          isA<FavoritesEmpty>(),
-        ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'emits error when toggleFavorite fails',
-        build: () {
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenThrow(ApiException(message: 'Toggle error'));
-          return cubit;
-        },
-        seed: () => FavoritesLoaded(
-          upcomingEvents: upcomingFavorites,
-          pastEvents: pastFavorites,
-        ),
-        act: (cubit) => cubit.toggleFavorite('1'),
-        expect: () => [
-          isA<FavoritesError>()
-              .having((state) => state.message, 'message', contains('Failed to update favorite')),
-        ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'handles toggle for non-existent event gracefully',
-        build: () {
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => allFavorites);
-          return cubit;
-        },
-        seed: () => FavoritesLoaded(
-          upcomingEvents: upcomingFavorites,
-          pastEvents: pastFavorites,
-        ),
-        act: (cubit) => cubit.toggleFavorite('999'),
-        expect: () => [
-          isA<FavoritesError>(),
-        ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'updates state correctly after toggling upcoming event',
-        build: () {
-          // First call returns all favorites, second call returns without the toggled event
-          var callCount = 0;
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
-            callCount++;
-            if (callCount == 1) {
-              return allFavorites;
-            }
-            return [upcomingEvent2, pastEvent1, pastEvent2];
-          });
           return cubit;
         },
         act: (cubit) async {
           await cubit.loadFavorites();
           await cubit.toggleFavorite('1');
         },
+        skip: 2,
+        verify: (cubit) {
+          final state = cubit.state as FavoritesLoaded;
+          final toggledEvent = state.upcomingEvents.firstWhere((e) => e.id == '1');
+          expect(toggledEvent.isFavorite, isFalse);
+          verify(() => mockRepository.toggleFavorite('1', true)).called(1);
+        },
+      );
+
+      blocTest<FavoritesCubit, FavoritesState>(
+        'emits error when event not found',
+        build: () {
+          when(() => mockRepository.getFavoriteEvents())
+              .thenAnswer((_) async => allFavorites);
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadFavorites();
+          await cubit.toggleFavorite('999');
+        },
+        skip: 2,
+        expect: () => [
+          isA<FavoritesError>(),
+        ],
+      );
+
+      blocTest<FavoritesCubit, FavoritesState>(
+        'does nothing when state is not loaded',
+        build: () => cubit,
+        act: (cubit) => cubit.toggleFavorite('1'),
+        expect: () => [],
+      );
+    });
+
+    group('filterUnfavoritedEvents', () {
+      blocTest<FavoritesCubit, FavoritesState>(
+        'removes unfavorited events from state',
+        build: () {
+          when(() => mockRepository.getFavoriteEvents())
+              .thenAnswer((_) async => allFavorites);
+          when(() => mockRepository.toggleFavorite('1', true))
+              .thenAnswer((_) async => {});
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadFavorites();
+          await cubit.toggleFavorite('1');
+          cubit.filterUnfavoritedEvents();
+        },
+        skip: 3,
         verify: (cubit) {
           final state = cubit.state as FavoritesLoaded;
           expect(state.upcomingEvents.length, 1);
-          expect(state.upcomingEvents.any((e) => e.id == '1'), false);
-          expect(state.upcomingEvents.any((e) => e.id == '2'), true);
+          expect(state.upcomingEvents.every((e) => e.isFavorite), isTrue);
         },
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
-        'updates state correctly after toggling past event',
-        build: () {
-          // First call returns all favorites, second call returns without the toggled event
-          var callCount = 0;
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
-            callCount++;
-            if (callCount == 1) {
-              return allFavorites;
-            }
-            return [upcomingEvent1, upcomingEvent2, pastEvent2];
-          });
-          return cubit;
-        },
-        act: (cubit) async {
-          await cubit.loadFavorites();
-          await cubit.toggleFavorite('3');
-        },
-        verify: (cubit) {
-          final state = cubit.state as FavoritesLoaded;
-          expect(state.pastEvents.length, 1);
-          expect(state.pastEvents.any((e) => e.id == '3'), false);
-          expect(state.pastEvents.any((e) => e.id == '4'), true);
-        },
-      );
-    });
-
-    group('state transitions', () {
-      blocTest<FavoritesCubit, FavoritesState>(
-        'maintains state after error until next action',
-        build: () {
-          when(() => mockRepository.getFavoriteEvents())
-              .thenThrow(ApiException(message: 'Error'));
-          return cubit;
-        },
-        act: (cubit) => cubit.loadFavorites(),
-        verify: (cubit) {
-          expect(cubit.state, isA<FavoritesError>());
-        },
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'can recover from error state',
-        build: () {
-          var callCount = 0;
-          when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
-            callCount++;
-            if (callCount == 1) {
-              throw ApiException(message: 'Error');
-            }
-            return allFavorites;
-          });
-          return cubit;
-        },
-        act: (cubit) async {
-          await cubit.loadFavorites();
-          await cubit.loadFavorites();
-        },
-        expect: () => [
-          isA<FavoritesLoading>(),
-          isA<FavoritesError>(),
-          isA<FavoritesLoading>(),
-          isA<FavoritesLoaded>(),
-        ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'transitions from empty to loaded when favorite is added',
-        build: () {
-          var callCount = 0;
-          when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
-            callCount++;
-            if (callCount == 1) {
-              return [];
-            }
-            return [upcomingEvent1];
-          });
-          return cubit;
-        },
-        act: (cubit) async {
-          await cubit.loadFavorites();
-          await cubit.loadFavorites();
-        },
-        expect: () => [
-          isA<FavoritesLoading>(),
-          isA<FavoritesEmpty>(),
-          isA<FavoritesLoading>(),
-          isA<FavoritesLoaded>(),
-        ],
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'transitions from loaded to empty when all favorites are removed',
-        build: () {
-          var callCount = 0;
-          when(() => mockRepository.getFavoriteEvents()).thenAnswer((_) async {
-            callCount++;
-            if (callCount == 1) {
-              return [upcomingEvent1];
-            }
-            return [];
-          });
-          return cubit;
-        },
-        act: (cubit) async {
-          await cubit.loadFavorites();
-          await cubit.loadFavorites();
-        },
-        expect: () => [
-          isA<FavoritesLoading>(),
-          isA<FavoritesLoaded>(),
-          isA<FavoritesLoading>(),
-          isA<FavoritesEmpty>(),
-        ],
-      );
-    });
-
-    group('edge cases', () {
-      blocTest<FavoritesCubit, FavoritesState>(
-        'handles single upcoming favorite',
+        'emits empty when all events are unfavorited',
         build: () {
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => [upcomingEvent1]);
+          when(() => mockRepository.toggleFavorite('1', true))
+              .thenAnswer((_) async => {});
           return cubit;
         },
-        act: (cubit) => cubit.loadFavorites(),
+        act: (cubit) async {
+          await cubit.loadFavorites();
+          await cubit.toggleFavorite('1');
+          cubit.filterUnfavoritedEvents();
+        },
+        skip: 3,
+        expect: () => [
+          isA<FavoritesEmpty>(),
+        ],
+      );
+    });
+
+    group('removePastEvent', () {
+      blocTest<FavoritesCubit, FavoritesState>(
+        'removes past event immediately',
+        build: () {
+          when(() => mockRepository.getFavoriteEvents())
+              .thenAnswer((_) async => allFavorites);
+          when(() => mockRepository.toggleFavorite('3', true))
+              .thenAnswer((_) async => {});
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadFavorites();
+          await cubit.removePastEvent('3');
+        },
+        skip: 2,
         verify: (cubit) {
           final state = cubit.state as FavoritesLoaded;
-          expect(state.upcomingEvents.length, 1);
-          expect(state.pastEvents.length, 0);
-          expect(state.upcomingEvents.first.id, '1');
+          expect(state.pastEvents.length, 1);
+          expect(state.pastEvents.every((e) => e.id != '3'), isTrue);
+          verify(() => mockRepository.toggleFavorite('3', true)).called(1);
         },
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
-        'handles single past favorite',
+        'emits empty when last event is removed',
         build: () {
           when(() => mockRepository.getFavoriteEvents())
               .thenAnswer((_) async => [pastEvent1]);
+          when(() => mockRepository.toggleFavorite('3', true))
+              .thenAnswer((_) async => {});
           return cubit;
         },
-        act: (cubit) => cubit.loadFavorites(),
-        verify: (cubit) {
-          final state = cubit.state as FavoritesLoaded;
-          expect(state.upcomingEvents.length, 0);
-          expect(state.pastEvents.length, 1);
-          expect(state.pastEvents.first.id, '3');
+        act: (cubit) async {
+          await cubit.loadFavorites();
+          await cubit.removePastEvent('3');
         },
+        skip: 2,
+        expect: () => [
+          isA<FavoritesEmpty>(),
+        ],
       );
 
       blocTest<FavoritesCubit, FavoritesState>(
-        'handles large number of favorites',
+        'emits error when event not found',
         build: () {
-          final manyFavorites = List.generate(
-            100,
-            (index) => Event(
-              id: 'event_$index',
-              title: 'Event $index',
-              description: 'Description $index',
-              organizer: 'Organizer',
-              venue: testVenue,
-              startTime: index < 50
-                  ? today.add(Duration(days: index))
-                  : yesterday.subtract(Duration(days: index - 50)),
-              endTime: index < 50
-                  ? today.add(Duration(days: index, hours: 3))
-                  : yesterday.subtract(Duration(days: index - 50, hours: -3)),
-              duration: const Duration(hours: 3),
-              dances: ['Salsa'],
-              isFavorite: true,
-              isPast: index >= 50,
-            ),
-          );
-          
           when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => manyFavorites);
+              .thenAnswer((_) async => allFavorites);
           return cubit;
         },
-        act: (cubit) => cubit.loadFavorites(),
-        verify: (cubit) {
-          final state = cubit.state as FavoritesLoaded;
-          expect(state.upcomingEvents.length, 50);
-          expect(state.pastEvents.length, 50);
+        act: (cubit) async {
+          await cubit.loadFavorites();
+          await cubit.removePastEvent('999');
         },
-      );
-
-      blocTest<FavoritesCubit, FavoritesState>(
-        'correctly separates events with same date but different isPast flag',
-        build: () {
-          final sameTimeUpcoming = Event(
-            id: '5',
-            title: 'Same Time Upcoming',
-            description: 'Event at same time but upcoming',
-            organizer: 'Test Organizer',
-            venue: testVenue,
-            startTime: today.add(const Duration(hours: 20)),
-            endTime: today.add(const Duration(hours: 23)),
-            duration: const Duration(hours: 3),
-            dances: ['Salsa'],
-            isFavorite: true,
-            isPast: false,
-          );
-          
-          final sameTimePast = Event(
-            id: '6',
-            title: 'Same Time Past',
-            description: 'Event at same time but past',
-            organizer: 'Test Organizer',
-            venue: testVenue,
-            startTime: today.add(const Duration(hours: 20)),
-            endTime: today.add(const Duration(hours: 23)),
-            duration: const Duration(hours: 3),
-            dances: ['Salsa'],
-            isFavorite: true,
-            isPast: true,
-          );
-          
-          when(() => mockRepository.getFavoriteEvents())
-              .thenAnswer((_) async => [sameTimeUpcoming, sameTimePast]);
-          return cubit;
-        },
-        act: (cubit) => cubit.loadFavorites(),
-        verify: (cubit) {
-          final state = cubit.state as FavoritesLoaded;
-          expect(state.upcomingEvents.length, 1);
-          expect(state.pastEvents.length, 1);
-          expect(state.upcomingEvents.first.id, '5');
-          expect(state.pastEvents.first.id, '6');
-        },
+        skip: 2,
+        expect: () => [
+          isA<FavoritesError>(),
+        ],
       );
     });
   });

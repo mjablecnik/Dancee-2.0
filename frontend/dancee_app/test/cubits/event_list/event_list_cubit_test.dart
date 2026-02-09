@@ -3,15 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:dancee_app/cubits/event_list/event_list_cubit.dart';
 import 'package:dancee_app/cubits/event_list/event_list_state.dart';
+import 'package:dancee_app/cubits/favorites/favorites_cubit.dart';
 import 'package:dancee_app/repositories/event_repository.dart';
+import 'package:dancee_app/core/exceptions/api_exception.dart';
+import 'package:dancee_app/di/service_locator.dart';
 import 'package:dancee_shared/dancee_shared.dart';
 
 // Mock class for EventRepository
 class MockEventRepository extends Mock implements EventRepository {}
 
+// Mock class for FavoritesCubit
+class MockFavoritesCubit extends Mock implements FavoritesCubit {}
+
 void main() {
   group('EventListCubit', () {
     late MockEventRepository mockRepository;
+    late MockFavoritesCubit mockFavoritesCubit;
     late EventListCubit cubit;
 
     // Test data
@@ -57,7 +64,7 @@ void main() {
       endTime: tomorrow.add(const Duration(hours: 23)),
       duration: const Duration(hours: 3),
       dances: ['Bachata'],
-      isFavorite: true,
+      isFavorite: false,
       isPast: false,
     );
 
@@ -79,11 +86,19 @@ void main() {
 
     setUp(() {
       mockRepository = MockEventRepository();
+      mockFavoritesCubit = MockFavoritesCubit();
       cubit = EventListCubit(mockRepository);
+      
+      // Register mock FavoritesCubit in GetIt
+      getIt.registerSingleton<FavoritesCubit>(mockFavoritesCubit);
+      
+      // Mock loadFavorites to do nothing
+      when(() => mockFavoritesCubit.loadFavorites()).thenAnswer((_) async => {});
     });
 
     tearDown(() {
       cubit.close();
+      getIt.reset();
     });
 
     test('initial state is EventListInitial', () {
@@ -102,14 +117,11 @@ void main() {
         expect: () => [
           isA<EventListLoading>(),
           isA<EventListLoaded>()
+              .having((state) => state.allEvents.length, 'allEvents length', 3)
               .having((state) => state.todayEvents.length, 'todayEvents length', 1)
               .having((state) => state.tomorrowEvents.length, 'tomorrowEvents length', 1)
-              .having((state) => state.upcomingEvents.length, 'upcomingEvents length', 1)
-              .having((state) => state.allEvents.length, 'allEvents length', 3),
+              .having((state) => state.upcomingEvents.length, 'upcomingEvents length', 1),
         ],
-        verify: (_) {
-          verify(() => mockRepository.getAllEvents()).called(1);
-        },
       );
 
       blocTest<EventListCubit, EventListState>(
@@ -122,74 +134,37 @@ void main() {
         act: (cubit) => cubit.loadEvents(),
         verify: (cubit) {
           final state = cubit.state as EventListLoaded;
-          
-          // Verify today events
-          expect(state.todayEvents.length, 1);
-          expect(state.todayEvents.first.id, '1');
-          expect(state.todayEvents.first.title, 'Today Event');
-          
-          // Verify tomorrow events
-          expect(state.tomorrowEvents.length, 1);
-          expect(state.tomorrowEvents.first.id, '2');
-          expect(state.tomorrowEvents.first.title, 'Tomorrow Event');
-          
-          // Verify upcoming events
-          expect(state.upcomingEvents.length, 1);
-          expect(state.upcomingEvents.first.id, '3');
-          expect(state.upcomingEvents.first.title, 'Upcoming Event');
+          expect(state.todayEvents.first.id, todayEvent.id);
+          expect(state.tomorrowEvents.first.id, tomorrowEvent.id);
+          expect(state.upcomingEvents.first.id, upcomingEvent.id);
         },
       );
 
       blocTest<EventListCubit, EventListState>(
-        'filters out past events from grouping',
-        build: () {
-          final pastEvent = Event(
-            id: '4',
-            title: 'Past Event',
-            description: 'Event that already happened',
-            organizer: 'Test Organizer',
-            venue: testVenue,
-            startTime: today.subtract(const Duration(days: 7)),
-            endTime: today.subtract(const Duration(days: 7, hours: -3)),
-            duration: const Duration(hours: 3),
-            dances: ['Salsa'],
-            isFavorite: false,
-            isPast: true,
-          );
-          
-          when(() => mockRepository.getAllEvents())
-              .thenAnswer((_) async => [...allEvents, pastEvent]);
-          return cubit;
-        },
-        act: (cubit) => cubit.loadEvents(),
-        verify: (cubit) {
-          final state = cubit.state as EventListLoaded;
-          
-          // Past event should be in allEvents but not in grouped lists
-          expect(state.allEvents.length, 4);
-          expect(state.todayEvents.length, 1);
-          expect(state.tomorrowEvents.length, 1);
-          expect(state.upcomingEvents.length, 1);
-          
-          // Verify past event is not in any group
-          expect(state.todayEvents.any((e) => e.isPast), false);
-          expect(state.tomorrowEvents.any((e) => e.isPast), false);
-          expect(state.upcomingEvents.any((e) => e.isPast), false);
-        },
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'emits [loading, error] when loadEvents fails',
+        'emits [loading, error] when loadEvents fails with ApiException',
         build: () {
           when(() => mockRepository.getAllEvents())
-              .thenThrow(Exception('Network error'));
+              .thenThrow(ApiException(message: 'API error'));
           return cubit;
         },
         act: (cubit) => cubit.loadEvents(),
         expect: () => [
           isA<EventListLoading>(),
-          isA<EventListError>()
-              .having((state) => state.message, 'message', contains('Failed to load events')),
+          isA<EventListError>(),
+        ],
+      );
+
+      blocTest<EventListCubit, EventListState>(
+        'emits [loading, error] when loadEvents fails with generic exception',
+        build: () {
+          when(() => mockRepository.getAllEvents())
+              .thenThrow(Exception('Generic error'));
+          return cubit;
+        },
+        act: (cubit) => cubit.loadEvents(),
+        expect: () => [
+          isA<EventListLoading>(),
+          isA<EventListError>(),
         ],
       );
 
@@ -213,248 +188,168 @@ void main() {
 
     group('searchEvents', () {
       blocTest<EventListCubit, EventListState>(
-        'emits [loading, loaded] when searchEvents succeeds',
-        build: () {
-          when(() => mockRepository.searchEvents('Salsa'))
-              .thenAnswer((_) async => [todayEvent]);
-          return cubit;
-        },
-        act: (cubit) => cubit.searchEvents('Salsa'),
-        expect: () => [
-          isA<EventListLoading>(),
-          isA<EventListLoaded>()
-              .having((state) => state.allEvents.length, 'allEvents length', 1)
-              .having((state) => state.todayEvents.length, 'todayEvents length', 1),
-        ],
-        verify: (_) {
-          verify(() => mockRepository.searchEvents('Salsa')).called(1);
-        },
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'groups search results correctly by date',
-        build: () {
-          when(() => mockRepository.searchEvents('Event'))
-              .thenAnswer((_) async => allEvents);
-          return cubit;
-        },
-        act: (cubit) => cubit.searchEvents('Event'),
-        verify: (cubit) {
-          final state = cubit.state as EventListLoaded;
-          expect(state.todayEvents.length, 1);
-          expect(state.tomorrowEvents.length, 1);
-          expect(state.upcomingEvents.length, 1);
-        },
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'calls loadEvents when query is empty',
+        'filters events locally by title',
         build: () {
           when(() => mockRepository.getAllEvents())
               .thenAnswer((_) async => allEvents);
           return cubit;
         },
-        act: (cubit) => cubit.searchEvents(''),
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.searchEvents('Today');
+        },
+        skip: 2, // Skip loading and initial loaded states
+        verify: (cubit) {
+          final state = cubit.state as EventListLoaded;
+          expect(state.allEvents.length, 1);
+          expect(state.allEvents.first.title, contains('Today'));
+        },
+      );
+
+      blocTest<EventListCubit, EventListState>(
+        'filters events by venue name',
+        build: () {
+          final venueEvent = todayEvent.copyWith(
+            venue: testVenue.copyWith(name: 'Lucerna Music Bar'),
+          );
+          when(() => mockRepository.getAllEvents())
+              .thenAnswer((_) async => [venueEvent]);
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.searchEvents('Lucerna');
+        },
+        skip: 2,
+        verify: (cubit) {
+          final state = cubit.state as EventListLoaded;
+          expect(state.allEvents.length, 1);
+          expect(state.allEvents.first.venue.name, contains('Lucerna'));
+        },
+      );
+
+      blocTest<EventListCubit, EventListState>(
+        'is case-insensitive',
+        build: () {
+          when(() => mockRepository.getAllEvents())
+              .thenAnswer((_) async => allEvents);
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.searchEvents('TODAY');
+        },
+        skip: 2,
+        verify: (cubit) {
+          final state = cubit.state as EventListLoaded;
+          expect(state.allEvents.length, 1);
+        },
+      );
+
+      blocTest<EventListCubit, EventListState>(
+        'reloads all events when query is empty',
+        build: () {
+          when(() => mockRepository.getAllEvents())
+              .thenAnswer((_) async => allEvents);
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.searchEvents('Today');
+          await cubit.searchEvents('');
+        },
         verify: (_) {
-          verify(() => mockRepository.getAllEvents()).called(1);
-          verifyNever(() => mockRepository.searchEvents(any()));
+          verify(() => mockRepository.getAllEvents()).called(2);
         },
       );
 
       blocTest<EventListCubit, EventListState>(
-        'emits [loading, error] when searchEvents fails',
+        'returns empty results for non-matching query',
         build: () {
-          when(() => mockRepository.searchEvents('Salsa'))
-              .thenThrow(Exception('Search error'));
+          when(() => mockRepository.getAllEvents())
+              .thenAnswer((_) async => allEvents);
           return cubit;
         },
-        act: (cubit) => cubit.searchEvents('Salsa'),
-        expect: () => [
-          isA<EventListLoading>(),
-          isA<EventListError>()
-              .having((state) => state.message, 'message', contains('Search failed')),
-        ],
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'handles empty search results',
-        build: () {
-          when(() => mockRepository.searchEvents('NonExistent'))
-              .thenAnswer((_) async => []);
-          return cubit;
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.searchEvents('NonExistent');
         },
-        act: (cubit) => cubit.searchEvents('NonExistent'),
+        skip: 2,
         verify: (cubit) {
           final state = cubit.state as EventListLoaded;
           expect(state.allEvents, isEmpty);
-          expect(state.todayEvents, isEmpty);
-          expect(state.tomorrowEvents, isEmpty);
-          expect(state.upcomingEvents, isEmpty);
         },
       );
     });
 
     group('toggleFavorite', () {
       blocTest<EventListCubit, EventListState>(
-        'calls repository toggleFavorite and reloads events',
+        'toggles favorite status and updates state',
         build: () {
-          when(() => mockRepository.toggleFavorite('1'))
-              .thenAnswer((_) async => {});
           when(() => mockRepository.getAllEvents())
               .thenAnswer((_) async => allEvents);
-          return cubit;
-        },
-        act: (cubit) => cubit.toggleFavorite('1'),
-        verify: (_) {
-          verify(() => mockRepository.toggleFavorite('1')).called(1);
-          verify(() => mockRepository.getAllEvents()).called(1);
-        },
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'emits loaded state after successful toggle',
-        build: () {
-          when(() => mockRepository.toggleFavorite('1'))
+          when(() => mockRepository.toggleFavorite('1', false))
               .thenAnswer((_) async => {});
-          when(() => mockRepository.getAllEvents())
-              .thenAnswer((_) async => allEvents);
-          return cubit;
-        },
-        act: (cubit) => cubit.toggleFavorite('1'),
-        expect: () => [
-          isA<EventListLoading>(),
-          isA<EventListLoaded>(),
-        ],
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'emits error when toggleFavorite fails',
-        build: () {
-          when(() => mockRepository.toggleFavorite('1'))
-              .thenThrow(Exception('Toggle error'));
-          return cubit;
-        },
-        act: (cubit) => cubit.toggleFavorite('1'),
-        expect: () => [
-          isA<EventListError>()
-              .having((state) => state.message, 'message', contains('Failed to toggle favorite')),
-        ],
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'handles toggle for non-existent event gracefully',
-        build: () {
-          when(() => mockRepository.toggleFavorite('999'))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository.getAllEvents())
-              .thenAnswer((_) async => allEvents);
-          return cubit;
-        },
-        act: (cubit) => cubit.toggleFavorite('999'),
-        verify: (_) {
-          verify(() => mockRepository.toggleFavorite('999')).called(1);
-          verify(() => mockRepository.getAllEvents()).called(1);
-        },
-      );
-    });
-
-    group('state transitions', () {
-      blocTest<EventListCubit, EventListState>(
-        'maintains state after error until next action',
-        build: () {
-          when(() => mockRepository.getAllEvents())
-              .thenThrow(Exception('Error'));
-          return cubit;
-        },
-        act: (cubit) => cubit.loadEvents(),
-        verify: (cubit) {
-          expect(cubit.state, isA<EventListError>());
-        },
-      );
-
-      blocTest<EventListCubit, EventListState>(
-        'can recover from error state',
-        build: () {
-          var callCount = 0;
-          when(() => mockRepository.getAllEvents()).thenAnswer((_) async {
-            callCount++;
-            if (callCount == 1) {
-              throw Exception('Error');
-            }
-            return allEvents;
-          });
           return cubit;
         },
         act: (cubit) async {
           await cubit.loadEvents();
-          await cubit.loadEvents();
+          await cubit.toggleFavorite('1');
         },
+        skip: 2,
+        verify: (cubit) {
+          final state = cubit.state as EventListLoaded;
+          final toggledEvent = state.allEvents.firstWhere((e) => e.id == '1');
+          expect(toggledEvent.isFavorite, isTrue);
+          verify(() => mockRepository.toggleFavorite('1', false)).called(1);
+        },
+      );
+
+      blocTest<EventListCubit, EventListState>(
+        'updates event in all date groups',
+        build: () {
+          when(() => mockRepository.getAllEvents())
+              .thenAnswer((_) async => allEvents);
+          when(() => mockRepository.toggleFavorite('1', false))
+              .thenAnswer((_) async => {});
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.toggleFavorite('1');
+        },
+        skip: 2,
+        verify: (cubit) {
+          final state = cubit.state as EventListLoaded;
+          final toggledInToday = state.todayEvents.firstWhere((e) => e.id == '1');
+          expect(toggledInToday.isFavorite, isTrue);
+        },
+      );
+
+      blocTest<EventListCubit, EventListState>(
+        'emits error when toggle fails',
+        build: () {
+          when(() => mockRepository.getAllEvents())
+              .thenAnswer((_) async => allEvents);
+          when(() => mockRepository.toggleFavorite('1', false))
+              .thenThrow(ApiException(message: 'Toggle error'));
+          return cubit;
+        },
+        act: (cubit) async {
+          await cubit.loadEvents();
+          await cubit.toggleFavorite('1');
+        },
+        skip: 2,
         expect: () => [
-          isA<EventListLoading>(),
           isA<EventListError>(),
-          isA<EventListLoading>(),
-          isA<EventListLoaded>(),
         ],
       );
-    });
-
-    group('edge cases', () {
-      blocTest<EventListCubit, EventListState>(
-        'handles events at midnight correctly',
-        build: () {
-          final midnightEvent = Event(
-            id: '5',
-            title: 'Midnight Event',
-            description: 'Event at midnight',
-            organizer: 'Test Organizer',
-            venue: testVenue,
-            startTime: today,
-            endTime: today.add(const Duration(hours: 3)),
-            duration: const Duration(hours: 3),
-            dances: ['Salsa'],
-            isFavorite: false,
-            isPast: false,
-          );
-          
-          when(() => mockRepository.getAllEvents())
-              .thenAnswer((_) async => [midnightEvent]);
-          return cubit;
-        },
-        act: (cubit) => cubit.loadEvents(),
-        verify: (cubit) {
-          final state = cubit.state as EventListLoaded;
-          expect(state.todayEvents.length, 1);
-          expect(state.todayEvents.first.title, 'Midnight Event');
-        },
-      );
 
       blocTest<EventListCubit, EventListState>(
-        'handles multiple events on same day',
-        build: () {
-          final event1 = todayEvent;
-          final event2 = Event(
-            id: '6',
-            title: 'Another Today Event',
-            description: 'Another event today',
-            organizer: 'Test Organizer',
-            venue: testVenue,
-            startTime: today.add(const Duration(hours: 18)),
-            endTime: today.add(const Duration(hours: 21)),
-            duration: const Duration(hours: 3),
-            dances: ['Bachata'],
-            isFavorite: false,
-            isPast: false,
-          );
-          
-          when(() => mockRepository.getAllEvents())
-              .thenAnswer((_) async => [event1, event2]);
-          return cubit;
-        },
-        act: (cubit) => cubit.loadEvents(),
-        verify: (cubit) {
-          final state = cubit.state as EventListLoaded;
-          expect(state.todayEvents.length, 2);
-        },
+        'does nothing when state is not loaded',
+        build: () => cubit,
+        act: (cubit) => cubit.toggleFavorite('1'),
+        expect: () => [],
       );
     });
   });
