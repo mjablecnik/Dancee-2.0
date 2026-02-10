@@ -22,12 +22,15 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Basic Auth
+  // Basic Auth for Swagger documentation
   if (process.env.NODE_ENV === 'production') {
-    app.use(['api', '/api', '/api-json'], basicAuth({
+    const swaggerUser = process.env.SWAGGER_USER || 'admin';
+    const swaggerPassword = process.env.SWAGGER_PASSWORD || 'admin';
+    
+    app.use(['/api', '/api-json'], basicAuth({
       challenge: true,
       users: {
-        admin: 'test123',  // => username: admin, password: heslo123
+        [swaggerUser]: swaggerPassword,
       },
     }));
   }
