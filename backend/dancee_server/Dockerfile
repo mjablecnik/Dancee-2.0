@@ -1,47 +1,42 @@
-# Multi-stage build for NestJS application
+# syntax = docker/dockerfile:1
 
-# Stage 1: Build
-FROM node:20-alpine AS builder
+# Adjust NODE_VERSION as desired
+ARG NODE_VERSION=24.12.0
+FROM node:${NODE_VERSION}-slim AS base
 
-# Set working directory
+LABEL fly_launch_runtime="NestJS"
+
+# NestJS app lives here
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Set production environment
+ENV NODE_ENV="production"
 
-# Install dependencies
-RUN npm ci
 
-# Copy source code
+# Throw-away build stage to reduce size of final image
+FROM base AS build
+
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+
+# Install node modules
+COPY package-lock.json package.json ./
+RUN npm ci --include=dev
+
+# Copy application code
 COPY . .
 
-# Build the application
+# Build application
 RUN npm run build
 
-# Stage 2: Production
-FROM node:20-alpine AS production
 
-# Set working directory
-WORKDIR /app
+# Final stage for app image
+FROM base
 
-# Set NODE_ENV to production
-ENV NODE_ENV=production
+# Copy built application
+COPY --from=build /app /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Expose the application port
+# Start the server by default, this can be overwritten at runtime
 EXPOSE 3001
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start the application
-CMD ["node", "dist/main"]
+CMD [ "npm", "run", "start" ]
