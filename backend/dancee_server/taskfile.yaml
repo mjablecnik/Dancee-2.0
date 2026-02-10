@@ -1,0 +1,53 @@
+version: '3'
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+      - npm install
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - npm run start:dev
+
+  start:
+    desc: Start production server
+    cmds:
+      - npm run start:prod
+
+  build:
+    desc: Build the application
+    cmds:
+      - npm run build
+
+  lint:
+    desc: Run linter
+    cmds:
+      - npm run lint
+
+  format:
+    desc: Format code with prettier
+    cmds:
+      - npm run format
+
+  test:
+    desc: Run tests
+    cmds:
+      - npm run test
+
+  test-watch:
+    desc: Run tests in watch mode
+    cmds:
+      - npm run test:watch
+
+  test-e2e:
+    desc: Run end-to-end tests
+    cmds:
+      - npm run test:e2e
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf dist
+      - rm -rf node_modules
