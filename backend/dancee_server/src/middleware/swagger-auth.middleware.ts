@@ -8,13 +8,23 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class SwaggerAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    // Only protect Swagger routes, not the events API
-    const path = req.path;
+    // Only protect Swagger routes, not the events API or other endpoints
+    // Use req.originalUrl instead of req.path to get the full URL path
+    // req.path can be "/" when middleware is applied globally in NestJS
+    const fullUrl = req.originalUrl || req.url;
+    // Remove query string if present
+    const path = fullUrl.split('?')[0];
+
+    console.log('SwaggerAuthMiddleware: Checking fullUrl:', fullUrl);
+    console.log('SwaggerAuthMiddleware: Checking path:', path);
+    console.log('SwaggerAuthMiddleware: Checking env:', process.env.NODE_ENV);
+    
+    // Swagger is mounted at /api and serves static files from /api/*
+    // We want to protect /api and /api/* but NOT /api-json
     const isSwaggerRoute =
       path === '/api' ||
-      path.startsWith('/api/') && !path.startsWith('/api-') ||
-      path === '/api-json' ||
-      path.startsWith('/api-json/');
+      path === '/api/' ||
+      (path.startsWith('/api/') && !path.startsWith('/api-json'));
 
     // If not a Swagger route, allow access
     if (!isSwaggerRoute) {

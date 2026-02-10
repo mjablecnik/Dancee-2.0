@@ -12,11 +12,8 @@ import { SwaggerAuthMiddleware } from './middleware/swagger-auth.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Apply authentication middleware to routes that might be Swagger-related
-    // The middleware itself will check the exact path and only protect Swagger routes
-    // while allowing /api/events, /api/favorites, etc. to pass through
-    consumer
-      .apply(SwaggerAuthMiddleware)
-      .forRoutes('api', 'api/*path', 'api-json');
+    // Apply authentication middleware to all routes
+    // The middleware itself will check the path and only protect Swagger routes
+    consumer.apply(SwaggerAuthMiddleware).forRoutes('*');
   }
 }

@@ -11,6 +11,8 @@ describe('SwaggerAuthMiddleware', () => {
     middleware = new SwaggerAuthMiddleware();
     mockRequest = {
       headers: {},
+      originalUrl: '/api', // Default to Swagger route
+      url: '/api',
     };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
@@ -133,6 +135,140 @@ describe('SwaggerAuthMiddleware', () => {
       mockRequest.headers = {
         authorization: `Basic ${defaultCredentials}`,
       };
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(nextFunction).toHaveBeenCalled();
+      expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Path Detection', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'production';
+      process.env.SWAGGER_USER = 'testuser';
+      process.env.SWAGGER_PASSWORD = 'testpass';
+    });
+
+    it('should protect /api route', () => {
+      mockRequest.originalUrl = '/api';
+      mockRequest.url = '/api';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should protect /api/ route', () => {
+      mockRequest.originalUrl = '/api/';
+      mockRequest.url = '/api/';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should protect /api/* routes', () => {
+      mockRequest.originalUrl = '/api/swagger-ui.css';
+      mockRequest.url = '/api/swagger-ui.css';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should allow /events/list route without authentication', () => {
+      mockRequest.originalUrl = '/events/list';
+      mockRequest.url = '/events/list';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(nextFunction).toHaveBeenCalled();
+      expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+
+    it('should allow /events/favorites route without authentication', () => {
+      mockRequest.originalUrl = '/events/favorites';
+      mockRequest.url = '/events/favorites';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(nextFunction).toHaveBeenCalled();
+      expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+
+    it('should allow /scraper routes without authentication', () => {
+      mockRequest.originalUrl = '/scraper/event/123';
+      mockRequest.url = '/scraper/event/123';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(nextFunction).toHaveBeenCalled();
+      expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+
+    it('should allow /api-json route without authentication', () => {
+      mockRequest.originalUrl = '/api-json';
+      mockRequest.url = '/api-json';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(nextFunction).toHaveBeenCalled();
+      expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+
+    it('should handle query strings correctly', () => {
+      mockRequest.originalUrl = '/events/list?page=1&limit=10';
+      mockRequest.url = '/events/list?page=1&limit=10';
+
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+
+      expect(nextFunction).toHaveBeenCalled();
+      expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+
+    it('should use req.url as fallback when originalUrl is not available', () => {
+      mockRequest.originalUrl = undefined;
+      mockRequest.url = '/events/list';
 
       middleware.use(
         mockRequest as Request,
