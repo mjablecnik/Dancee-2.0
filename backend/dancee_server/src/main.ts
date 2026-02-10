@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable global validation
   app.useGlobalPipes(
     new ValidationPipe({
@@ -14,7 +14,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  
+
   // Enable CORS for frontend communication
   app.enableCors({
     origin: true, // Allow all origins in development
@@ -29,14 +29,22 @@ async function bootstrap() {
     .addTag('scraper', 'Facebook event scraping endpoints')
     .addTag('app', 'Application health and info endpoints')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port);
-  
+
   console.log(`🚀 Dancee Server is running on: http://localhost:${port}`);
-  console.log(`📚 Swagger documentation available at: http://localhost:${port}/api`);
+  console.log(
+    `📚 Swagger documentation available at: http://localhost:${port}/api`,
+  );
+
+  if (process.env.NODE_ENV === 'production') {
+    console.log(
+      `🔒 Swagger is protected with Basic Authentication in production`,
+    );
+  }
 }
 bootstrap();

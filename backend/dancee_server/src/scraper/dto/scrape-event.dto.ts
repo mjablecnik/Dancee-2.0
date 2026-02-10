@@ -5,7 +5,7 @@ export class ScrapeEventDto {
   @ApiProperty({
     description: 'Facebook event ID or full event URL',
     example: '1987385505448084',
-    type: String
+    type: String,
   })
   @IsString()
   @IsNotEmpty()
@@ -16,7 +16,7 @@ export class ScrapeEventListDto {
   @ApiProperty({
     description: 'Facebook page, group, or profile ID or full URL',
     example: '123456789',
-    type: String
+    type: String,
   })
   @IsString()
   @IsNotEmpty()
@@ -26,7 +26,7 @@ export class ScrapeEventListDto {
     description: 'Filter events by type (upcoming or past)',
     enum: ['upcoming', 'past'],
     required: false,
-    example: 'upcoming'
+    example: 'upcoming',
   })
   @IsOptional()
   @IsString()

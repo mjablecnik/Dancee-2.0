@@ -25,8 +25,8 @@ export class FavoritesRepository {
     }
 
     const userFavorites = this.favorites.get(userId)!;
-    const alreadyExists = userFavorites.some(e => e.id === event.id);
-    
+    const alreadyExists = userFavorites.some((e) => e.id === event.id);
+
     if (!alreadyExists) {
       userFavorites.push(event);
     }
@@ -38,7 +38,7 @@ export class FavoritesRepository {
   async removeFavorite(userId: string, eventId: string): Promise<void> {
     const userFavorites = this.favorites.get(userId);
     if (userFavorites) {
-      const filtered = userFavorites.filter(event => event.id !== eventId);
+      const filtered = userFavorites.filter((event) => event.id !== eventId);
       this.favorites.set(userId, filtered);
     }
   }

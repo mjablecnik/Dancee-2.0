@@ -34,7 +34,8 @@ export class EventsController {
   @Get('events')
   @ApiOperation({
     summary: 'List all dance events',
-    description: 'Retrieves all available dance events. Optionally accepts userId query parameter to mark favorite events.',
+    description:
+      'Retrieves all available dance events. Optionally accepts userId query parameter to mark favorite events.',
   })
   @ApiQuery({
     name: 'userId',
@@ -58,7 +59,8 @@ export class EventsController {
   @Get('favorites')
   @ApiOperation({
     summary: 'List user favorite events',
-    description: 'Retrieves all favorite events for a specific user. Requires userId query parameter.',
+    description:
+      'Retrieves all favorite events for a specific user. Requires userId query parameter.',
   })
   @ApiQuery({
     name: 'userId',
@@ -90,7 +92,8 @@ export class EventsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Add event to favorites',
-    description: 'Adds an event to user favorites. Requires userId and eventId in request body.',
+    description:
+      'Adds an event to user favorites. Requires userId and eventId in request body.',
   })
   @ApiBody({
     type: AddFavoriteDto,
@@ -122,9 +125,9 @@ export class EventsController {
   })
   async addFavorite(@Body() addFavoriteDto: AddFavoriteDto) {
     const { userId, eventId } = addFavoriteDto;
-    
+
     await this.eventsService.addFavorite(userId, eventId);
-    
+
     return {
       message: 'Favorite added successfully',
       userId,
@@ -136,7 +139,8 @@ export class EventsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Remove event from favorites',
-    description: 'Removes an event from user favorites. Requires userId query parameter and eventId path parameter.',
+    description:
+      'Removes an event from user favorites. Requires userId query parameter and eventId path parameter.',
   })
   @ApiParam({
     name: 'eventId',
@@ -172,7 +176,7 @@ export class EventsController {
     if (!userId) {
       throw new BadRequestException('userId query parameter is required');
     }
-    
+
     await this.eventsService.removeFavorite(userId, eventId);
   }
 }

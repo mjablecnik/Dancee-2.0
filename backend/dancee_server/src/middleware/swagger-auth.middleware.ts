@@ -1,0 +1,49 @@
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+/**
+ * Middleware for protecting Swagger documentation with HTTP Basic Authentication
+ * Only active in production environment
+ */
+@Injectable()
+export class SwaggerAuthMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    // Skip authentication in development
+    if (process.env.NODE_ENV !== 'production') {
+      return next();
+    }
+
+    // Get credentials from environment variables
+    const swaggerUser = process.env.SWAGGER_USER || 'admin';
+    const swaggerPassword = process.env.SWAGGER_PASSWORD || 'changeme';
+
+    // Parse Authorization header
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return this.requestAuth(res);
+    }
+
+    // Decode Base64 credentials
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString(
+      'utf-8',
+    );
+    const [username, password] = credentials.split(':');
+
+    // Verify credentials
+    if (username === swaggerUser && password === swaggerPassword) {
+      return next();
+    }
+
+    return this.requestAuth(res);
+  }
+
+  /**
+   * Send 401 Unauthorized response with WWW-Authenticate header
+   */
+  private requestAuth(res: Response) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Swagger Documentation"');
+    res.status(401).send('Authentication required');
+  }
+}

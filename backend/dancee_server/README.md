@@ -10,9 +10,16 @@ A simple NestJS REST API server for the Dancee application.
 ## Installation
 
 ```bash
+# 1. Install dependencies
 task install
 # or
 npm install
+
+# 2. Create .env file from example
+cp .env.example .env
+
+# 3. Edit .env with your configuration (optional for development)
+# See docs/ENVIRONMENT_SETUP.md for details
 ```
 
 ## Running the Application
@@ -63,7 +70,19 @@ The Swagger UI provides:
 - Parameter documentation
 - Example requests and responses
 
-For more details, see [SWAGGER.md](./docs/SWAGGER.md)
+**🔒 Production Security:**
+In production environments, Swagger documentation is protected with HTTP Basic Authentication. Only authorized users with valid credentials can access the API documentation.
+
+**Security Documentation:**
+- 🚀 [Quick Start (5 min)](./docs/SWAGGER_SECURITY_QUICKSTART.md) - Fast setup guide
+- 📚 [Documentation Index](./docs/SWAGGER_SECURITY_INDEX.md) - Complete guide navigation
+- ✅ [Deployment Checklist](./docs/SWAGGER_SECURITY_CHECKLIST.md) - Pre-deployment tasks
+- 📘 [Complete Security Guide](./docs/SWAGGER_SECURITY.md) - Detailed documentation
+- 💻 [Usage Examples](./docs/SWAGGER_SECURITY_EXAMPLES.md) - Code examples in 10+ languages
+
+For more details, see:
+- [SWAGGER.md](./docs/SWAGGER.md) - Swagger usage guide
+- [SWAGGER_SECURITY.md](./docs/SWAGGER_SECURITY.md) - Security configuration
 
 ### API Modules
 

@@ -12,6 +12,22 @@ Once the server is running, you can access the Swagger documentation at:
 http://localhost:3001/api
 ```
 
+### 🔒 Production Security
+
+In production environments, Swagger documentation is protected with HTTP Basic Authentication. You'll need to enter a username and password to access the documentation.
+
+**Quick Setup:**
+```bash
+export NODE_ENV=production
+export SWAGGER_USER=your_username
+export SWAGGER_PASSWORD=your_secure_password
+```
+
+**For detailed security setup, see:**
+- [SWAGGER_SECURITY_QUICKSTART.md](./SWAGGER_SECURITY_QUICKSTART.md) - 5-minute setup guide
+- [SWAGGER_SECURITY.md](./SWAGGER_SECURITY.md) - Complete security documentation
+- [SWAGGER_SECURITY_EXAMPLES.md](./SWAGGER_SECURITY_EXAMPLES.md) - Usage examples
+
 ## Features
 
 The Swagger documentation provides:
@@ -160,6 +176,7 @@ You can customize:
 ## Notes
 
 - Swagger UI is available in all environments (development, staging, production)
-- Consider adding authentication to Swagger UI in production environments
+- **🔒 Production environments require authentication** - see [SWAGGER_SECURITY.md](./SWAGGER_SECURITY.md)
+- In development, no authentication is required for easy testing
 - The documentation is automatically updated when you modify decorators
 - All changes are reflected immediately in development mode with hot reload

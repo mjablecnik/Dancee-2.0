@@ -33,18 +33,20 @@ describe('EventsController', () => {
     it('should mark favorites when userId is provided', async () => {
       // First add a favorite
       await service.addFavorite('user123', 'event-001');
-      
+
       // Then list events with userId
       const result = await controller.listEvents('user123');
-      const favoriteEvent = result.find(e => e.id === 'event-001');
-      
+      const favoriteEvent = result.find((e) => e.id === 'event-001');
+
       expect(favoriteEvent?.isFavorite).toBe(true);
     });
   });
 
   describe('listFavorites', () => {
     it('should throw BadRequestException when userId is missing', async () => {
-      await expect(controller.listFavorites()).rejects.toThrow(BadRequestException);
+      await expect(controller.listFavorites()).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return empty array for user with no favorites', async () => {
@@ -55,7 +57,7 @@ describe('EventsController', () => {
     it('should return user favorites', async () => {
       await service.addFavorite('user123', 'event-001');
       const result = await controller.listFavorites('user123');
-      
+
       expect(result.length).toBe(1);
       expect(result[0].id).toBe('event-001');
     });
@@ -85,9 +87,9 @@ describe('EventsController', () => {
 
   describe('removeFavorite', () => {
     it('should throw BadRequestException when userId is missing', async () => {
-      await expect(
-        controller.removeFavorite('event-001'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.removeFavorite('event-001')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException for invalid eventId', async () => {
@@ -99,17 +101,17 @@ describe('EventsController', () => {
     it('should remove event from favorites', async () => {
       // Add favorite first
       await service.addFavorite('user123', 'event-003');
-      
+
       // Verify it was added
       let favorites = await service.getFavorites('user123');
-      expect(favorites.some(e => e.id === 'event-003')).toBe(true);
-      
+      expect(favorites.some((e) => e.id === 'event-003')).toBe(true);
+
       // Remove it
       await controller.removeFavorite('event-003', 'user123');
-      
+
       // Verify it was removed
       favorites = await service.getFavorites('user123');
-      expect(favorites.some(e => e.id === 'event-003')).toBe(false);
+      expect(favorites.some((e) => e.id === 'event-003')).toBe(false);
     });
   });
 });

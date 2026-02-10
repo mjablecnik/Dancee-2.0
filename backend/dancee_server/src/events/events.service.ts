@@ -28,10 +28,10 @@ export class EventsService {
 
     // Get user's favorite event IDs
     const favorites = await this.favoritesRepository.getFavorites(userId);
-    const favoriteIds = new Set(favorites.map(e => e.id));
+    const favoriteIds = new Set(favorites.map((e) => e.id));
 
     // Mark events as favorite if they are in user's favorites
-    return events.map(event => ({
+    return events.map((event) => ({
       ...event,
       isFavorite: favoriteIds.has(event.id),
     }));
@@ -50,7 +50,7 @@ export class EventsService {
    */
   async addFavorite(userId: string, eventId: string): Promise<void> {
     const event = await this.eventRepository.getEventById(eventId);
-    
+
     if (!event) {
       throw new NotFoundException('Event not found');
     }
@@ -66,7 +66,7 @@ export class EventsService {
    */
   async removeFavorite(userId: string, eventId: string): Promise<void> {
     const eventExists = await this.eventRepository.eventExists(eventId);
-    
+
     if (!eventExists) {
       throw new NotFoundException('Event not found');
     }

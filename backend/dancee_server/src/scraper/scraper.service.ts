@@ -1,9 +1,9 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { 
-  scrapeFbEvent, 
-  scrapeFbEventFromFbid, 
-  scrapeFbEventList, 
-  EventType 
+import {
+  scrapeFbEvent,
+  scrapeFbEventFromFbid,
+  scrapeFbEventList,
+  EventType,
 } from 'facebook-event-scraper';
 
 @Injectable()
@@ -18,9 +18,9 @@ export class ScraperService {
   async scrapeEvent(eventId: string): Promise<any> {
     try {
       this.logger.log(`Scraping event: ${eventId}`);
-      
+
       let eventData;
-      
+
       // Check if it's a URL or just an ID
       if (eventId.includes('facebook.com') || eventId.includes('fb.com')) {
         // It's a URL
@@ -29,7 +29,7 @@ export class ScraperService {
         // It's just an ID
         eventData = await scrapeFbEventFromFbid(eventId);
       }
-      
+
       this.logger.log(`Successfully scraped event: ${eventId}`);
       return eventData;
     } catch (error) {
@@ -54,7 +54,7 @@ export class ScraperService {
       this.logger.log(
         `Scraping event list from: ${pageId} (type: ${eventType || 'all'})`,
       );
-      
+
       // Convert string to EventType enum
       let fbEventType: EventType | undefined;
       if (eventType === 'upcoming') {
@@ -62,7 +62,7 @@ export class ScraperService {
       } else if (eventType === 'past') {
         fbEventType = EventType.Past;
       }
-      
+
       const events = await scrapeFbEventList(pageId, fbEventType);
       this.logger.log(
         `Successfully scraped ${events.length} events from: ${pageId}`,
