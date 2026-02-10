@@ -21,7 +21,13 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 │       ├── taskfile.yaml    # Task automation file
 │       └── pubspec.yaml     # Flutter dependencies
 ├── backend/
-│   └── dancee_event_service/ # Backend services
+│   ├── dancee_event_service/ # Dart backend service (REST API)
+│   └── dancee_server/        # NestJS backend service (Node.js/TypeScript)
+│       ├── src/             # TypeScript source code
+│       ├── docs/            # Documentation files
+│       ├── test/            # Test files
+│       ├── taskfile.yaml    # Task automation file
+│       └── package.json     # Node.js dependencies
 └── shared/
     └── dancee_shared/       # Shared code between frontend and backend
         └── lib/
@@ -89,6 +95,71 @@ Not in:
 - ❌ `frontend/dancee_app/lib/models/event.dart`
 - ❌ `backend/dancee_event_service/lib/models/event.dart`
 
+## Backend Services
+
+The project includes two backend services:
+
+### 🎯 dancee_event_service (Dart)
+- **Technology**: Dart with shelf framework
+- **Purpose**: REST API for event data management
+- **Location**: `backend/dancee_event_service/`
+- **Port**: Configurable (typically 8080)
+
+### 🚀 dancee_server (NestJS)
+- **Technology**: Node.js with NestJS framework (TypeScript)
+- **Purpose**: Web scraping and data collection service
+- **Location**: `backend/dancee_server/`
+- **Port**: 3001 (default)
+- **Key Features**:
+  - Facebook event scraping
+  - RESTful API endpoints
+  - Swagger/OpenAPI documentation
+  - CORS enabled for frontend communication
+
+#### dancee_server Structure:
+```
+backend/dancee_server/
+├── src/
+│   ├── scraper/           # Scraper module
+│   │   ├── dto/          # Data Transfer Objects
+│   │   ├── scraper.controller.ts
+│   │   ├── scraper.service.ts
+│   │   └── scraper.module.ts
+│   ├── app.controller.ts  # Main controller
+│   ├── app.module.ts      # Root module
+│   ├── app.service.ts     # Business logic
+│   └── main.ts           # Application entry point
+├── docs/                  # Documentation files (REQUIRED)
+├── test/                  # Test files
+├── taskfile.yaml         # Task automation
+└── package.json          # Dependencies
+```
+
+#### dancee_server Task Commands:
+```bash
+task install      # Install dependencies
+task dev          # Start development server with hot reload
+task start        # Start production server
+task build        # Build the application
+task lint         # Run linter
+task format       # Format code with prettier
+task test         # Run tests
+task test-watch   # Run tests in watch mode
+task test-e2e     # Run end-to-end tests
+task clean        # Clean build artifacts
+```
+
+#### dancee_server API Documentation:
+- **Swagger UI**: Available at `http://localhost:3001/api`
+- **Interactive testing**: Test endpoints directly from browser
+- **Complete schemas**: Request/response documentation
+- **Examples**: Sample requests and responses
+
+For detailed information, see:
+- `backend/dancee_server/README.md` - Main documentation
+- `backend/dancee_server/docs/SWAGGER.md` - Swagger setup guide
+- `backend/dancee_server/docs/EXAMPLES.md` - Usage examples
+
 ## Critical Development Guidelines for Kiro AI
 
 ### 💻 Development Environment
@@ -142,6 +213,48 @@ Examples:
 - ❌ `String uzivatel = "Zadejte své jméno";`
 - ✅ `// Calculate user score`
 - ❌ `// Vypočítej skóre uživatele`
+
+### 📚 Documentation Requirements
+
+**CRITICAL**: All documentation files MUST follow strict organizational rules.
+
+#### Documentation File Placement:
+
+**For ALL backend services (`dancee_server`, `dancee_event_service`):**
+- ✅ **All documentation files** MUST be placed in the `docs/` folder
+- ✅ **Exception**: Only `README.md` can be in the root directory
+- ❌ **Never** place documentation files (`.md`) in the root except `README.md`
+
+**Examples:**
+```
+✅ CORRECT:
+backend/dancee_server/README.md              # Root README only
+backend/dancee_server/docs/SWAGGER.md        # Documentation in docs/
+backend/dancee_server/docs/EXAMPLES.md       # Documentation in docs/
+backend/dancee_server/docs/QUICK_START.md    # Documentation in docs/
+
+❌ WRONG:
+backend/dancee_server/SWAGGER.md             # Should be in docs/
+backend/dancee_server/API_GUIDE.md           # Should be in docs/
+backend/dancee_server/SETUP.md               # Should be in docs/
+```
+
+#### Documentation Standards:
+1. **README.md** - Overview, quick start, basic usage (root only)
+2. **docs/** folder - All other documentation:
+   - Setup guides
+   - API documentation
+   - Examples and tutorials
+   - Troubleshooting guides
+   - Architecture documentation
+   - Deployment guides
+
+#### When Creating New Documentation:
+1. **Check if it's a README** - If yes, place in root
+2. **All other docs** - Place in `docs/` folder
+3. **Create docs/ folder** if it doesn't exist
+4. **Use descriptive names** - `SWAGGER.md`, `EXAMPLES.md`, `DEPLOYMENT.md`
+5. **Link from README** - Reference docs from main README.md
 
 ### 🌐 Internationalization (i18n) Requirements
 
@@ -290,6 +403,106 @@ cp lib/app_config.example.dart lib/app_config.dart
 4. **Document all fields** with comments explaining their purpose
 5. **Keep sensitive data separate** - don't mix with public config
 
+### 📖 Swagger/OpenAPI Documentation
+
+**CRITICAL**: For `dancee_server` (NestJS backend), every new endpoint MUST have Swagger documentation.
+
+#### Swagger Requirements:
+
+**For EVERY new endpoint, you MUST:**
+1. **Add Swagger decorators** to the controller
+2. **Document request parameters** with `@ApiParam()`, `@ApiQuery()`, `@ApiBody()`
+3. **Document responses** with `@ApiResponse()`
+4. **Add descriptions** with `@ApiOperation()`
+5. **Define DTOs** with `@ApiProperty()` decorators
+6. **Add examples** where applicable
+
+#### Swagger Decorator Examples:
+
+**Controller-level documentation:**
+```typescript
+@ApiTags('scraper')  // Group endpoints
+@Controller('scraper')
+export class ScraperController {
+  // ...
+}
+```
+
+**Endpoint documentation:**
+```typescript
+@Get('event/:eventId')
+@ApiOperation({ 
+  summary: 'Scrape a single Facebook event',
+  description: 'Fetches detailed information about a Facebook event by ID or URL'
+})
+@ApiParam({ 
+  name: 'eventId', 
+  description: 'Facebook event ID or full event URL',
+  example: '115982989234742'
+})
+@ApiResponse({ 
+  status: 200, 
+  description: 'Event data successfully retrieved',
+  type: ScrapeEventDto 
+})
+@ApiResponse({ 
+  status: 400, 
+  description: 'Invalid event ID or URL' 
+})
+async scrapeEvent(@Param('eventId') eventId: string) {
+  // ...
+}
+```
+
+**DTO documentation:**
+```typescript
+export class ScrapeEventDto {
+  @ApiProperty({ 
+    description: 'Facebook event ID',
+    example: '115982989234742'
+  })
+  id: string;
+
+  @ApiProperty({ 
+    description: 'Event name/title',
+    example: 'Summer Dance Party'
+  })
+  name: string;
+
+  @ApiPropertyOptional({ 
+    description: 'Event description',
+    example: 'Join us for an amazing night of dancing!'
+  })
+  description?: string;
+}
+```
+
+#### Swagger Best Practices:
+1. **Use descriptive summaries** - Clear, concise endpoint purpose
+2. **Add examples** - Help developers understand expected values
+3. **Document all parameters** - Path params, query params, body
+4. **Document all responses** - Success and error cases
+5. **Use proper HTTP status codes** - 200, 201, 400, 404, 500, etc.
+6. **Group related endpoints** - Use `@ApiTags()` for organization
+7. **Keep DTOs documented** - Every property should have `@ApiProperty()`
+
+#### Accessing Swagger UI:
+```
+http://localhost:3001/api
+```
+
+#### Swagger Documentation Files:
+- `backend/dancee_server/docs/SWAGGER.md` - Setup and usage guide
+- `backend/dancee_server/docs/SWAGGER_SETUP.md` - Configuration details
+- `backend/dancee_server/docs/SWAGGER_SCREENSHOTS.md` - Visual examples
+
+#### When Creating New Endpoints:
+1. ✅ **Write the endpoint code**
+2. ✅ **Add Swagger decorators** (MANDATORY)
+3. ✅ **Test in Swagger UI** at `/api`
+4. ✅ **Update documentation** if needed
+5. ✅ **Verify examples work** in interactive UI
+
 ### 🛠️ Task Management
 
 This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands when suggesting or running commands:
@@ -360,11 +573,14 @@ As Kiro AI, always:
 7. Use build runner tasks for code generation needs
 8. **Run `task slang`** after modifying translation files
 9. Suggest appropriate task commands instead of direct Flutter commands
+10. **Place documentation in `docs/` folder** (except README.md)
+11. **Add Swagger documentation** for all new `dancee_server` endpoints
 
 ### 📞 Quick Commands Reference
 
 When suggesting commands to users:
 
+**Frontend (Flutter):**
 ```bash
 # Start development
 task get-deps
@@ -384,6 +600,36 @@ task build-android
 task build-ios
 ```
 
+**Backend - dancee_server (NestJS):**
+```bash
+# Start development
+task install
+task dev                # Development with hot reload
+
+# Code quality
+task lint
+task format
+
+# Testing
+task test
+task test-watch
+task test-e2e
+
+# Build for production
+task build
+task start
+```
+
+**Backend - dancee_event_service (Dart):**
+```bash
+# Start development
+task get-deps
+task run
+
+# Testing
+task test
+```
+
 ### 🤖 AI-Specific Instructions
 
 - Always prioritize English language usage in all generated content
@@ -400,5 +646,10 @@ task build-ios
 - **Use global `t` variable** for translations: `t.keyName` or `t.method(param: value)`
 - **Keep `dancee_shared` pure Dart** - no Flutter dependencies allowed
 - **Never commit sensitive values** - always use `app_config.dart` for environment-specific data
+- **Documentation placement**: All docs in `docs/` folder except `README.md`
+- **Swagger documentation**: MANDATORY for all new `dancee_server` endpoints
+- **Use appropriate backend**: `dancee_server` for scraping/external APIs, `dancee_event_service` for event data management
+- **NestJS conventions**: Follow NestJS patterns for `dancee_server` (modules, controllers, services, DTOs)
+- **TypeScript best practices**: Use proper typing, interfaces, and decorators in `dancee_server`
 
 Remember: This guide ensures consistency and maintainability for international development teams working on the Dancee App project.
