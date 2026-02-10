@@ -51,3 +51,35 @@ tasks:
     cmds:
       - rm -rf dist
       - rm -rf node_modules
+
+  # Docker tasks
+  docker-dev:
+    desc: Start development server in Docker with hot reload
+    cmds:
+      - docker-compose -f docker-compose.dev.yml up --build
+
+  docker-dev-down:
+    desc: Stop development Docker container
+    cmds:
+      - docker-compose -f docker-compose.dev.yml down
+
+  docker-prod:
+    desc: Build and start production Docker container
+    cmds:
+      - docker-compose -f docker-compose.prod.yml up --build -d
+
+  docker-prod-down:
+    desc: Stop production Docker container
+    cmds:
+      - docker-compose -f docker-compose.prod.yml down
+
+  docker-prod-logs:
+    desc: View production Docker container logs
+    cmds:
+      - docker-compose -f docker-compose.prod.yml logs -f
+
+  docker-clean:
+    desc: Remove all Docker containers, images, and volumes
+    cmds:
+      - docker-compose -f docker-compose.dev.yml down -v --rmi all
+      - docker-compose -f docker-compose.prod.yml down -v --rmi all

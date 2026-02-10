@@ -44,6 +44,7 @@ npm run start:prod
 
 ## Available Tasks
 
+### Local Development
 - `task install` - Install dependencies
 - `task dev` - Start development server with hot reload
 - `task start` - Start production server
@@ -54,6 +55,16 @@ npm run start:prod
 - `task test-watch` - Run tests in watch mode
 - `task test-e2e` - Run end-to-end tests
 - `task clean` - Clean build artifacts
+
+### Docker Tasks
+- `task docker-dev` - Start development server in Docker with hot reload
+- `task docker-dev-down` - Stop development Docker container
+- `task docker-prod` - Build and start production Docker container
+- `task docker-prod-down` - Stop production Docker container
+- `task docker-prod-logs` - View production Docker container logs
+- `task docker-clean` - Remove all Docker containers, images, and volumes
+
+**📦 For complete Docker setup guide, see [DOCKER.md](./docs/DOCKER.md)**
 
 ## API Endpoints
 
