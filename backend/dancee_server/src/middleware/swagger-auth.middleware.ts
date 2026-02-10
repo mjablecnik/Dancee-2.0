@@ -8,6 +8,19 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class SwaggerAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
+    // Only protect Swagger routes, not the events API
+    const path = req.path;
+    const isSwaggerRoute =
+      path === '/api' ||
+      path.startsWith('/api/') && !path.startsWith('/api-') ||
+      path === '/api-json' ||
+      path.startsWith('/api-json/');
+
+    // If not a Swagger route, allow access
+    if (!isSwaggerRoute) {
+      return next();
+    }
+
     // Skip authentication in development
     if (process.env.NODE_ENV !== 'production') {
       return next();

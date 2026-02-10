@@ -27,11 +27,11 @@ import { AddFavoriteDto } from './dto/add-favorite.dto';
  * This is a direct port from the Dart dancee_event_service.
  */
 @ApiTags('events')
-@Controller('api')
+@Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Get('events')
+  @Get('list')
   @ApiOperation({
     summary: 'List all dance events',
     description:
