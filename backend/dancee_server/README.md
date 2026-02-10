@@ -50,6 +50,23 @@ npm run start:prod
 
 ## API Endpoints
 
+### Interactive API Documentation (Swagger)
+
+**📚 Full interactive API documentation is available at:**
+```
+http://localhost:3001/api
+```
+
+The Swagger UI provides:
+- Interactive endpoint testing
+- Complete request/response schemas
+- Parameter documentation
+- Example requests and responses
+
+For more details, see [SWAGGER.md](./SWAGGER.md)
+
+### Quick Reference
+
 ### GET /
 Returns a simple "Hello World!" message.
 
@@ -152,6 +169,7 @@ src/
 - ✅ Facebook event scraping with `facebook-event-scraper`
 - ✅ Input validation with class-validator
 - ✅ Structured logging
+- ✅ **Swagger/OpenAPI documentation** - Interactive API docs at `/api`
 
 ## Facebook Event Scraper
 

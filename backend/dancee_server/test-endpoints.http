@@ -1,3 +1,9 @@
+### Dancee Server API Test Endpoints
+###
+### 📚 Interactive Swagger Documentation: http://localhost:3001/api
+### Use Swagger UI for better documentation, request/response schemas, and interactive testing!
+###
+
 ### Test Hello World endpoint
 GET http://localhost:3001/
 
