@@ -63,7 +63,17 @@ The Swagger UI provides:
 - Parameter documentation
 - Example requests and responses
 
-For more details, see [SWAGGER.md](./SWAGGER.md)
+For more details, see [SWAGGER.md](./docs/SWAGGER.md)
+
+### API Modules
+
+This server provides two main API modules:
+
+1. **Events API** (`/api/events`, `/api/favorites`) - Dance event management and user favorites
+   - See [EVENTS_API.md](./docs/EVENTS_API.md) for detailed documentation
+   
+2. **Scraper API** (`/scraper/*`) - Facebook event scraping
+   - See examples below and [EXAMPLES.md](./docs/EXAMPLES.md)
 
 ### Quick Reference
 
@@ -74,6 +84,60 @@ Returns a simple "Hello World!" message.
 ```
 Hello World!
 ```
+
+---
+
+## Events API
+
+### GET /api/events
+List all dance events, optionally marking favorites for a user.
+
+**Query Parameters:**
+- `userId` (optional) - User identifier to mark favorites
+
+**Example:**
+```bash
+GET http://localhost:3001/api/events?userId=user123
+```
+
+### GET /api/favorites
+List all favorite events for a user.
+
+**Query Parameters:**
+- `userId` (required) - User identifier
+
+**Example:**
+```bash
+GET http://localhost:3001/api/favorites?userId=user123
+```
+
+### POST /api/favorites
+Add an event to user favorites.
+
+**Body:**
+```json
+{
+  "userId": "user123",
+  "eventId": "event-001"
+}
+```
+
+### DELETE /api/favorites/:eventId
+Remove an event from user favorites.
+
+**Query Parameters:**
+- `userId` (required) - User identifier
+
+**Example:**
+```bash
+DELETE http://localhost:3001/api/favorites/event-001?userId=user123
+```
+
+**📖 For complete Events API documentation, see [EVENTS_API.md](./docs/EVENTS_API.md)**
+
+---
+
+## Scraper API
 
 ### GET /scraper/event/:eventId
 Scrape a single Facebook event by ID or URL.
@@ -152,10 +216,25 @@ GET http://localhost:3001/scraper/events?pageId=123456789&eventType=upcoming
 
 ```
 src/
-├── app.controller.ts    # Main controller with routes
-├── app.module.ts        # Root module
-├── app.service.ts       # Business logic
-└── main.ts             # Application entry point
+├── events/                  # Events API module
+│   ├── dto/                # Data Transfer Objects
+│   ├── repositories/       # Data access layer
+│   ├── events.controller.ts
+│   ├── events.service.ts
+│   └── events.module.ts
+├── scraper/                # Scraper API module
+│   ├── dto/
+│   ├── scraper.controller.ts
+│   ├── scraper.service.ts
+│   └── scraper.module.ts
+├── app.controller.ts       # Main controller
+├── app.module.ts           # Root module
+├── app.service.ts          # Business logic
+└── main.ts                 # Application entry point
+docs/                       # Documentation
+├── EVENTS_API.md          # Events API documentation
+├── SWAGGER.md             # Swagger setup guide
+└── EXAMPLES.md            # Usage examples
 ```
 
 ## Features
@@ -166,7 +245,8 @@ src/
 - ✅ ESLint and Prettier configured
 - ✅ Jest testing setup
 - ✅ Task automation with Taskfile
-- ✅ Facebook event scraping with `facebook-event-scraper`
+- ✅ **Events API** - Dance event management and user favorites
+- ✅ **Scraper API** - Facebook event scraping with `facebook-event-scraper`
 - ✅ Input validation with class-validator
 - ✅ Structured logging
 - ✅ **Swagger/OpenAPI documentation** - Interactive API docs at `/api`

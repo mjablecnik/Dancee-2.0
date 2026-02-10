@@ -1,0 +1,98 @@
+### Test Events API Endpoints
+### This file can be used with REST Client extension in VS Code
+
+@baseUrl = http://localhost:3001
+
+### 1. List all events (no userId)
+GET {{baseUrl}}/api/events
+
+###
+
+### 2. List all events with userId (marks favorites)
+GET {{baseUrl}}/api/events?userId=user123
+
+###
+
+### 3. Get user favorites (empty initially)
+GET {{baseUrl}}/api/favorites?userId=user123
+
+###
+
+### 4. Get user favorites without userId (should return 400)
+GET {{baseUrl}}/api/favorites
+
+###
+
+### 5. Add event to favorites
+POST {{baseUrl}}/api/favorites
+Content-Type: application/json
+
+{
+  "userId": "user123",
+  "eventId": "event-001"
+}
+
+###
+
+### 6. Add another event to favorites
+POST {{baseUrl}}/api/favorites
+Content-Type: application/json
+
+{
+  "userId": "user123",
+  "eventId": "event-002"
+}
+
+###
+
+### 7. Get user favorites (should have 2 events now)
+GET {{baseUrl}}/api/favorites?userId=user123
+
+###
+
+### 8. List all events with favorites marked
+GET {{baseUrl}}/api/events?userId=user123
+
+###
+
+### 9. Try to add non-existent event (should return 404)
+POST {{baseUrl}}/api/favorites
+Content-Type: application/json
+
+{
+  "userId": "user123",
+  "eventId": "invalid-event"
+}
+
+###
+
+### 10. Remove event from favorites
+DELETE {{baseUrl}}/api/favorites/event-001?userId=user123
+
+###
+
+### 11. Get user favorites (should have 1 event now)
+GET {{baseUrl}}/api/favorites?userId=user123
+
+###
+
+### 12. Remove event without userId (should return 400)
+DELETE {{baseUrl}}/api/favorites/event-002
+
+###
+
+### 13. Try to remove non-existent event (should return 404)
+DELETE {{baseUrl}}/api/favorites/invalid-event?userId=user123
+
+###
+
+### 14. Check Swagger documentation
+GET {{baseUrl}}/api
+
+###
+
+### 15. Get specific event details (from events list)
+# First get all events, then check individual event data
+GET {{baseUrl}}/api/events
+
+###
