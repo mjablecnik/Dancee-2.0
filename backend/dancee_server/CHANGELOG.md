@@ -7,21 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- **SwaggerAuthMiddleware path detection bug** - Fixed critical issue where `req.path` always returned "/" causing incorrect route protection. Changed to use `req.originalUrl || req.url` for accurate path detection. This ensures:
-  - `/api` and `/api/*` routes are properly protected with basic auth in production
-  - `/events/*` routes remain publicly accessible
-  - Query strings are handled correctly
-  - Development mode bypasses authentication as expected
-  - See [docs/SWAGGER_AUTH_FIX.md](./docs/SWAGGER_AUTH_FIX.md) for details
-
-### Added
-- Comprehensive unit tests for path detection in SwaggerAuthMiddleware (9 new tests)
-- Documentation for middleware testing in [docs/MIDDLEWARE_TESTING.md](./docs/MIDDLEWARE_TESTING.md)
-- Documentation for the authentication fix in [docs/SWAGGER_AUTH_FIX.md](./docs/SWAGGER_AUTH_FIX.md)
-
 ### Changed
-- Removed debug console.log statements from SwaggerAuthMiddleware
+- Refactored project structure: moved app files to `src/app/` folder
+- Simplified Swagger authentication: using `express-basic-auth` instead of custom middleware
+- Cleaned up documentation: removed 16 redundant/obsolete MD files
+
+### Removed
+- Custom `SwaggerAuthMiddleware` (replaced with `express-basic-auth`)
+- Obsolete documentation files (migration guides, summaries, duplicates)
 
 ## [1.0.0] - 2024-01-XX
 
@@ -29,8 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release of Dancee Server
 - Facebook event scraping functionality
 - RESTful API endpoints
-- Swagger/OpenAPI documentation
+- Swagger/OpenAPI documentation with Basic Auth protection in production
 - Events management API
-- Favorites system
+- Favorites system with Firestore integration
 - Docker support
 - Fly.io deployment configuration
+- Comprehensive documentation

@@ -184,7 +184,7 @@ task slang-analyze      # Check for missing keys
 
 ## Design
 
-The app follows the design from `design/event-list.html` with:
+The app follows the design from `.design/event-list.html` with:
 - Modern gradient backgrounds
 - Clean card-based layout
 - Intuitive filtering system
@@ -204,7 +204,7 @@ The app follows clean architecture principles with:
 
 1. **UI Layer** (Screens) → Displays data and handles user interactions
 2. **State Management Layer** (Cubits) → Manages business logic and state
-3. **Data Layer** (Repository) → Provides data access (currently hardcoded, ready for API integration)
+3. **Data Layer** (Repository) → Provides data access via REST API
 
 ## Development
 
@@ -258,11 +258,9 @@ task build-ios
 
 ## Next Steps
 
-- ✅ Implement repository pattern with state management
-- ✅ Add favorites functionality
-- Add backend integration for real event data (API ready architecture)
+- Add backend integration for real-time event updates
 - Implement user authentication
 - Add event details screen
 - Add location-based filtering
 - Add push notifications for new events
-- Implement event search and advanced filtering
+- Implement advanced search and filtering

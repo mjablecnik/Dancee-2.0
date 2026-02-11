@@ -91,9 +91,7 @@ In production environments, Swagger documentation is protected with HTTP Basic A
 - 📘 [Complete Security Guide](./docs/SWAGGER_SECURITY.md) - Detailed documentation
 - 💻 [Usage Examples](./docs/SWAGGER_SECURITY_EXAMPLES.md) - Code examples in 10+ languages
 
-For more details, see:
-- [SWAGGER.md](./docs/SWAGGER.md) - Swagger usage guide
-- [SWAGGER_SECURITY.md](./docs/SWAGGER_SECURITY.md) - Security configuration
+For more details, see [SWAGGER.md](./docs/SWAGGER.md)
 
 ### API Modules
 
@@ -246,24 +244,29 @@ GET http://localhost:3001/scraper/events?pageId=123456789&eventType=upcoming
 
 ```
 src/
+├── app/                     # Main application module
+│   ├── app.controller.ts   # Main controller
+│   ├── app.module.ts       # Root module
+│   └── app.service.ts      # Business logic
 ├── events/                  # Events API module
 │   ├── dto/                # Data Transfer Objects
 │   ├── repositories/       # Data access layer
 │   ├── events.controller.ts
 │   ├── events.service.ts
 │   └── events.module.ts
+├── firebase/               # Firebase integration
+│   ├── firebase.module.ts
+│   └── firebase.service.ts
 ├── scraper/                # Scraper API module
 │   ├── dto/
 │   ├── scraper.controller.ts
 │   ├── scraper.service.ts
 │   └── scraper.module.ts
-├── app.controller.ts       # Main controller
-├── app.module.ts           # Root module
-├── app.service.ts          # Business logic
 └── main.ts                 # Application entry point
 docs/                       # Documentation
 ├── EVENTS_API.md          # Events API documentation
 ├── SWAGGER.md             # Swagger setup guide
+├── FIRESTORE_SETUP.md     # Firestore configuration
 └── EXAMPLES.md            # Usage examples
 ```
 

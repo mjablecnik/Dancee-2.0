@@ -281,8 +281,6 @@ frontend/dancee_app/
 
 - [Slang Documentation](https://pub.dev/packages/slang)
 - [Slang Flutter Documentation](https://pub.dev/packages/slang_flutter)
-- [Project Migration Guide](SLANG_MIGRATION.md)
-- [Setup Complete Guide](SLANG_SETUP_COMPLETE.md)
 
 ---
 
