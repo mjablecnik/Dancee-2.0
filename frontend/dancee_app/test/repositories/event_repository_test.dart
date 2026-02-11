@@ -50,7 +50,7 @@ void main() {
     group('getAllEvents', () {
       test('returns list of events from API', () async {
         when(() => mockApiClient.get(
-              '/events/list',
+              '/api/events/list',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => [testEvent.toJson()]);
 
@@ -60,14 +60,14 @@ void main() {
         expect(events.length, 1);
         expect(events.first.id, testEvent.id);
         verify(() => mockApiClient.get(
-              '/events/list',
+              '/api/events/list',
               queryParameters: any(named: 'queryParameters'),
             )).called(1);
       });
 
       test('throws ApiException when API returns invalid format', () async {
         when(() => mockApiClient.get(
-              '/events/list',
+              '/api/events/list',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => 'invalid');
 
@@ -79,7 +79,7 @@ void main() {
 
       test('throws ApiException when API call fails', () async {
         when(() => mockApiClient.get(
-              '/events/list',
+              '/api/events/list',
               queryParameters: any(named: 'queryParameters'),
             )).thenThrow(Exception('Network error'));
 
@@ -94,7 +94,7 @@ void main() {
       test('returns list of favorite events from API', () async {
         final favoriteEvent = testEvent.copyWith(isFavorite: true);
         when(() => mockApiClient.get(
-              '/events/favorites',
+              '/api/events/favorites',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => [favoriteEvent.toJson()]);
 
@@ -104,14 +104,14 @@ void main() {
         expect(events.length, 1);
         expect(events.first.isFavorite, isTrue);
         verify(() => mockApiClient.get(
-              '/events/favorites',
+              '/api/events/favorites',
               queryParameters: any(named: 'queryParameters'),
             )).called(1);
       });
 
       test('returns empty list when no favorites', () async {
         when(() => mockApiClient.get(
-              '/events/favorites',
+              '/api/events/favorites',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => []);
 
@@ -122,7 +122,7 @@ void main() {
 
       test('throws ApiException when API returns invalid format', () async {
         when(() => mockApiClient.get(
-              '/events/favorites',
+              '/api/events/favorites',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => 'invalid');
 
@@ -136,21 +136,21 @@ void main() {
     group('addFavorite', () {
       test('calls API to add favorite', () async {
         when(() => mockApiClient.post(
-              '/events/favorites',
+              '/api/events/favorites',
               data: any(named: 'data'),
             )).thenAnswer((_) async => {});
 
         await repository.addFavorite('1');
 
         verify(() => mockApiClient.post(
-              '/events/favorites',
+              '/api/events/favorites',
               data: any(named: 'data'),
             )).called(1);
       });
 
       test('throws ApiException when API call fails', () async {
         when(() => mockApiClient.post(
-              '/events/favorites',
+              '/api/events/favorites',
               data: any(named: 'data'),
             )).thenThrow(Exception('Network error'));
 
@@ -164,21 +164,21 @@ void main() {
     group('removeFavorite', () {
       test('calls API to remove favorite', () async {
         when(() => mockApiClient.delete(
-              '/events/favorites/1',
+              '/api/events/favorites/1',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => {});
 
         await repository.removeFavorite('1');
 
         verify(() => mockApiClient.delete(
-              '/events/favorites/1',
+              '/api/events/favorites/1',
               queryParameters: any(named: 'queryParameters'),
             )).called(1);
       });
 
       test('throws ApiException when API call fails', () async {
         when(() => mockApiClient.delete(
-              '/events/favorites/1',
+              '/api/events/favorites/1',
               queryParameters: any(named: 'queryParameters'),
             )).thenThrow(Exception('Network error'));
 
@@ -192,28 +192,28 @@ void main() {
     group('toggleFavorite', () {
       test('calls removeFavorite when currentIsFavorite is true', () async {
         when(() => mockApiClient.delete(
-              '/events/favorites/1',
+              '/api/events/favorites/1',
               queryParameters: any(named: 'queryParameters'),
             )).thenAnswer((_) async => {});
 
         await repository.toggleFavorite('1', true);
 
         verify(() => mockApiClient.delete(
-              '/events/favorites/1',
+              '/api/events/favorites/1',
               queryParameters: any(named: 'queryParameters'),
             )).called(1);
       });
 
       test('calls addFavorite when currentIsFavorite is false', () async {
         when(() => mockApiClient.post(
-              '/events/favorites',
+              '/api/events/favorites',
               data: any(named: 'data'),
             )).thenAnswer((_) async => {});
 
         await repository.toggleFavorite('1', false);
 
         verify(() => mockApiClient.post(
-              '/events/favorites',
+              '/api/events/favorites',
               data: any(named: 'data'),
             )).called(1);
       });
