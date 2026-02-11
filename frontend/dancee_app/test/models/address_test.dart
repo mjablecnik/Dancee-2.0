@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dancee_shared/dancee_shared.dart';
+import 'package:dancee_app/models/address.dart';
 
 void main() {
   group('Address', () {

@@ -52,10 +52,6 @@ dependencies:
   
   # HTTP client
   dio: ^5.4.0
-  
-  # Shared models and utilities
-  dancee_shared:
-    path: ../../shared/dancee_shared
 
 dev_dependencies:
   flutter_test:

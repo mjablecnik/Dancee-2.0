@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dancee_shared/dancee_shared.dart';
+import '../../models/event.dart';
 import '../../repositories/event_repository.dart';
 import '../../core/exceptions/api_exception.dart';
 import '../../i18n/translations.g.dart';

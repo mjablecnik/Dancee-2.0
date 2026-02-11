@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:dancee_shared/dancee_shared.dart';
+
+import '../../models/event.dart';
 
 /// Base class for all EventList states.
 abstract class EventListState extends Equatable {

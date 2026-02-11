@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dancee_shared/dancee_shared.dart';
+import '../models/event.dart';
 import '../i18n/translations.g.dart';
 
 /// Reusable event card widget used in both event list and favorites screens.

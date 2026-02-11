@@ -1,4 +1,4 @@
-import 'package:dancee_shared/dancee_shared.dart';
+import '../models/event.dart';
 import '../core/clients/api_client.dart';
 import '../core/config/api_config.dart';
 import '../core/exceptions/api_exception.dart';

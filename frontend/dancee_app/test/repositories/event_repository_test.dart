@@ -3,7 +3,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:dancee_app/repositories/event_repository.dart';
 import 'package:dancee_app/core/clients/api_client.dart';
 import 'package:dancee_app/core/exceptions/api_exception.dart';
-import 'package:dancee_shared/dancee_shared.dart';
+import 'package:dancee_app/models/event.dart';
+import 'package:dancee_app/models/venue.dart';
+import 'package:dancee_app/models/address.dart';
 
 // Mock class for ApiClient
 class MockApiClient extends Mock implements ApiClient {}

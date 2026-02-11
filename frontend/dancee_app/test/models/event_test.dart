@@ -1,5 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dancee_shared/dancee_shared.dart';
+import 'package:dancee_app/models/event.dart';
+import 'package:dancee_app/models/venue.dart';
+import 'package:dancee_app/models/address.dart';
+import 'package:dancee_app/models/event_info.dart';
+import 'package:dancee_app/models/event_part.dart';
 
 void main() {
   group('Event', () {
