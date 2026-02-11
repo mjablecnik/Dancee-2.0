@@ -16,13 +16,13 @@ class EventRepository {
 
   /// Returns all events from the backend API.
   ///
-  /// Makes a GET request to /api/events with userId query parameter
+  /// Makes a GET request to /events/list with userId query parameter
   /// to mark favorite events. Parses the response.
   /// Throws ApiException on failure.
   Future<List<Event>> getAllEvents() async {
     try {
       final response = await _apiClient.get(
-        '/api/events',
+        '/events/list',
         queryParameters: {'userId': ApiConfig.userId},
       );
       
@@ -50,13 +50,13 @@ class EventRepository {
 
   /// Returns only favorite events from the backend API.
   ///
-  /// Makes a GET request to /api/favorites with userId query parameter.
+  /// Makes a GET request to /events/favorites with userId query parameter.
   /// Returns an empty list if the API returns an empty array.
   /// Throws ApiException on failure.
   Future<List<Event>> getFavoriteEvents() async {
     try {
       final response = await _apiClient.get(
-        '/api/favorites',
+        '/events/favorites',
         queryParameters: {'userId': ApiConfig.userId},
       );
       
@@ -84,13 +84,13 @@ class EventRepository {
 
   /// Adds an event to the user's favorites.
   ///
-  /// Makes a POST request to /api/favorites with userId and eventId.
+  /// Makes a POST request to /events/favorites with userId and eventId.
   /// The Cubit is responsible for updating the cache after this call.
   /// Throws ApiException on failure.
   Future<void> addFavorite(String eventId) async {
     try {
       await _apiClient.post(
-        '/api/favorites',
+        '/events/favorites',
         data: {
           'userId': ApiConfig.userId,
           'eventId': eventId,
@@ -108,13 +108,13 @@ class EventRepository {
 
   /// Removes an event from the user's favorites.
   ///
-  /// Makes a DELETE request to /api/favorites/:eventId with userId query parameter.
+  /// Makes a DELETE request to /events/favorites/:eventId with userId query parameter.
   /// The Cubit is responsible for updating the cache after this call.
   /// Throws ApiException on failure.
   Future<void> removeFavorite(String eventId) async {
     try {
       await _apiClient.delete(
-        '/api/favorites/$eventId',
+        '/events/favorites/$eventId',
         queryParameters: {'userId': ApiConfig.userId},
       );
     } on ApiException {
