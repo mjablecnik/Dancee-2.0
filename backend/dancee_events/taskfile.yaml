@@ -1,0 +1,57 @@
+version: '3'
+
+tasks:
+  install:
+    desc: Install Go dependencies
+    cmds:
+      - go mod download
+
+  run:
+    desc: Run the application in development mode
+    cmds:
+      - go run main.go
+
+  build:
+    desc: Build the application
+    cmds:
+      - go build -o dancee_events main.go
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -f dancee_events
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test ./...
+
+  test-verbose:
+    desc: Run tests with verbose output
+    cmds:
+      - go test -v ./...
+
+  lint:
+    desc: Run linter
+    cmds:
+      - go vet ./...
+
+  format:
+    desc: Format code
+    cmds:
+      - go fmt ./...
+
+  docker-build:
+    desc: Build Docker image
+    cmds:
+      - docker build -t dancee_events:latest .
+
+  docker-run:
+    desc: Run Docker container
+    cmds:
+      - docker run -p 3002:3002 --env-file .env dancee_events:latest
+
+  dev:
+    desc: Run with auto-reload (requires air)
+    cmds:
+      - air
