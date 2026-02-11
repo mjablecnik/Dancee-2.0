@@ -276,10 +276,33 @@ docs/                       # Documentation
 - ✅ Jest testing setup
 - ✅ Task automation with Taskfile
 - ✅ **Events API** - Dance event management and user favorites
+- ✅ **Firestore Integration** - Persistent data storage with Firebase
 - ✅ **Scraper API** - Facebook event scraping with `facebook-event-scraper`
 - ✅ Input validation with class-validator
 - ✅ Structured logging
 - ✅ **Swagger/OpenAPI documentation** - Interactive API docs at `/api`
+
+## Data Storage
+
+This application uses **Firebase Firestore** for persistent data storage.
+
+**Collections:**
+- `events` - Dance events with details (venue, time, dances, etc.)
+- `favorites` - User favorite events (subcollection per user)
+
+**Setup:**
+1. Create Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. **Enable Firestore Database** (see [Database Setup Guide](./docs/FIRESTORE_DATABASE_SETUP.md))
+3. Generate service account key
+4. Configure `FIREBASE_SERVICE_ACCOUNT_PATH` in `.env`
+
+**Documentation:**
+- 🚨 [Database Setup](./docs/FIRESTORE_DATABASE_SETUP.md) - **START HERE if you get "NOT_FOUND" error**
+- 🚀 [Quick Reference](./docs/FIRESTORE_QUICK_REFERENCE.md) - Fast setup commands
+- 📚 [Complete Setup Guide](./docs/FIRESTORE_SETUP.md) - Detailed configuration
+
+**Sample Data:**
+The application automatically initializes Firestore with sample events on first startup if the collection is empty.
 
 ## Facebook Event Scraper
 
@@ -302,3 +325,49 @@ For detailed usage examples, see [EXAMPLES.md](./EXAMPLES.md)
 The server runs on port 3001 by default (configurable via PORT environment variable).
 
 CORS is enabled to allow requests from the Flutter frontend application.
+
+## Deployment
+
+### Fly.io (Automated)
+
+Use deployment scripts for easy deployment:
+
+```bash
+# Interactive deployment (recommended for first time)
+task deploy
+
+# Quick deployment (for updates)
+task deploy-quick
+
+# View logs
+task deploy-logs
+
+# Check status
+task deploy-status
+```
+
+**Manual deployment:**
+
+```bash
+# Set secrets
+fly secrets set FIREBASE_SERVICE_ACCOUNT_JSON="$(cat secrets/dancee-b5c0d-firebase-adminsdk-fbsvc-1584be4511.json)"
+fly secrets set SWAGGER_USER=admin
+fly secrets set SWAGGER_PASSWORD=your-secure-password
+
+# Deploy
+fly deploy
+```
+
+**Documentation:**
+- 📜 [Deploy Scripts Guide](./docs/DEPLOY_SCRIPTS.md) - Automated deployment scripts
+- 🚀 [Quick Deploy Guide](./docs/FLY_IO_QUICK_DEPLOY.md) - 5-minute deployment
+- 📚 [Complete Deployment Guide](./docs/FLY_IO_DEPLOYMENT.md) - Detailed instructions
+- 🧠 [Memory Optimization](./docs/MEMORY_OPTIMIZATION.md) - Fix memory issues
+
+### Docker Production
+
+```bash
+task docker-prod
+```
+
+See [DOCKER.md](./docs/DOCKER.md) for complete Docker documentation.

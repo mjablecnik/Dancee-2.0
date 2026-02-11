@@ -1,34 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventDto } from '../dto/event.dto';
+import { FirebaseService } from '../../firebase/firebase.service';
 
 /**
- * Repository for managing user favorites using in-memory storage.
+ * Repository for managing user favorites using Firestore.
  * This is a direct port from the Dart dancee_event_service.
  */
 @Injectable()
 export class FavoritesRepository {
-  private favorites: Map<string, EventDto[]> = new Map();
+  private readonly logger = new Logger(FavoritesRepository.name);
+  private readonly collectionName = 'favorites';
+
+  constructor(private readonly firebaseService: FirebaseService) {}
 
   /**
    * Returns all favorite events for a given user.
    */
   async getFavorites(userId: string): Promise<EventDto[]> {
-    return [...(this.favorites.get(userId) || [])];
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      const snapshot = await firestore
+        .collection(this.collectionName)
+        .doc(userId)
+        .collection('events')
+        .get();
+
+      return snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as EventDto[];
+    } catch (error) {
+      this.logger.error(`Failed to get favorites for user: ${userId}`, error);
+      throw error;
+    }
   }
 
   /**
    * Adds an event to a user's favorites (idempotent operation).
    */
   async addFavorite(userId: string, event: EventDto): Promise<void> {
-    if (!this.favorites.has(userId)) {
-      this.favorites.set(userId, []);
-    }
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      const { id, ...eventData } = event;
 
-    const userFavorites = this.favorites.get(userId)!;
-    const alreadyExists = userFavorites.some((e) => e.id === event.id);
+      await firestore
+        .collection(this.collectionName)
+        .doc(userId)
+        .collection('events')
+        .doc(id)
+        .set(eventData);
 
-    if (!alreadyExists) {
-      userFavorites.push(event);
+      this.logger.log(`Added favorite for user ${userId}: ${id}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to add favorite for user ${userId}: ${event.id}`,
+        error,
+      );
+      throw error;
     }
   }
 
@@ -36,10 +64,22 @@ export class FavoritesRepository {
    * Removes an event from a user's favorites (idempotent operation).
    */
   async removeFavorite(userId: string, eventId: string): Promise<void> {
-    const userFavorites = this.favorites.get(userId);
-    if (userFavorites) {
-      const filtered = userFavorites.filter((event) => event.id !== eventId);
-      this.favorites.set(userId, filtered);
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      await firestore
+        .collection(this.collectionName)
+        .doc(userId)
+        .collection('events')
+        .doc(eventId)
+        .delete();
+
+      this.logger.log(`Removed favorite for user ${userId}: ${eventId}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to remove favorite for user ${userId}: ${eventId}`,
+        error,
+      );
+      throw error;
     }
   }
 }

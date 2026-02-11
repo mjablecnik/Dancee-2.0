@@ -83,3 +83,46 @@ tasks:
     cmds:
       - docker-compose -f docker-compose.dev.yml down -v --rmi all
       - docker-compose -f docker-compose.prod.yml down -v --rmi all
+
+  # Fly.io deployment tasks
+  deploy:
+    desc: Deploy to Fly.io (interactive setup)
+    cmds:
+      - chmod +x deploy.sh
+      - ./deploy.sh
+
+  deploy-quick:
+    desc: Quick deploy to Fly.io (no prompts)
+    cmds:
+      - chmod +x deploy-quick.sh
+      - ./deploy-quick.sh
+
+  deploy-logs:
+    desc: View Fly.io deployment logs
+    cmds:
+      - fly logs --app dancee-server
+
+  deploy-status:
+    desc: Check Fly.io deployment status
+    cmds:
+      - fly status --app dancee-server
+
+  deploy-open:
+    desc: Open deployed app in browser
+    cmds:
+      - fly open --app dancee-server
+
+  deploy-ssh:
+    desc: SSH into Fly.io instance
+    cmds:
+      - fly ssh console --app dancee-server
+
+  deploy-restart:
+    desc: Restart Fly.io app
+    cmds:
+      - fly apps restart dancee-server
+
+  deploy-secrets:
+    desc: List Fly.io secrets
+    cmds:
+      - fly secrets list --app dancee-server

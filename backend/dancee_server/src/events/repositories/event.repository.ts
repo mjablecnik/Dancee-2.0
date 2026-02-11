@@ -1,34 +1,129 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventDto } from '../dto/event.dto';
+import { FirebaseService } from '../../firebase/firebase.service';
 
 /**
- * Repository for managing dance events using in-memory storage.
+ * Repository for managing dance events using Firestore.
  * This is a direct port from the Dart dancee_event_service.
  */
 @Injectable()
-export class EventRepository {
-  private events: EventDto[] = [];
+export class EventRepository implements OnModuleInit {
+  private readonly logger = new Logger(EventRepository.name);
+  private readonly collectionName = 'events';
 
-  constructor() {
-    this.initializeSampleData();
+  constructor(private readonly firebaseService: FirebaseService) {}
+
+  /**
+   * Called after the module has been initialized.
+   * Initializes sample data if the collection is empty.
+   */
+  async onModuleInit() {
+    await this.initializeSampleData();
   }
 
   async getAllEvents(): Promise<EventDto[]> {
-    return [...this.events];
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      const snapshot = await firestore.collection(this.collectionName).get();
+
+      return snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as EventDto[];
+    } catch (error) {
+      this.logger.error('Failed to get all events', error);
+      throw error;
+    }
   }
 
   async eventExists(eventId: string): Promise<boolean> {
-    return this.events.some((event) => event.id === eventId);
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      const doc = await firestore
+        .collection(this.collectionName)
+        .doc(eventId)
+        .get();
+
+      return doc.exists;
+    } catch (error) {
+      this.logger.error(`Failed to check if event exists: ${eventId}`, error);
+      throw error;
+    }
   }
 
   async getEventById(eventId: string): Promise<EventDto | null> {
-    return this.events.find((event) => event.id === eventId) || null;
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      const doc = await firestore
+        .collection(this.collectionName)
+        .doc(eventId)
+        .get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      return {
+        id: doc.id,
+        ...doc.data(),
+      } as EventDto;
+    } catch (error) {
+      this.logger.error(`Failed to get event by ID: ${eventId}`, error);
+      throw error;
+    }
   }
 
-  private initializeSampleData(): void {
-    const now = new Date();
+  /**
+   * Adds or updates an event in Firestore.
+   */
+  async saveEvent(event: EventDto): Promise<void> {
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      const { id, ...eventData } = event;
 
-    this.events = [
+      await firestore.collection(this.collectionName).doc(id).set(eventData);
+
+      this.logger.log(`Event saved: ${id}`);
+    } catch (error) {
+      this.logger.error(`Failed to save event: ${event.id}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes an event from Firestore.
+   */
+  async deleteEvent(eventId: string): Promise<void> {
+    try {
+      const firestore = this.firebaseService.getFirestore();
+      await firestore.collection(this.collectionName).doc(eventId).delete();
+
+      this.logger.log(`Event deleted: ${eventId}`);
+    } catch (error) {
+      this.logger.error(`Failed to delete event: ${eventId}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Initializes Firestore with sample data if the collection is empty.
+   * This runs asynchronously on startup.
+   */
+  private async initializeSampleData(): Promise<void> {
+    try {
+      // Check if collection already has data
+      const existingEvents = await this.getAllEvents();
+      if (existingEvents.length > 0) {
+        this.logger.log(
+          `Events collection already has ${existingEvents.length} events`,
+        );
+        return;
+      }
+
+      this.logger.log('Initializing Firestore with sample data...');
+      const now = new Date();
+
+    const sampleEvents: EventDto[] = [
       {
         id: 'event-001',
         title: 'Prague Salsa Night',
@@ -429,5 +524,32 @@ export class EventRepository {
         ],
       },
     ];
+
+      // Save all sample events to Firestore
+      await Promise.all(sampleEvents.map((event) => this.saveEvent(event)));
+
+      this.logger.log(
+        `Successfully initialized ${sampleEvents.length} sample events`,
+      );
+    } catch (error) {
+      // Check if it's a Firestore NOT_FOUND error
+      if (error.code === 5 || error.message?.includes('NOT_FOUND')) {
+        this.logger.error(
+          '❌ Firestore database not found or not enabled!',
+          '\n' +
+            '📋 Please follow these steps:\n' +
+            '1. Go to Firebase Console: https://console.firebase.google.com/project/dancee-b5c0d\n' +
+            '2. Click "Build" → "Firestore Database"\n' +
+            '3. Click "Create database"\n' +
+            '4. Choose "Start in production mode" or "Start in test mode"\n' +
+            '5. Select a location (e.g., europe-west3)\n' +
+            '6. Wait for database creation to complete\n' +
+            '7. Restart the server\n',
+        );
+      } else {
+        this.logger.error('Failed to initialize sample data', error);
+      }
+      // Don't throw - allow app to start even if sample data fails
+    }
   }
 }

@@ -8,6 +8,9 @@ services:
     container_name: dancee-server-prod
     ports:
       - "3001:3001"
+    volumes:
+      # Mount secrets folder for Firebase credentials
+      - ./secrets:/app/secrets
     env_file:
       - .env
     restart: always

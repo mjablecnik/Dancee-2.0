@@ -3,10 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScraperModule } from './scraper/scraper.module';
 import { EventsModule } from './events/events.module';
+import { FirebaseModule } from './firebase/firebase.module';
 import { SwaggerAuthMiddleware } from './middleware/swagger-auth.middleware';
 
 @Module({
-  imports: [ScraperModule, EventsModule],
+  imports: [FirebaseModule, ScraperModule, EventsModule],
   controllers: [AppController],
   providers: [AppService],
 })

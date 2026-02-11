@@ -34,6 +34,9 @@ RUN npm run build
 # Final stage for app image
 FROM base
 
+# Set Node.js memory limit (adjust based on available RAM)
+ENV NODE_OPTIONS="--max-old-space-size=896"
+
 # Copy built application
 COPY --from=build /app /app
 
