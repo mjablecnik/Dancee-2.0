@@ -1,0 +1,472 @@
+openapi: 3.0.0
+info:
+  title: Dancee Scraper API
+  version: 1.0.0
+  description: |
+    REST API for scraping Facebook event data.
+    
+    The Dancee Scraper API provides endpoints to scrape public Facebook events and event lists
+    from Facebook pages, groups, and profiles. This service uses the facebook-event-scraper
+    library to extract event information from publicly accessible Facebook pages.
+    
+    **Important Notes:**
+    - Only PUBLIC Facebook events can be scraped
+    - Events must be active and accessible
+    - Rate limiting may apply
+    - Use at your own risk - Facebook ToS prohibit automated scraping
+  contact:
+    name: Dancee API Support
+    email: support@dancee.app
+
+servers:
+  - url: https://dancee-scraper.fly.dev
+    description: Production server
+  - url: http://localhost:3002
+    description: Development server
+
+tags:
+  - name: Info
+    description: API information and usage
+  - name: Scraper
+    description: Facebook event scraping endpoints
+
+paths:
+  /api/scraper:
+    get:
+      tags:
+        - Info
+      summary: Get API information
+      description: |
+        Retrieve API usage information, available endpoints, and examples.
+        
+        This endpoint provides a comprehensive overview of the scraper API capabilities,
+        including endpoint descriptions, parameters, and usage examples.
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfoResponse'
+              example:
+                message: Facebook Event Scraper API
+                version: 1.0.0
+                endpoints:
+                  GET /api/scraper/event/:eventId:
+                    description: Scrape a single Facebook event
+                    parameters:
+                      eventId: Facebook event ID or full URL (must be public)
+                    examples:
+                      - GET /api/scraper/event/1987385505448084
+                      - GET /api/scraper/event/https://www.facebook.com/events/1987385505448084
+                  GET /api/scraper/events:
+                    description: Scrape a list of events from a page/group/profile
+                    parameters:
+                      pageId: Facebook page/group/profile ID or URL (required)
+                      eventType: Filter by "upcoming" or "past" (optional)
+                    examples:
+                      - GET /api/scraper/events?pageId=123456789&eventType=upcoming
+                      - GET /api/scraper/events?pageId=https://www.facebook.com/yourpage
+                notes:
+                  - Only PUBLIC Facebook events can be scraped
+                  - Events must be active and accessible
+                  - Rate limiting may apply
+                  - Use at your own risk - Facebook ToS prohibit automated scraping
+
+  /api/scraper/event/{eventId}:
+    get:
+      tags:
+        - Scraper
+      summary: Scrape a single Facebook event
+      description: |
+        Scrape detailed information about a single Facebook event by providing either
+        the event ID or the full Facebook event URL.
+        
+        The event must be public and accessible. Private or deleted events will result in an error.
+        
+        **Supported formats:**
+        - Event ID: `1987385505448084`
+        - Full URL: `https://www.facebook.com/events/1987385505448084`
+        - Short URL: `https://fb.com/events/1987385505448084`
+      operationId: scrapeEvent
+      parameters:
+        - name: eventId
+          in: path
+          description: |
+            Facebook event ID or full event URL.
+            
+            Can be either a numeric event ID (e.g., "1987385505448084") or a complete
+            Facebook event URL (e.g., "https://www.facebook.com/events/1987385505448084").
+          required: true
+          schema:
+            type: string
+          examples:
+            eventId:
+              value: "1987385505448084"
+              summary: Event ID only
+            eventUrl:
+              value: "https://www.facebook.com/events/1987385505448084"
+              summary: Full event URL
+      responses:
+        '200':
+          description: Event data scraped successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacebookEvent'
+              example:
+                id: "1987385505448084"
+                name: Prague Salsa Night 2024
+                description: Join us for an amazing night of Salsa and Bachata dancing in the heart of Prague!
+                startTimestamp: 1708027200
+                endTimestamp: 1708048800
+                location:
+                  name: Lucerna Music Bar
+                  address: Vodičkova 36, 110 00 Prague, Czech Republic
+                  city: Prague
+                  country: Czech Republic
+                  latitude: 50.0813
+                  longitude: 14.4258
+                photo:
+                  url: https://scontent.fprg2-1.fna.fbcdn.net/v/t39.30808-6/...
+                  id: "123456789"
+                url: https://www.facebook.com/events/1987385505448084
+                onlineDetails: null
+                isOnline: false
+                hosts:
+                  - name: Prague Salsa Club
+                    id: "123456789"
+                    url: https://www.facebook.com/praguesalsaclub
+                    type: page
+        '400':
+          description: Invalid event ID or URL format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Bad Request
+                message: Invalid event ID or URL format
+        '404':
+          description: Event not found or not accessible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Not Found
+                message: Failed to scrape event. Make sure the event is public and the ID/URL is correct.
+        '500':
+          description: Internal server error during scraping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Internal Server Error
+                message: Failed to scrape event. Please try again later.
+
+  /api/scraper/events:
+    get:
+      tags:
+        - Scraper
+      summary: Scrape a list of events from a Facebook page
+      description: |
+        Scrape a list of events from a Facebook page, group, or profile.
+        
+        This endpoint retrieves all public events associated with the specified Facebook entity.
+        You can optionally filter events by type (upcoming or past).
+        
+        **Supported formats for pageId:**
+        - Page ID: `123456789`
+        - Full URL: `https://www.facebook.com/yourpage`
+        - Username: `yourpage`
+      operationId: scrapeEventList
+      parameters:
+        - name: pageId
+          in: query
+          description: |
+            Facebook page, group, or profile ID or URL.
+            
+            Can be a numeric ID, a username, or a complete Facebook URL.
+            The page/group/profile must be public and have accessible events.
+          required: true
+          schema:
+            type: string
+          examples:
+            pageId:
+              value: "123456789"
+              summary: Page ID
+            pageUrl:
+              value: "https://www.facebook.com/praguesalsaclub"
+              summary: Page URL
+            username:
+              value: "praguesalsaclub"
+              summary: Page username
+        - name: eventType
+          in: query
+          description: |
+            Filter events by type.
+            
+            - `upcoming`: Only return future events
+            - `past`: Only return past events
+            - Omit parameter: Return all events (both upcoming and past)
+          required: false
+          schema:
+            type: string
+            enum:
+              - upcoming
+              - past
+          example: upcoming
+      responses:
+        '200':
+          description: Event list scraped successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FacebookEvent'
+              example:
+                - id: "1987385505448084"
+                  name: Prague Salsa Night 2024
+                  description: Join us for an amazing night of Salsa and Bachata dancing!
+                  startTimestamp: 1708027200
+                  endTimestamp: 1708048800
+                  location:
+                    name: Lucerna Music Bar
+                    address: Vodičkova 36, 110 00 Prague, Czech Republic
+                    city: Prague
+                    country: Czech Republic
+                  photo:
+                    url: https://scontent.fprg2-1.fna.fbcdn.net/v/t39.30808-6/...
+                  url: https://www.facebook.com/events/1987385505448084
+                  isOnline: false
+                - id: "2123456789012345"
+                  name: Bachata Workshop with Maria
+                  description: Learn advanced Bachata techniques with international instructor Maria Rodriguez
+                  startTimestamp: 1708113600
+                  endTimestamp: 1708120800
+                  location:
+                    name: Dance Studio Prague
+                    address: Karlova 10, 110 00 Prague, Czech Republic
+                    city: Prague
+                    country: Czech Republic
+                  photo:
+                    url: https://scontent.fprg2-1.fna.fbcdn.net/v/t39.30808-6/...
+                  url: https://www.facebook.com/events/2123456789012345
+                  isOnline: false
+        '400':
+          description: Missing or invalid pageId parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Bad Request
+                message: pageId query parameter is required
+        '404':
+          description: Page not found or not accessible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Not Found
+                message: Failed to scrape event list. Make sure the page/group/profile is public and the ID/URL is correct.
+        '500':
+          description: Internal server error during scraping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Internal Server Error
+                message: Failed to scrape event list. Please try again later.
+
+components:
+  schemas:
+    ApiInfoResponse:
+      type: object
+      required:
+        - message
+        - version
+        - endpoints
+        - notes
+      properties:
+        message:
+          type: string
+          description: API title
+          example: Facebook Event Scraper API
+        version:
+          type: string
+          description: API version
+          example: 1.0.0
+        endpoints:
+          type: object
+          description: Available API endpoints with descriptions and examples
+          additionalProperties:
+            type: object
+            properties:
+              description:
+                type: string
+              parameters:
+                type: object
+                additionalProperties:
+                  type: string
+              examples:
+                type: array
+                items:
+                  type: string
+        notes:
+          type: array
+          description: Important notes and warnings about API usage
+          items:
+            type: string
+          example:
+            - Only PUBLIC Facebook events can be scraped
+            - Events must be active and accessible
+            - Rate limiting may apply
+            - Use at your own risk - Facebook ToS prohibit automated scraping
+
+    FacebookEvent:
+      type: object
+      required:
+        - id
+        - name
+        - url
+      properties:
+        id:
+          type: string
+          description: Facebook event ID
+          example: "1987385505448084"
+        name:
+          type: string
+          description: Event name/title
+          example: Prague Salsa Night 2024
+        description:
+          type: string
+          description: Event description (may contain HTML)
+          example: Join us for an amazing night of Salsa and Bachata dancing in the heart of Prague!
+        startTimestamp:
+          type: integer
+          format: int64
+          description: Event start time as Unix timestamp (seconds since epoch)
+          example: 1708027200
+        endTimestamp:
+          type: integer
+          format: int64
+          description: Event end time as Unix timestamp (seconds since epoch)
+          example: 1708048800
+        location:
+          $ref: '#/components/schemas/EventLocation'
+        photo:
+          $ref: '#/components/schemas/EventPhoto'
+        url:
+          type: string
+          format: uri
+          description: Facebook event URL
+          example: https://www.facebook.com/events/1987385505448084
+        onlineDetails:
+          type: string
+          nullable: true
+          description: Online event details (link, platform, etc.) if the event is online
+          example: https://zoom.us/j/123456789
+        isOnline:
+          type: boolean
+          description: Whether the event is online only
+          example: false
+        hosts:
+          type: array
+          description: Event hosts (pages, groups, or profiles)
+          items:
+            $ref: '#/components/schemas/EventHost'
+
+    EventLocation:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Venue or location name
+          example: Lucerna Music Bar
+        address:
+          type: string
+          description: Full address string
+          example: Vodičkova 36, 110 00 Prague, Czech Republic
+        city:
+          type: string
+          description: City name
+          example: Prague
+        country:
+          type: string
+          description: Country name
+          example: Czech Republic
+        latitude:
+          type: number
+          format: double
+          description: Location latitude coordinate
+          example: 50.0813
+        longitude:
+          type: number
+          format: double
+          description: Location longitude coordinate
+          example: 14.4258
+
+    EventPhoto:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Event cover photo URL
+          example: https://scontent.fprg2-1.fna.fbcdn.net/v/t39.30808-6/...
+        id:
+          type: string
+          description: Photo ID
+          example: "123456789"
+
+    EventHost:
+      type: object
+      required:
+        - name
+        - id
+        - url
+        - type
+      properties:
+        name:
+          type: string
+          description: Host name (page, group, or profile name)
+          example: Prague Salsa Club
+        id:
+          type: string
+          description: Facebook entity ID
+          example: "123456789"
+        url:
+          type: string
+          format: uri
+          description: Facebook entity URL
+          example: https://www.facebook.com/praguesalsaclub
+        type:
+          type: string
+          enum:
+            - page
+            - group
+            - profile
+          description: Type of Facebook entity hosting the event
+          example: page
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type or category
+          example: Bad Request
+        message:
+          type: string
+          description: Detailed error message
+          example: pageId query parameter is required

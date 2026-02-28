@@ -1,0 +1,15 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+  description: Test API for health check validation
+servers:
+  - url: http://localhost:8080
+    description: Development server
+paths:
+  /test:
+    get:
+      summary: Test endpoint
+      responses:
+        '200':
+          description: Success
