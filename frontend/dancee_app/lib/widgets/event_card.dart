@@ -65,7 +65,7 @@ class EventCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: event.isPast ? Colors.grey[300]! : Colors.grey[200]!,
+          color: event.isPast ? Colors.grey[100]! : Colors.grey[200]!,
           width: 2,
         ),
         boxShadow: [
