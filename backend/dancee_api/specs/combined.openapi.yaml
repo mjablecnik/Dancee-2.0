@@ -1,0 +1,567 @@
+openapi: 3.0.0
+info:
+  title: Dancee API - Complete Documentation
+  version: 1.0.0
+  description: |
+    Complete API documentation for all Dancee backend services.
+    
+    This unified documentation includes:
+    - **Events API**: Event management and user favorites
+    - **Scraper API**: Facebook event data extraction
+    
+    All endpoints are organized by service tags for easy navigation.
+  contact:
+    name: Dancee API Support
+    email: support@dancee.app
+
+servers:
+  - url: https://dancee-events.fly.dev
+    description: Events API - Production
+  - url: http://localhost:8080
+    description: Events API - Development
+  - url: https://dancee-scraper.fly.dev
+    description: Scraper API - Production
+  - url: http://localhost:3002
+    description: Scraper API - Development
+
+tags:
+  - name: Events - Health
+    description: Events service health check
+  - name: Events - Event Management
+    description: Event listing and retrieval
+  - name: Events - Favorites
+    description: User favorite event management
+  - name: Scraper - Info
+    description: Scraper API information
+  - name: Scraper - Facebook Scraping
+    description: Facebook event data extraction
+
+paths:
+  # ============================================
+  # EVENTS API ENDPOINTS
+  # ============================================
+  
+  /health:
+    get:
+      tags:
+        - Events - Health
+      summary: Health check (Events API)
+      description: Check if the Events API server is running and healthy
+      operationId: eventsHealthCheck
+      servers:
+        - url: https://dancee-events.fly.dev
+        - url: http://localhost:8080
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/events/list:
+    get:
+      tags:
+        - Events - Event Management
+      summary: List all events
+      description: |
+        Retrieve all dance events. Optionally mark favorite events for a specific user.
+      operationId: listEvents
+      servers:
+        - url: https://dancee-events.fly.dev
+        - url: http://localhost:8080
+      parameters:
+        - name: userId
+          in: query
+          description: User identifier to mark favorite events
+          required: false
+          schema:
+            type: string
+          example: user123
+      responses:
+        '200':
+          description: List of events retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+
+  /api/events/favorites:
+    get:
+      tags:
+        - Events - Favorites
+      summary: List favorite events
+      description: Retrieve all favorite events for a specific user
+      operationId: listFavorites
+      servers:
+        - url: https://dancee-events.fly.dev
+        - url: http://localhost:8080
+      parameters:
+        - name: userId
+          in: query
+          description: User identifier
+          required: true
+          schema:
+            type: string
+          example: user123
+      responses:
+        '200':
+          description: List of favorite events retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '400':
+          description: Missing required userId parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Events - Favorites
+      summary: Add favorite event
+      description: Add an event to a user's favorites
+      operationId: addFavorite
+      servers:
+        - url: https://dancee-events.fly.dev
+        - url: http://localhost:8080
+      requestBody:
+        description: User and event identifiers
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFavoriteRequest'
+            example:
+              userId: user123
+              eventId: event-001
+      responses:
+        '201':
+          description: Favorite added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddFavoriteResponse'
+        '400':
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/events/favorites/{eventId}:
+    delete:
+      tags:
+        - Events - Favorites
+      summary: Remove favorite event
+      description: Remove an event from a user's favorites
+      operationId: removeFavorite
+      servers:
+        - url: https://dancee-events.fly.dev
+        - url: http://localhost:8080
+      parameters:
+        - name: eventId
+          in: path
+          description: Event identifier to remove
+          required: true
+          schema:
+            type: string
+          example: event-001
+        - name: userId
+          in: query
+          description: User identifier
+          required: true
+          schema:
+            type: string
+          example: user123
+      responses:
+        '204':
+          description: Favorite removed successfully
+        '400':
+          description: Missing required userId parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ============================================
+  # SCRAPER API ENDPOINTS
+  # ============================================
+
+  /api/scraper:
+    get:
+      tags:
+        - Scraper - Info
+      summary: Get Scraper API information
+      description: Retrieve API usage information, available endpoints, and examples
+      operationId: getScraperApiInfo
+      servers:
+        - url: https://dancee-scraper.fly.dev
+        - url: http://localhost:3002
+      responses:
+        '200':
+          description: API information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfoResponse'
+
+  /api/scraper/event/{eventId}:
+    get:
+      tags:
+        - Scraper - Facebook Scraping
+      summary: Scrape a single Facebook event
+      description: |
+        Scrape detailed information about a single Facebook event by providing either
+        the event ID or the full Facebook event URL.
+        
+        **Supported formats:**
+        - Event ID: `1987385505448084`
+        - Full URL: `https://www.facebook.com/events/1987385505448084`
+      operationId: scrapeEvent
+      servers:
+        - url: https://dancee-scraper.fly.dev
+        - url: http://localhost:3002
+      parameters:
+        - name: eventId
+          in: path
+          description: Facebook event ID or full event URL
+          required: true
+          schema:
+            type: string
+          example: "1987385505448084"
+      responses:
+        '200':
+          description: Event data scraped successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacebookEvent'
+        '400':
+          description: Invalid event ID or URL format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScraperError'
+        '404':
+          description: Event not found or not accessible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScraperError'
+
+  /api/scraper/events:
+    get:
+      tags:
+        - Scraper - Facebook Scraping
+      summary: Scrape a list of events from a Facebook page
+      description: |
+        Scrape a list of events from a Facebook page, group, or profile.
+        
+        **Supported formats for pageId:**
+        - Page ID: `123456789`
+        - Full URL: `https://www.facebook.com/yourpage`
+        - Username: `yourpage`
+      operationId: scrapeEventList
+      servers:
+        - url: https://dancee-scraper.fly.dev
+        - url: http://localhost:3002
+      parameters:
+        - name: pageId
+          in: query
+          description: Facebook page, group, or profile ID or URL
+          required: true
+          schema:
+            type: string
+          example: "123456789"
+        - name: eventType
+          in: query
+          description: Filter events by type (upcoming or past)
+          required: false
+          schema:
+            type: string
+            enum:
+              - upcoming
+              - past
+          example: upcoming
+      responses:
+        '200':
+          description: Event list scraped successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FacebookEvent'
+        '400':
+          description: Missing or invalid pageId parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScraperError'
+
+components:
+  schemas:
+    # ============================================
+    # EVENTS API SCHEMAS
+    # ============================================
+    
+    Event:
+      type: object
+      required:
+        - id
+        - title
+        - organizer
+        - venue
+        - startTime
+        - dances
+      properties:
+        id:
+          type: string
+          description: Unique event identifier
+          example: event-001
+        title:
+          type: string
+          description: Event title
+          example: Prague Salsa Night
+        description:
+          type: string
+          description: Event description
+          example: Join us for an amazing night of Salsa dancing!
+        organizer:
+          type: string
+          description: Event organizer name
+          example: Prague Salsa Club
+        venue:
+          $ref: '#/components/schemas/Venue'
+        startTime:
+          type: string
+          format: date-time
+          description: Event start time in ISO 8601 format
+          example: "2024-02-15T20:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          description: Event end time in ISO 8601 format
+          example: "2024-02-16T02:00:00Z"
+        dances:
+          type: array
+          description: List of dance styles
+          items:
+            type: string
+          example:
+            - Salsa
+            - Bachata
+        isFavorite:
+          type: boolean
+          description: Whether the event is marked as favorite
+          example: false
+
+    Venue:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+          description: Venue name
+          example: Lucerna Music Bar
+        address:
+          $ref: '#/components/schemas/Address'
+        latitude:
+          type: number
+          format: double
+          description: Venue latitude coordinate
+          example: 50.0813
+        longitude:
+          type: number
+          format: double
+          description: Venue longitude coordinate
+          example: 14.4258
+
+    Address:
+      type: object
+      required:
+        - street
+        - city
+        - postalCode
+        - country
+      properties:
+        street:
+          type: string
+          example: Vodičkova 36
+        city:
+          type: string
+          example: Prague
+        postalCode:
+          type: string
+          example: "110 00"
+        country:
+          type: string
+          example: Czech Republic
+
+    AddFavoriteRequest:
+      type: object
+      required:
+        - userId
+        - eventId
+      properties:
+        userId:
+          type: string
+          example: user123
+        eventId:
+          type: string
+          example: event-001
+
+    AddFavoriteResponse:
+      type: object
+      required:
+        - message
+        - userId
+        - eventId
+      properties:
+        message:
+          type: string
+          example: Favorite added successfully
+        userId:
+          type: string
+          example: user123
+        eventId:
+          type: string
+          example: event-001
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: userId query parameter is required
+
+    # ============================================
+    # SCRAPER API SCHEMAS
+    # ============================================
+
+    ApiInfoResponse:
+      type: object
+      required:
+        - message
+        - version
+        - endpoints
+        - notes
+      properties:
+        message:
+          type: string
+          example: Facebook Event Scraper API
+        version:
+          type: string
+          example: 1.0.0
+        endpoints:
+          type: object
+        notes:
+          type: array
+          items:
+            type: string
+
+    FacebookEvent:
+      type: object
+      required:
+        - id
+        - name
+        - url
+      properties:
+        id:
+          type: string
+          description: Facebook event ID
+          example: "1987385505448084"
+        name:
+          type: string
+          description: Event name/title
+          example: Prague Salsa Night 2024
+        description:
+          type: string
+          description: Event description
+          example: Join us for an amazing night of Salsa and Bachata dancing!
+        startTimestamp:
+          type: integer
+          format: int64
+          description: Event start time as Unix timestamp
+          example: 1708027200
+        endTimestamp:
+          type: integer
+          format: int64
+          description: Event end time as Unix timestamp
+          example: 1708048800
+        location:
+          $ref: '#/components/schemas/EventLocation'
+        photo:
+          $ref: '#/components/schemas/EventPhoto'
+        url:
+          type: string
+          format: uri
+          description: Facebook event URL
+          example: https://www.facebook.com/events/1987385505448084
+        isOnline:
+          type: boolean
+          description: Whether the event is online only
+          example: false
+
+    EventLocation:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Lucerna Music Bar
+        address:
+          type: string
+          example: Vodičkova 36, 110 00 Prague, Czech Republic
+        city:
+          type: string
+          example: Prague
+        country:
+          type: string
+          example: Czech Republic
+        latitude:
+          type: number
+          format: double
+          example: 50.0813
+        longitude:
+          type: number
+          format: double
+          example: 14.4258
+
+    EventPhoto:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          example: https://scontent.fprg2-1.fna.fbcdn.net/v/t39.30808-6/...
+        id:
+          type: string
+          example: "123456789"
+
+    ScraperError:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: Invalid event ID or URL format

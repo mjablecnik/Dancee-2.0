@@ -41,13 +41,22 @@ export interface ServiceConfig {
 export const serviceConfig: ServiceConfig = {
   services: [
     {
+      id: 'dancee-combined',
+      name: 'Dancee API - Complete',
+      version: '1.0.0',
+      description: 'Complete API documentation for all Dancee services (Events + Scraper)',
+      baseUrl: appConfig.eventsServiceUrl,
+      specFile: 'combined.openapi.yaml',
+      enabled: true,
+    },
+    {
       id: 'dancee-events',
       name: 'Dancee Events API',
       version: '1.0.0',
       description: 'Event management and favorites API',
       baseUrl: appConfig.eventsServiceUrl,
       specFile: 'events.openapi.yaml',
-      enabled: true,
+      enabled: true, 
     },
     {
       id: 'dancee-scraper',
@@ -56,7 +65,7 @@ export const serviceConfig: ServiceConfig = {
       description: 'Facebook event scraping API',
       baseUrl: appConfig.scraperServiceUrl,
       specFile: 'scraper.openapi.yaml',
-      enabled: true,
+      enabled: true, 
     },
     {
       id: 'test-api',
@@ -65,13 +74,13 @@ export const serviceConfig: ServiceConfig = {
       description: 'Test API for health check validation',
       baseUrl: 'http://localhost:8080',
       specFile: 'test.openapi.yaml',
-      enabled: true,
+      enabled: true, 
     },
   ],
   ui: {
     title: 'Dancee API Documentation',
     description: 'Centralized API documentation for all Dancee backend services',
-    defaultService: 'dancee-events',
+    defaultService: 'dancee-combined',
     theme: 'auto',
   },
 };
