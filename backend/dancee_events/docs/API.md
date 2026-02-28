@@ -98,7 +98,8 @@ curl "http://localhost:8080/api/events/list?userId=user123"
         "djs": ["DJ Carlos", "DJ Maria"]
       }
     ],
-    "isFavorite": false
+    "isFavorite": false,
+    "isPast": false
   }
 ]
 ```
@@ -275,7 +276,8 @@ curl -X DELETE "http://localhost:8080/api/events/favorites/event-001?userId=user
       "lectors": ["string (optional)"]
     }
   ],
-  "isFavorite": "boolean (optional)"
+  "isFavorite": "boolean (optional)",
+  "isPast": "boolean (optional, calculated based on endTime or startTime)"
 }
 ```
 

@@ -49,6 +49,7 @@ type Event struct {
 	Info        []EventInfo  `json:"info,omitempty" firestore:"info,omitempty"`
 	Parts       []EventPart  `json:"parts,omitempty" firestore:"parts,omitempty"`
 	IsFavorite  *bool        `json:"isFavorite,omitempty" firestore:"isFavorite,omitempty"`
+	IsPast      *bool        `json:"isPast,omitempty" firestore:"-"`
 }
 
 // AddFavoriteRequest represents the request to add a favorite
