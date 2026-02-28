@@ -6,7 +6,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
 
 ## Tasks
 
-- [ ] 1. Initialize project structure and dependencies
+- [x] 1. Initialize project structure and dependencies
   - Create `backend/dancee_api/` directory
   - Initialize Node.js project with TypeScript configuration
   - Install runtime dependencies (express, swagger-ui-express, js-yaml, cors, dotenv)
@@ -16,35 +16,35 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
   - Create `taskfile.yaml` with common development tasks
   - _Requirements: 11.4, 11.5_
 
-- [ ] 2. Set up TypeScript configuration and project structure
+- [x] 2. Set up TypeScript configuration and project structure
   - Create `tsconfig.json` with strict type checking
   - Create directory structure: `src/`, `src/config/`, `src/aggregator/`, `src/routes/`, `src/middleware/`, `specs/`, `docs/`
   - Create `src/index.ts` as application entry point
   - _Requirements: 1.1_
 
-- [ ] 3. Implement configuration management
-  - [ ] 3.1 Create `src/config/app.config.ts` for environment-based configuration
+- [x] 3. Implement configuration management
+  - [x] 3.1 Create `src/config/app.config.ts` for environment-based configuration
     - Define ServerConfig interface
     - Load PORT, HOST, NODE_ENV from environment variables
     - Load service URLs (EVENTS_SERVICE_URL, SCRAPER_SERVICE_URL)
     - Load CORS origins configuration
     - _Requirements: 9.1, 9.5_
   
-  - [ ] 3.2 Create `src/config/services.config.ts` for service definitions
+  - [x] 3.2 Create `src/config/services.config.ts` for service definitions
     - Define ServiceDefinition and ServiceConfig interfaces
     - Configure dancee_events service (id, name, version, description, baseUrl, specFile)
     - Configure dancee_scraper service (id, name, version, description, baseUrl, specFile)
     - Define UI configuration (title, description, defaultService, theme)
     - _Requirements: 9.3, 9.4_
 
-- [ ] 4. Implement OpenAPI specification aggregator
-  - [ ] 4.1 Create `src/aggregator/spec-validator.ts` for OpenAPI validation
+- [-] 4. Implement OpenAPI specification aggregator
+  - [-] 4.1 Create `src/aggregator/spec-validator.ts` for OpenAPI validation
     - Implement validateSpec function to check OpenAPI 3.0 compliance
     - Validate required fields (openapi, info, paths)
     - Return ValidationResult with errors if validation fails
     - _Requirements: 1.2, 12.1_
   
-  - [ ] 4.2 Create `src/aggregator/spec-aggregator.ts` for spec management
+  - [x] 4.2 Create `src/aggregator/spec-aggregator.ts` for spec management
     - Implement SpecAggregator class with loadSpecs, getServiceList, getSpec methods
     - Load YAML and JSON specs from `specs/` directory using js-yaml
     - Validate each spec using spec-validator
@@ -60,21 +60,21 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test getSpec returns cached specs
     - _Requirements: 1.3, 7.3, 8.2_
 
-- [ ] 5. Implement Express server and middleware
-  - [ ] 5.1 Create `src/middleware/cors.middleware.ts` for CORS configuration
+- [~] 5. Implement Express server and middleware
+  - [x] 5.1 Create `src/middleware/cors.middleware.ts` for CORS configuration
     - Configure CORS to allow all origins in development
     - Allow GET, POST, PUT, DELETE, PATCH, OPTIONS methods
     - Allow Content-Type and Authorization headers
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
   
-  - [ ] 5.2 Create `src/middleware/error.middleware.ts` for error handling
+  - [x] 5.2 Create `src/middleware/error.middleware.ts` for error handling
     - Implement global error handler middleware
     - Return 500 status with generic error message for internal errors
     - Ensure no sensitive information is exposed in error messages
     - Log errors for debugging
     - _Requirements: 7.2, 7.5_
   
-  - [ ] 5.3 Create `src/server.ts` for Express server setup
+  - [x] 5.3 Create `src/server.ts` for Express server setup
     - Initialize Express application
     - Apply CORS middleware
     - Apply JSON body parser
@@ -90,15 +90,15 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test error handler doesn't expose sensitive data
     - _Requirements: 6.1, 7.2, 7.5_
 
-- [ ] 6. Implement API routes
-  - [ ] 6.1 Create `src/routes/services.routes.ts` for service listing
+- [~] 6. Implement API routes
+  - [x] 6.1 Create `src/routes/services.routes.ts` for service listing
     - Implement GET `/api/services` endpoint
     - Return JSON array of all enabled services with id, name, version, description, baseUrl, specPath
     - Return empty array with 200 status when no services available
     - Ensure response time < 100ms
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
   
-  - [ ] 6.2 Create `src/routes/spec.routes.ts` for spec retrieval
+  - [x] 6.2 Create `src/routes/spec.routes.ts` for spec retrieval
     - Implement GET `/api/spec/:serviceId` endpoint
     - Validate serviceId parameter to prevent path traversal
     - Return OpenAPI spec as JSON for valid serviceId
@@ -107,7 +107,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Ensure response time < 100ms
     - _Requirements: 3.1, 3.2, 3.4, 3.5, 7.1, 7.4_
   
-  - [ ] 6.3 Implement health check endpoint
+  - [x] 6.3 Implement health check endpoint
     - Create GET `/health` endpoint
     - Return overall service status and individual spec loading status
     - Return 200 status with "ok" when all specs loaded successfully
@@ -122,25 +122,25 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test path traversal prevention in serviceId parameter
     - _Requirements: 2.1, 3.1, 3.2, 5.1, 7.4_
 
-- [ ] 7. Integrate Swagger UI
-  - [ ] 7.1 Configure swagger-ui-express in server
+- [~] 7. Integrate Swagger UI
+  - [x] 7.1 Configure swagger-ui-express in server
     - Mount Swagger UI at root path `/`
     - Configure multi-spec support with service selector
     - Set up URLs for dancee-events and dancee-scraper specs
     - Enable explorer mode
     - _Requirements: 4.1, 4.2_
   
-  - [ ] 7.2 Configure Swagger UI options
+  - [x] 7.2 Configure Swagger UI options
     - Display service selector with all available services
     - Set default service to dancee-events
     - Enable "Try it out" functionality for API testing
     - _Requirements: 4.2, 4.3, 4.4_
 
-- [ ] 8. Checkpoint - Ensure server starts and basic endpoints work
+- [x] 8. Checkpoint - Ensure server starts and basic endpoints work
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Generate OpenAPI specifications
-  - [ ] 9.1 Create `specs/events.openapi.yaml` for dancee_events API
+- [~] 9. Generate OpenAPI specifications
+  - [x] 9.1 Create `specs/events.openapi.yaml` for dancee_events API
     - Parse `backend/dancee_events/docs/API.md` documentation
     - Create OpenAPI 3.0 spec with info, servers, paths, components
     - Include development server (http://localhost:8080) and production server (https://dancee-events.fly.dev)
@@ -149,7 +149,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Document data models in components/schemas section
     - _Requirements: 3.3, 8.1, 8.3, 9.2, 9.3, 12.1, 12.2, 12.3, 12.4, 12.5_
   
-  - [ ] 9.2 Create `specs/scraper.openapi.yaml` for dancee_scraper API
+  - [x] 9.2 Create `specs/scraper.openapi.yaml` for dancee_scraper API
     - Parse `backend/dancee_scraper/README.md` and code
     - Create OpenAPI 3.0 spec with info, servers, paths, components
     - Include development server (http://localhost:3002) and production server (https://dancee-scraper.fly.dev)
@@ -158,36 +158,36 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Document DTOs in components/schemas section
     - _Requirements: 3.3, 8.1, 8.3, 9.2, 9.4, 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ] 10. Create documentation files
-  - [ ] 10.1 Create `README.md` with project overview
+- [~] 10. Create documentation files
+  - [x] 10.1 Create `README.md` with project overview
     - Write overview of the centralized API documentation service
     - Include quick start instructions
     - Document available endpoints
     - Explain Single Source of Truth principle
     - _Requirements: 11.1_
   
-  - [ ] 10.2 Create `docs/SETUP.md` with detailed setup instructions
+  - [x] 10.2 Create `docs/SETUP.md` with detailed setup instructions
     - Document prerequisites (Node.js version, dependencies)
     - Provide step-by-step installation instructions
     - Explain environment variable configuration
     - Include troubleshooting section
     - _Requirements: 11.2_
   
-  - [ ] 10.3 Create `docs/USAGE.md` with usage examples
+  - [x] 10.3 Create `docs/USAGE.md` with usage examples
     - Document how to access Swagger UI
     - Explain how to switch between services
     - Provide examples of using the API endpoints
     - Show how to test APIs from Swagger UI
     - _Requirements: 11.3_
   
-  - [ ] 10.4 Create `docs/CONTRIBUTING.md` with contribution guidelines
+  - [x] 10.4 Create `docs/CONTRIBUTING.md` with contribution guidelines
     - Explain how to add new service specifications
     - Document OpenAPI spec standards and best practices
     - Provide guidelines for updating existing specs
     - Include code style and testing requirements
 
-- [ ] 11. Implement application entry point
-  - [ ] 11.1 Complete `src/index.ts` implementation
+- [~] 11. Implement application entry point
+  - [x] 11.1 Complete `src/index.ts` implementation
     - Load configuration from app.config
     - Initialize SpecAggregator and load all specs
     - Create and configure Express server
@@ -203,7 +203,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test server responds to requests after startup
     - _Requirements: 1.1, 1.4, 1.5_
 
-- [ ] 12. Add task automation commands
+- [x] 12. Add task automation commands
   - Update `taskfile.yaml` with all development tasks
   - Add `task install` - Install dependencies
   - Add `task dev` - Start development server with hot reload (nodemon)
@@ -216,7 +216,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
   - Add `task clean` - Clean build artifacts
   - _Requirements: 11.5_
 
-- [ ] 13. Final checkpoint - Complete testing and validation
+- [x] 13. Final checkpoint - Complete testing and validation
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
