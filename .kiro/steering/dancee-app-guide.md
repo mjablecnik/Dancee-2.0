@@ -20,80 +20,18 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 │       ├── test/            # Test files
 │       ├── taskfile.yaml    # Task automation file
 │       └── pubspec.yaml     # Flutter dependencies
-├── backend/
-│   ├── dancee_event_service/ # Dart backend service (REST API)
-│   └── dancee_server/        # NestJS backend service (Node.js/TypeScript)
-│       ├── src/             # TypeScript source code
-│       ├── docs/            # Documentation files
-│       ├── test/            # Test files
-│       ├── taskfile.yaml    # Task automation file
-│       └── package.json     # Node.js dependencies
-└── shared/
-    └── dancee_shared/       # Shared code between frontend and backend
-        └── lib/
-            └── src/
-                └── models/  # Shared data models
+└── backend/
+    ├── dancee_api/          # TypeScript API Gateway (Express)
+    ├── dancee_events/       # Go events service
+    ├── dancee_scraper/      # TypeScript scraping service
+    ├── dancee_event_service/ # Dart backend service (REST API)
+    └── dancee_server/       # NestJS backend service (Node.js/TypeScript)
+        ├── src/             # TypeScript source code
+        ├── docs/            # Documentation files
+        ├── test/            # Test files
+        ├── taskfile.yaml    # Task automation file
+        └── package.json     # Node.js dependencies
 ```
-
-### 📦 Shared Code Package (`dancee_shared`)
-
-**CRITICAL**: When code needs to be used by BOTH frontend and backend, it MUST be placed in the `dancee_shared` package.
-
-#### Purpose:
-The `dancee_shared` package serves as a common library for code that is shared between the frontend Flutter app and the backend Dart services.
-
-#### What Goes in `dancee_shared`:
-- **Data models** (e.g., Event, Venue, Address, EventInfo, EventPart)
-- **DTOs** (Data Transfer Objects) used in API communication
-- **Shared utilities** and helper functions
-- **Constants** used across frontend and backend
-- **Validation logic** that needs to be consistent
-- **Serialization/deserialization** code
-
-#### What Does NOT Go in `dancee_shared`:
-- UI components (frontend-only)
-- State management (frontend-only)
-- Server-specific logic (backend-only)
-- Platform-specific code
-
-#### Usage:
-
-**In Frontend (`frontend/dancee_app/pubspec.yaml`):**
-```yaml
-dependencies:
-  dancee_shared:
-    path: ../../shared/dancee_shared
-```
-
-**In Backend (`backend/dancee_event_service/pubspec.yaml`):**
-```yaml
-dependencies:
-  dancee_shared:
-    path: ../../shared/dancee_shared
-```
-
-**Importing in Code:**
-```dart
-import 'package:dancee_shared/dancee_shared.dart';
-```
-
-#### Important Rules:
-1. **Always check if code should be shared** before placing it in frontend or backend
-2. **Models used in API contracts MUST be in `dancee_shared`**
-3. **Keep `dancee_shared` dependency-light** - avoid heavy dependencies
-4. **No Flutter dependencies** in `dancee_shared` (it's pure Dart)
-5. **Document shared models** thoroughly since they're used in multiple places
-6. **Version carefully** - changes affect both frontend and backend
-
-#### Example:
-If you're creating an `Event` model that the backend returns via API and the frontend consumes, it MUST go in:
-```
-shared/dancee_shared/lib/src/models/event.dart
-```
-
-Not in:
-- ❌ `frontend/dancee_app/lib/models/event.dart`
-- ❌ `backend/dancee_event_service/lib/models/event.dart`
 
 ## Backend Services
 
@@ -162,59 +100,7 @@ For detailed information, see:
 
 ## Critical Development Guidelines for Kiro AI
 
-### 💻 Development Environment
-
-**CRITICAL**: This project is developed in **WSL (Windows Subsystem for Linux)** running Ubuntu.
-
-#### Environment Requirements:
-- **Operating System**: Ubuntu on WSL
-- **Shell**: zsh-compatible commands
-- **Command Compatibility**: All terminal commands MUST be Linux/Unix compatible
-
-#### Command Guidelines:
-When suggesting or running terminal commands:
-- ✅ Use Linux/Unix commands: `ls`, `cp`, `rm`, `mkdir`, `cat`, etc.
-- ✅ Use forward slashes for paths: `lib/models/event.dart`
-- ✅ Use bash/zsh syntax: `&&`, `||`, `|`, etc.
-- ❌ Never use Windows CMD commands: `dir`, `copy`, `del`, etc.
-- ❌ Never use Windows PowerShell cmdlets: `Get-ChildItem`, `Copy-Item`, etc.
-- ❌ Never use backslashes for paths: `lib\models\event.dart`
-
-#### Examples:
-```bash
-# ✅ CORRECT (Linux/WSL)
-ls -la
-cp source.dart destination.dart
-rm -rf build/
-mkdir -p lib/models
-cat pubspec.yaml
-
-# ❌ WRONG (Windows)
-dir
-copy source.dart destination.dart
-del /f /q build\*
-mkdir lib\models
-type pubspec.yaml
-```
-
-#### Task Commands:
-All `task` commands work seamlessly in WSL:
-```bash
-task get-deps
-task run-web
-task slang
-```
-
-### 🌍 Language Requirements
-**MANDATORY**: All code, comments, strings, variable names, function names, and documentation MUST be written in English only. This is non-negotiable because international developers who don't speak Czech may work on this project.
-
-Examples:
-- ✅ `String userName = "Enter your name";`
-- ❌ `String uzivatel = "Zadejte své jméno";`
-- ✅ `// Calculate user score`
-- ❌ `// Vypočítej skóre uživatele`
-
-### 📚 Documentation Requirements
+### � Documentation Requirements
 
 **CRITICAL**: All documentation files MUST follow strict organizational rules.
 
@@ -403,107 +289,7 @@ cp lib/app_config.example.dart lib/app_config.dart
 4. **Document all fields** with comments explaining their purpose
 5. **Keep sensitive data separate** - don't mix with public config
 
-### 📖 Swagger/OpenAPI Documentation
-
-**CRITICAL**: For `dancee_server` (NestJS backend), every new endpoint MUST have Swagger documentation.
-
-#### Swagger Requirements:
-
-**For EVERY new endpoint, you MUST:**
-1. **Add Swagger decorators** to the controller
-2. **Document request parameters** with `@ApiParam()`, `@ApiQuery()`, `@ApiBody()`
-3. **Document responses** with `@ApiResponse()`
-4. **Add descriptions** with `@ApiOperation()`
-5. **Define DTOs** with `@ApiProperty()` decorators
-6. **Add examples** where applicable
-
-#### Swagger Decorator Examples:
-
-**Controller-level documentation:**
-```typescript
-@ApiTags('scraper')  // Group endpoints
-@Controller('scraper')
-export class ScraperController {
-  // ...
-}
-```
-
-**Endpoint documentation:**
-```typescript
-@Get('event/:eventId')
-@ApiOperation({ 
-  summary: 'Scrape a single Facebook event',
-  description: 'Fetches detailed information about a Facebook event by ID or URL'
-})
-@ApiParam({ 
-  name: 'eventId', 
-  description: 'Facebook event ID or full event URL',
-  example: '115982989234742'
-})
-@ApiResponse({ 
-  status: 200, 
-  description: 'Event data successfully retrieved',
-  type: ScrapeEventDto 
-})
-@ApiResponse({ 
-  status: 400, 
-  description: 'Invalid event ID or URL' 
-})
-async scrapeEvent(@Param('eventId') eventId: string) {
-  // ...
-}
-```
-
-**DTO documentation:**
-```typescript
-export class ScrapeEventDto {
-  @ApiProperty({ 
-    description: 'Facebook event ID',
-    example: '115982989234742'
-  })
-  id: string;
-
-  @ApiProperty({ 
-    description: 'Event name/title',
-    example: 'Summer Dance Party'
-  })
-  name: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Event description',
-    example: 'Join us for an amazing night of dancing!'
-  })
-  description?: string;
-}
-```
-
-#### Swagger Best Practices:
-1. **Use descriptive summaries** - Clear, concise endpoint purpose
-2. **Add examples** - Help developers understand expected values
-3. **Document all parameters** - Path params, query params, body
-4. **Document all responses** - Success and error cases
-5. **Use proper HTTP status codes** - 200, 201, 400, 404, 500, etc.
-6. **Group related endpoints** - Use `@ApiTags()` for organization
-7. **Keep DTOs documented** - Every property should have `@ApiProperty()`
-
-#### Accessing Swagger UI:
-```
-http://localhost:3001/api
-```
-
-#### Swagger Documentation Files:
-- `backend/dancee_server/docs/SWAGGER.md` - Setup and usage guide
-- `backend/dancee_server/docs/SWAGGER_SETUP.md` - Configuration details
-- `backend/dancee_server/docs/SWAGGER_SCREENSHOTS.md` - Visual examples
-
-#### When Creating New Endpoints:
-1. ✅ **Write the endpoint code**
-2. ✅ **Add Swagger decorators** (MANDATORY)
-3. ✅ **Test in Swagger UI** at `/api`
-4. ✅ **Update documentation** if needed
-5. ✅ **Verify examples work** in interactive UI
-
-### 🛠️ Task Management
+### �️ Task ManagementD
 
 This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands when suggesting or running commands:
 
@@ -565,16 +351,14 @@ When generating or modifying code:
 
 As Kiro AI, always:
 1. Check current taskfile.yaml for available commands
-2. Ensure all new code follows English-only rule
-3. **Ensure all user-facing strings use slang translations** (never hardcode)
-4. **Add translations to ALL language files** when creating new strings
-5. **Store sensitive values in `app_config.dart`** (API URLs, keys, tokens)
-6. Consider cross-platform implications
-7. Use build runner tasks for code generation needs
-8. **Run `task slang`** after modifying translation files
-9. Suggest appropriate task commands instead of direct Flutter commands
-10. **Place documentation in `docs/` folder** (except README.md)
-11. **Add Swagger documentation** for all new `dancee_server` endpoints
+2. **Ensure all user-facing strings use slang translations** (never hardcode)
+3. **Add translations to ALL language files** when creating new strings
+4. **Store sensitive values in `app_config.dart`** (API URLs, keys, tokens)
+5. Consider cross-platform implications
+6. Use build runner tasks for code generation needs
+7. **Run `task slang`** after modifying translation files
+8. Suggest appropriate task commands instead of direct Flutter commands
+9. **Place documentation in `docs/` folder** (except README.md)
 
 ### 📞 Quick Commands Reference
 
@@ -632,10 +416,8 @@ task test
 
 ### 🤖 AI-Specific Instructions
 
-- Always prioritize English language usage in all generated content
 - **CRITICAL: Never hardcode user-facing strings** - always use slang translations
 - **When adding new UI text**: Add to all 3 language files (en, cs, es) and run `task slang`
-- **Check if code should be shared**: If models or logic are used by both frontend and backend, place them in `dancee_shared`
 - **Store sensitive config in `app_config.dart`**: API URLs, keys, tokens, credentials
 - Utilize taskfile commands in all suggestions
 - Consider Flutter best practices and cross-platform compatibility
@@ -644,10 +426,8 @@ task test
 - Be aware of Flutter-specific patterns and state management approaches
 - **Import translations**: Always include `import '../i18n/translations.g.dart';` in UI files
 - **Use global `t` variable** for translations: `t.keyName` or `t.method(param: value)`
-- **Keep `dancee_shared` pure Dart** - no Flutter dependencies allowed
 - **Never commit sensitive values** - always use `app_config.dart` for environment-specific data
 - **Documentation placement**: All docs in `docs/` folder except `README.md`
-- **Swagger documentation**: MANDATORY for all new `dancee_server` endpoints
 - **Use appropriate backend**: `dancee_server` for scraping/external APIs, `dancee_event_service` for event data management
 - **NestJS conventions**: Follow NestJS patterns for `dancee_server` (modules, controllers, services, DTOs)
 - **TypeScript best practices**: Use proper typing, interfaces, and decorators in `dancee_server`
