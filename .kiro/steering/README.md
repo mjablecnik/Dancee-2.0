@@ -43,6 +43,12 @@ This directory contains steering files that guide AI development for the Dancee 
 - Pre-change checklist
 - AI-specific instructions
 
+### 🔄 api-documentation-sync.md
+- Centralized API documentation in dancee_api
+- OpenAPI/Swagger synchronization rules
+- Workflow for API changes
+- Examples and validation
+
 ## How to Use
 
 All steering files are set to `inclusion: always`, meaning they are automatically loaded into the AI context. You don't need to manually reference them.
