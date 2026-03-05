@@ -60,7 +60,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test getSpec returns cached specs
     - _Requirements: 1.3, 7.3, 8.2_
 
-- [~] 5. Implement Express server and middleware
+- [ ] 5. Implement Express server and middleware
   - [x] 5.1 Create `src/middleware/cors.middleware.ts` for CORS configuration
     - Configure CORS to allow all origins in development
     - Allow GET, POST, PUT, DELETE, PATCH, OPTIONS methods
@@ -90,7 +90,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test error handler doesn't expose sensitive data
     - _Requirements: 6.1, 7.2, 7.5_
 
-- [~] 6. Implement API routes
+- [ ] 6. Implement API routes
   - [x] 6.1 Create `src/routes/services.routes.ts` for service listing
     - Implement GET `/api/services` endpoint
     - Return JSON array of all enabled services with id, name, version, description, baseUrl, specPath
@@ -122,7 +122,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Test path traversal prevention in serviceId parameter
     - _Requirements: 2.1, 3.1, 3.2, 5.1, 7.4_
 
-- [~] 7. Integrate Swagger UI
+- [ ] 7. Integrate Swagger UI
   - [x] 7.1 Configure swagger-ui-express in server
     - Mount Swagger UI at root path `/`
     - Configure multi-spec support with service selector
@@ -139,7 +139,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
 - [x] 8. Checkpoint - Ensure server starts and basic endpoints work
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 9. Generate OpenAPI specifications
+- [ ] 9. Generate OpenAPI specifications
   - [x] 9.1 Create `specs/events.openapi.yaml` for dancee_events API
     - Parse `backend/dancee_events/docs/API.md` documentation
     - Create OpenAPI 3.0 spec with info, servers, paths, components
@@ -158,7 +158,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Document DTOs in components/schemas section
     - _Requirements: 3.3, 8.1, 8.3, 9.2, 9.4, 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [~] 10. Create documentation files
+- [ ] 10. Create documentation files
   - [x] 10.1 Create `README.md` with project overview
     - Write overview of the centralized API documentation service
     - Include quick start instructions
@@ -186,7 +186,7 @@ This plan implements a standalone Node.js/TypeScript service that serves as the 
     - Provide guidelines for updating existing specs
     - Include code style and testing requirements
 
-- [~] 11. Implement application entry point
+- [ ] 11. Implement application entry point
   - [x] 11.1 Complete `src/index.ts` implementation
     - Load configuration from app.config
     - Initialize SpecAggregator and load all specs
