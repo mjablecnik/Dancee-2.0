@@ -25,7 +25,7 @@ The refactored application will use feature-based organization:
 
 1. Establish clean architecture with clear separation of concerns
 2. Organize code by features for better maintainability
-3. Implement proper data layer with DTOs, Entities, and Models
+3. Implement entities-only data layer with direct fromJson/toJson serialization
 4. Integrate type-safe routing with go_router
 5. Create reusable design system
 6. Maintain all existing functionality during migration
@@ -51,13 +51,10 @@ graph TB
     subgraph "Data Layer"
         Repos[Repositories]
         Entities[Entities]
-        DTOs[DTOs]
-        Models[Models]
     end
     
     subgraph "External"
         API[REST API]
-        DB[Local Database]
     end
     
     Pages --> Sections
@@ -66,10 +63,7 @@ graph TB
     Pages --> Cubits
     Cubits --> Repos
     Repos --> Entities
-    Repos --> DTOs
-    Repos --> Models
-    DTOs --> API
-    Models --> DB
+    Repos --> API
     Entities --> Cubits
 ```
 
@@ -81,9 +75,7 @@ Each feature module follows clean architecture principles:
 graph LR
     subgraph "Feature Module"
         subgraph "data/"
-            Entities[entities/]
-            DTOs[dtos/]
-            ModelsDir[models/]
+            EntitiesFile[entities.dart]
             Repo[feature_repository.dart]
         end
         
@@ -95,8 +87,7 @@ graph LR
         end
         
         subgraph "logic/"
-            Cubit[feature_cubit.dart]
-            State[feature_state.dart]
+            CubitFile[feature.dart - Cubit + State]
         end
     end
 ```
@@ -174,14 +165,13 @@ lib/
 │   ├── auth/
 │   │   ├── data/
 │   │   │   ├── entities.dart    # All auth entities in one file
-│   │   │   ├── dtos.dart        # All auth DTOs in one file
 │   │   │   └── auth_repository.dart
 │   │   ├── pages/
 │   │   │   ├── login/           # Complex page with sections/components
 │   │   │   │   ├── login_page.dart
-│   │   │   │   ├── sections.dart     # All sections in one file
-│   │   │   │   └── components.dart   # All components in one file
-│   │   │   └── register/        # Complex page with sections/components
+│   │   │   │   ├── sections.dart
+│   │   │   │   └── components.dart
+│   │   │   └── register/
 │   │   │       ├── register_page.dart
 │   │   │       ├── sections.dart
 │   │   │       └── components.dart
@@ -190,14 +180,13 @@ lib/
 │   ├── events/
 │   │   ├── data/
 │   │   │   ├── entities.dart    # EventEntity, VenueEntity, AddressEntity, etc.
-│   │   │   ├── dtos.dart        # EventDto, VenueDto, AddressDto, etc.
 │   │   │   └── event_repository.dart
 │   │   ├── pages/
-│   │   │   ├── event_list/      # Complex page with sections/components
+│   │   │   ├── event_list/
 │   │   │   │   ├── event_list_page.dart
-│   │   │   │   ├── sections.dart     # All sections in one file
-│   │   │   │   └── components.dart   # All components in one file
-│   │   │   ├── event_detail/    # Complex page with sections/components
+│   │   │   │   ├── sections.dart
+│   │   │   │   └── components.dart
+│   │   │   ├── event_detail/
 │   │   │   │   ├── event_detail_page.dart
 │   │   │   │   ├── sections.dart
 │   │   │   │   └── components.dart
@@ -209,7 +198,6 @@ lib/
 │   └── settings/
 │       ├── data/
 │       │   ├── entities.dart    # All settings entities
-│       │   ├── dtos.dart        # All settings DTOs
 │       │   └── settings_repository.dart
 │       ├── pages/
 │       │   └── settings_page.dart  # Simple page - direct file
@@ -245,9 +233,9 @@ lib/
      - `components.dart` (all components in one file)
 
 4. **Data Layer**
-   - Multiple small related classes → combine into one file
-   - `entities/event_entity.dart`, `entities/venue_entity.dart` → `entities.dart` (all entities)
-   - `dtos/event_dto.dart`, `dtos/venue_dto.dart` → `dtos.dart` (all DTOs)
+   - All entities for a feature combined into one `entities.dart` file
+   - Each entity has `fromJson(Map<String, dynamic>)` and `toJson()` directly
+   - No separate DTO or Model files by default
 
 5. **Logic Layer**
    - Cubit + State → combine into one file
@@ -263,44 +251,33 @@ lib/
 
 ### Data Layer Components
 
-#### Entity, DTO, and Model Separation
+#### Entities-Only Data Layer
 
 ```mermaid
 graph LR
-    API[REST API] -->|JSON| DTO[DTO]
-    DTO -->|fromDto| Entity[Entity]
-    Entity -->|toDto| DTO
-    Entity -->|toModel| Model[Model]
-    Model -->|fromModel| Entity
-    Model -->|Save/Load| DB[(Database)]
+    API[REST API] -->|JSON Map| Repo[Repository]
+    Repo -->|Entity.fromJson| Entity[Entity]
     Entity -->|Used in| Cubit[Cubit State]
+    Entity -->|toJson| API
 ```
 
 **Entity**: Domain model used throughout the application
 - Used in Cubit state
 - Used in UI components
-- Contains business logic
+- Contains `fromJson(Map<String, dynamic>)` factory constructor
+- Contains `toJson()` method
 - Immutable with Equatable
+- Includes `copyWith` method for updates
 
-**DTO**: Data Transfer Object for API communication
-- Matches API response structure
-- Contains fromJson/toJson methods
-- Converts to Entity via toEntity() or Entity.fromDto()
+**Repository**: Receives `Map<String, dynamic>` from ApiClient, converts to Entity via `Entity.fromJson()`, returns Entity objects.
 
-**Model**: Database persistence model
-- Matches database schema
-- Contains database-specific fields (e.g., localId)
-- Converts to Entity via toEntity() or Entity.fromModel()
+**No separate DTOs or Models** unless there is a genuine structural mismatch between API response and domain object. In most cases, a single Entity class is sufficient.
 
 #### Event Entity Design
 
 ```dart
-// lib/features/events/data/entities/event_entity.dart
+// lib/features/events/data/entities.dart
 import 'package:equatable/equatable.dart';
-import 'venue_entity.dart';
-import 'event_info_entity.dart';
-import 'event_part_entity.dart';
-import '../dtos/event_dto.dart';
 
 class EventEntity extends Equatable {
   final String id;
@@ -335,24 +312,48 @@ class EventEntity extends Equatable {
     this.badge,
   });
 
-  // Factory constructor from DTO
-  factory EventEntity.fromDto(EventDto dto) {
+  factory EventEntity.fromJson(Map<String, dynamic> json) {
     return EventEntity(
-      id: dto.id,
-      title: dto.title,
-      description: dto.description,
-      organizer: dto.organizer,
-      venue: VenueEntity.fromDto(dto.venue),
-      startTime: dto.startTime,
-      endTime: dto.endTime,
-      duration: dto.duration,
-      dances: dto.dances,
-      info: dto.info.map((i) => EventInfoEntity.fromDto(i)).toList(),
-      parts: dto.parts.map((p) => EventPartEntity.fromDto(p)).toList(),
-      isFavorite: dto.isFavorite,
-      isPast: dto.isPast,
-      badge: dto.badge,
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      organizer: json['organizer'] as String,
+      venue: VenueEntity.fromJson(json['venue'] as Map<String, dynamic>),
+      startTime: DateTime.parse(json['startTime'] as String),
+      endTime: DateTime.parse(json['endTime'] as String),
+      duration: Duration(seconds: json['duration'] as int),
+      dances: (json['dances'] as List<dynamic>).cast<String>(),
+      info: (json['info'] as List<dynamic>?)
+              ?.map((i) => EventInfoEntity.fromJson(i as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      parts: (json['parts'] as List<dynamic>?)
+              ?.map((p) => EventPartEntity.fromJson(p as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      isPast: json['isPast'] as bool? ?? false,
+      badge: json['badge'] as String?,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'organizer': organizer,
+      'venue': venue.toJson(),
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime.toIso8601String(),
+      'duration': duration.inSeconds,
+      'dances': dances,
+      'info': info.map((i) => i.toJson()).toList(),
+      'parts': parts.map((p) => p.toJson()).toList(),
+      'isFavorite': isFavorite,
+      'isPast': isPast,
+      'badge': badge,
+    };
   }
 
   EventEntity copyWith({
@@ -391,108 +392,10 @@ class EventEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        organizer,
-        venue,
-        startTime,
-        endTime,
-        duration,
-        dances,
-        info,
-        parts,
-        isFavorite,
-        isPast,
-        badge,
+        id, title, description, organizer, venue,
+        startTime, endTime, duration, dances,
+        info, parts, isFavorite, isPast, badge,
       ];
-}
-```
-
-
-#### Event DTO Design
-
-```dart
-// lib/features/events/data/dtos/event_dto.dart
-import 'venue_dto.dart';
-import 'event_info_dto.dart';
-import 'event_part_dto.dart';
-
-class EventDto {
-  final String id;
-  final String title;
-  final String description;
-  final String organizer;
-  final VenueDto venue;
-  final DateTime startTime;
-  final DateTime endTime;
-  final Duration duration;
-  final List<String> dances;
-  final List<EventInfoDto> info;
-  final List<EventPartDto> parts;
-  final bool isFavorite;
-  final bool isPast;
-  final String? badge;
-
-  const EventDto({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.organizer,
-    required this.venue,
-    required this.startTime,
-    required this.endTime,
-    required this.duration,
-    required this.dances,
-    this.info = const [],
-    this.parts = const [],
-    this.isFavorite = false,
-    this.isPast = false,
-    this.badge,
-  });
-
-  // JSON serialization for API communication
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'organizer': organizer,
-      'venue': venue.toJson(),
-      'startTime': startTime.toIso8601String(),
-      'endTime': endTime.toIso8601String(),
-      'duration': duration.inSeconds,
-      'dances': dances,
-      'info': info.map((i) => i.toJson()).toList(),
-      'parts': parts.map((p) => p.toJson()).toList(),
-      'isFavorite': isFavorite,
-      'isPast': isPast,
-      'badge': badge,
-    };
-  }
-
-  factory EventDto.fromJson(Map<String, dynamic> json) {
-    return EventDto(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      organizer: json['organizer'] as String,
-      venue: VenueDto.fromJson(json['venue'] as Map<String, dynamic>),
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
-      duration: Duration(seconds: json['duration'] as int),
-      dances: (json['dances'] as List<dynamic>).cast<String>(),
-      info: (json['info'] as List<dynamic>)
-          .map((i) => EventInfoDto.fromJson(i as Map<String, dynamic>))
-          .toList(),
-      parts: (json['parts'] as List<dynamic>)
-          .map((p) => EventPartDto.fromJson(p as Map<String, dynamic>))
-          .toList(),
-      isFavorite: json['isFavorite'] as bool? ?? false,
-      isPast: json['isPast'] as bool? ?? false,
-      badge: json['badge'] as String?,
-    );
-  }
 }
 ```
 
@@ -505,23 +408,22 @@ import '../../../core/clients.dart';
 import '../../../core/config.dart';
 import '../../../core/exceptions.dart';
 import 'entities.dart';
-import 'dtos.dart';
 
 /// Repository for managing event data.
 ///
 /// Responsibilities:
-/// - Fetch data from API
-/// - Convert DTOs to Entities
+/// - Fetch data from API (receives Map<String, dynamic>)
+/// - Convert JSON to Entities via Entity.fromJson()
 /// - Validate data
 /// - Throw custom exceptions on errors
-/// - ALWAYS return Entities (never DTOs)
+/// - ALWAYS return Entities
 class EventRepository {
   final ApiClient _apiClient;
 
   EventRepository(this._apiClient);
 
   /// Returns all events from the backend API.
-  /// Converts DTOs to Entities before returning.
+  /// Converts JSON maps directly to Entities.
   Future<List<EventEntity>> getAllEvents() async {
     try {
       final response = await _apiClient.get(
@@ -533,10 +435,9 @@ class EventRepository {
         throw ApiException(message: 'Invalid response format');
       }
       
-      // Convert DTOs to Entities
+      // Convert JSON maps directly to Entities
       return response
-          .map((json) => EventDto.fromJson(json as Map<String, dynamic>))
-          .map((dto) => EventEntity.fromDto(dto))
+          .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
           .toList();
     } on ApiException {
       rethrow;
@@ -554,7 +455,6 @@ class EventRepository {
   }
 
   /// Returns only favorite events from the backend API.
-  /// Converts DTOs to Entities before returning.
   Future<List<EventEntity>> getFavoriteEvents() async {
     try {
       final response = await _apiClient.get(
@@ -566,10 +466,8 @@ class EventRepository {
         throw ApiException(message: 'Invalid response format');
       }
       
-      // Convert DTOs to Entities
       return response
-          .map((json) => EventDto.fromJson(json as Map<String, dynamic>))
-          .map((dto) => EventEntity.fromDto(dto))
+          .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
           .toList();
     } on ApiException {
       rethrow;
@@ -906,7 +804,6 @@ class EventListPage extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    // Page implementation
     return Scaffold(
       // ...
     );
@@ -940,7 +837,6 @@ class EventDetailPage extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    // Page implementation
     return Scaffold(
       // ...
     );
@@ -1208,8 +1104,9 @@ All entities follow these principles:
 - Immutable classes using `const` constructors
 - Extend `Equatable` for value equality
 - Include `copyWith` method for updates
-- Factory constructor `fromDto` for DTO conversion
-- No JSON serialization (that's in DTOs)
+- Factory constructor `fromJson(Map<String, dynamic>)` for JSON deserialization
+- `toJson()` method for JSON serialization
+- No separate DTO or Model classes by default
 
 #### Core Entity Structure
 
@@ -1224,11 +1121,18 @@ class XEntity extends Equatable {
     required this.field2,
   });
   
-  factory XEntity.fromDto(XDto dto) {
+  factory XEntity.fromJson(Map<String, dynamic> json) {
     return XEntity(
-      field1: dto.field1,
-      field2: dto.field2,
+      field1: json['field1'] as Type,
+      field2: json['field2'] as Type,
     );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'field1': field1,
+      'field2': field2,
+    };
   }
   
   XEntity copyWith({
@@ -1243,43 +1147,6 @@ class XEntity extends Equatable {
   
   @override
   List<Object?> get props => [field1, field2];
-}
-```
-
-### DTO Models
-
-All DTOs follow these principles:
-- Immutable classes using `const` constructors
-- Include `toJson` and `fromJson` methods
-- Match API response structure exactly
-- No business logic
-
-#### Core DTO Structure
-
-```dart
-// Base pattern for all DTOs
-class XDto {
-  final Type field1;
-  final Type field2;
-  
-  const XDto({
-    required this.field1,
-    required this.field2,
-  });
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'field1': field1,
-      'field2': field2,
-    };
-  }
-  
-  factory XDto.fromJson(Map<String, dynamic> json) {
-    return XDto(
-      field1: json['field1'] as Type,
-      field2: json['field2'] as Type,
-    );
-  }
 }
 ```
 
@@ -1298,9 +1165,8 @@ sequenceDiagram
     Repo->>API: HTTP Request
     API->>Server: GET /api/events
     Server-->>API: JSON Response
-    API-->>Repo: Response Data
-    Repo->>Repo: Parse JSON to DTO
-    Repo->>Repo: Convert DTO to Entity
+    API-->>Repo: Map<String, dynamic>
+    Repo->>Repo: Entity.fromJson(map)
     Repo->>Repo: Validate Entity
     Repo-->>Cubit: Return Entity
     Cubit->>Cubit: Store Entity in State
@@ -1318,40 +1184,39 @@ sequenceDiagram
 After analyzing all acceptance criteria, I identified the following testable properties. I then performed a reflection to eliminate redundancy:
 
 **Redundancy Analysis:**
-- Properties 2.8, 6.4, and 7.3 all test "repositories return Entity objects" - these can be combined into one comprehensive property
-- Properties 2.9 and 7.4 both test "DTO to Entity conversion" - these can be combined
-- Properties 6.6 and 6.7 test specific conversion methods - these are examples, not properties
-- Property 2.10 and 11.6 both test "existing functionality maintained" - these are examples for specific features
+- Requirements 2.2, 6.2, 6.3, and 7.4 all test entity serialization (fromJson/toJson). Combined into one round-trip property.
+- Requirements 2.7 and 6.4 both test "repositories return Entity objects". Combined into one property.
+- Requirements 11.4 and 11.5 both test cubit exception handling with translated messages. Combined into one property.
 
 **Final Properties (after removing redundancy):**
 
-### Property 1: Repository Return Type Consistency
+### Property 1: Entity Serialization Round-Trip
 
-*For any* repository method that fetches data, the return type should be Entity or List<Entity>, never DTO or Model.
+*For any* valid EventEntity (and its nested entities VenueEntity, EventInfoEntity, EventPartEntity), calling `toJson()` and then `Entity.fromJson()` on the result should produce an entity equal to the original.
 
-**Validates: Requirements 2.8, 6.4, 7.3**
+**Validates: Requirements 2.2, 6.2, 6.3, 7.4**
 
-### Property 2: DTO to Entity Conversion Completeness
+### Property 2: Repository Return Type Consistency
 
-*For any* DTO received from the API, converting it to an Entity and back to DTO should preserve all data fields.
+*For any* repository method that fetches data, the return type should be Entity or List<Entity>, never raw JSON maps or other intermediate types.
 
-**Validates: Requirements 2.9, 6.5, 7.4**
+**Validates: Requirements 2.7, 6.4**
 
 ### Property 3: Entity Value Equality
 
-*For any* two entities with identical field values, they should be equal according to Equatable comparison.
+*For any* two entities constructed with identical field values, they should be equal according to Equatable comparison, and two entities with at least one differing field should not be equal.
 
-**Validates: Requirements 6.8**
+**Validates: Requirements 6.5**
 
 ### Property 4: Repository Error Handling
 
-*For any* error condition encountered by a repository (network error, parse error, validation error), the repository should throw a custom ApiException with a descriptive message.
+*For any* error condition encountered by a repository (network error, parse error, validation error), the repository should throw a custom ApiException with a descriptive message rather than propagating raw exceptions.
 
 **Validates: Requirements 7.5**
 
 ### Property 5: Repository Data Validation
 
-*For any* invalid data received from the API (missing required fields, invalid formats), the repository should reject it and throw an exception before returning.
+*For any* invalid data received from the API (missing required fields, invalid formats, wrong types), the repository should reject it and throw an exception before returning.
 
 **Validates: Requirements 7.6**
 
@@ -1363,15 +1228,9 @@ After analyzing all acceptance criteria, I identified the following testable pro
 
 ### Property 7: Cubit Exception Handling
 
-*For any* exception thrown by a repository, the cubit should catch it and emit an error state with a translated user-friendly message.
+*For any* exception thrown by a repository, the cubit should catch it and emit an error state with a translated, user-friendly message (not a raw exception string).
 
 **Validates: Requirements 11.4, 11.5**
-
-### Property 8: Cubit State Data Type
-
-*For any* cubit state that stores data, the stored data should be Entity objects, never DTO or Model objects.
-
-**Validates: Requirements 11.7**
 
 
 ## Error Handling
@@ -1379,7 +1238,7 @@ After analyzing all acceptance criteria, I identified the following testable pro
 ### Exception Hierarchy
 
 ```dart
-// lib/core/exceptions/api_exception.dart
+// lib/core/exceptions.dart
 class ApiException implements Exception {
   final String message;
   final dynamic originalError;
@@ -1446,22 +1305,18 @@ Future<List<EventEntity>> getAllEvents() async {
       );
     }
     
-    // Parse and convert
+    // Convert JSON maps directly to Entities
     return response
-        .map((json) => EventDto.fromJson(json as Map<String, dynamic>))
-        .map((dto) => EventEntity.fromDto(dto))
+        .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
         .toList();
         
   } on ApiException {
-    // Re-throw API exceptions
     rethrow;
   } on FormatException catch (e) {
-    // Handle parsing errors
     throw ValidationException(
       message: 'Failed to parse events response: ${e.message}',
     );
   } catch (e) {
-    // Handle unexpected errors
     throw ApiException(
       message: 'Failed to load events',
       originalError: e,
@@ -1490,11 +1345,9 @@ Future<void> loadEvents() async {
     emit(EventListState.error(t.errors.notFoundError));
     
   } on ApiException catch (e) {
-    // Generic API error
     emit(EventListState.error(t.errors.apiError));
     
   } catch (e) {
-    // Unexpected error
     emit(EventListState.error(t.errors.genericError));
   }
 }
@@ -1521,11 +1374,7 @@ class ErrorPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 24),
             Text(
               message,
@@ -1557,11 +1406,7 @@ class NotFoundPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 64,
-              color: Colors.grey,
-            ),
+            Icon(Icons.search_off, size: 64, color: Colors.grey),
             const SizedBox(height: 24),
             Text(
               t.errors.pageNotFound,
@@ -1595,7 +1440,7 @@ This refactoring requires both unit tests and property-based tests for comprehen
 
 **Property-Based Tests:**
 - Universal properties across all inputs
-- Data conversion correctness
+- Entity serialization correctness (round-trip)
 - Repository behavior consistency
 - State management invariants
 
@@ -1616,15 +1461,10 @@ test/
 │   ├── events/
 │   │   ├── data/
 │   │   │   ├── event_repository_test.dart
-│   │   │   ├── entities/
-│   │   │   │   └── event_entity_test.dart
-│   │   │   └── dtos/
-│   │   │       └── event_dto_test.dart
+│   │   │   └── entities_test.dart
 │   │   ├── logic/
-│   │   │   ├── event_list/
-│   │   │   │   └── event_list_cubit_test.dart
-│   │   │   └── favorites/
-│   │   │       └── favorites_cubit_test.dart
+│   │   │   ├── event_list_cubit_test.dart
+│   │   │   └── favorites_cubit_test.dart
 │   │   └── pages/
 │   │       └── event_list/
 │   │           └── event_list_page_test.dart
@@ -1639,69 +1479,64 @@ test/
 
 ### Property Test Examples
 
-#### Property 1: Repository Return Type Consistency
+#### Property 1: Entity Serialization Round-Trip
 
 ```dart
-// test/features/events/data/event_repository_property_test.dart
+// test/features/events/data/entities_property_test.dart
 import 'package:test/test.dart';
 
 /// Feature: flutter-architecture-refactor
-/// Property 1: Repository Return Type Consistency
+/// Property 1: Entity Serialization Round-Trip
 void main() {
-  group('Property 1: Repository Return Type Consistency', () {
-    test('getAllEvents returns List<EventEntity>', () async {
-      // Arrange
-      final mockClient = MockApiClient();
-      final repository = EventRepository(mockClient);
-      
-      // Mock API response with valid data
-      when(() => mockClient.get(any(), queryParameters: any(named: 'queryParameters')))
-          .thenAnswer((_) async => [
-            {
-              'id': '1',
-              'title': 'Test Event',
-              // ... other fields
-            }
-          ]);
-      
-      // Act
-      final result = await repository.getAllEvents();
-      
-      // Assert
-      expect(result, isA<List<EventEntity>>());
-      expect(result.every((item) => item is EventEntity), isTrue);
+  group('Property 1: Entity Serialization Round-Trip', () {
+    test('toJson then fromJson preserves all fields', () {
+      // Run 100 iterations with different data
+      for (var i = 0; i < 100; i++) {
+        // Arrange - Generate random Entity
+        final original = generateRandomEventEntity(seed: i);
+        
+        // Act - Convert Entity -> JSON -> Entity
+        final json = original.toJson();
+        final restored = EventEntity.fromJson(json);
+        
+        // Assert - Data should be preserved
+        expect(restored, equals(original));
+      }
     });
     
-    test('getFavoriteEvents returns List<EventEntity>', () async {
-      // Similar test for getFavoriteEvents
+    test('nested entities round-trip correctly', () {
+      for (var i = 0; i < 100; i++) {
+        final original = generateRandomVenueEntity(seed: i);
+        final json = original.toJson();
+        final restored = VenueEntity.fromJson(json);
+        expect(restored, equals(original));
+      }
     });
   });
 }
 ```
 
-#### Property 2: DTO to Entity Conversion Completeness
+#### Property 2: Repository Return Type Consistency
 
 ```dart
 /// Feature: flutter-architecture-refactor
-/// Property 2: DTO to Entity Conversion Completeness
+/// Property 2: Repository Return Type Consistency
 void main() {
-  group('Property 2: DTO to Entity Conversion', () {
-    test('round-trip conversion preserves data', () {
-      // Run 100 iterations with different data
-      for (var i = 0; i < 100; i++) {
-        // Arrange - Generate random DTO
-        final originalDto = generateRandomEventDto(seed: i);
-        
-        // Act - Convert DTO -> Entity -> DTO
-        final entity = EventEntity.fromDto(originalDto);
-        final convertedDto = EventDto.fromEntity(entity);
-        
-        // Assert - Data should be preserved
-        expect(convertedDto.id, equals(originalDto.id));
-        expect(convertedDto.title, equals(originalDto.title));
-        expect(convertedDto.description, equals(originalDto.description));
-        // ... check all fields
-      }
+  group('Property 2: Repository Return Type Consistency', () {
+    test('getAllEvents returns List<EventEntity>', () async {
+      final mockClient = MockApiClient();
+      final repository = EventRepository(mockClient);
+      
+      when(() => mockClient.get(any(), queryParameters: any(named: 'queryParameters')))
+          .thenAnswer((_) async => [
+            generateRandomEventJson(seed: 1),
+            generateRandomEventJson(seed: 2),
+          ]);
+      
+      final result = await repository.getAllEvents();
+      
+      expect(result, isA<List<EventEntity>>());
+      expect(result.every((item) => item is EventEntity), isTrue);
     });
   });
 }
@@ -1714,8 +1549,7 @@ void main() {
 /// Property 7: Cubit Exception Handling
 void main() {
   group('Property 7: Cubit Exception Handling', () {
-    test('cubit catches repository exceptions and emits error state', () async {
-      // Test with different exception types
+    test('cubit catches repository exceptions and emits translated error state', () async {
       final exceptionTypes = [
         ApiException(message: 'API error'),
         NetworkException(),
@@ -1724,20 +1558,18 @@ void main() {
       ];
       
       for (final exception in exceptionTypes) {
-        // Arrange
         final mockRepository = MockEventRepository();
         final cubit = EventListCubit(mockRepository);
         
         when(() => mockRepository.getAllEvents())
             .thenThrow(exception);
         
-        // Act
         await cubit.loadEvents();
         
-        // Assert
         expect(cubit.state, isA<EventListError>());
         final errorState = cubit.state as EventListError;
         expect(errorState.message, isNotEmpty);
+        // Should be a translated message, not a raw exception
         expect(errorState.message, isNot(contains('Exception')));
         expect(errorState.message, isNot(contains('Error:')));
       }
@@ -1764,95 +1596,48 @@ void main() {
     
     group('getAllEvents', () {
       test('returns events when API call succeeds', () async {
-        // Arrange
         final mockResponse = [
           {
             'id': '1',
             'title': 'Test Event',
             'description': 'Test Description',
-            // ... other fields
+            'organizer': 'Test Org',
+            'venue': {'name': 'Test Venue', 'address': {'city': 'Prague'}},
+            'startTime': '2024-01-01T10:00:00.000Z',
+            'endTime': '2024-01-01T12:00:00.000Z',
+            'duration': 7200,
+            'dances': ['salsa'],
           }
         ];
         
         when(() => mockClient.get(any(), queryParameters: any(named: 'queryParameters')))
             .thenAnswer((_) async => mockResponse);
         
-        // Act
         final result = await repository.getAllEvents();
         
-        // Assert
         expect(result, hasLength(1));
         expect(result.first.id, equals('1'));
         expect(result.first.title, equals('Test Event'));
       });
       
       test('throws ApiException when response is not a list', () async {
-        // Arrange
         when(() => mockClient.get(any(), queryParameters: any(named: 'queryParameters')))
             .thenAnswer((_) async => {'error': 'Invalid format'});
         
-        // Act & Assert
         expect(
           () => repository.getAllEvents(),
           throwsA(isA<ApiException>()),
         );
-      });
-      
-      test('throws ApiException when JSON parsing fails', () async {
-        // Arrange
-        when(() => mockClient.get(any(), queryParameters: any(named: 'queryParameters')))
-            .thenAnswer((_) async => [
-              {'id': 1} // Invalid: id should be String
-            ]);
-        
-        // Act & Assert
-        expect(
-          () => repository.getAllEvents(),
-          throwsA(isA<ApiException>()),
-        );
-      });
-    });
-    
-    group('toggleFavorite', () {
-      test('calls addFavorite when currentIsFavorite is false', () async {
-        // Arrange
-        when(() => mockClient.post(any(), data: any(named: 'data')))
-            .thenAnswer((_) async => {});
-        
-        // Act
-        await repository.toggleFavorite('event-1', false);
-        
-        // Assert
-        verify(() => mockClient.post(
-          '/api/events/favorites',
-          data: {'userId': any(named: 'userId'), 'eventId': 'event-1'},
-        )).called(1);
-      });
-      
-      test('calls removeFavorite when currentIsFavorite is true', () async {
-        // Arrange
-        when(() => mockClient.delete(any(), queryParameters: any(named: 'queryParameters')))
-            .thenAnswer((_) async => {});
-        
-        // Act
-        await repository.toggleFavorite('event-1', true);
-        
-        // Assert
-        verify(() => mockClient.delete(
-          '/api/events/favorites/event-1',
-          queryParameters: any(named: 'queryParameters'),
-        )).called(1);
       });
     });
   });
 }
 ```
 
-
 #### Cubit Unit Tests
 
 ```dart
-// test/features/events/logic/event_list/event_list_cubit_test.dart
+// test/features/events/logic/event_list_cubit_test.dart
 void main() {
   group('EventListCubit', () {
     late MockEventRepository mockRepository;
@@ -1869,7 +1654,6 @@ void main() {
     
     group('loadEvents', () {
       test('emits [loading, loaded] when successful', () async {
-        // Arrange
         final mockEvents = [
           createMockEventEntity(id: '1', startTime: DateTime.now()),
           createMockEventEntity(id: '2', startTime: DateTime.now().add(Duration(days: 1))),
@@ -1878,7 +1662,6 @@ void main() {
         when(() => mockRepository.getAllEvents())
             .thenAnswer((_) async => mockEvents);
         
-        // Assert
         expectLater(
           cubit.stream,
           emitsInOrder([
@@ -1887,16 +1670,13 @@ void main() {
           ]),
         );
         
-        // Act
         await cubit.loadEvents();
       });
       
       test('emits [loading, error] when repository throws exception', () async {
-        // Arrange
         when(() => mockRepository.getAllEvents())
             .thenThrow(ApiException(message: 'Network error'));
         
-        // Assert
         expectLater(
           cubit.stream,
           emitsInOrder([
@@ -1905,12 +1685,10 @@ void main() {
           ]),
         );
         
-        // Act
         await cubit.loadEvents();
       });
       
       test('groups events by date correctly', () async {
-        // Arrange
         final now = DateTime.now();
         final today = DateTime(now.year, now.month, now.day);
         final tomorrow = today.add(Duration(days: 1));
@@ -1925,10 +1703,8 @@ void main() {
         when(() => mockRepository.getAllEvents())
             .thenAnswer((_) async => mockEvents);
         
-        // Act
         await cubit.loadEvents();
         
-        // Assert
         final state = cubit.state as EventListLoaded;
         expect(state.todayEvents, hasLength(1));
         expect(state.tomorrowEvents, hasLength(1));
@@ -1936,54 +1712,8 @@ void main() {
       });
     });
     
-    group('searchEvents', () {
-      test('filters events by title', () async {
-        // Arrange
-        final mockEvents = [
-          createMockEventEntity(id: '1', title: 'Salsa Night'),
-          createMockEventEntity(id: '2', title: 'Bachata Workshop'),
-          createMockEventEntity(id: '3', title: 'Salsa Festival'),
-        ];
-        
-        when(() => mockRepository.getAllEvents())
-            .thenAnswer((_) async => mockEvents);
-        
-        await cubit.loadEvents();
-        
-        // Act
-        await cubit.searchEvents('Salsa');
-        
-        // Assert
-        final state = cubit.state as EventListLoaded;
-        expect(state.allEvents, hasLength(2));
-        expect(state.allEvents.every((e) => e.title.contains('Salsa')), isTrue);
-      });
-      
-      test('reloads all events when query is empty', () async {
-        // Arrange
-        final mockEvents = [
-          createMockEventEntity(id: '1', title: 'Event 1'),
-          createMockEventEntity(id: '2', title: 'Event 2'),
-        ];
-        
-        when(() => mockRepository.getAllEvents())
-            .thenAnswer((_) async => mockEvents);
-        
-        await cubit.loadEvents();
-        await cubit.searchEvents('Event 1');
-        
-        // Act
-        await cubit.searchEvents('');
-        
-        // Assert
-        final state = cubit.state as EventListLoaded;
-        expect(state.allEvents, hasLength(2));
-      });
-    });
-    
     group('toggleFavorite', () {
       test('updates event favorite status locally', () async {
-        // Arrange
         final mockEvents = [
           createMockEventEntity(id: '1', isFavorite: false),
           createMockEventEntity(id: '2', isFavorite: false),
@@ -1995,11 +1725,8 @@ void main() {
             .thenAnswer((_) async => {});
         
         await cubit.loadEvents();
-        
-        // Act
         await cubit.toggleFavorite('1');
         
-        // Assert
         final state = cubit.state as EventListLoaded;
         final updatedEvent = state.allEvents.firstWhere((e) => e.id == '1');
         expect(updatedEvent.isFavorite, isTrue);
@@ -2011,25 +1738,10 @@ void main() {
 
 ### Test Coverage Goals
 
-- **Repository Layer:** 90%+ coverage
-  - All public methods
-  - Error handling paths
-  - Data validation
-
-- **Cubit Layer:** 90%+ coverage
-  - All state transitions
-  - Error handling
-  - Business logic
-
-- **Entity/DTO Layer:** 100% coverage
-  - Conversion methods
-  - Equality comparison
-  - copyWith methods
-
-- **UI Components:** 70%+ coverage
-  - Widget rendering
-  - User interactions
-  - State-based rendering
+- **Repository Layer:** 90%+ coverage (all public methods, error handling, data validation)
+- **Cubit Layer:** 90%+ coverage (all state transitions, error handling, business logic)
+- **Entity Layer:** 100% coverage (fromJson/toJson round-trip, equality, copyWith)
+- **UI Components:** 70%+ coverage (widget rendering, user interactions, state-based rendering)
 
 ### Running Tests
 
@@ -2090,10 +1802,10 @@ The refactoring will be performed incrementally to maintain functionality:
 #### Phase 2: Events Feature Migration (Week 2-3)
 
 1. **Create data layer**
-   - Create entity classes in `lib/features/events/data/entities/`
-   - Create DTO classes in `lib/features/events/data/dtos/`
+   - Create entity classes in `lib/features/events/data/entities.dart` with fromJson/toJson
    - Migrate EventRepository to `lib/features/events/data/`
-   - Update repository to use DTOs and return Entities
+   - Update repository to convert JSON maps directly to Entities via fromJson
+   - Add data validation in repository
 
 2. **Create logic layer**
    - Move cubits to `lib/features/events/logic/`
@@ -2115,7 +1827,7 @@ The refactoring will be performed incrementally to maintain functionality:
 5. **Run tests**
    - Update test imports
    - Verify all tests pass
-   - Add new tests for entities and DTOs
+   - Add new tests for entity fromJson/toJson
 
 #### Phase 3: App Feature Creation (Week 3)
 
@@ -2148,27 +1860,23 @@ The refactoring will be performed incrementally to maintain functionality:
 
 2. **Create login page**
    - Create page structure based on .design/auth-login.html
-   - Extract sections
-   - Extract components
+   - Extract sections and components
    - Add route definition
 
 3. **Create register page**
    - Create page structure based on .design/auth-register.html
-   - Extract sections
-   - Extract components
+   - Extract sections and components
    - Add route definition
 
 #### Phase 5: Settings Feature Scaffolding (Week 4)
 
 1. **Create feature structure**
    - Create `lib/features/settings/` directories
-   - Create placeholder repository
-   - Create placeholder cubits
+   - Create placeholder repository and cubits
 
 2. **Create settings page**
    - Create page structure based on .design/settings.html
-   - Extract sections
-   - Extract components
+   - Extract sections and components
    - Add route definition
 
 #### Phase 6: Design System Organization (Week 5)
@@ -2190,22 +1898,15 @@ The refactoring will be performed incrementally to maintain functionality:
 #### Phase 7: Cleanup and Documentation (Week 5)
 
 1. **Remove legacy directories**
-   - Delete `lib/screens/`
-   - Delete `lib/models/`
-   - Delete `lib/cubits/`
-   - Delete `lib/widgets/`
+   - Delete `lib/screens/`, `lib/models/`, `lib/cubits/`, `lib/widgets/`
 
 2. **Update documentation**
    - Update README.md
-   - Document feature structure
-   - Document data layer patterns
-   - Document routing setup
-   - Provide examples
+   - Document feature structure and data layer patterns
 
 3. **Final testing**
    - Run full test suite
    - Test on all platforms (web, Android, iOS)
-   - Verify all functionality works
 
 ### Code Generation Commands
 
@@ -2232,7 +1933,6 @@ task build-runner-clean
 - [ ] Cubits suffixed with `_cubit.dart`
 - [ ] States suffixed with `_state.dart`
 - [ ] Entities suffixed with `_entity.dart`
-- [ ] DTOs suffixed with `_dto.dart`
 
 ### Import Organization
 
@@ -2249,15 +1949,15 @@ import 'package:go_router/go_router.dart';
 
 // 4. Relative imports (grouped by layer)
 // Core
-import '../../../core/exceptions/api_exception.dart';
-import '../../../core/clients/api_client.dart';
+import '../../../core/exceptions.dart';
+import '../../../core/clients.dart';
 
 // Data
-import '../../data/entities/event_entity.dart';
+import '../../data/entities.dart';
 import '../../data/event_repository.dart';
 
 // Logic
-import '../../logic/event_list/event_list_cubit.dart';
+import '../../logic/event_list.dart';
 
 // UI
 import '../components/event_card.dart';
@@ -2265,7 +1965,6 @@ import '../components/event_card.dart';
 // Translations
 import '../../../i18n/translations.g.dart';
 ```
-
 
 ### Common Pitfalls and Solutions
 
@@ -2277,17 +1976,16 @@ import '../../../i18n/translations.g.dart';
 - Keep features independent
 - Share common code through `lib/core/` or `lib/design/`
 - Use dependency injection for cross-feature communication
-- Use event bus or state management for loose coupling
 
-#### Pitfall 2: Mixing DTOs and Entities
+#### Pitfall 2: Using Raw JSON in UI or Cubits
 
-**Problem:** Using DTOs in UI or Entities in API calls
+**Problem:** Passing `Map<String, dynamic>` beyond the repository layer
 
 **Solution:**
-- Repository always converts DTO → Entity
+- Repository always converts JSON to Entity via `Entity.fromJson()`
 - Cubit always stores Entity in state
 - UI always receives Entity
-- API calls always use DTO
+- Only the repository layer touches raw JSON maps
 
 #### Pitfall 3: Private Build Methods
 
@@ -2316,7 +2014,6 @@ import '../../../i18n/translations.g.dart';
 - Add `part 'page_name.g.dart';` directive
 - Ensure @TypedGoRoute annotation is correct
 - Run `task build-runner` to generate routes
-- Check for syntax errors in route definitions
 
 #### Pitfall 6: State Not Updating
 
@@ -2502,8 +2199,6 @@ cp lib/config.example.dart lib/config.dart
 
 #### Event List Page Design
 
-Based on the current implementation and design requirements:
-
 **Page Structure:**
 ```
 EventListPage
@@ -2528,14 +2223,11 @@ EventListPage
 
 1. **EventCard** - Feature-specific component (used across multiple event pages)
    - Location: `lib/features/events/pages/event_list/components/event_card.dart`
-   - Displays event information
-   - Handles favorite toggle
-   - Handles tap navigation
+   - Displays event information, handles favorite toggle and tap navigation
 
 2. **SectionHeader** - Feature-specific component
    - Location: `lib/features/events/pages/event_list/components/section_header.dart`
    - Displays section title, subtitle, count, and icon
-   - Reusable across date sections
 
 3. **FilterChip** - Feature-specific widget
    - Location: `lib/features/events/pages/event_list/components/filter_chip.dart`
@@ -2754,61 +2446,32 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
-  // Display styles
   static TextStyle displayLarge = GoogleFonts.inter(
-    fontSize: 32,
-    fontWeight: FontWeight.bold,
-    height: 1.2,
+    fontSize: 32, fontWeight: FontWeight.bold, height: 1.2,
   );
-  
   static TextStyle displayMedium = GoogleFonts.inter(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    height: 1.3,
+    fontSize: 24, fontWeight: FontWeight.bold, height: 1.3,
   );
-  
   static TextStyle displaySmall = GoogleFonts.inter(
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-    height: 1.4,
+    fontSize: 20, fontWeight: FontWeight.bold, height: 1.4,
   );
-  
-  // Body styles
   static TextStyle bodyLarge = GoogleFonts.inter(
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-    height: 1.5,
+    fontSize: 16, fontWeight: FontWeight.normal, height: 1.5,
   );
-  
   static TextStyle bodyMedium = GoogleFonts.inter(
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-    height: 1.5,
+    fontSize: 14, fontWeight: FontWeight.normal, height: 1.5,
   );
-  
   static TextStyle bodySmall = GoogleFonts.inter(
-    fontSize: 12,
-    fontWeight: FontWeight.normal,
-    height: 1.5,
+    fontSize: 12, fontWeight: FontWeight.normal, height: 1.5,
   );
-  
-  // Label styles
   static TextStyle labelLarge = GoogleFonts.inter(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    height: 1.4,
+    fontSize: 14, fontWeight: FontWeight.w600, height: 1.4,
   );
-  
   static TextStyle labelMedium = GoogleFonts.inter(
-    fontSize: 12,
-    fontWeight: FontWeight.w600,
-    height: 1.4,
+    fontSize: 12, fontWeight: FontWeight.w600, height: 1.4,
   );
-  
   static TextStyle labelSmall = GoogleFonts.inter(
-    fontSize: 10,
-    fontWeight: FontWeight.w600,
-    height: 1.4,
+    fontSize: 10, fontWeight: FontWeight.w600, height: 1.4,
   );
 }
 ```
@@ -2914,26 +2577,20 @@ Widgets that are truly shared across multiple features should be placed in `lib/
 ### Phase 2: Events Feature
 
 **Data Layer:**
-- [ ] Create `lib/features/events/data/entities/` directory
-- [ ] Create EventEntity with fromDto constructor
-- [ ] Create VenueEntity, AddressEntity, EventInfoEntity, EventPartEntity
-- [ ] Create `lib/features/events/data/dtos/` directory
-- [ ] Create EventDto with toJson/fromJson
-- [ ] Create VenueDto, AddressDto, EventInfoDto, EventPartDto
+- [ ] Create `lib/features/events/data/entities.dart` with all entities (fromJson/toJson)
+- [ ] Create EventEntity, VenueEntity, AddressEntity, EventInfoEntity, EventPartEntity
 - [ ] Move EventRepository to `lib/features/events/data/`
-- [ ] Update repository to convert DTOs to Entities
+- [ ] Update repository to convert JSON maps to Entities via fromJson
 - [ ] Add data validation in repository
+- [ ] Write entity round-trip tests
 - [ ] Write repository tests
 
 **Logic Layer:**
-- [ ] Create `lib/features/events/logic/event_list/` directory
-- [ ] Move event_list_cubit.dart
+- [ ] Create `lib/features/events/logic/event_list.dart` (Cubit + State)
 - [ ] Convert EventListState to use freezed
 - [ ] Update cubit to use Entities
-- [ ] Create `lib/features/events/logic/favorites/` directory
-- [ ] Move favorites_cubit.dart
+- [ ] Create `lib/features/events/logic/favorites.dart` (Cubit + State)
 - [ ] Convert FavoritesState to use freezed
-- [ ] Update cubit to use Entities
 - [ ] Write cubit tests
 
 **Presentation Layer:**
@@ -2943,24 +2600,17 @@ Widgets that are truly shared across multiple features should be placed in `lib/
 - [ ] Extract EventListHeaderSection
 - [ ] Extract SearchAndFiltersSection
 - [ ] Extract EventsByDateSection
-- [ ] Create `sections/` directory with all sections
-- [ ] Create `components/` directory
+- [ ] Create `sections/` and `components/` directories
 - [ ] Move EventCard to components
-- [ ] Extract SectionHeader component
-- [ ] Extract FilterChip component
 - [ ] Create event_detail_page.dart with route
 - [ ] Create event_filters_page.dart with route
 - [ ] Move favorites_screen.dart to favorites_page.dart
-- [ ] Add @TypedGoRoute to favorites page
-- [ ] Extract favorites sections and components
 
 **Verification:**
 - [ ] Run `task build-runner`
 - [ ] Update imports in all files
 - [ ] Run tests
-- [ ] Test event list functionality
-- [ ] Test favorites functionality
-- [ ] Test search functionality
+- [ ] Test event list, favorites, and search functionality
 
 ### Phase 3: App Feature
 
@@ -2982,25 +2632,17 @@ Widgets that are truly shared across multiple features should be placed in `lib/
 
 - [ ] Create `lib/features/auth/` directory structure
 - [ ] Create auth_repository.dart (placeholder)
-- [ ] Create auth_cubit.dart (placeholder)
-- [ ] Create AuthState with freezed (placeholder)
-- [ ] Create login_page.dart with route
-- [ ] Extract login sections based on design
-- [ ] Extract login components
-- [ ] Create register_page.dart with route
-- [ ] Extract register sections based on design
-- [ ] Extract register components
+- [ ] Create auth.dart cubit (placeholder)
+- [ ] Create login_page.dart with route and sections
+- [ ] Create register_page.dart with route and sections
 - [ ] Test navigation to auth pages
 
 ### Phase 5: Settings Feature
 
 - [ ] Create `lib/features/settings/` directory structure
 - [ ] Create settings_repository.dart (placeholder)
-- [ ] Create settings_cubit.dart (placeholder)
-- [ ] Create SettingsState with freezed (placeholder)
-- [ ] Create settings_page.dart with route
-- [ ] Extract settings sections based on design
-- [ ] Extract settings components
+- [ ] Create settings.dart cubit (placeholder)
+- [ ] Create settings_page.dart with route and sections
 - [ ] Test navigation to settings page
 - [ ] Test auth guard on settings page
 
@@ -3026,17 +2668,11 @@ Widgets that are truly shared across multiple features should be placed in `lib/
 - [ ] Delete `lib/widgets/` directory
 - [ ] Update service_locator.dart with final paths
 - [ ] Run full test suite
-- [ ] Test on web platform
-- [ ] Test on Android platform
-- [ ] Test on iOS platform
+- [ ] Test on web, Android, and iOS platforms
 - [ ] Update README.md
-- [ ] Document feature structure
-- [ ] Document data layer patterns
+- [ ] Document feature structure and data layer patterns
 - [ ] Document routing setup
 - [ ] Provide examples for new features
-- [ ] Create pull request
-- [ ] Code review
-- [ ] Merge to main
 
 ### Post-Migration
 
@@ -3052,21 +2688,20 @@ This design document provides a comprehensive blueprint for refactoring the Danc
 
 1. **Establish Clean Architecture** - Clear separation between data, logic, and presentation layers
 2. **Feature-Based Organization** - Self-contained feature modules for better maintainability
-3. **Proper Data Layer** - Explicit separation of DTOs, Entities, and Models with clear conversion patterns
+3. **Entities-Only Data Layer** - Direct fromJson/toJson on entities, no separate DTOs or Models unless genuinely needed
 4. **Type-Safe Routing** - go_router with code generation for compile-time safety
 5. **Immutable State** - freezed for state classes ensuring predictable state management
 6. **Design System** - Centralized colors, typography, and shared components
 7. **Comprehensive Testing** - Both unit tests and property-based tests for correctness
 
-The migration will be performed incrementally over 5 weeks, maintaining functionality throughout the process. Each phase builds on the previous one, allowing for continuous testing and validation.
+The migration will be performed incrementally over 5 weeks, maintaining functionality throughout the process.
 
 Key architectural decisions:
-- Repository always returns Entities (never DTOs)
-- Cubit always stores Entities in state (never DTOs)
+- Repository receives `Map<String, dynamic>` from API and converts to Entity via `Entity.fromJson()`
+- Repository always returns Entities
+- Cubit always stores Entities in state
 - Every UI element is its own class (no private build methods)
 - Page → Section → Component → Widget hierarchy
 - Feature modules are independent and self-contained
 - Shared code lives in `lib/core/` or `lib/design/`
-
-The result will be a scalable, maintainable codebase that follows Flutter best practices and clean architecture principles, ready for future feature development.
-
+- No separate DTO or Model classes unless there is a genuine structural mismatch between API response and domain object

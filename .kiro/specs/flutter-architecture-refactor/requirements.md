@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document defines the requirements for refactoring the Dancee App Flutter application from its current basic structure to a clean architecture pattern following the flutter-architecture.md standards. The refactoring will transform the existing `screens/`, `models/`, `cubits/`, and `widgets/` directories into a feature-based architecture with proper separation of concerns, routing, and a shared design system.
+This document defines the requirements for refactoring the Dancee App Flutter application from its current basic structure to a clean architecture pattern following the flutter-architecture.md standards. The refactoring will transform the existing `screens/`, `models/`, `cubits/`, and `widgets/` directories into a feature-based architecture with proper separation of concerns, routing, and a shared design system. The data layer uses entities only (no separate DTOs or Models) with direct fromJson/toJson serialization.
 
 The current application has basic functionality (event list, favorites) but lacks proper architectural organization. This refactoring will establish a scalable foundation for future features while maintaining all existing functionality.
 
@@ -10,15 +10,13 @@ The current application has basic functionality (event list, favorites) but lack
 
 - **Flutter_App**: The Dancee App mobile and web application built with Flutter
 - **Feature_Module**: A self-contained directory containing all code for a specific feature (data, pages, logic)
-- **Data_Layer**: The layer containing entities, DTOs, models, and repositories
+- **Data_Layer**: The layer containing entities and repositories
 - **Presentation_Layer**: The layer containing pages, sections, components, and widgets
 - **Logic_Layer**: The layer containing cubits and state management
 - **Design_System**: Shared UI components, themes, and design tokens used across features
 - **Core_Module**: Shared utilities, configurations, and services used across features
 - **Repository**: A class that abstracts data sources and returns entities
-- **Entity**: Domain model used in application logic
-- **DTO**: Data Transfer Object used for API communication
-- **Model**: Data model used for database persistence
+- **Entity**: Domain object with fromJson/toJson methods, used throughout the application for both API communication and domain logic
 - **Cubit**: State management class using the Bloc pattern
 - **Auto_Route**: Flutter routing package for type-safe navigation
 - **Page**: A complete application screen
@@ -51,15 +49,13 @@ The current application has basic functionality (event list, favorites) but lack
 #### Acceptance Criteria
 
 1. THE Flutter_App SHALL create `lib/features/events/` directory structure
-2. THE Flutter_App SHALL move event models to `lib/features/events/data/entities/`
-3. THE Flutter_App SHALL create `lib/features/events/data/dtos/` for API data transfer objects
-4. THE Flutter_App SHALL move EventRepository to `lib/features/events/data/event_repository.dart`
-5. THE Flutter_App SHALL move event cubits to `lib/features/events/logic/`
-6. THE Flutter_App SHALL move event screens to `lib/features/events/pages/`
-7. THE Flutter_App SHALL create sections and components within each page directory
-8. THE Flutter_App SHALL ensure EventRepository returns Entity objects (not DTOs)
-9. WHEN EventRepository fetches data from API, THE EventRepository SHALL convert DTOs to Entities before returning
-10. THE Flutter_App SHALL maintain all existing event functionality (list, search, favorites, toggle)
+2. THE Flutter_App SHALL create `lib/features/events/data/entities.dart` containing all event entities with fromJson/toJson methods
+3. THE Flutter_App SHALL move EventRepository to `lib/features/events/data/event_repository.dart`
+4. THE Flutter_App SHALL move event cubits to `lib/features/events/logic/`
+5. THE Flutter_App SHALL move event screens to `lib/features/events/pages/`
+6. THE Flutter_App SHALL create sections and components within each page directory
+7. THE Flutter_App SHALL ensure EventRepository receives Map<String, dynamic> from ApiClient and converts to Entity via fromJson
+8. THE Flutter_App SHALL maintain all existing event functionality (list, search, favorites, toggle)
 
 ### Requirement 3: App Feature Module
 
@@ -100,20 +96,19 @@ The current application has basic functionality (event list, favorites) but lack
 4. THE Flutter_App SHALL create sections and components based on .design/settings-change.html
 5. THE Flutter_App SHALL create placeholder implementations for settings pages (no backend integration required)
 
-### Requirement 6: Data Layer Architecture
+### Requirement 6: Entities-Only Data Layer
 
-**User Story:** As a developer, I want proper separation between DTOs, Models, and Entities, so that data transformation is explicit and maintainable.
+**User Story:** As a developer, I want a simplified data layer using only entities, so that data transformation is straightforward and there is no unnecessary abstraction.
 
 #### Acceptance Criteria
 
-1. THE Flutter_App SHALL create `entities/` subdirectory in each feature's data directory
-2. THE Flutter_App SHALL create `dtos/` subdirectory in each feature's data directory
-3. WHERE database persistence is needed, THE Flutter_App SHALL create `models/` subdirectory
+1. THE Flutter_App SHALL create a single `entities.dart` file in each feature's data directory containing all domain entities
+2. THE Flutter_App SHALL ensure each entity has a `fromJson(Map<String, dynamic>)` factory constructor for deserialization
+3. THE Flutter_App SHALL ensure each entity has a `toJson()` method for serialization
 4. THE Flutter_App SHALL ensure all repositories return Entity objects
-5. THE Flutter_App SHALL create conversion methods between DTOs and Entities
-6. THE Flutter_App SHALL ensure Event entity has fromDto factory constructor
-7. THE Flutter_App SHALL ensure Event DTO has toEntity method
-8. THE Flutter_App SHALL maintain Equatable for value equality in entities
+5. THE Flutter_App SHALL maintain Equatable for value equality in entities
+6. THE Flutter_App SHALL NOT create separate DTO or Model classes unless there is a genuine structural mismatch between API response and domain object
+7. WHERE a structural mismatch exists between API response and domain object, THE Flutter_App SHALL document the reason for creating a separate DTO or Model class
 
 ### Requirement 7: Repository Pattern Implementation
 
@@ -123,8 +118,8 @@ The current application has basic functionality (event list, favorites) but lack
 
 1. THE Flutter_App SHALL place each repository in its feature's data directory
 2. THE Flutter_App SHALL ensure repositories accept ApiClient via dependency injection
-3. THE Flutter_App SHALL ensure repositories return Entity objects (never DTOs)
-4. WHEN repository fetches data from API, THE Repository SHALL convert DTOs to Entities
+3. THE Flutter_App SHALL ensure repositories receive Map<String, dynamic> from ApiClient
+4. THE Flutter_App SHALL ensure repositories convert Map<String, dynamic> to Entity via Entity.fromJson()
 5. WHEN repository encounters errors, THE Repository SHALL throw custom exceptions
 6. THE Flutter_App SHALL ensure repositories validate data before returning
 7. THE Flutter_App SHALL maintain existing repository methods (getAllEvents, getFavoriteEvents, toggleFavorite)
@@ -190,7 +185,7 @@ The current application has basic functionality (event list, favorites) but lack
 4. THE Flutter_App SHALL ensure cubits catch repository exceptions
 5. THE Flutter_App SHALL ensure cubits display user-friendly error messages using translations
 6. THE Flutter_App SHALL maintain existing cubit functionality (load, search, toggle)
-7. THE Flutter_App SHALL ensure cubits store entities in state (not DTOs)
+7. THE Flutter_App SHALL ensure cubits store entities in state
 
 ### Requirement 12: Dependency Injection Updates
 

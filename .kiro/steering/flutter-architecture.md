@@ -62,8 +62,8 @@ Create a folder only when:
 Combine multiple small related classes into one file:
 - ❌ `entities/event_entity.dart`, `entities/venue_entity.dart`, etc. in separate files
 - ✅ `entities.dart` (all entities in one file)
-- ❌ `dtos/event_dto.dart`, `dtos/venue_dto.dart`, etc. in separate files
-- ✅ `dtos.dart` (all DTOs in one file)
+
+**No DTOs or Models by default.** Entities handle JSON conversion directly via `fromJson`/`toJson`. Only create DTOs or Models when there is a genuine structural mismatch between API response and domain object, or when database persistence requires a different schema. In most cases, a single Entity class is sufficient.
 
 ### Logic Layer Rules
 
@@ -184,9 +184,7 @@ Each feature follows clean architecture:
 ```
 lib/features/<feature_name>/
 ├── data/
-│   ├── entities.dart        # All domain entities in one file
-│   ├── models.dart          # All database models in one file (if needed)
-│   ├── dtos.dart            # All API DTOs in one file
+│   ├── entities.dart        # All domain entities in one file (with fromJson/toJson)
 │   └── <feature>_repository.dart
 ├── pages/
 │   ├── <simple_page>.dart   # Simple pages directly in pages/
@@ -200,6 +198,8 @@ lib/features/<feature_name>/
 └── constants.dart           # Feature-specific constants (optional)
 ```
 
+**Note:** No separate DTOs or Models directories. Entities handle JSON serialization directly. Only add `dtos.dart` or `models.dart` when there is a genuine structural mismatch that justifies a separate class.
+
 ### Common Features
 
 - **app**: Core app functionality (initial page, redirects, layouts)
@@ -212,59 +212,37 @@ lib/features/<feature_name>/
 
 ### Data Models
 
-Three types of data models, all in `features/<feature>/data/`:
+**Entities only by default.** Each feature has a single `entities.dart` file containing all domain entities with `fromJson`/`toJson` methods.
 
-1. **DTOs** (`dtos/`) - API communication
-2. **Models** (`models/`) - Database persistence
-3. **Entities** (`entities/`) - Application domain logic
+- **Entities** - Domain objects with JSON serialization, used everywhere in the app
+- **DTOs** - Only when API response structure differs significantly from domain model (rare)
+- **Models** - Only when local database persistence requires a different schema (rare)
 
 ### Repository Pattern
 
 **Location**: `lib/features/<feature>/data/<feature>_repository.dart`
 
 **Responsibilities**:
-- Abstract data source (API, DB, or both)
-- Return entities (never DTOs or Models)
+- Fetch data from API (receives `Map<String, dynamic>`)
+- Convert JSON maps to Entities via `Entity.fromJson()`
+- Return entities
 - Handle data validation
 - Throw exceptions on errors
 
-**Data Source Patterns**:
+**Data Source Pattern**:
 
 ```dart
 // API only (default)
-class AuthRepository {
-  final Dio _httpClient;
-  
-  Future<UserEntity> login(String email, String password) async {
-    final dto = await _httpClient.post(...);
-    return UserEntity.fromDto(dto);
-  }
-}
-
-// Database only
-class SettingsRepository {
-  final Database _db;
-  
-  Future<SettingsEntity> getSettings() async {
-    final model = await _db.query(...);
-    return SettingsEntity.fromModel(model);
-  }
-}
-
-// Both API and DB (with custom logic)
 class EventRepository {
-  final Dio _httpClient;
-  final Database _db;
+  final ApiClient _apiClient;
   
-  Future<List<EventEntity>> getEvents() async {
-    // Custom logic: cache-first, network-first, etc.
-    try {
-      final cached = await _db.getEvents();
-      if (cached.isNotEmpty) return cached.map((m) => EventEntity.fromModel(m)).toList();
-    } catch (_) {}
-    
-    final dtos = await _httpClient.get(...);
-    return dtos.map((dto) => EventEntity.fromDto(dto)).toList();
+  EventRepository(this._apiClient);
+  
+  Future<List<EventEntity>> getAllEvents() async {
+    final response = await _apiClient.get('/api/events/list');
+    return (response as List)
+        .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 }
 ```
@@ -276,13 +254,10 @@ class EventRepository {
 ```dart
 Future<UserEntity> getUser(String id) async {
   try {
-    final dto = await _httpClient.get('/users/$id');
-    if (dto.email == null) {
-      throw InvalidDataException('User email is required');
-    }
-    return UserEntity.fromDto(dto);
+    final json = await _apiClient.get('/users/$id');
+    return UserEntity.fromJson(json as Map<String, dynamic>);
   } catch (e) {
-    throw RepositoryException('Failed to fetch user', e);
+    throw ApiException(message: 'Failed to fetch user', originalError: e);
   }
 }
 ```
@@ -579,18 +554,18 @@ void main() async {
 
 **Setup**: One global Dio instance in DI (default)
 
-**Usage**: Inject into repositories
+**Usage**: Inject into repositories via ApiClient wrapper
 
 ```dart
 class EventRepository {
-  final Dio _httpClient;
+  final ApiClient _apiClient;
   
-  EventRepository(this._httpClient);
+  EventRepository(this._apiClient);
   
   Future<List<EventEntity>> getEvents() async {
-    final response = await _httpClient.get('/events');
-    return (response.data as List)
-        .map((json) => EventEntity.fromJson(json))
+    final response = await _apiClient.get('/events');
+    return (response as List)
+        .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 }
@@ -604,9 +579,11 @@ class EventRepository {
 
 **Common Options**: Hive, Drift, SQLite, ObjectBox
 
-**Location**: Models in `lib/features/<feature>/data/models/`
+**Location**: If needed, models in `lib/features/<feature>/data/models.dart`
 
 **Caching Strategy**: Defined per project (cache-first, network-first, etc.)
+
+**Note**: Only create Model classes when you actually have a local database. Don't create them preemptively.
 
 ## Code Generation
 
@@ -720,8 +697,8 @@ See `task-management.md` steering file for complete task reference.
 
 1. Create feature directory: `lib/features/<feature_name>/`
 2. Create subdirectories: `data/`, `pages/`, `logic/`
-3. Create data files: `entities.dart`, `dtos.dart`, `models.dart` (as needed - all in single files)
-4. Create repository: `<feature>_repository.dart`
+3. Create `data/entities.dart` with all entities (including `fromJson`/`toJson`)
+4. Create repository: `data/<feature>_repository.dart`
 5. Create cubit: `logic/<cubit_name>.dart` (Cubit + State in one file)
 6. Create pages: `pages/<page_name>.dart` (simple) or `pages/<page_name>/` (complex with sections/components)
 7. Add route definition: `@TypedGoRoute` with `GoRouteData` class in page file
@@ -753,9 +730,9 @@ Cubit
   ↓ call method
 Repository
   ↓ fetch data
-API Client / Database
-  ↓ return DTO/Model
-Repository (converts to Entity)
+API Client
+  ↓ return Map<String, dynamic>
+Repository (converts to Entity via fromJson)
   ↓ return Entity
 Cubit (stores in state)
   ↓ emit new state
@@ -766,7 +743,9 @@ UI (rebuilds with new data)
 
 - **Single file = no folder rule** - If only one file would be in a folder, use a single file instead
 - **Every UI element is its own class** - no private build methods
-- **Repository always returns entities** - never DTOs or Models
+- **Entities only by default** - no separate DTOs or Models unless genuinely needed
+- **Entity has fromJson/toJson** - handles JSON serialization directly
+- **Repository receives Map, returns Entity** - converts via `Entity.fromJson()`
 - **Cubit catches exceptions** - and displays user-friendly errors
 - **Use slang for all user-facing text** - never hardcode strings
 - **Prefix files with feature name** - `auth_repository.dart`, not `repository.dart`
@@ -774,7 +753,7 @@ UI (rebuilds with new data)
 - **No database by default** - API only unless specified
 - **Route definitions in page files** - using @TypedGoRoute with GoRouteData
 - **Error pages in app feature** - for 404, network errors, etc.
-- **Combine related files** - entities.dart (all entities), dtos.dart (all DTOs), cubit+state in one file
+- **Combine related files** - entities.dart (all entities), cubit+state in one file
 - **Simple pages directly in pages/** - only create folder if page has sections/components
 - **Config separation** - `lib/config.dart` (sensitive, gitignored), `lib/core/config.dart` (public)
 - **DI in core/** - `lib/core/service_locator.dart` (moved from lib/di/)
