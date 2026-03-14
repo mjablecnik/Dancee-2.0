@@ -348,8 +348,11 @@ class AuthCubit extends Cubit<AuthState> {
 
 **Route Definition**: Define routes directly in each page file using `@TypedGoRoute` annotation
 
+**CRITICAL**: All routes MUST use `NoTransitionPage` by default (no page transition animations). Override `buildPage` instead of `build`.
+
 ```dart
 // lib/features/auth/pages/login/login_page.dart
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 part 'login_page.g.dart';
@@ -359,8 +362,8 @@ class LoginRoute extends GoRouteData {
   const LoginRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const LoginPage();
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return const NoTransitionPage(child: LoginPage());
   }
 }
 
@@ -384,8 +387,8 @@ class EventDetailRoute extends GoRouteData {
   const EventDetailRoute({required this.id});
 
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return EventDetailPage(eventId: id);
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return NoTransitionPage(child: EventDetailPage(eventId: id));
   }
 }
 ```

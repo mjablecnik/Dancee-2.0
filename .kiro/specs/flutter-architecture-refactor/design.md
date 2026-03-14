@@ -882,6 +882,8 @@ final goRouter = GoRouter(
 
 #### Route Definitions in Page Files
 
+All routes use `NoTransitionPage` by default (no page transition animations). Override `buildPage` instead of `build`.
+
 ```dart
 // lib/features/events/pages/event_list/event_list_page.dart
 import 'package:flutter/material.dart';
@@ -894,8 +896,8 @@ class EventListRoute extends GoRouteData {
   const EventListRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const EventListPage();
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return const NoTransitionPage(child: EventListPage());
   }
 }
 
@@ -926,8 +928,8 @@ class EventDetailRoute extends GoRouteData {
   const EventDetailRoute({required this.id});
 
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return EventDetailPage(eventId: id);
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return NoTransitionPage(child: EventDetailPage(eventId: id));
   }
 }
 
