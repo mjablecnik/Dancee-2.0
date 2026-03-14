@@ -153,120 +153,110 @@ lib/
 ```
 lib/
 ├── core/
-│   ├── clients/
-│   │   └── api_client.dart
-│   ├── config/
-│   │   └── api_config.dart
-│   ├── exceptions/
-│   │   └── api_exception.dart
-│   └── routing/
-│       └── app_router.dart
+│   ├── service_locator.dart    # Dependency injection (moved from lib/di/)
+│   ├── clients.dart             # API clients (single file if only one client)
+│   ├── config.dart              # Public configuration (timeouts, feature flags, etc.)
+│   ├── exceptions.dart          # Custom exceptions (single file if simple)
+│   └── routing.dart             # App router configuration
 ├── design/
-│   ├── widgets/
-│   │   └── (shared widgets)
-│   ├── components/
-│   │   └── (shared components)
-│   ├── theme/
-│   │   └── app_theme.dart
-│   ├── colors/
-│   │   └── app_colors.dart
-│   └── typography/
-│       └── app_typography.dart
+│   ├── widgets.dart             # Shared widgets (or folder if multiple files)
+│   ├── components.dart          # Shared components (or folder if multiple files)
+│   ├── theme.dart               # App theme configuration
+│   ├── colors.dart              # Color constants
+│   └── typography.dart          # Typography definitions
 ├── features/
 │   ├── app/
-│   │   ├── layouts/
-│   │   │   └── main_layout.dart
+│   │   ├── layouts.dart         # Main layout (single file if only one layout)
 │   │   └── pages/
 │   │       ├── initial_page.dart
 │   │       ├── not_found_page.dart
 │   │       └── error_page.dart
 │   ├── auth/
 │   │   ├── data/
-│   │   │   ├── entities/
-│   │   │   ├── dtos/
+│   │   │   ├── entities.dart    # All auth entities in one file
+│   │   │   ├── dtos.dart        # All auth DTOs in one file
 │   │   │   └── auth_repository.dart
 │   │   ├── pages/
-│   │   │   ├── login/
+│   │   │   ├── login/           # Complex page with sections/components
 │   │   │   │   ├── login_page.dart
-│   │   │   │   ├── sections/
-│   │   │   │   └── components/
-│   │   │   └── register/
+│   │   │   │   ├── sections.dart     # All sections in one file
+│   │   │   │   └── components.dart   # All components in one file
+│   │   │   └── register/        # Complex page with sections/components
 │   │   │       ├── register_page.dart
-│   │   │       ├── sections/
-│   │   │       └── components/
+│   │   │       ├── sections.dart
+│   │   │       └── components.dart
 │   │   └── logic/
-│   │       ├── auth_cubit.dart
-│   │       └── auth_state.dart
+│   │       └── auth.dart        # Cubit + State in one file
 │   ├── events/
 │   │   ├── data/
-│   │   │   ├── entities/
-│   │   │   │   ├── event_entity.dart
-│   │   │   │   ├── venue_entity.dart
-│   │   │   │   ├── address_entity.dart
-│   │   │   │   ├── event_info_entity.dart
-│   │   │   │   └── event_part_entity.dart
-│   │   │   ├── dtos/
-│   │   │   │   ├── event_dto.dart
-│   │   │   │   ├── venue_dto.dart
-│   │   │   │   ├── address_dto.dart
-│   │   │   │   ├── event_info_dto.dart
-│   │   │   │   └── event_part_dto.dart
+│   │   │   ├── entities.dart    # EventEntity, VenueEntity, AddressEntity, etc.
+│   │   │   ├── dtos.dart        # EventDto, VenueDto, AddressDto, etc.
 │   │   │   └── event_repository.dart
 │   │   ├── pages/
-│   │   │   ├── event_list/
+│   │   │   ├── event_list/      # Complex page with sections/components
 │   │   │   │   ├── event_list_page.dart
-│   │   │   │   ├── sections/
-│   │   │   │   │   ├── event_list_header_section.dart
-│   │   │   │   │   ├── search_section.dart
-│   │   │   │   │   ├── filter_section.dart
-│   │   │   │   │   └── events_by_date_section.dart
-│   │   │   │   └── components/
-│   │   │   │       ├── event_card.dart
-│   │   │   │       ├── filter_chip.dart
-│   │   │   │       └── section_header.dart
-│   │   │   ├── event_detail/
+│   │   │   │   ├── sections.dart     # All sections in one file
+│   │   │   │   └── components.dart   # All components in one file
+│   │   │   ├── event_detail/    # Complex page with sections/components
 │   │   │   │   ├── event_detail_page.dart
-│   │   │   │   ├── sections/
-│   │   │   │   └── components/
-│   │   │   ├── event_filters/
-│   │   │   │   ├── event_filters_page.dart
-│   │   │   │   ├── sections/
-│   │   │   │   └── components/
-│   │   │   └── favorites/
-│   │   │       ├── favorites_page.dart
-│   │   │       ├── sections/
-│   │   │       └── components/
+│   │   │   │   ├── sections.dart
+│   │   │   │   └── components.dart
+│   │   │   ├── event_filters_page.dart  # Simple page - direct file
+│   │   │   └── favorites_page.dart      # Simple page - direct file
 │   │   └── logic/
-│   │       ├── event_list/
-│   │       │   ├── event_list_cubit.dart
-│   │       │   └── event_list_state.dart
-│   │       └── favorites/
-│   │           ├── favorites_cubit.dart
-│   │           └── favorites_state.dart
+│   │       ├── event_list.dart  # EventListCubit + EventListState
+│   │       └── favorites.dart   # FavoritesCubit + FavoritesState
 │   └── settings/
 │       ├── data/
-│       │   ├── entities/
-│       │   ├── dtos/
+│       │   ├── entities.dart    # All settings entities
+│       │   ├── dtos.dart        # All settings DTOs
 │       │   └── settings_repository.dart
 │       ├── pages/
-│       │   └── settings/
-│       │       ├── settings_page.dart
-│       │       ├── sections/
-│       │       └── components/
+│       │   └── settings_page.dart  # Simple page - direct file
 │       └── logic/
-│           ├── settings_cubit.dart
-│           └── settings_state.dart
-├── di/
-│   └── service_locator.dart
+│           └── settings.dart    # SettingsCubit + SettingsState
 ├── i18n/
 │   ├── strings.i18n.json
 │   ├── strings_cs.i18n.json
 │   ├── strings_es.i18n.json
 │   └── translations.g.dart
-├── app_config.dart (gitignored)
-├── app_config.example.dart
+├── config.dart (gitignored - ONLY sensitive data)
+├── config.example.dart (template for config.dart)
 └── main.dart
 ```
+
+**Directory Structure Rules:**
+
+1. **Single File = No Folder Rule**
+   - If a directory would contain only ONE file → No directory, use a single file with the directory name
+   - Example: `core/clients/api_client.dart` → `core/clients.dart`
+   - Example: `logic/auth_cubit.dart` + `auth_state.dart` → `logic/auth.dart` (both in one file)
+
+2. **When to Create a Folder**
+   - When a file grows beyond ~500 lines
+   - When a page has sections AND components (needs multiple files)
+   - When there are multiple related files that need organization
+
+3. **Pages Structure**
+   - **Simple page** (no sections/components, < 500 lines) → `page_name.dart` directly in `pages/`
+   - **Complex page** (has sections/components OR > 500 lines) → `page_name/` folder with:
+     - `page_name_page.dart`
+     - `sections.dart` (all sections in one file)
+     - `components.dart` (all components in one file)
+
+4. **Data Layer**
+   - Multiple small related classes → combine into one file
+   - `entities/event_entity.dart`, `entities/venue_entity.dart` → `entities.dart` (all entities)
+   - `dtos/event_dto.dart`, `dtos/venue_dto.dart` → `dtos.dart` (all DTOs)
+
+5. **Logic Layer**
+   - Cubit + State → combine into one file
+   - `event_list/event_list_cubit.dart` + `event_list_state.dart` → `event_list.dart`
+
+6. **Core and Design**
+   - Apply same rules: single file unless multiple files needed
+   - `core/clients/api_client.dart` → `core/clients.dart`
+   - `design/theme/app_theme.dart` → `design/theme.dart`
 
 
 ## Components and Interfaces
@@ -511,11 +501,11 @@ class EventDto {
 
 ```dart
 // lib/features/events/data/event_repository.dart
-import '../../../core/clients/api_client.dart';
-import '../../../core/config/api_config.dart';
-import '../../../core/exceptions/api_exception.dart';
-import 'entities/event_entity.dart';
-import 'dtos/event_dto.dart';
+import '../../../core/clients.dart';
+import '../../../core/config.dart';
+import '../../../core/exceptions.dart';
+import 'entities.dart';
+import 'dtos.dart';
 
 /// Repository for managing event data.
 ///
@@ -536,7 +526,7 @@ class EventRepository {
     try {
       final response = await _apiClient.get(
         '/api/events/list',
-        queryParameters: {'userId': ApiConfig.userId},
+        queryParameters: {'userId': AppConfig.userId},
       );
       
       if (response is! List) {
@@ -569,7 +559,7 @@ class EventRepository {
     try {
       final response = await _apiClient.get(
         '/api/events/favorites',
-        queryParameters: {'userId': ApiConfig.userId},
+        queryParameters: {'userId': AppConfig.userId},
       );
       
       if (response is! List) {
@@ -610,7 +600,7 @@ class EventRepository {
       await _apiClient.post(
         '/api/events/favorites',
         data: {
-          'userId': ApiConfig.userId,
+          'userId': AppConfig.userId,
           'eventId': eventId,
         },
       );
@@ -628,7 +618,7 @@ class EventRepository {
     try {
       await _apiClient.delete(
         '/api/events/favorites/$eventId',
-        queryParameters: {'userId': ApiConfig.userId},
+        queryParameters: {'userId': AppConfig.userId},
       );
     } on ApiException {
       rethrow;
@@ -648,12 +638,19 @@ class EventRepository {
 #### Cubit with Freezed State
 
 ```dart
-// lib/features/events/logic/event_list/event_list_state.dart
+// lib/features/events/logic/event_list.dart
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../data/entities/event_entity.dart';
+import '../../../i18n/translations.g.dart';
+import '../../../core/exceptions.dart';
+import '../../../core/service_locator.dart';
+import '../data/event_repository.dart';
+import '../data/entities.dart';
+import 'favorites.dart';
 
-part 'event_list_state.freezed.dart';
+part 'event_list.freezed.dart';
 
+// State definition
 @freezed
 class EventListState with _$EventListState {
   const factory EventListState.initial() = EventListInitial;
@@ -669,18 +666,8 @@ class EventListState with _$EventListState {
   
   const factory EventListState.error(String message) = EventListError;
 }
-```
 
-```dart
-// lib/features/events/logic/event_list/event_list_cubit.dart
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../i18n/translations.g.dart';
-import '../../../../core/exceptions/api_exception.dart';
-import '../../../../di/service_locator.dart';
-import '../../data/event_repository.dart';
-import '../favorites/favorites_cubit.dart';
-import 'event_list_state.dart';
-
+// Cubit implementation
 class EventListCubit extends Cubit<EventListState> {
   final EventRepository _repository;
 
@@ -857,18 +844,18 @@ class EventListCubit extends Cubit<EventListState> {
 #### Go Router Configuration
 
 ```dart
-// lib/core/routing/app_router.dart
+// lib/core/routing.dart
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import '../../features/app/pages/initial_page.dart';
-import '../../features/app/pages/not_found_page.dart';
-import '../../features/events/pages/event_list/event_list_page.dart';
-import '../../features/events/pages/event_detail/event_detail_page.dart';
-import '../../features/events/pages/event_filters/event_filters_page.dart';
-import '../../features/events/pages/favorites/favorites_page.dart';
-import '../../features/auth/pages/login/login_page.dart';
-import '../../features/auth/pages/register/register_page.dart';
-import '../../features/settings/pages/settings/settings_page.dart';
+import '../features/app/pages/initial_page.dart';
+import '../features/app/pages/not_found_page.dart';
+import '../features/events/pages/event_list/event_list_page.dart';
+import '../features/events/pages/event_detail/event_detail_page.dart';
+import '../features/events/pages/event_filters_page.dart';
+import '../features/events/pages/favorites_page.dart';
+import '../features/auth/pages/login/login_page.dart';
+import '../features/auth/pages/register/register_page.dart';
+import '../features/settings/pages/settings_page.dart';
 
 final goRouter = GoRouter(
   initialLocation: '/',
@@ -2342,35 +2329,36 @@ import '../../../i18n/translations.g.dart';
 ### Dependency Injection Updates
 
 ```dart
-// lib/di/service_locator.dart
+// lib/core/service_locator.dart (moved from lib/di/)
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 
 // Core
-import '../core/clients/api_client.dart';
-import '../app_config.dart';
+import 'clients.dart';
+import '../config.dart';
+import 'config.dart';
 
 // Features - Events
 import '../features/events/data/event_repository.dart';
-import '../features/events/logic/event_list/event_list_cubit.dart';
-import '../features/events/logic/favorites/favorites_cubit.dart';
+import '../features/events/logic/event_list.dart';
+import '../features/events/logic/favorites.dart';
 
 // Features - Auth
 import '../features/auth/data/auth_repository.dart';
-import '../features/auth/logic/auth_cubit.dart';
+import '../features/auth/logic/auth.dart';
 
 // Features - Settings
 import '../features/settings/data/settings_repository.dart';
-import '../features/settings/logic/settings_cubit.dart';
+import '../features/settings/logic/settings.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
   // Core - API Client
   getIt.registerLazySingleton<Dio>(() => Dio(BaseOptions(
-    baseUrl: AppConfig.baseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
+    baseUrl: AppConfig.apiBaseUrl,
+    connectTimeout: Duration(milliseconds: AppConfig.connectTimeout),
+    receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeout),
   )));
   
   getIt.registerLazySingleton<ApiClient>(
@@ -2416,8 +2404,8 @@ Future<void> setupDependencies() async {
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'core/routing/app_router.dart';
-import 'di/service_locator.dart';
+import 'core/routing.dart';
+import 'core/service_locator.dart';
 import 'i18n/translations.g.dart';
 
 void main() async {
@@ -2458,34 +2446,51 @@ class MyApp extends StatelessWidget {
 
 ### Configuration Management
 
-The refactoring maintains the existing configuration pattern:
+The refactoring uses a clear separation between sensitive and public configuration:
+
+**Sensitive Configuration (gitignored):**
 
 ```dart
-// lib/app_config.dart (gitignored)
-class AppConfig {
-  static const String baseUrl = 'https://api.dancee.app';
+// lib/config.dart (gitignored - NOT committed)
+class Config {
+  static const String apiBaseUrl = 'https://api.dancee.app';
   static const String apiKey = 'your-api-key-here';
+  static const String sentryDsn = 'your-sentry-dsn';
 }
 
-// lib/app_config.example.dart (committed)
-class AppConfig {
-  static const String baseUrl = 'YOUR_API_BASE_URL_HERE';
+// lib/config.example.dart (committed as template)
+class Config {
+  static const String apiBaseUrl = 'YOUR_API_BASE_URL_HERE';
   static const String apiKey = 'YOUR_API_KEY_HERE';
+  static const String sentryDsn = 'YOUR_SENTRY_DSN_HERE';
 }
+```
 
-// lib/core/config/api_config.dart (public)
-import '../../app_config.dart';
+**Public Configuration:**
 
-class ApiConfig {
-  // Import sensitive values from AppConfig
-  static const String baseUrl = AppConfig.baseUrl;
-  static const String apiKey = AppConfig.apiKey;
+```dart
+// lib/core/config.dart (public - committed)
+import '../config.dart';
+
+class AppConfig {
+  // Import sensitive values from Config
+  static const String apiBaseUrl = Config.apiBaseUrl;
+  static const String apiKey = Config.apiKey;
+  static const String sentryDsn = Config.sentryDsn;
   
   // Public non-sensitive values
   static const String userId = 'user123';
   static const int connectTimeout = 10000;
   static const int receiveTimeout = 10000;
+  static const int sendTimeout = 10000;
+  static const bool enableLogging = true;
 }
+```
+
+**Setup for new developers:**
+```bash
+cp lib/config.example.dart lib/config.dart
+# Edit lib/config.dart with actual values
 ```
 
 

@@ -11,14 +11,65 @@ Flutter projects follow a clean architecture pattern with clear separation of co
 ```
 lib/
 ├── core/                    # Shared utilities across features
+│   ├── service_locator.dart # Dependency injection
+│   ├── clients.dart         # API clients (or folder if multiple)
+│   ├── config.dart          # Public configuration
+│   ├── exceptions.dart      # Custom exceptions (or folder if multiple)
+│   └── routing.dart         # App router
 ├── features/                # Feature modules
 ├── i18n/                    # Localization (slang)
 ├── design/                  # Shared design system
-└── config.dart             # Environment configuration (gitignored)
+├── config.dart              # Sensitive configuration (gitignored)
+└── config.example.dart      # Template for config.dart
 
 assets/                      # Images, fonts, icons
 test/                        # All test files
 ```
+
+## Directory Structure Rules
+
+### Single File = No Folder Rule
+
+**CRITICAL**: If a directory would contain only ONE file, don't create the directory. Use a single file with the directory name instead.
+
+**Examples:**
+- ❌ `core/clients/api_client.dart` → ✅ `core/clients.dart`
+- ❌ `logic/auth_cubit.dart` + `auth_state.dart` in separate folders → ✅ `logic/auth.dart` (both in one file)
+- ❌ `design/theme/app_theme.dart` → ✅ `design/theme.dart`
+
+### When to Create a Folder
+
+Create a folder only when:
+1. A file grows beyond ~500 lines
+2. A page has sections AND components (needs multiple files)
+3. There are multiple related files that need organization
+
+### Pages Structure Rules
+
+- **Simple page** (no sections/components, < 500 lines):
+  - File: `pages/page_name.dart` directly in pages/
+  - Example: `pages/event_filters_page.dart`
+
+- **Complex page** (has sections/components OR > 500 lines):
+  - Folder: `pages/page_name/` with:
+    - `page_name_page.dart`
+    - `sections.dart` (all sections in one file)
+    - `components.dart` (all components in one file)
+  - Example: `pages/event_list/event_list_page.dart`, `sections.dart`, `components.dart`
+
+### Data Layer Rules
+
+Combine multiple small related classes into one file:
+- ❌ `entities/event_entity.dart`, `entities/venue_entity.dart`, etc. in separate files
+- ✅ `entities.dart` (all entities in one file)
+- ❌ `dtos/event_dto.dart`, `dtos/venue_dto.dart`, etc. in separate files
+- ✅ `dtos.dart` (all DTOs in one file)
+
+### Logic Layer Rules
+
+Combine Cubit + State into one file:
+- ❌ `logic/event_list/event_list_cubit.dart` + `event_list_state.dart` in folder
+- ✅ `logic/event_list.dart` (both Cubit and State in one file)
 
 ## UI Component Hierarchy
 
@@ -85,22 +136,23 @@ class LoginButton extends StatelessWidget {
 
 ```
 lib/core/
-├── config/              # App-wide configuration
-├── clients/             # HTTP clients, API clients
-├── exceptions/          # Custom exceptions
-├── utils/               # Utility functions
-├── constants/           # App-wide constants
-└── di/                  # Dependency injection setup
+├── service_locator.dart # Dependency injection (moved from lib/di/)
+├── clients.dart         # API clients (or folder if multiple clients)
+├── config.dart          # Public configuration
+├── exceptions.dart      # Custom exceptions (or folder if multiple)
+├── routing.dart         # App router
+├── utils.dart           # Utility functions (or folder if multiple)
+└── constants.dart       # App-wide constants (or folder if multiple)
 ```
 
 ### What Goes in Core
 
+- Dependency injection setup (service_locator.dart)
 - Universal configs shared between features
 - API/HTTP clients
 - Custom exceptions
 - Shared utilities
 - App-wide constants and enums
-- DI initialization function
 
 ## Design System
 
@@ -108,11 +160,11 @@ lib/core/
 
 ```
 lib/design/
-├── widgets/             # Shared widgets
-├── components/          # Shared components
-├── theme/               # Color themes, text styles
-├── colors/              # Color constants
-└── typography/          # Font definitions
+├── widgets.dart         # Shared widgets (or folder if multiple)
+├── components.dart      # Shared components (or folder if multiple)
+├── theme.dart           # Color themes, text styles
+├── colors.dart          # Color constants
+└── typography.dart      # Font definitions
 ```
 
 ### What Goes in Design
@@ -132,21 +184,20 @@ Each feature follows clean architecture:
 ```
 lib/features/<feature_name>/
 ├── data/
-│   ├── entities/        # Domain entities (app-level models)
-│   ├── models/          # Database models
-│   ├── dtos/            # API data transfer objects
+│   ├── entities.dart        # All domain entities in one file
+│   ├── models.dart          # All database models in one file (if needed)
+│   ├── dtos.dart            # All API DTOs in one file
 │   └── <feature>_repository.dart
 ├── pages/
-│   ├── <page_name>/
-│   │   ├── <page_name>_page.dart
-│   │   ├── sections/    # Page sections
-│   │   └── components/  # Page-specific components
-│   └── ...
+│   ├── <simple_page>.dart   # Simple pages directly in pages/
+│   └── <complex_page>/      # Complex pages in folders
+│       ├── <page>_page.dart
+│       ├── sections.dart    # All sections in one file
+│       └── components.dart  # All components in one file
 ├── logic/
-│   ├── <feature>_cubit.dart
-│   ├── <feature>_state.dart
+│   ├── <cubit_name>.dart    # Cubit + State in one file
 │   └── ...
-└── constants/           # Feature-specific constants (optional)
+└── constants.dart           # Feature-specific constants (optional)
 ```
 
 ### Common Features
@@ -243,8 +294,44 @@ Future<UserEntity> getUser(String id) async {
 **Location**: `lib/features/<feature>/logic/`
 
 **Files**:
-- `<feature>_cubit.dart` - Business logic
-- `<feature>_state.dart` - State definitions (use freezed)
+- `<cubit_name>.dart` - Cubit + State in ONE file (use freezed for state)
+
+**Example Structure:**
+```dart
+// lib/features/auth/logic/auth.dart
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'auth.freezed.dart';
+
+// State definition
+@freezed
+class AuthState with _$AuthState {
+  const factory AuthState.initial() = AuthInitial;
+  const factory AuthState.loading() = AuthLoading;
+  const factory AuthState.authenticated(UserEntity user) = AuthAuthenticated;
+  const factory AuthState.error(String message) = AuthError;
+}
+
+// Cubit implementation
+class AuthCubit extends Cubit<AuthState> {
+  final AuthRepository _repository;
+  
+  AuthCubit(this._repository) : super(const AuthState.initial());
+  
+  Future<void> login(String email, String password) async {
+    emit(const AuthState.loading());
+    try {
+      final user = await _repository.login(email, password);
+      emit(AuthState.authenticated(user));
+    } on InvalidCredentialsException {
+      emit(AuthState.error(t.auth.invalidCredentials));
+    } on NetworkException {
+      emit(AuthState.error(t.common.networkError));
+    }
+  }
+}
+```
 
 **Cubit Responsibilities**:
 - Call repository methods
@@ -252,26 +339,6 @@ Future<UserEntity> getUser(String id) async {
 - Store entities in state
 - Catch repository exceptions
 - Display appropriate errors to user
-
-```dart
-class AuthCubit extends Cubit<AuthState> {
-  final AuthRepository _repository;
-  
-  AuthCubit(this._repository) : super(AuthState.initial());
-  
-  Future<void> login(String email, String password) async {
-    emit(state.copyWith(isLoading: true));
-    try {
-      final user = await _repository.login(email, password);
-      emit(state.copyWith(user: user, isLoading: false));
-    } on InvalidCredentialsException catch (e) {
-      emit(state.copyWith(error: t.auth.invalidCredentials, isLoading: false));
-    } on NetworkException catch (e) {
-      emit(state.copyWith(error: t.common.networkError, isLoading: false));
-    }
-  }
-}
-```
 
 ## Routing
 
@@ -323,14 +390,14 @@ class EventDetailRoute extends GoRouteData {
 }
 ```
 
-**Router Configuration**: Create `lib/core/routing/app_router.dart`
+**Router Configuration**: Create `lib/core/routing.dart`
 
 ```dart
 import 'package:go_router/go_router.dart';
 
 // Import all route files
-import '../../features/auth/pages/login/login_page.dart';
-import '../../features/events/pages/event_list/event_list_page.dart';
+import '../features/auth/pages/login/login_page.dart';
+import '../features/events/pages/event_list/event_list_page.dart';
 // ... other imports
 
 final goRouter = GoRouter(
@@ -390,12 +457,12 @@ Examples: `NotFoundPage`, `ErrorPage`, `NetworkErrorPage`
 
 **Package**: `get_it`
 
-**Location**: `lib/core/di/service_locator.dart` (or similar)
+**Location**: `lib/core/service_locator.dart`
 
 **Initialization**: Call setup function in `main.dart`
 
 ```dart
-// lib/core/di/service_locator.dart
+// lib/core/service_locator.dart
 final getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
@@ -429,22 +496,38 @@ void main() async {
 
 ### Environment Configuration
 
-**File**: `lib/config.dart` (gitignored)
-**Template**: `lib/config.example.dart` (committed)
+**Sensitive Config File**: `lib/config.dart` (gitignored - ONLY sensitive data)
+**Template File**: `lib/config.example.dart` (committed)
+**Public Config File**: `lib/core/config.dart` (committed - all non-sensitive config)
 
 ```dart
-// lib/config.dart (NOT committed)
-class AppConfig {
+// lib/config.dart (NOT committed - ONLY sensitive values)
+class Config {
   static const String apiBaseUrl = 'https://api.production.com';
   static const String sentryDsn = 'your-sentry-dsn';
   static const String apiKey = 'your-api-key';
 }
 
 // lib/config.example.dart (committed as template)
-class AppConfig {
+class Config {
   static const String apiBaseUrl = 'YOUR_API_URL_HERE';
   static const String sentryDsn = 'YOUR_SENTRY_DSN_HERE';
   static const String apiKey = 'YOUR_API_KEY_HERE';
+}
+
+// lib/core/config.dart (committed - public config + imports from Config)
+import '../config.dart';
+
+class AppConfig {
+  // Import sensitive values
+  static const String apiBaseUrl = Config.apiBaseUrl;
+  static const String apiKey = Config.apiKey;
+  static const String sentryDsn = Config.sentryDsn;
+  
+  // Public non-sensitive values
+  static const int connectTimeout = 10000;
+  static const int receiveTimeout = 10000;
+  static const bool enableLogging = true;
 }
 ```
 
@@ -634,23 +717,29 @@ See `task-management.md` steering file for complete task reference.
 
 1. Create feature directory: `lib/features/<feature_name>/`
 2. Create subdirectories: `data/`, `pages/`, `logic/`
-3. Create data models: `entities/`, `dtos/`, `models/` (as needed)
+3. Create data files: `entities.dart`, `dtos.dart`, `models.dart` (as needed - all in single files)
 4. Create repository: `<feature>_repository.dart`
-5. Create cubit: `logic/<feature>_cubit.dart` and `logic/<feature>_state.dart`
-6. Create pages: `pages/<page_name>/<page_name>_page.dart`
+5. Create cubit: `logic/<cubit_name>.dart` (Cubit + State in one file)
+6. Create pages: `pages/<page_name>.dart` (simple) or `pages/<page_name>/` (complex with sections/components)
 7. Add route definition: `@TypedGoRoute` with `GoRouteData` class in page file
-8. Register in DI: Add to `core/di/service_locator.dart`
+8. Register in DI: Add to `core/service_locator.dart`
 9. Run code generation: `task build-runner`
 
 ### Creating a New Page
 
-1. Create page directory: `lib/features/<feature>/pages/<page_name>/`
-2. Create page file: `<page_name>_page.dart` with `@TypedGoRoute` and route class
-3. Add `part '<page_name>_page.g.dart';` directive
-4. Create sections: `sections/<section_name>_section.dart`
-5. Create components: `components/<component_name>.dart`
-6. Use shared widgets from `lib/design/widgets/`
-7. Run route generation: `task build-runner`
+1. **Simple page** (no sections/components):
+   - Create: `lib/features/<feature>/pages/<page_name>.dart`
+   - Add `@TypedGoRoute` and route class
+   - Add `part '<page_name>.g.dart';` directive
+
+2. **Complex page** (with sections/components):
+   - Create directory: `lib/features/<feature>/pages/<page_name>/`
+   - Create: `<page_name>_page.dart` with `@TypedGoRoute` and route class
+   - Create: `sections.dart` (all sections in one file)
+   - Create: `components.dart` (all components in one file)
+   - Add `part '<page_name>_page.g.dart';` directive
+
+3. Run route generation: `task build-runner`
 
 ### Data Flow
 
@@ -672,6 +761,7 @@ UI (rebuilds with new data)
 
 ## Remember
 
+- **Single file = no folder rule** - If only one file would be in a folder, use a single file instead
 - **Every UI element is its own class** - no private build methods
 - **Repository always returns entities** - never DTOs or Models
 - **Cubit catches exceptions** - and displays user-friendly errors
@@ -681,3 +771,7 @@ UI (rebuilds with new data)
 - **No database by default** - API only unless specified
 - **Route definitions in page files** - using @TypedGoRoute with GoRouteData
 - **Error pages in app feature** - for 404, network errors, etc.
+- **Combine related files** - entities.dart (all entities), dtos.dart (all DTOs), cubit+state in one file
+- **Simple pages directly in pages/** - only create folder if page has sections/components
+- **Config separation** - `lib/config.dart` (sensitive, gitignored), `lib/core/config.dart` (public)
+- **DI in core/** - `lib/core/service_locator.dart` (moved from lib/di/)
