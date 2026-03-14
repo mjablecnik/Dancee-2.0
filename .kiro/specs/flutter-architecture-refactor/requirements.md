@@ -16,7 +16,7 @@ The current application has basic functionality (event list, favorites) but lack
 - **Design_System**: Shared UI components, themes, and design tokens used across features
 - **Core_Module**: Shared utilities, configurations, and services used across features
 - **Repository**: A class that abstracts data sources and returns entities
-- **Entity**: Domain object with fromJson/toJson methods, used throughout the application for both API communication and domain logic
+- **Entity**: Domain object with fromJson/toJson methods, used throughout the application for both API communication and domain logic. Entity class names do NOT use an `Entity` suffix (e.g., `Event`, `Venue`, `User` — not `EventEntity`, `VenueEntity`, `UserEntity`).
 - **Cubit**: State management class using the Bloc pattern
 - **Auto_Route**: Flutter routing package for type-safe navigation
 - **Page**: A complete application screen
@@ -49,12 +49,12 @@ The current application has basic functionality (event list, favorites) but lack
 #### Acceptance Criteria
 
 1. THE Flutter_App SHALL create `lib/features/events/` directory structure
-2. THE Flutter_App SHALL create `lib/features/events/data/entities.dart` containing all event entities with fromJson/toJson methods
+2. THE Flutter_App SHALL create `lib/features/events/data/entities.dart` containing all event entities (Event, Venue, Address, EventInfo, EventPart) with fromJson/toJson methods
 3. THE Flutter_App SHALL move EventRepository to `lib/features/events/data/event_repository.dart`
 4. THE Flutter_App SHALL move event cubits to `lib/features/events/logic/`
 5. THE Flutter_App SHALL move event screens to `lib/features/events/pages/`
 6. THE Flutter_App SHALL create sections and components within each page directory
-7. THE Flutter_App SHALL ensure EventRepository receives Map<String, dynamic> from ApiClient and converts to Entity via fromJson
+7. THE Flutter_App SHALL ensure EventRepository receives Map<String, dynamic> from ApiClient and converts to entity via fromJson (e.g., `Event.fromJson()`)
 8. THE Flutter_App SHALL maintain all existing event functionality (list, search, favorites, toggle)
 
 ### Requirement 3: App Feature Module
@@ -105,10 +105,11 @@ The current application has basic functionality (event list, favorites) but lack
 1. THE Flutter_App SHALL create a single `entities.dart` file in each feature's data directory containing all domain entities
 2. THE Flutter_App SHALL ensure each entity has a `fromJson(Map<String, dynamic>)` factory constructor for deserialization
 3. THE Flutter_App SHALL ensure each entity has a `toJson()` method for serialization
-4. THE Flutter_App SHALL ensure all repositories return Entity objects
+4. THE Flutter_App SHALL ensure all repositories return entity objects (e.g., `Event`, `List<Event>`)
 5. THE Flutter_App SHALL maintain Equatable for value equality in entities
 6. THE Flutter_App SHALL NOT create separate DTO or Model classes unless there is a genuine structural mismatch between API response and domain object
 7. WHERE a structural mismatch exists between API response and domain object, THE Flutter_App SHALL document the reason for creating a separate DTO or Model class
+8. THE Flutter_App SHALL NOT use an `Entity` suffix in entity class names (e.g., use `Event`, `Venue`, `User` — not `EventEntity`, `VenueEntity`, `UserEntity`)
 
 ### Requirement 7: Repository Pattern Implementation
 
@@ -119,7 +120,7 @@ The current application has basic functionality (event list, favorites) but lack
 1. THE Flutter_App SHALL place each repository in its feature's data directory
 2. THE Flutter_App SHALL ensure repositories accept ApiClient via dependency injection
 3. THE Flutter_App SHALL ensure repositories receive Map<String, dynamic> from ApiClient
-4. THE Flutter_App SHALL ensure repositories convert Map<String, dynamic> to Entity via Entity.fromJson()
+4. THE Flutter_App SHALL ensure repositories convert Map<String, dynamic> to entity via `Entity.fromJson()` (e.g., `Event.fromJson(map)`)
 5. WHEN repository encounters errors, THE Repository SHALL throw custom exceptions
 6. THE Flutter_App SHALL ensure repositories validate data before returning
 7. THE Flutter_App SHALL maintain existing repository methods (getAllEvents, getFavoriteEvents, toggleFavorite)

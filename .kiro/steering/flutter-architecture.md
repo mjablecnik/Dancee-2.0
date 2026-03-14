@@ -60,7 +60,7 @@ Create a folder only when:
 ### Data Layer Rules
 
 Combine multiple small related classes into one file:
-- ❌ `entities/event_entity.dart`, `entities/venue_entity.dart`, etc. in separate files
+- ❌ `entities/event.dart`, `entities/venue.dart`, etc. in separate files
 - ✅ `entities.dart` (all entities in one file)
 
 **No DTOs or Models by default.** Entities handle JSON conversion directly via `fromJson`/`toJson`. Only create DTOs or Models when there is a genuine structural mismatch between API response and domain object, or when database persistence requires a different schema. In most cases, a single Entity class is sufficient.
@@ -214,7 +214,7 @@ lib/features/<feature_name>/
 
 **Entities only by default.** Each feature has a single `entities.dart` file containing all domain entities with `fromJson`/`toJson` methods.
 
-- **Entities** - Domain objects with JSON serialization, used everywhere in the app
+- **Entities** - Domain objects with JSON serialization, used everywhere in the app. Entity class names do NOT use an `Entity` suffix (e.g., `Event`, `Venue`, `User` — not `EventEntity`, `VenueEntity`, `UserEntity`).
 - **DTOs** - Only when API response structure differs significantly from domain model (rare)
 - **Models** - Only when local database persistence requires a different schema (rare)
 
@@ -224,7 +224,7 @@ lib/features/<feature_name>/
 
 **Responsibilities**:
 - Fetch data from API (receives `Map<String, dynamic>`)
-- Convert JSON maps to Entities via `Entity.fromJson()`
+- Convert JSON maps to entities via `Entity.fromJson()`
 - Return entities
 - Handle data validation
 - Throw exceptions on errors
@@ -238,24 +238,24 @@ class EventRepository {
   
   EventRepository(this._apiClient);
   
-  Future<List<EventEntity>> getAllEvents() async {
+  Future<List<Event>> getAllEvents() async {
     final response = await _apiClient.get('/api/events/list');
     return (response as List)
-        .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
+        .map((json) => Event.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 }
 ```
 
-**Return Types**: Always `Entity` or `List<Entity>`
+**Return Types**: Always entity or `List<entity>`
 
 **Error Handling**: Validate data and throw custom exceptions
 
 ```dart
-Future<UserEntity> getUser(String id) async {
+Future<User> getUser(String id) async {
   try {
     final json = await _apiClient.get('/users/$id');
-    return UserEntity.fromJson(json as Map<String, dynamic>);
+    return User.fromJson(json as Map<String, dynamic>);
   } catch (e) {
     throw ApiException(message: 'Failed to fetch user', originalError: e);
   }
@@ -284,7 +284,7 @@ part 'auth.freezed.dart';
 class AuthState with _$AuthState {
   const factory AuthState.initial() = AuthInitial;
   const factory AuthState.loading() = AuthLoading;
-  const factory AuthState.authenticated(UserEntity user) = AuthAuthenticated;
+  const factory AuthState.authenticated(User user) = AuthAuthenticated;
   const factory AuthState.error(String message) = AuthError;
 }
 
@@ -562,10 +562,10 @@ class EventRepository {
   
   EventRepository(this._apiClient);
   
-  Future<List<EventEntity>> getEvents() async {
+  Future<List<Event>> getEvents() async {
     final response = await _apiClient.get('/events');
     return (response as List)
-        .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
+        .map((json) => Event.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 }
@@ -732,8 +732,8 @@ Repository
   ↓ fetch data
 API Client
   ↓ return Map<String, dynamic>
-Repository (converts to Entity via fromJson)
-  ↓ return Entity
+Repository (converts to entity via fromJson)
+  ↓ return entity
 Cubit (stores in state)
   ↓ emit new state
 UI (rebuilds with new data)
@@ -745,7 +745,8 @@ UI (rebuilds with new data)
 - **Every UI element is its own class** - no private build methods
 - **Entities only by default** - no separate DTOs or Models unless genuinely needed
 - **Entity has fromJson/toJson** - handles JSON serialization directly
-- **Repository receives Map, returns Entity** - converts via `Entity.fromJson()`
+- **Entity class names have NO `Entity` suffix** - use `Event`, `Venue`, `User` (not `EventEntity`, `VenueEntity`, `UserEntity`)
+- **Repository receives Map, returns entity** - converts via `Entity.fromJson()`
 - **Cubit catches exceptions** - and displays user-friendly errors
 - **Use slang for all user-facing text** - never hardcode strings
 - **Prefix files with feature name** - `auth_repository.dart`, not `repository.dart`

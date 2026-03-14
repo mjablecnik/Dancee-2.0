@@ -29,7 +29,7 @@ Incremental migration of the Dancee App from a flat directory structure (`screen
 
 - [ ] 3. Phase 2: Events Feature - Data Layer
   - [ ] 3.1 Create event entities with fromJson/toJson in `lib/features/events/data/entities.dart`
-    - Consolidate `EventEntity`, `VenueEntity`, `AddressEntity`, `EventInfoEntity`, `EventPartEntity` into a single file
+    - Consolidate `Event`, `Venue`, `Address`, `EventInfo`, `EventPart` into a single file (no `Entity` suffix in class names)
     - Each entity: `fromJson(Map<String, dynamic>)` factory, `toJson()`, `copyWith()`, Equatable
     - Reference existing models in `lib/models/` for field definitions
     - _Requirements: 2.2, 6.1, 6.2, 6.3, 6.5_
@@ -44,7 +44,7 @@ Incremental migration of the Dancee App from a flat directory structure (`screen
 
   - [ ] 3.4 Migrate EventRepository to `lib/features/events/data/event_repository.dart`
     - Update repository to accept ApiClient via DI
-    - Ensure repository receives `Map<String, dynamic>` from ApiClient and converts to Entity via `Entity.fromJson()`
+    - Ensure repository receives `Map<String, dynamic>` from ApiClient and converts to entity via `Event.fromJson()` (no Entity suffix)
     - Add data validation and custom exception throwing
     - Maintain existing methods: `getAllEvents`, `getFavoriteEvents`, `toggleFavorite`
     - _Requirements: 2.3, 2.7, 2.8, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
@@ -166,7 +166,7 @@ Incremental migration of the Dancee App from a flat directory structure (`screen
 
 - [ ] 9. Phase 4: Auth Feature
   - [ ] 9.1 Create auth data layer placeholders
-    - Create `lib/features/auth/data/entities.dart` with placeholder auth entities (UserEntity)
+    - Create `lib/features/auth/data/entities.dart` with placeholder auth entities (User)
     - Create `lib/features/auth/data/auth_repository.dart` with placeholder methods
     - _Requirements: 4.1_
 

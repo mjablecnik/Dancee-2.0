@@ -179,7 +179,7 @@ lib/
 │   │       └── auth.dart        # Cubit + State in one file
 │   ├── events/
 │   │   ├── data/
-│   │   │   ├── entities.dart    # EventEntity, VenueEntity, AddressEntity, etc.
+│   │   │   ├── entities.dart    # Event, Venue, Address, etc.
 │   │   │   └── event_repository.dart
 │   │   ├── pages/
 │   │   │   ├── event_list/
@@ -261,7 +261,7 @@ graph LR
     Entity -->|toJson| API
 ```
 
-**Entity**: Domain model used throughout the application
+**Entity**: Domain model used throughout the application. Entity class names do NOT use an `Entity` suffix (e.g., `Event`, `Venue`, `User` — not `EventEntity`, `VenueEntity`, `UserEntity`).
 - Used in Cubit state
 - Used in UI components
 - Contains `fromJson(Map<String, dynamic>)` factory constructor
@@ -269,33 +269,33 @@ graph LR
 - Immutable with Equatable
 - Includes `copyWith` method for updates
 
-**Repository**: Receives `Map<String, dynamic>` from ApiClient, converts to Entity via `Entity.fromJson()`, returns Entity objects.
+**Repository**: Receives `Map<String, dynamic>` from ApiClient, converts to entity via `Entity.fromJson()`, returns entity objects.
 
-**No separate DTOs or Models** unless there is a genuine structural mismatch between API response and domain object. In most cases, a single Entity class is sufficient.
+**No separate DTOs or Models** unless there is a genuine structural mismatch between API response and domain object. In most cases, a single entity class is sufficient.
 
-#### Event Entity Design
+#### Event Entity Design (No `Entity` Suffix)
 
 ```dart
 // lib/features/events/data/entities.dart
 import 'package:equatable/equatable.dart';
 
-class EventEntity extends Equatable {
+class Event extends Equatable {
   final String id;
   final String title;
   final String description;
   final String organizer;
-  final VenueEntity venue;
+  final Venue venue;
   final DateTime startTime;
   final DateTime endTime;
   final Duration duration;
   final List<String> dances;
-  final List<EventInfoEntity> info;
-  final List<EventPartEntity> parts;
+  final List<EventInfo> info;
+  final List<EventPart> parts;
   final bool isFavorite;
   final bool isPast;
   final String? badge;
 
-  const EventEntity({
+  const Event({
     required this.id,
     required this.title,
     required this.description,
@@ -312,23 +312,23 @@ class EventEntity extends Equatable {
     this.badge,
   });
 
-  factory EventEntity.fromJson(Map<String, dynamic> json) {
-    return EventEntity(
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
       organizer: json['organizer'] as String,
-      venue: VenueEntity.fromJson(json['venue'] as Map<String, dynamic>),
+      venue: Venue.fromJson(json['venue'] as Map<String, dynamic>),
       startTime: DateTime.parse(json['startTime'] as String),
       endTime: DateTime.parse(json['endTime'] as String),
       duration: Duration(seconds: json['duration'] as int),
       dances: (json['dances'] as List<dynamic>).cast<String>(),
       info: (json['info'] as List<dynamic>?)
-              ?.map((i) => EventInfoEntity.fromJson(i as Map<String, dynamic>))
+              ?.map((i) => EventInfo.fromJson(i as Map<String, dynamic>))
               .toList() ??
           const [],
       parts: (json['parts'] as List<dynamic>?)
-              ?.map((p) => EventPartEntity.fromJson(p as Map<String, dynamic>))
+              ?.map((p) => EventPart.fromJson(p as Map<String, dynamic>))
               .toList() ??
           const [],
       isFavorite: json['isFavorite'] as bool? ?? false,
@@ -356,23 +356,23 @@ class EventEntity extends Equatable {
     };
   }
 
-  EventEntity copyWith({
+  Event copyWith({
     String? id,
     String? title,
     String? description,
     String? organizer,
-    VenueEntity? venue,
+    Venue? venue,
     DateTime? startTime,
     DateTime? endTime,
     Duration? duration,
     List<String>? dances,
-    List<EventInfoEntity>? info,
-    List<EventPartEntity>? parts,
+    List<EventInfo>? info,
+    List<EventPart>? parts,
     bool? isFavorite,
     bool? isPast,
     String? badge,
   }) {
-    return EventEntity(
+    return Event(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
@@ -413,18 +413,18 @@ import 'entities.dart';
 ///
 /// Responsibilities:
 /// - Fetch data from API (receives Map<String, dynamic>)
-/// - Convert JSON to Entities via Entity.fromJson()
+/// - Convert JSON to entities via Entity.fromJson()
 /// - Validate data
 /// - Throw custom exceptions on errors
-/// - ALWAYS return Entities
+/// - ALWAYS return entities
 class EventRepository {
   final ApiClient _apiClient;
 
   EventRepository(this._apiClient);
 
   /// Returns all events from the backend API.
-  /// Converts JSON maps directly to Entities.
-  Future<List<EventEntity>> getAllEvents() async {
+  /// Converts JSON maps directly to entities.
+  Future<List<Event>> getAllEvents() async {
     try {
       final response = await _apiClient.get(
         '/api/events/list',
@@ -435,9 +435,9 @@ class EventRepository {
         throw ApiException(message: 'Invalid response format');
       }
       
-      // Convert JSON maps directly to Entities
+      // Convert JSON maps directly to entities
       return response
-          .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
+          .map((json) => Event.fromJson(json as Map<String, dynamic>))
           .toList();
     } on ApiException {
       rethrow;
@@ -455,7 +455,7 @@ class EventRepository {
   }
 
   /// Returns only favorite events from the backend API.
-  Future<List<EventEntity>> getFavoriteEvents() async {
+  Future<List<Event>> getFavoriteEvents() async {
     try {
       final response = await _apiClient.get(
         '/api/events/favorites',
@@ -467,7 +467,7 @@ class EventRepository {
       }
       
       return response
-          .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
+          .map((json) => Event.fromJson(json as Map<String, dynamic>))
           .toList();
     } on ApiException {
       rethrow;
@@ -556,10 +556,10 @@ class EventListState with _$EventListState {
   const factory EventListState.loading() = EventListLoading;
   
   const factory EventListState.loaded({
-    required List<EventEntity> allEvents,
-    required List<EventEntity> todayEvents,
-    required List<EventEntity> tomorrowEvents,
-    required List<EventEntity> upcomingEvents,
+    required List<Event> allEvents,
+    required List<Event> todayEvents,
+    required List<Event> tomorrowEvents,
+    required List<Event> upcomingEvents,
   }) = EventListLoaded;
   
   const factory EventListState.error(String message) = EventListError;
@@ -1046,7 +1046,7 @@ class SearchAndFiltersSection extends StatelessWidget {
 ```dart
 // lib/features/events/pages/event_list/components/event_card.dart
 class EventCard extends StatelessWidget {
-  final EventEntity event;
+  final Event event;
   final VoidCallback onTap;
   final VoidCallback onFavoriteToggle;
   
@@ -1108,21 +1108,21 @@ All entities follow these principles:
 - `toJson()` method for JSON serialization
 - No separate DTO or Model classes by default
 
-#### Core Entity Structure
+#### Core Entity Structure (No `Entity` Suffix)
 
 ```dart
-// Base pattern for all entities
-class XEntity extends Equatable {
+// Base pattern for all entities (no Entity suffix in class name)
+class X extends Equatable {
   final Type field1;
   final Type field2;
   
-  const XEntity({
+  const X({
     required this.field1,
     required this.field2,
   });
   
-  factory XEntity.fromJson(Map<String, dynamic> json) {
-    return XEntity(
+  factory X.fromJson(Map<String, dynamic> json) {
+    return X(
       field1: json['field1'] as Type,
       field2: json['field2'] as Type,
     );
@@ -1135,11 +1135,11 @@ class XEntity extends Equatable {
     };
   }
   
-  XEntity copyWith({
+  X copyWith({
     Type? field1,
     Type? field2,
   }) {
-    return XEntity(
+    return X(
       field1: field1 ?? this.field1,
       field2: field2 ?? this.field2,
     );
@@ -1192,13 +1192,13 @@ After analyzing all acceptance criteria, I identified the following testable pro
 
 ### Property 1: Entity Serialization Round-Trip
 
-*For any* valid EventEntity (and its nested entities VenueEntity, EventInfoEntity, EventPartEntity), calling `toJson()` and then `Entity.fromJson()` on the result should produce an entity equal to the original.
+*For any* valid Event (and its nested entities Venue, EventInfo, EventPart), calling `toJson()` and then `Entity.fromJson()` on the result should produce an entity equal to the original.
 
 **Validates: Requirements 2.2, 6.2, 6.3, 7.4**
 
 ### Property 2: Repository Return Type Consistency
 
-*For any* repository method that fetches data, the return type should be Entity or List<Entity>, never raw JSON maps or other intermediate types.
+*For any* repository method that fetches data, the return type should be an entity or list of entities (e.g., `Event`, `List<Event>`), never raw JSON maps or other intermediate types.
 
 **Validates: Requirements 2.7, 6.4**
 
@@ -1294,7 +1294,7 @@ sequenceDiagram
 ### Error Handling in Repository
 
 ```dart
-Future<List<EventEntity>> getAllEvents() async {
+Future<List<Event>> getAllEvents() async {
   try {
     final response = await _apiClient.get('/api/events/list');
     
@@ -1305,9 +1305,9 @@ Future<List<EventEntity>> getAllEvents() async {
       );
     }
     
-    // Convert JSON maps directly to Entities
+    // Convert JSON maps directly to entities
     return response
-        .map((json) => EventEntity.fromJson(json as Map<String, dynamic>))
+        .map((json) => Event.fromJson(json as Map<String, dynamic>))
         .toList();
         
   } on ApiException {
@@ -1492,12 +1492,12 @@ void main() {
     test('toJson then fromJson preserves all fields', () {
       // Run 100 iterations with different data
       for (var i = 0; i < 100; i++) {
-        // Arrange - Generate random Entity
-        final original = generateRandomEventEntity(seed: i);
+        // Arrange - Generate random event
+        final original = generateRandomEvent(seed: i);
         
-        // Act - Convert Entity -> JSON -> Entity
+        // Act - Convert entity -> JSON -> entity
         final json = original.toJson();
-        final restored = EventEntity.fromJson(json);
+        final restored = Event.fromJson(json);
         
         // Assert - Data should be preserved
         expect(restored, equals(original));
@@ -1506,9 +1506,9 @@ void main() {
     
     test('nested entities round-trip correctly', () {
       for (var i = 0; i < 100; i++) {
-        final original = generateRandomVenueEntity(seed: i);
+        final original = generateRandomVenue(seed: i);
         final json = original.toJson();
-        final restored = VenueEntity.fromJson(json);
+        final restored = Venue.fromJson(json);
         expect(restored, equals(original));
       }
     });
@@ -1523,7 +1523,7 @@ void main() {
 /// Property 2: Repository Return Type Consistency
 void main() {
   group('Property 2: Repository Return Type Consistency', () {
-    test('getAllEvents returns List<EventEntity>', () async {
+    test('getAllEvents returns List<Event>', () async {
       final mockClient = MockApiClient();
       final repository = EventRepository(mockClient);
       
@@ -1535,8 +1535,8 @@ void main() {
       
       final result = await repository.getAllEvents();
       
-      expect(result, isA<List<EventEntity>>());
-      expect(result.every((item) => item is EventEntity), isTrue);
+      expect(result, isA<List<Event>>());
+      expect(result.every((item) => item is Event), isTrue);
     });
   });
 }
@@ -1655,8 +1655,8 @@ void main() {
     group('loadEvents', () {
       test('emits [loading, loaded] when successful', () async {
         final mockEvents = [
-          createMockEventEntity(id: '1', startTime: DateTime.now()),
-          createMockEventEntity(id: '2', startTime: DateTime.now().add(Duration(days: 1))),
+          createMockEvent(id: '1', startTime: DateTime.now()),
+          createMockEvent(id: '2', startTime: DateTime.now().add(Duration(days: 1))),
         ];
         
         when(() => mockRepository.getAllEvents())
@@ -1695,9 +1695,9 @@ void main() {
         final nextWeek = today.add(Duration(days: 7));
         
         final mockEvents = [
-          createMockEventEntity(id: '1', startTime: today.add(Duration(hours: 10))),
-          createMockEventEntity(id: '2', startTime: tomorrow.add(Duration(hours: 10))),
-          createMockEventEntity(id: '3', startTime: nextWeek.add(Duration(hours: 10))),
+          createMockEvent(id: '1', startTime: today.add(Duration(hours: 10))),
+          createMockEvent(id: '2', startTime: tomorrow.add(Duration(hours: 10))),
+          createMockEvent(id: '3', startTime: nextWeek.add(Duration(hours: 10))),
         ];
         
         when(() => mockRepository.getAllEvents())
@@ -1715,8 +1715,8 @@ void main() {
     group('toggleFavorite', () {
       test('updates event favorite status locally', () async {
         final mockEvents = [
-          createMockEventEntity(id: '1', isFavorite: false),
-          createMockEventEntity(id: '2', isFavorite: false),
+          createMockEvent(id: '1', isFavorite: false),
+          createMockEvent(id: '2', isFavorite: false),
         ];
         
         when(() => mockRepository.getAllEvents())
@@ -1804,14 +1804,14 @@ The refactoring will be performed incrementally to maintain functionality:
 1. **Create data layer**
    - Create entity classes in `lib/features/events/data/entities.dart` with fromJson/toJson
    - Migrate EventRepository to `lib/features/events/data/`
-   - Update repository to convert JSON maps directly to Entities via fromJson
+   - Update repository to convert JSON maps directly to entities via fromJson
    - Add data validation in repository
 
 2. **Create logic layer**
    - Move cubits to `lib/features/events/logic/`
    - Update cubit imports
    - Convert state classes to use freezed
-   - Update cubits to use Entities
+   - Update cubits to use entities
 
 3. **Create presentation layer**
    - Create page directories in `lib/features/events/pages/`
@@ -1932,7 +1932,7 @@ task build-runner-clean
 - [ ] Sections suffixed with `_section.dart`
 - [ ] Cubits suffixed with `_cubit.dart`
 - [ ] States suffixed with `_state.dart`
-- [ ] Entities suffixed with `_entity.dart`
+- [ ] Entities suffixed with `_entity.dart` — **NO**: Entity class names do NOT use an `Entity` suffix (use `Event`, `Venue`, `User`)
 
 ### Import Organization
 
@@ -1982,9 +1982,9 @@ import '../../../i18n/translations.g.dart';
 **Problem:** Passing `Map<String, dynamic>` beyond the repository layer
 
 **Solution:**
-- Repository always converts JSON to Entity via `Entity.fromJson()`
-- Cubit always stores Entity in state
-- UI always receives Entity
+- Repository always converts JSON to entity via `Entity.fromJson()`
+- Cubit always stores entity in state
+- UI always receives entity
 - Only the repository layer touches raw JSON maps
 
 #### Pitfall 3: Private Build Methods
@@ -2578,9 +2578,9 @@ Widgets that are truly shared across multiple features should be placed in `lib/
 
 **Data Layer:**
 - [ ] Create `lib/features/events/data/entities.dart` with all entities (fromJson/toJson)
-- [ ] Create EventEntity, VenueEntity, AddressEntity, EventInfoEntity, EventPartEntity
+- [ ] Create Event, Venue, Address, EventInfo, EventPart (no Entity suffix)
 - [ ] Move EventRepository to `lib/features/events/data/`
-- [ ] Update repository to convert JSON maps to Entities via fromJson
+- [ ] Update repository to convert JSON maps to entities via fromJson
 - [ ] Add data validation in repository
 - [ ] Write entity round-trip tests
 - [ ] Write repository tests
@@ -2588,7 +2588,7 @@ Widgets that are truly shared across multiple features should be placed in `lib/
 **Logic Layer:**
 - [ ] Create `lib/features/events/logic/event_list.dart` (Cubit + State)
 - [ ] Convert EventListState to use freezed
-- [ ] Update cubit to use Entities
+- [ ] Update cubit to use entities
 - [ ] Create `lib/features/events/logic/favorites.dart` (Cubit + State)
 - [ ] Convert FavoritesState to use freezed
 - [ ] Write cubit tests
@@ -2697,9 +2697,9 @@ This design document provides a comprehensive blueprint for refactoring the Danc
 The migration will be performed incrementally over 5 weeks, maintaining functionality throughout the process.
 
 Key architectural decisions:
-- Repository receives `Map<String, dynamic>` from API and converts to Entity via `Entity.fromJson()`
-- Repository always returns Entities
-- Cubit always stores Entities in state
+- Repository receives `Map<String, dynamic>` from API and converts to entity via `Entity.fromJson()`
+- Repository always returns entities
+- Cubit always stores entities in state
 - Every UI element is its own class (no private build methods)
 - Page → Section → Component → Widget hierarchy
 - Feature modules are independent and self-contained
