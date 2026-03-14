@@ -951,37 +951,37 @@ class EventDetailPage extends StatelessWidget {
 #### Shell Routes for Main Layout
 
 ```dart
-// lib/features/app/layouts/main_layout.dart
+// lib/features/app/layouts/app_layout.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-part 'main_layout.g.dart';
+part 'app_layout.g.dart';
 
-@TypedShellRoute<MainLayoutRoute>(
+@TypedShellRoute<AppLayoutRoute>(
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<EventListRoute>(path: '/events'),
     TypedGoRoute<FavoritesRoute>(path: '/favorites'),
   ],
 )
-class MainLayoutRoute extends ShellRouteData {
-  const MainLayoutRoute();
+class AppLayoutRoute extends ShellRouteData {
+  const AppLayoutRoute();
 
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return MainLayout(child: navigator);
+    return AppLayout(child: navigator);
   }
 }
 
-class MainLayout extends StatefulWidget {
+class AppLayout extends StatefulWidget {
   final Widget child;
   
-  const MainLayout({super.key, required this.child});
+  const AppLayout({super.key, required this.child});
 
   @override
-  State<MainLayout> createState() => _MainLayoutState();
+  State<AppLayout> createState() => _AppLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> {
+class _AppLayoutState extends State<AppLayout> {
   int _selectedIndex = 0;
 
   @override
@@ -2609,7 +2609,7 @@ FavoritesPage
 
 **Layout Structure:**
 ```
-MainLayout
+AppLayout
 ├── child (Navigator outlet)
 └── BottomNavigationBar
     ├── EventsNavItem (widget)
@@ -2619,7 +2619,7 @@ MainLayout
 **Navigation Flow:**
 ```mermaid
 graph LR
-    A[MainLayout] --> B[Events Tab]
+    A[AppLayout] --> B[Events Tab]
     A --> C[Favorites Tab]
     B --> D[EventListPage]
     C --> E[FavoritesPage]

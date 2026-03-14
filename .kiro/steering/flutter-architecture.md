@@ -128,7 +128,7 @@ class LoginButton extends StatelessWidget {
 **Layouts** are shared UI structures used across multiple pages (e.g., headers, footers, navigation bars).
 
 - Location: `lib/features/app/layouts/`
-- Examples: `AppLayout`, `AuthLayout`, `MainLayout`
+- Examples: `AppLayout`, `AuthLayout`
 
 ## Core Architecture
 
@@ -422,18 +422,18 @@ final goRouter = GoRouter(
 **Shell Routes for Layouts**:
 
 ```dart
-@TypedShellRoute<MainLayoutRoute>(
+@TypedShellRoute<AppLayoutRoute>(
   routes: <TypedGoRoute<GoRouteData>>[
     TypedGoRoute<EventListRoute>(path: '/events'),
     TypedGoRoute<FavoritesRoute>(path: '/favorites'),
   ],
 )
-class MainLayoutRoute extends ShellRouteData {
-  const MainLayoutRoute();
+class AppLayoutRoute extends ShellRouteData {
+  const AppLayoutRoute();
 
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return MainLayout(child: navigator);
+    return AppLayout(child: navigator);
   }
 }
 ```
