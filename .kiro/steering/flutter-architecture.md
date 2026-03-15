@@ -415,15 +415,23 @@ class AppLayoutRoute extends ShellRouteData {
 
 **Navigation**:
 
-```dart
-// Type-safe navigation
-context.go(EventDetailRoute(id: '123').location);
-context.push(LoginRoute().location);
+**CRITICAL**: Never use string-based paths for navigation. Always use the generated route classes and their extension methods.
 
-// Or using extension methods
-const EventDetailRoute(id: '123').go(context);
+```dart
+// ✅ CORRECT — type-safe navigation via generated extensions
+const EventListRoute().go(context);
 const LoginRoute().push(context);
+const EventDetailRoute(id: '123').go(context);
+
+// ❌ WRONG — hardcoded string paths
+context.go('/events');
+context.push('/login');
+context.go('/events/123');
 ```
+
+**Import rules for route extensions**:
+- Routes defined with `@TypedGoRoute` directly on the class: import the page file (e.g., `login_page.dart`)
+- Routes defined inside `@TypedShellRoute` (e.g., `EventListRoute`, `FavoritesRoute`): import both the shell route file (`layouts.dart`) for the `.go()` extension AND the page file for the class itself
 
 **Error Pages**: Define in `lib/features/app/pages/`
 
@@ -753,6 +761,7 @@ UI (rebuilds with new data)
 - **One global API client** - unless specified otherwise
 - **No database by default** - API only unless specified
 - **Route definitions in page files** - using @TypedGoRoute with GoRouteData
+- **Type-safe navigation only** - always use `const SomeRoute().go(context)`, never `context.go('/path')`
 - **Error pages in app feature** - for 404, network errors, etc.
 - **Combine related files** - entities.dart (all entities), cubit+state in one file
 - **Simple pages directly in pages/** - only create folder if page has sections/components

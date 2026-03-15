@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../i18n/translations.g.dart';
+import '../register/register_page.dart';
 import 'components.dart';
 
 // ============================================================================
@@ -176,7 +176,7 @@ class RegisterLinkSection extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => context.go('/register'),
+            onTap: () => const RegisterRoute().go(context),
             child: Text(
               t.auth.register,
               style: GoogleFonts.inter(

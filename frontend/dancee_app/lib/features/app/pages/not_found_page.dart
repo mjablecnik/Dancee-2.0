@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../i18n/translations.g.dart';
+import '../layouts.dart';
+import '../../events/pages/event_list/event_list_page.dart';
 
 /// Page displayed when the user navigates to an undefined route.
 ///
@@ -35,7 +37,7 @@ class NotFoundPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => context.go('/events'),
+                onPressed: () => const EventListRoute().go(context),
                 child: Text(t.goHome),
               ),
             ],

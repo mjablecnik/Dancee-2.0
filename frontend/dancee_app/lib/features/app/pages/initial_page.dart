@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../design/widgets.dart';
+import '../../app/layouts.dart';
+import '../../events/pages/event_list/event_list_page.dart';
 
 part 'initial_page.g.dart';
 
@@ -25,7 +27,7 @@ class InitialPage extends StatelessWidget {
     // Redirect to events on first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.mounted) {
-        context.go('/events');
+        const EventListRoute().go(context);
       }
     });
 

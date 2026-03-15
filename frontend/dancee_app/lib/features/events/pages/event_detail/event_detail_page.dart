@@ -6,6 +6,8 @@ import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
 import '../../logic/event_list.dart';
+import '../../../app/layouts.dart';
+import '../event_list/event_list_page.dart';
 import 'sections.dart';
 
 part 'event_detail_page.g.dart';
@@ -46,7 +48,7 @@ class EventDetailPage extends StatelessWidget {
 
           if (event == null) {
             return EventNotFoundSection(
-              onBackPressed: () => context.go('/events'),
+              onBackPressed: () => const EventListRoute().go(context),
             );
           }
 

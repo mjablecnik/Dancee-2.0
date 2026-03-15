@@ -10,6 +10,8 @@ import '../../../core/service_locator.dart';
 import '../../../i18n/translations.g.dart';
 import '../data/entities.dart';
 import '../logic/favorites.dart';
+import '../../app/layouts.dart';
+import 'event_list/event_list_page.dart';
 import 'event_list/components.dart';
 
 // ============================================================================
@@ -140,7 +142,7 @@ class FavoritesEmptySection extends StatelessWidget {
           description: t.noFavoriteEventsDescription,
         ),
         BrowseEventsButton(
-          onPressed: () => context.go('/events'),
+          onPressed: () => const EventListRoute().go(context),
         ),
       ],
     );

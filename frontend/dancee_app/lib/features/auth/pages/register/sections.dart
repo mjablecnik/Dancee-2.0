@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../i18n/translations.g.dart';
 import '../login/components.dart';
+import '../login/login_page.dart';
 import 'components.dart';
 
 // ============================================================================
@@ -170,7 +170,7 @@ class LoginLinkSection extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => context.go('/login'),
+            onTap: () => const LoginRoute().go(context),
             child: Text(
               t.auth.loginLink,
               style: GoogleFonts.inter(
