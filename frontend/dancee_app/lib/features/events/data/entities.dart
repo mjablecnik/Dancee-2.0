@@ -87,22 +87,22 @@ class Venue extends Equatable {
   /// The physical address of the venue
   final Address address;
 
-  /// A description of the venue
-  final String description;
+  /// A description of the venue (optional — not all venues have one)
+  final String? description;
 
-  /// The latitude coordinate for map integration
-  final double latitude;
+  /// The latitude coordinate for map integration (optional)
+  final double? latitude;
 
-  /// The longitude coordinate for map integration
-  final double longitude;
+  /// The longitude coordinate for map integration (optional)
+  final double? longitude;
 
-  /// Creates a Venue with all required fields.
+  /// Creates a Venue with required and optional fields.
   const Venue({
     required this.name,
     required this.address,
-    required this.description,
-    required this.latitude,
-    required this.longitude,
+    this.description,
+    this.latitude,
+    this.longitude,
   });
 
   /// Creates a Venue from a JSON map.
@@ -110,9 +110,9 @@ class Venue extends Equatable {
     return Venue(
       name: json['name'] as String,
       address: Address.fromJson(json['address'] as Map<String, dynamic>),
-      description: json['description'] as String,
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
+      description: json['description'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
 
@@ -266,8 +266,8 @@ class EventPart extends Equatable {
   /// The start time of this event part
   final DateTime startTime;
 
-  /// The end time of this event part
-  final DateTime endTime;
+  /// The end time of this event part (optional)
+  final DateTime? endTime;
 
   /// Optional list of instructors/lectors for workshops and lessons
   final List<String>? lectors;
@@ -281,7 +281,7 @@ class EventPart extends Equatable {
     this.description,
     required this.type,
     required this.startTime,
-    required this.endTime,
+    this.endTime,
     this.lectors,
     this.djs,
   });
@@ -297,7 +297,7 @@ class EventPart extends Equatable {
         (e) => e.name == json['type'],
       ),
       startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
+      endTime: json['endTime'] != null ? DateTime.parse(json['endTime'] as String) : null,
       lectors: (json['lectors'] as List<dynamic>?)?.cast<String>(),
       djs: (json['djs'] as List<dynamic>?)?.cast<String>(),
     );
@@ -312,7 +312,7 @@ class EventPart extends Equatable {
       'description': description,
       'type': type.name,
       'startTime': startTime.toIso8601String(),
-      'endTime': endTime.toIso8601String(),
+      'endTime': endTime?.toIso8601String(),
       'lectors': lectors,
       'djs': djs,
     };
@@ -362,8 +362,8 @@ class Event extends Equatable {
   /// The title of the event
   final String title;
 
-  /// A detailed description of the event
-  final String description;
+  /// A detailed description of the event (optional)
+  final String? description;
 
   /// The name of the event organizer
   final String organizer;
@@ -374,11 +374,11 @@ class Event extends Equatable {
   /// The start time of the event
   final DateTime startTime;
 
-  /// The end time of the event
-  final DateTime endTime;
+  /// The end time of the event (optional)
+  final DateTime? endTime;
 
-  /// The duration of the event
-  final Duration duration;
+  /// The duration of the event (optional)
+  final Duration? duration;
 
   /// List of dance styles featured at this event
   final List<String> dances;
@@ -402,12 +402,12 @@ class Event extends Equatable {
   const Event({
     required this.id,
     required this.title,
-    required this.description,
+    this.description,
     required this.organizer,
     required this.venue,
     required this.startTime,
-    required this.endTime,
-    required this.duration,
+    this.endTime,
+    this.duration,
     required this.dances,
     this.info = const [],
     this.parts = const [],
@@ -423,19 +423,19 @@ class Event extends Equatable {
     return Event(
       id: json['id'] as String,
       title: json['title'] as String,
-      description: json['description'] as String,
+      description: json['description'] as String?,
       organizer: json['organizer'] as String,
       venue: Venue.fromJson(json['venue'] as Map<String, dynamic>),
       startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
-      duration: Duration(seconds: json['duration'] as int),
-      dances: (json['dances'] as List<dynamic>).cast<String>(),
-      info: (json['info'] as List<dynamic>)
-          .map((i) => EventInfo.fromJson(i as Map<String, dynamic>))
-          .toList(),
-      parts: (json['parts'] as List<dynamic>)
-          .map((p) => EventPart.fromJson(p as Map<String, dynamic>))
-          .toList(),
+      endTime: json['endTime'] != null ? DateTime.parse(json['endTime'] as String) : null,
+      duration: json['duration'] != null ? Duration(seconds: json['duration'] as int) : null,
+      dances: (json['dances'] as List<dynamic>?)?.cast<String>() ?? [],
+      info: (json['info'] as List<dynamic>?)
+          ?.map((i) => EventInfo.fromJson(i as Map<String, dynamic>))
+          .toList() ?? [],
+      parts: (json['parts'] as List<dynamic>?)
+          ?.map((p) => EventPart.fromJson(p as Map<String, dynamic>))
+          .toList() ?? [],
       isFavorite: json['isFavorite'] as bool? ?? false,
       isPast: json['isPast'] as bool? ?? false,
       badge: json['badge'] as String?,
@@ -453,8 +453,8 @@ class Event extends Equatable {
       'organizer': organizer,
       'venue': venue.toJson(),
       'startTime': startTime.toIso8601String(),
-      'endTime': endTime.toIso8601String(),
-      'duration': duration.inSeconds,
+      'endTime': endTime?.toIso8601String(),
+      'duration': duration?.inSeconds,
       'dances': dances,
       'info': info.map((i) => i.toJson()).toList(),
       'parts': parts.map((p) => p.toJson()).toList(),

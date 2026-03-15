@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import '../../../core/clients.dart';
 import '../../../core/config.dart';
 import '../../../core/exceptions.dart';
@@ -29,18 +31,38 @@ class EventRepository {
   /// Throws [ApiException] on failure.
   Future<List<Event>> getAllEvents() async {
     try {
+      developer.log('Fetching events from /api/events/list', name: 'EventRepository');
       final response = await _apiClient.get(
         '/api/events/list',
         queryParameters: {'userId': AppConfig.userId},
       );
 
+      developer.log('Response type: ${response.runtimeType}', name: 'EventRepository');
+
       if (response is! List) {
+        developer.log('Invalid response format: expected List, got ${response.runtimeType}', name: 'EventRepository');
         throw ApiException(message: 'Invalid response format');
       }
 
-      return response
-          .map((json) => Event.fromJson(json as Map<String, dynamic>))
-          .toList();
+      developer.log('Received ${response.length} events, parsing...', name: 'EventRepository');
+
+      final events = <Event>[];
+      for (var i = 0; i < response.length; i++) {
+        try {
+          final json = response[i] as Map<String, dynamic>;
+          events.add(Event.fromJson(json));
+        } catch (e) {
+          developer.log(
+            'Failed to parse event at index $i: $e\nJSON: ${response[i]}',
+            name: 'EventRepository',
+            level: 900,
+          );
+          rethrow;
+        }
+      }
+
+      developer.log('Successfully parsed ${events.length} events', name: 'EventRepository');
+      return events;
     } on ApiException {
       rethrow;
     } on FormatException catch (e) {

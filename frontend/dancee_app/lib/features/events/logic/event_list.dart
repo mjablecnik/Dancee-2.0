@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -57,13 +59,18 @@ class EventListCubit extends Cubit<EventListState> {
   /// - Tomorrow: Events starting tomorrow that are not past
   /// - Upcoming: Events starting after tomorrow that are not past
   Future<void> loadEvents() async {
+    developer.log('loadEvents() called', name: 'EventListCubit');
     emit(const EventListState.loading());
     try {
       final events = await _repository.getAllEvents();
+      developer.log('Received ${events.length} events from repository', name: 'EventListCubit');
       _emitGrouped(events);
-    } on ApiException {
+    } on ApiException catch (e) {
+      developer.log('ApiException in loadEvents: ${e.message} (status: ${e.statusCode}, original: ${e.originalError})', name: 'EventListCubit', level: 900);
       emit(EventListState.error(t.errors.loadEventsError));
-    } catch (_) {
+    } catch (e, stackTrace) {
+      developer.log('Unexpected error in loadEvents: $e', name: 'EventListCubit', level: 1000);
+      developer.log('Stack trace: $stackTrace', name: 'EventListCubit', level: 1000);
       emit(EventListState.error(t.errors.genericError));
     }
   }
@@ -86,7 +93,7 @@ class EventListCubit extends Cubit<EventListState> {
     final filteredEvents = currentState.allEvents.where((event) {
       return event.title.toLowerCase().contains(lowerQuery) ||
           event.venue.name.toLowerCase().contains(lowerQuery) ||
-          event.description.toLowerCase().contains(lowerQuery);
+          (event.description?.toLowerCase().contains(lowerQuery) ?? false);
     }).toList();
 
     _emitGrouped(filteredEvents);

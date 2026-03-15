@@ -481,9 +481,10 @@ String _formatDate(DateTime dateTime) {
   }
 }
 
-String _formatTimeRange(DateTime start, DateTime end) {
+String _formatTimeRange(DateTime start, DateTime? end) {
   final startHour = start.hour.toString().padLeft(2, '0');
   final startMinute = start.minute.toString().padLeft(2, '0');
+  if (end == null) return '$startHour:$startMinute';
   final endHour = end.hour.toString().padLeft(2, '0');
   final endMinute = end.minute.toString().padLeft(2, '0');
   return '$startHour:$startMinute - $endHour:$endMinute';
