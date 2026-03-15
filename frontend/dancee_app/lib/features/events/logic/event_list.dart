@@ -46,7 +46,9 @@ class EventListState with _$EventListState {
 class EventListCubit extends Cubit<EventListState> {
   final EventRepository _repository;
 
-  EventListCubit(this._repository) : super(const EventListState.initial());
+  EventListCubit(this._repository) : super(const EventListState.initial()) {
+    loadEvents();
+  }
 
   /// Loads all events from the repository and groups them by date.
   ///

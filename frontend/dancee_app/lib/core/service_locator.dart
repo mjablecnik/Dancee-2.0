@@ -35,12 +35,12 @@ void setupDependencies() {
     () => SettingsRepository(getIt<ApiClient>()),
   );
 
-  // Register cubits as factories
-  getIt.registerFactory<EventListCubit>(
+  // Register cubits
+  getIt.registerLazySingleton<EventListCubit>(
     () => EventListCubit(getIt<EventRepository>()),
   );
 
-  getIt.registerFactory<FavoritesCubit>(
+  getIt.registerLazySingleton<FavoritesCubit>(
     () => FavoritesCubit(getIt<EventRepository>()),
   );
 
