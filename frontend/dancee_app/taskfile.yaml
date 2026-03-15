@@ -35,7 +35,7 @@ tasks:
 
   build-runner:
     desc: Run build runner for code generation
-    cmd: flutter packages pub run build_runner build
+    cmd: dart run build_runner build
 
   build-runner-force:
     desc: Run build runner with delete conflicting outputs
@@ -43,11 +43,11 @@ tasks:
 
   build-runner-watch:
     desc: Run build runner in watch mode
-    cmd: flutter packages pub run build_runner watch
+    cmd: dart run build_runner watch
 
   build-runner-clean:
     desc: Clean build runner generated files
-    cmd: flutter packages pub run build_runner clean
+    cmd: dart run build_runner clean
 
   slang:
     desc: Generate translations with slang

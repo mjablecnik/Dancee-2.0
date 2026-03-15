@@ -1,0 +1,16 @@
+# Build configuration for code generation
+# Used by build_runner for go_router_builder, freezed, and json_serializable
+targets:
+  $default:
+    builders:
+      # go_router_builder configuration
+      go_router_builder:
+        enabled: true
+      # freezed configuration
+      freezed:
+        enabled: true
+      # json_serializable configuration
+      json_serializable:
+        enabled: true
+        options:
+          explicit_to_json: true
