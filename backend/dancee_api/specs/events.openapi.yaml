@@ -135,6 +135,33 @@ paths:
                 items:
                   $ref: '#/components/schemas/Event'
 
+  /api/events/seed:
+    post:
+      tags:
+        - Events
+      summary: Seed sample events
+      description: |
+        Generate and save 10 sample dance events to the database.
+        Useful for development and testing purposes.
+      operationId: seedEvents
+      responses:
+        '201':
+          description: Events seeded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeedEventsResponse'
+              example:
+                message: Successfully seeded events
+                count: 10
+                events: []
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/events/favorites:
     get:
       tags:
@@ -625,6 +652,27 @@ components:
           type: string
           description: Event identifier
           example: event-001
+
+    SeedEventsResponse:
+      type: object
+      required:
+        - message
+        - count
+        - events
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: Successfully seeded events
+        count:
+          type: integer
+          description: Number of events created
+          example: 10
+        events:
+          type: array
+          description: List of created events
+          items:
+            $ref: '#/components/schemas/Event'
 
     ErrorResponse:
       type: object

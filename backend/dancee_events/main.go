@@ -74,6 +74,7 @@ func main() {
 			events.GET("/favorites", eventHandler.ListFavorites)
 			events.POST("/favorites", eventHandler.AddFavorite)
 			events.DELETE("/favorites/:eventId", eventHandler.RemoveFavorite)
+			events.POST("/seed", eventHandler.SeedEvents) // TODO: Remove once Facebook scraping is implemented
 		}
 	}
 

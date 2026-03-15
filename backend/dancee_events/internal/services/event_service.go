@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"dancee_events/internal/models"
@@ -124,4 +125,96 @@ func (s *EventService) RemoveFavorite(userID, eventID string) error {
 	}
 
 	return s.favoritesRepo.RemoveFavorite(userID, eventID)
+}
+
+// SeedEvents generates and saves 10 sample dance events to the database.
+// TODO: Remove this method once Facebook event scraping is fully implemented.
+func (s *EventService) SeedEvents() ([]models.Event, error) {
+	dances := [][]string{
+		{"Salsa", "Bachata"},
+		{"Kizomba", "Semba"},
+		{"Zouk", "Lambada"},
+		{"West Coast Swing"},
+		{"Lindy Hop", "Charleston"},
+		{"Tango"},
+		{"Salsa", "Bachata", "Kizomba"},
+		{"Zouk"},
+		{"West Coast Swing", "Hustle"},
+		{"Lindy Hop", "Balboa", "Blues"},
+	}
+
+	venues := []models.Venue{
+		{Name: "Lucerna Music Bar", Address: models.Address{Street: "Vodičkova 36", City: "Prague", PostalCode: "110 00", Country: "Czech Republic"}},
+		{Name: "SaSaZu", Address: models.Address{Street: "Bubenské nábřeží 306", City: "Prague", PostalCode: "170 00", Country: "Czech Republic"}},
+		{Name: "Jazz Dock", Address: models.Address{Street: "Janáčkovo nábřeží 2", City: "Prague", PostalCode: "150 00", Country: "Czech Republic"}},
+		{Name: "Roxy", Address: models.Address{Street: "Dlouhá 33", City: "Prague", PostalCode: "110 00", Country: "Czech Republic"}},
+		{Name: "Palác Akropolis", Address: models.Address{Street: "Kubelíkova 27", City: "Prague", PostalCode: "130 00", Country: "Czech Republic"}},
+	}
+
+	titles := []string{
+		"Prague Salsa Night",
+		"Kizomba Fever",
+		"Zouk Weekend Party",
+		"WCS Social Night",
+		"Swing Jam Session",
+		"Tango Milonga",
+		"Latin Dance Festival",
+		"Zouk Flow Evening",
+		"Hustle & Swing Night",
+		"Vintage Swing Ball",
+	}
+
+	organizers := []string{
+		"Prague Salsa Club",
+		"Kizomba Prague",
+		"Zouk Academy CZ",
+		"WCS Czech Republic",
+		"Prague Swing Society",
+		"Tango Prague",
+		"Latin Vibes CZ",
+		"Zouk Flow Prague",
+		"Dance Connection CZ",
+		"Swing Time Prague",
+	}
+
+	now := time.Now()
+	var created []models.Event
+
+	for i := 0; i < 10; i++ {
+		startTime := now.AddDate(0, 0, i+1).Truncate(time.Hour).Add(20 * time.Hour)
+		endTime := startTime.Add(5 * time.Hour)
+		endStr := endTime.Format(time.RFC3339)
+		duration := int64(endTime.Sub(startTime).Milliseconds())
+		desc := "Join us for an amazing night of dancing!"
+
+		event := models.Event{
+			ID:          fmt.Sprintf("seed-%d-%d", now.Unix(), i),
+			Title:       titles[i],
+			Description: &desc,
+			Organizer:   organizers[i],
+			Venue:       venues[i%len(venues)],
+			StartTime:   startTime.Format(time.RFC3339),
+			EndTime:     &endStr,
+			Duration:    &duration,
+			Dances:      dances[i],
+			Info: []models.EventInfo{
+				{Type: "price", Key: "Entry Fee", Value: fmt.Sprintf("%d Kč", 150+i*50)},
+			},
+			Parts: []models.EventPart{
+				{
+					Name:      "Social Dancing",
+					Type:      "party",
+					StartTime: startTime.Format(time.RFC3339),
+					EndTime:   &endStr,
+				},
+			},
+		}
+
+		if err := s.eventRepo.SaveEvent(&event); err != nil {
+			return nil, fmt.Errorf("failed to save event %s: %w", event.ID, err)
+		}
+		created = append(created, event)
+	}
+
+	return created, nil
 }

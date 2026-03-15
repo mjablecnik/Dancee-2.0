@@ -96,3 +96,19 @@ func (h *EventHandler) RemoveFavorite(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+// SeedEvents handles POST /api/events/seed
+// TODO: Remove this endpoint once Facebook event scraping is fully implemented.
+func (h *EventHandler) SeedEvents(c *gin.Context) {
+	events, err := h.service.SeedEvents()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Successfully seeded events",
+		"count":   len(events),
+		"events":  events,
+	})
+}
