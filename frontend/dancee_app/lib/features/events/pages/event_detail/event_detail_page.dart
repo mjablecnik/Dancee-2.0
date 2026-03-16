@@ -31,8 +31,7 @@ class EventDetailRoute extends GoRouteData {
 /// Page displaying full details of a dance event.
 ///
 /// Uses [EventDetailCubit] via [BlocProvider] to manage state.
-/// The cubit reads the event from [EventListCubit] and handles
-/// favorite toggling, map navigation, and URL launching.
+/// The cubit emits [Event?] directly — null means event not found.
 class EventDetailPage extends StatelessWidget {
   final String eventId;
 
@@ -41,21 +40,16 @@ class EventDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<EventDetailCubit>(param1: eventId)..loadEvent(),
+      create: (_) => getIt<EventDetailCubit>(param1: eventId),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: BlocConsumer<EventDetailCubit, EventDetailState>(
-          listenWhen: (previous, current) {
-            // Listen when isTogglingFavorite transitions from true to false
-            final wasTog = previous is EventDetailLoaded &&
-                previous.isTogglingFavorite;
-            final isDone = current is EventDetailLoaded &&
-                !current.isTogglingFavorite;
-            return wasTog && isDone;
-          },
-          listener: (context, state) {
-            if (state is! EventDetailLoaded) return;
-            final event = state.event;
+        body: BlocConsumer<EventDetailCubit, Event?>(
+          listenWhen: (previous, current) =>
+              previous != null &&
+              current != null &&
+              previous.isFavorite != current.isFavorite,
+          listener: (context, event) {
+            if (event == null) return;
             final message = event.isFavorite
                 ? t.eventDetail.addedToFavorites
                 : t.eventDetail.removedFromFavorites;
@@ -66,14 +60,14 @@ class EventDetailPage extends StatelessWidget {
               ),
             );
           },
-          builder: (context, state) => state.when(
-            initial: () => const Center(child: CircularProgressIndicator()),
-            loaded: (event, isTogglingFavorite) =>
-                _EventDetailContent(event: event),
-            error: (msg) => EventNotFoundSection(
-              onBackPressed: () => const EventListRoute().go(context),
-            ),
-          ),
+          builder: (context, event) {
+            if (event == null) {
+              return EventNotFoundSection(
+                onBackPressed: () => const EventListRoute().go(context),
+              );
+            }
+            return _EventDetailContent(event: event);
+          },
         ),
       ),
     );

@@ -1,133 +1,63 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data/entities.dart';
-import '../data/event_repository.dart';
 import 'event_list.dart';
-
-part 'event_detail.freezed.dart';
-
-// ============================================================================
-// State
-// ============================================================================
-
-/// State for the EventDetailCubit.
-///
-/// Uses freezed for immutability and union types:
-/// - [initial]: Before the event is loaded
-/// - [loaded]: Event successfully found, with optional toggling flag
-/// - [error]: Event not found or EventListCubit state not loaded
-@freezed
-class EventDetailState with _$EventDetailState {
-  const factory EventDetailState.initial() = EventDetailInitial;
-
-  const factory EventDetailState.loaded({
-    required Event event,
-    @Default(false) bool isTogglingFavorite,
-  }) = EventDetailLoaded;
-
-  const factory EventDetailState.error(String message) = EventDetailError;
-}
-
-// ============================================================================
-// Cubit
-// ============================================================================
 
 /// Cubit for managing the event detail page state.
 ///
-/// Reads the event from [EventListCubit] state, handles optimistic
-/// favorite toggling via [EventRepository], and launches external
-/// map/URL navigation via url_launcher.
-class EventDetailCubit extends Cubit<EventDetailState> {
-  final EventRepository _repository;
+/// Emits [Event?] directly — null means event not found.
+/// Reads the event from [EventListCubit] state, delegates favorite
+/// toggling to [EventListCubit.toggleFavorite], and stays in sync
+/// via stream subscription. Launches external map/URL navigation
+/// via url_launcher.
+class EventDetailCubit extends Cubit<Event?> {
   final EventListCubit _eventListCubit;
   final String eventId;
+  StreamSubscription<EventListState>? _subscription;
 
   EventDetailCubit({
-    required EventRepository repository,
     required EventListCubit eventListCubit,
     required this.eventId,
-  })  : _repository = repository,
-        _eventListCubit = eventListCubit,
-        super(const EventDetailState.initial());
+  })  : _eventListCubit = eventListCubit,
+        super(null) {
+    _loadEvent();
+    _subscription = _eventListCubit.stream.listen(_onListStateChanged);
+  }
 
-  /// Finds the event by [eventId] from [EventListCubit.state.allEvents].
-  ///
-  /// Emits [EventDetailLoaded] if found, [EventDetailError] if the
-  /// EventListCubit state is not loaded or the event ID doesn't exist.
-  void loadEvent() {
+  void _loadEvent() {
     final listState = _eventListCubit.state;
-
-    if (listState is! EventListLoaded) {
-      emit(const EventDetailState.error('Event not found'));
-      return;
-    }
-
-    try {
-      final event = listState.allEvents.firstWhere(
-        (e) => e.id == eventId,
-      );
-      emit(EventDetailState.loaded(event: event));
-    } catch (_) {
-      emit(const EventDetailState.error('Event not found'));
+    if (listState is EventListLoaded) {
+      final event = listState.allEvents
+          .where((e) => e.id == eventId)
+          .firstOrNull;
+      emit(event);
     }
   }
 
-  /// Toggles the favorite status with optimistic UI update.
-  ///
-  /// 1. Immediately flips isFavorite in local state
-  /// 2. Calls [EventRepository.toggleFavorite] with original status
-  /// 3. On success: syncs back to [EventListCubit] via loadEvents()
-  /// 4. On failure: reverts local state to original value
-  Future<void> toggleFavorite() async {
-    final currentState = state;
-    if (currentState is! EventDetailLoaded) return;
-
-    final originalEvent = currentState.event;
-    final originalIsFavorite = originalEvent.isFavorite;
-
-    // Optimistically flip isFavorite
-    emit(EventDetailState.loaded(
-      event: originalEvent.copyWith(isFavorite: !originalIsFavorite),
-      isTogglingFavorite: true,
-    ));
-
-    try {
-      await _repository.toggleFavorite(eventId, originalIsFavorite);
-
-      // Sync back to EventListCubit
-      await _eventListCubit.loadEvents();
-
-      // Keep the local optimistic state, just clear the toggling flag
-      if (state is EventDetailLoaded) {
-        final loaded = state as EventDetailLoaded;
-        emit(EventDetailState.loaded(
-          event: loaded.event,
-          isTogglingFavorite: false,
-        ));
-      }
-    } catch (e) {
-      developer.log(
-        'Failed to toggle favorite: $e',
-        name: 'EventDetailCubit',
-        level: 900,
-      );
-
-      // Revert to original favorite status
-      emit(EventDetailState.loaded(
-        event: originalEvent.copyWith(isFavorite: originalIsFavorite),
-        isTogglingFavorite: false,
-      ));
+  void _onListStateChanged(EventListState listState) {
+    if (listState is EventListLoaded) {
+      final event = listState.allEvents
+          .where((e) => e.id == eventId)
+          .firstOrNull;
+      emit(event);
     }
+  }
+
+  /// Delegates favorite toggling to [EventListCubit].
+  ///
+  /// The list cubit handles the API call, optimistic update, and error
+  /// recovery. This cubit picks up the change via stream subscription.
+  Future<void> toggleFavorite() async {
+    await _eventListCubit.toggleFavorite(eventId);
   }
 
   /// Opens an external map application with directions to the venue.
   ///
   /// Uses coordinates when available, falls back to encoded address string.
-  /// Builds a Google Maps directions URL.
   Future<void> openMap(Venue venue) async {
     try {
       final Uri uri;
@@ -151,8 +81,6 @@ class EventDetailCubit extends Cubit<EventDetailState> {
   }
 
   /// Opens an external URL via url_launcher.
-  ///
-  /// Used for info items of type URL.
   Future<void> openUrl(String url) async {
     try {
       final uri = Uri.parse(url);
@@ -164,5 +92,11 @@ class EventDetailCubit extends Cubit<EventDetailState> {
         level: 900,
       );
     }
+  }
+
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 }

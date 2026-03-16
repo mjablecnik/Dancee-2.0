@@ -14,7 +14,7 @@ import '../../../../helpers/property_test_helpers.dart';
 void main() {
   group('Property 1: Favorite icon reflects event state', () {
     test(
-      'loaded state isFavorite matches the original event isFavorite '
+      'cubit state isFavorite matches the original event isFavorite '
       'for 100 random events',
       () async {
         for (var i = 0; i < 100; i++) {
@@ -36,28 +36,23 @@ void main() {
           when(() => mockEventListCubit.stream)
               .thenAnswer((_) => const Stream.empty());
 
-          // Create cubit and load event
+          // Create cubit (loads event in constructor)
           final cubit = EventDetailCubit(
-            repository: MockEventRepository(),
             eventListCubit: mockEventListCubit,
             eventId: event.id,
           );
-          cubit.loadEvent();
 
-          // Assert: state is loaded and isFavorite matches the original event
-          final loadedState = cubit.state;
+          // Assert: state is non-null and isFavorite matches the original event
           expect(
-            loadedState,
-            isA<EventDetailLoaded>(),
-            reason: 'seed=$i: state should be loaded after loadEvent',
+            cubit.state,
+            isNotNull,
+            reason: 'seed=$i: state should be non-null after construction',
           );
-
-          final stateEvent = (loadedState as EventDetailLoaded).event;
           expect(
-            stateEvent.isFavorite,
+            cubit.state!.isFavorite,
             equals(event.isFavorite),
             reason:
-                'seed=$i: loaded state isFavorite (${stateEvent.isFavorite}) '
+                'seed=$i: cubit state isFavorite (${cubit.state!.isFavorite}) '
                 'should match original event isFavorite (${event.isFavorite})',
           );
 

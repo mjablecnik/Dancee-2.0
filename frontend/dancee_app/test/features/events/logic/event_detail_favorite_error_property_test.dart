@@ -1,6 +1,7 @@
-// Feature: event-detail-page, Property 7: Favorite toggle error recovery
+// Feature: event-detail-page, Property 7: Favorite toggle error — detail cubit unchanged
 // **Validates: Requirements 9.4**
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -12,18 +13,18 @@ import '../../../helpers/mock_factories.dart';
 import '../../../helpers/property_test_helpers.dart';
 
 void main() {
-  group('Property 7: Favorite toggle error recovery', () {
+  group('Property 7: Favorite toggle error — detail cubit unchanged', () {
     test(
-      'toggleFavorite reverts isFavorite to original value when repository '
-      'throws, for 100 random events',
+      'when EventListCubit emits error, detail cubit Event? stays unchanged '
+      'for 100 random events',
       () async {
         for (var i = 0; i < 100; i++) {
           final rng = Random(i);
           final event = randomEvent(rng);
 
           // Set up mocks
-          final mockRepository = MockEventRepository();
           final mockEventListCubit = MockEventListCubit();
+          final streamController = StreamController<EventListState>();
 
           // Stub EventListCubit state with the random event
           when(() => mockEventListCubit.state).thenReturn(
@@ -35,54 +36,47 @@ void main() {
             ),
           );
           when(() => mockEventListCubit.stream)
-              .thenAnswer((_) => const Stream.empty());
+              .thenAnswer((_) => streamController.stream);
 
-          // Stub repository to THROW an exception
-          when(() => mockRepository.toggleFavorite(any(), any()))
-              .thenThrow(Exception('API error'));
+          // Stub toggleFavorite to emit error state via stream
+          when(() => mockEventListCubit.toggleFavorite(any()))
+              .thenAnswer((_) async {
+            streamController.add(
+              const EventListState.error('Failed to toggle favorite'),
+            );
+          });
 
-          // Create cubit and load event
+          // Create cubit (loads event in constructor)
           final cubit = EventDetailCubit(
-            repository: mockRepository,
             eventListCubit: mockEventListCubit,
             eventId: event.id,
           );
-          cubit.loadEvent();
 
-          // Record original favorite status
-          final originalIsFavorite = event.isFavorite;
+          // Record original state
+          final originalIsFavorite = cubit.state?.isFavorite;
 
           // Act
           await cubit.toggleFavorite();
 
-          // Assert: state is still loaded
-          final loadedState = cubit.state;
+          // Allow stream event to propagate
+          await Future.delayed(Duration.zero);
+
+          // Assert: Event? state is unchanged (error state is ignored by cubit)
           expect(
-            loadedState,
-            isA<EventDetailLoaded>(),
-            reason: 'seed=$i: state should be loaded after failed toggleFavorite',
+            cubit.state,
+            isNotNull,
+            reason: 'seed=$i: state should still be non-null after error',
           );
-
-          final loaded = loadedState as EventDetailLoaded;
-
-          // Assert: isFavorite reverted to original value
           expect(
-            loaded.event.isFavorite,
+            cubit.state!.isFavorite,
             equals(originalIsFavorite),
             reason:
-                'seed=$i: isFavorite should revert to $originalIsFavorite '
-                'after repository error',
-          );
-
-          // Assert: isTogglingFavorite is false
-          expect(
-            loaded.isTogglingFavorite,
-            isFalse,
-            reason:
-                'seed=$i: isTogglingFavorite should be false after error recovery',
+                'seed=$i: isFavorite should remain $originalIsFavorite '
+                'after EventListCubit error',
           );
 
           // Clean up
+          await streamController.close();
           await cubit.close();
         }
       },

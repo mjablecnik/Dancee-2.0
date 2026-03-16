@@ -55,7 +55,6 @@ void setupDependencies() {
 
   getIt.registerFactoryParam<EventDetailCubit, String, void>(
     (eventId, _) => EventDetailCubit(
-      repository: getIt<EventRepository>(),
       eventListCubit: getIt<EventListCubit>(),
       eventId: eventId,
     ),
