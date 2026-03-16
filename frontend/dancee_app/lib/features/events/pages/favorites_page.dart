@@ -257,7 +257,7 @@ class FavoritesListSection extends StatelessWidget {
                   return EventCard(
                     event: event,
                     onTap: () {
-                      EventDetailRoute(id: event.id).go(context);
+                      EventDetailRoute(id: event.id).push(context);
                     },
                     onFavoriteToggle: () {
                       getIt<FavoritesCubit>().toggleFavorite(event.id);
@@ -282,7 +282,7 @@ class FavoritesListSection extends StatelessWidget {
                   return EventCard(
                     event: event,
                     onTap: () {
-                      EventDetailRoute(id: event.id).go(context);
+                      EventDetailRoute(id: event.id).push(context);
                     },
                     onFavoriteToggle: () {
                       getIt<FavoritesCubit>().removePastEvent(event.id);

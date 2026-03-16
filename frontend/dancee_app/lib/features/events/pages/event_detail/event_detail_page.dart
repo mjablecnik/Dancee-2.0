@@ -6,8 +6,6 @@ import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
 import '../../logic/event_detail.dart';
-import '../../../app/layouts.dart';
-import '../event_list/event_list_page.dart';
 import 'sections.dart';
 
 part 'event_detail_page.g.dart';
@@ -41,41 +39,33 @@ class EventDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<EventDetailCubit>(param1: eventId),
-      child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) {
-            const EventListRoute().go(context);
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: BlocConsumer<EventDetailCubit, Event?>(
-            listenWhen: (previous, current) =>
-                previous != null &&
-                current != null &&
-                previous.isFavorite != current.isFavorite,
-            listener: (context, event) {
-              if (event == null) return;
-              final message = event.isFavorite
-                  ? t.eventDetail.addedToFavorites
-                  : t.eventDetail.removedFromFavorites;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(message),
-                  duration: const Duration(seconds: 2),
-                ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: BlocConsumer<EventDetailCubit, Event?>(
+          listenWhen: (previous, current) =>
+              previous != null &&
+              current != null &&
+              previous.isFavorite != current.isFavorite,
+          listener: (context, event) {
+            if (event == null) return;
+            final message = event.isFavorite
+                ? t.eventDetail.addedToFavorites
+                : t.eventDetail.removedFromFavorites;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
+          builder: (context, event) {
+            if (event == null) {
+              return EventNotFoundSection(
+                onBackPressed: () => context.pop(),
               );
-            },
-            builder: (context, event) {
-              if (event == null) {
-                return EventNotFoundSection(
-                  onBackPressed: () => const EventListRoute().go(context),
-                );
-              }
-              return _EventDetailContent(event: event);
-            },
-          ),
+            }
+            return _EventDetailContent(event: event);
+          },
         ),
       ),
     );
@@ -101,7 +91,7 @@ class _EventDetailContent extends StatelessWidget {
         children: [
           EventDetailHeaderSection(
             event: event,
-            onBackPressed: () => const EventListRoute().go(context),
+            onBackPressed: () => context.pop(),
             onFavoritePressed: () => cubit.toggleFavorite(),
             onMapPressed: () => cubit.openMap(event.venue),
           ),

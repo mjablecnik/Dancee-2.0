@@ -250,7 +250,7 @@ class EventsByDateSection extends StatelessWidget {
             (event) => components.EventCard(
               event: event,
               onTap: () {
-                EventDetailRoute(id: event.id).go(context);
+                EventDetailRoute(id: event.id).push(context);
               },
               onFavoriteToggle: () =>
                   getIt<EventListCubit>().toggleFavorite(event.id),
@@ -271,7 +271,7 @@ class EventsByDateSection extends StatelessWidget {
             (event) => components.EventCard(
               event: event,
               onTap: () {
-                EventDetailRoute(id: event.id).go(context);
+                EventDetailRoute(id: event.id).push(context);
               },
               onFavoriteToggle: () =>
                   getIt<EventListCubit>().toggleFavorite(event.id),
@@ -292,7 +292,7 @@ class EventsByDateSection extends StatelessWidget {
             (event) => components.EventCard(
               event: event,
               onTap: () {
-                EventDetailRoute(id: event.id).go(context);
+                EventDetailRoute(id: event.id).push(context);
               },
               onFavoriteToggle: () =>
                   getIt<EventListCubit>().toggleFavorite(event.id),
