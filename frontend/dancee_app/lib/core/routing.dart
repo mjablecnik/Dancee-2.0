@@ -1,7 +1,5 @@
 import 'package:go_router/go_router.dart';
 
-import 'auth_redirect.dart';
-
 // Route definitions — importing these files gives access to the generated
 // route variables ($initialRoute, $appLayoutRoute, etc.) from their .g.dart parts.
 import '../features/app/layouts.dart';
@@ -41,3 +39,25 @@ final goRouter = GoRouter(
     );
   },
 );
+
+/// Protected routes that require authentication.
+const protectedRoutes = ['/settings'];
+
+/// Pure redirect logic extracted for testability.
+///
+/// Returns `'/login'` when [matchedLocation] starts with any protected route
+/// and [isAuthenticated] is `false`. Returns `null` otherwise (no redirect).
+String? authRedirect({
+  required String matchedLocation,
+  required bool isAuthenticated,
+}) {
+  final isProtectedRoute = protectedRoutes.any(
+        (route) => matchedLocation.startsWith(route),
+  );
+
+  if (!isAuthenticated && isProtectedRoute) {
+    return '/login';
+  }
+
+  return null;
+}
