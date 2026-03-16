@@ -64,36 +64,32 @@ void main() {
     // State transitions
     // =========================================================================
     group('state transitions', () {
-      test('initial state is EventListInitial', () {
-        final cubit = EventListCubit(mockRepository);
-        expect(cubit.state, isA<EventListInitial>());
-        cubit.close();
-      });
+      // Note: EventListCubit constructor calls loadEvents() automatically.
+      // blocTest captures states emitted AFTER build(). The synchronous
+      // emit(loading) happens during build and is NOT captured. Only the
+      // async emit(loaded/error) after await is captured.
 
       blocTest<EventListCubit, EventListState>(
-        'emits [loading, loaded] when loadEvents succeeds',
+        'emits [loaded] when constructor loadEvents succeeds (loading emitted during build)',
         setUp: () {
           when(() => mockRepository.getAllEvents())
               .thenAnswer((_) async => <Event>[]);
         },
         build: () => EventListCubit(mockRepository),
-        act: (cubit) => cubit.loadEvents(),
+        // Don't call loadEvents() in act — constructor already does it
         expect: () => [
-          isA<EventListLoading>(),
           isA<EventListLoaded>(),
         ],
       );
 
       blocTest<EventListCubit, EventListState>(
-        'emits [loading, error] when loadEvents throws ApiException',
+        'emits [error] when loadEvents throws ApiException',
         setUp: () {
           when(() => mockRepository.getAllEvents())
-              .thenThrow(ApiException(message: 'Server error'));
+              .thenAnswer((_) async => throw ApiException(message: 'Server error'));
         },
         build: () => EventListCubit(mockRepository),
-        act: (cubit) => cubit.loadEvents(),
         expect: () => [
-          isA<EventListLoading>(),
           isA<EventListError>(),
         ],
         verify: (cubit) {
@@ -103,15 +99,13 @@ void main() {
       );
 
       blocTest<EventListCubit, EventListState>(
-        'emits [loading, error] with genericError when loadEvents throws non-ApiException',
+        'emits [error] with genericError when loadEvents throws non-ApiException',
         setUp: () {
           when(() => mockRepository.getAllEvents())
-              .thenThrow(Exception('unexpected'));
+              .thenAnswer((_) async => throw Exception('unexpected'));
         },
         build: () => EventListCubit(mockRepository),
-        act: (cubit) => cubit.loadEvents(),
         expect: () => [
-          isA<EventListLoading>(),
           isA<EventListError>(),
         ],
         verify: (cubit) {
@@ -143,9 +137,7 @@ void main() {
               .thenAnswer((_) async => events);
         },
         build: () => EventListCubit(mockRepository),
-        act: (cubit) => cubit.loadEvents(),
         expect: () => [
-          isA<EventListLoading>(),
           isA<EventListLoaded>(),
         ],
         verify: (cubit) {
@@ -175,7 +167,6 @@ void main() {
               .thenAnswer((_) async => events);
         },
         build: () => EventListCubit(mockRepository),
-        act: (cubit) => cubit.loadEvents(),
         verify: (cubit) {
           final state = cubit.state as EventListLoaded;
           expect(state.allEvents, hasLength(2));
@@ -184,6 +175,7 @@ void main() {
         },
       );
     });
+
 
     // =========================================================================
     // Search filtering
@@ -206,10 +198,11 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          // Wait for constructor's loadEvents() to complete
+          await Future.delayed(Duration.zero);
           await cubit.searchEvents('salsa');
         },
-        skip: 2, // skip loading + first loaded
+        skip: 1, // skip loaded from constructor
         expect: () => [
           isA<EventListLoaded>(),
         ],
@@ -236,10 +229,10 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          await Future.delayed(Duration.zero);
           await cubit.searchEvents('jazz');
         },
-        skip: 2,
+        skip: 1,
         expect: () => [
           isA<EventListLoaded>(),
         ],
@@ -266,10 +259,10 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          await Future.delayed(Duration.zero);
           await cubit.searchEvents('workshop');
         },
-        skip: 2,
+        skip: 1,
         expect: () => [
           isA<EventListLoaded>(),
         ],
@@ -296,12 +289,12 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          await Future.delayed(Duration.zero);
           await cubit.searchEvents('Event A');
           await cubit.searchEvents('');
         },
         verify: (cubit) {
-          // loadEvents called once initially, once when empty query triggers reload
+          // Constructor calls loadEvents once, empty query triggers reload
           verify(() => mockRepository.getAllEvents()).called(2);
           final state = cubit.state as EventListLoaded;
           expect(state.allEvents, hasLength(2));
@@ -309,13 +302,17 @@ void main() {
       );
 
       test('searchEvents does nothing when state is not loaded', () async {
+        when(() => mockRepository.getAllEvents())
+            .thenAnswer((_) async => throw Exception('not set up'));
         final cubit = EventListCubit(mockRepository);
-        // State is initial, search should be a no-op
+        await Future.delayed(Duration.zero);
+        final stateBeforeSearch = cubit.state;
         await cubit.searchEvents('test');
-        expect(cubit.state, isA<EventListInitial>());
+        expect(cubit.state, stateBeforeSearch);
         await cubit.close();
       });
     });
+
 
     // =========================================================================
     // toggleFavorite local state update
@@ -338,10 +335,10 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          await Future.delayed(Duration.zero);
           await cubit.toggleFavorite('evt1');
         },
-        skip: 2, // skip loading + first loaded
+        skip: 1, // skip loaded from constructor
         expect: () => [
           isA<EventListLoaded>(),
         ],
@@ -369,10 +366,10 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          await Future.delayed(Duration.zero);
           await cubit.toggleFavorite('evt1');
         },
-        skip: 2,
+        skip: 1, // skip loaded from constructor
         expect: () => [
           isA<EventListError>(),
         ],
@@ -390,19 +387,23 @@ void main() {
         },
         build: () => EventListCubit(mockRepository),
         act: (cubit) async {
-          await cubit.loadEvents();
+          await Future.delayed(Duration.zero);
           await cubit.toggleFavorite('nonexistent');
         },
-        skip: 2,
+        skip: 1, // skip loaded from constructor
         expect: () => [
           isA<EventListError>(),
         ],
       );
 
       test('toggleFavorite does nothing when state is not loaded', () async {
+        when(() => mockRepository.getAllEvents())
+            .thenAnswer((_) async => throw Exception('not set up'));
         final cubit = EventListCubit(mockRepository);
+        await Future.delayed(Duration.zero);
+        final stateBeforeToggle = cubit.state;
         await cubit.toggleFavorite('evt1');
-        expect(cubit.state, isA<EventListInitial>());
+        expect(cubit.state, stateBeforeToggle);
         await cubit.close();
       });
     });
