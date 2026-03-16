@@ -14,11 +14,15 @@ import 'components.dart';
 class EventDetailHeaderSection extends StatelessWidget {
   final Event event;
   final VoidCallback onBackPressed;
+  final VoidCallback onFavoritePressed;
+  final VoidCallback onMapPressed;
 
   const EventDetailHeaderSection({
     super.key,
     required this.event,
     required this.onBackPressed,
+    required this.onFavoritePressed,
+    required this.onMapPressed,
   });
 
   @override
@@ -39,7 +43,11 @@ class EventDetailHeaderSection extends StatelessWidget {
             children: [
               _HeaderTopRow(onBackPressed: onBackPressed),
               const SizedBox(height: 12),
-              _QuickActionsRow(),
+              _QuickActionsRow(
+                isFavorite: event.isFavorite,
+                onFavoritePressed: onFavoritePressed,
+                onMapPressed: onMapPressed,
+              ),
             ],
           ),
         ),
@@ -48,7 +56,7 @@ class EventDetailHeaderSection extends StatelessWidget {
   }
 }
 
-/// Top row of the header with back button, title, and share button.
+/// Top row of the header with back button and title.
 class _HeaderTopRow extends StatelessWidget {
   final VoidCallback onBackPressed;
 
@@ -74,10 +82,7 @@ class _HeaderTopRow extends StatelessWidget {
             ),
           ),
         ),
-        HeaderActionButton(
-          icon: Icons.share,
-          onPressed: () {},
-        ),
+        const SizedBox(width: 40),
       ],
     );
   }
@@ -85,15 +90,25 @@ class _HeaderTopRow extends StatelessWidget {
 
 /// Quick action buttons row (favorite + map).
 class _QuickActionsRow extends StatelessWidget {
+  final bool isFavorite;
+  final VoidCallback onFavoritePressed;
+  final VoidCallback onMapPressed;
+
+  const _QuickActionsRow({
+    required this.isFavorite,
+    required this.onFavoritePressed,
+    required this.onMapPressed,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: QuickActionButton(
-            icon: Icons.favorite_border,
+            icon: isFavorite ? Icons.favorite : Icons.favorite_border,
             label: t.eventDetail.favorite,
-            onPressed: () {},
+            onPressed: onFavoritePressed,
           ),
         ),
         const SizedBox(width: 8),
@@ -101,7 +116,7 @@ class _QuickActionsRow extends StatelessWidget {
           child: QuickActionButton(
             icon: Icons.map,
             label: t.eventDetail.map,
-            onPressed: () {},
+            onPressed: onMapPressed,
           ),
         ),
       ],
@@ -211,8 +226,13 @@ class DanceStylesSection extends StatelessWidget {
 /// a navigate button.
 class EventVenueSection extends StatelessWidget {
   final Venue venue;
+  final VoidCallback onNavigatePressed;
 
-  const EventVenueSection({super.key, required this.venue});
+  const EventVenueSection({
+    super.key,
+    required this.venue,
+    required this.onNavigatePressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -329,7 +349,7 @@ class EventVenueSection extends StatelessWidget {
                 width: double.infinity,
                 height: 44,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: onNavigatePressed,
                   icon: const Icon(Icons.directions, size: 18),
                   label: Text(
                     t.eventDetail.navigateToVenue,
@@ -493,8 +513,13 @@ class EventDescriptionSection extends StatelessWidget {
 /// Displays additional event information (prices, URLs, etc.) as info cards.
 class EventInfoSection extends StatelessWidget {
   final List<EventInfo> info;
+  final void Function(String url)? onUrlTapped;
 
-  const EventInfoSection({super.key, required this.info});
+  const EventInfoSection({
+    super.key,
+    required this.info,
+    this.onUrlTapped,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -508,7 +533,12 @@ class EventInfoSection extends StatelessWidget {
         const SizedBox(height: 12),
         ...info.map((item) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: EventInfoCard(info: item),
+              child: EventInfoCard(
+                info: item,
+                onTap: item.type == EventInfoType.url
+                    ? () => onUrlTapped?.call(item.value)
+                    : null,
+              ),
             )),
       ],
     );

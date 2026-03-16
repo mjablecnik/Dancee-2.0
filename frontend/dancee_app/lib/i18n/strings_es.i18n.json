@@ -49,7 +49,11 @@
     "openLesson": "Clase Abierta",
     "eventNotFound": "Evento no encontrado",
     "eventNotFoundDescription": "El evento que buscas no se pudo encontrar.",
-    "backToEvents": "Volver a Eventos"
+    "backToEvents": "Volver a Eventos",
+    "addedToFavorites": "Añadido a favoritos",
+    "removedFromFavorites": "Eliminado de favoritos",
+    "favoriteError": "Error al actualizar favorito",
+    "remove": "Eliminar"
   },
   "eventFilters": {
     "title": "Filtrar y Ordenar",

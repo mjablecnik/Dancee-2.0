@@ -49,7 +49,11 @@
     "openLesson": "Open Lesson",
     "eventNotFound": "Event not found",
     "eventNotFoundDescription": "The event you are looking for could not be found.",
-    "backToEvents": "Back to Events"
+    "backToEvents": "Back to Events",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "favoriteError": "Failed to update favorite",
+    "remove": "Remove"
   },
   "eventFilters": {
     "title": "Filter & Sort",

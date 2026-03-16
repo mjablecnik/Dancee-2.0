@@ -138,8 +138,8 @@ class DateTimeInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = _formatDate(event.startTime);
-    final timeStr = _formatTimeRange(event.startTime, event.endTime);
+    final dateStr = formatDate(event.startTime);
+    final timeStr = formatTimeRange(event.startTime, event.endTime);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -296,16 +296,19 @@ class DanceStyleChip extends StatelessWidget {
 // ============================================================================
 
 /// Card displaying a single piece of event info (price, text, url).
+///
+/// When [onTap] is provided, the card becomes tappable (used for URL-type items).
 class EventInfoCard extends StatelessWidget {
   final EventInfo info;
+  final VoidCallback? onTap;
 
-  const EventInfoCard({super.key, required this.info});
+  const EventInfoCard({super.key, required this.info, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colors = _getInfoCardColors(info.type);
 
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -348,6 +351,12 @@ class EventInfoCard extends StatelessWidget {
         ],
       ),
     );
+
+    if (onTap != null) {
+      return GestureDetector(onTap: onTap, child: card);
+    }
+
+    return card;
   }
 }
 
@@ -364,7 +373,7 @@ class EventPartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = _getPartColors(part.type);
-    final timeStr = _formatTimeRange(part.startTime, part.endTime);
+    final timeStr = formatTimeRange(part.startTime, part.endTime);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -392,7 +401,7 @@ class EventPartCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                _getPartTypeLabel(part.type),
+                getPartTypeLabel(part.type),
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -463,7 +472,7 @@ class EventPartCard extends StatelessWidget {
 // Helper functions
 // ============================================================================
 
-String _formatDate(DateTime dateTime) {
+String formatDate(DateTime dateTime) {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final eventDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
@@ -481,7 +490,7 @@ String _formatDate(DateTime dateTime) {
   }
 }
 
-String _formatTimeRange(DateTime start, DateTime? end) {
+String formatTimeRange(DateTime start, DateTime? end) {
   final startHour = start.hour.toString().padLeft(2, '0');
   final startMinute = start.minute.toString().padLeft(2, '0');
   if (end == null) return '$startHour:$startMinute';
@@ -614,7 +623,7 @@ Color _getPartIconColor(EventPartType type) {
   }
 }
 
-String _getPartTypeLabel(EventPartType type) {
+String getPartTypeLabel(EventPartType type) {
   switch (type) {
     case EventPartType.workshop:
       return t.eventDetail.workshop;

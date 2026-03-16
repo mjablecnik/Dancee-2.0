@@ -11,6 +11,7 @@ import '../../../i18n/translations.g.dart';
 import '../data/entities.dart';
 import '../logic/favorites.dart';
 import '../../app/layouts.dart';
+import 'event_detail/event_detail_page.dart';
 import 'event_list/event_list_page.dart';
 import 'event_list/components.dart';
 
@@ -256,7 +257,7 @@ class FavoritesListSection extends StatelessWidget {
                   return EventCard(
                     event: event,
                     onTap: () {
-                      // TODO: Navigate to event detail
+                      EventDetailRoute(id: event.id).go(context);
                     },
                     onFavoriteToggle: () {
                       getIt<FavoritesCubit>().toggleFavorite(event.id);
@@ -281,7 +282,7 @@ class FavoritesListSection extends StatelessWidget {
                   return EventCard(
                     event: event,
                     onTap: () {
-                      // TODO: Navigate to event detail
+                      EventDetailRoute(id: event.id).go(context);
                     },
                     onFavoriteToggle: () {
                       getIt<FavoritesCubit>().removePastEvent(event.id);

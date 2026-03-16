@@ -6,6 +6,7 @@ import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
 import '../../logic/event_list.dart';
+import '../event_detail/event_detail_page.dart';
 import 'components.dart' as components;
 
 // ============================================================================
@@ -249,7 +250,7 @@ class EventsByDateSection extends StatelessWidget {
             (event) => components.EventCard(
               event: event,
               onTap: () {
-                // TODO: Navigate to event detail (wired in routing task)
+                EventDetailRoute(id: event.id).go(context);
               },
               onFavoriteToggle: () =>
                   getIt<EventListCubit>().toggleFavorite(event.id),
@@ -270,7 +271,7 @@ class EventsByDateSection extends StatelessWidget {
             (event) => components.EventCard(
               event: event,
               onTap: () {
-                // TODO: Navigate to event detail (wired in routing task)
+                EventDetailRoute(id: event.id).go(context);
               },
               onFavoriteToggle: () =>
                   getIt<EventListCubit>().toggleFavorite(event.id),
@@ -291,7 +292,7 @@ class EventsByDateSection extends StatelessWidget {
             (event) => components.EventCard(
               event: event,
               onTap: () {
-                // TODO: Navigate to event detail (wired in routing task)
+                EventDetailRoute(id: event.id).go(context);
               },
               onFavoriteToggle: () =>
                   getIt<EventListCubit>().toggleFavorite(event.id),

@@ -56,6 +56,9 @@ dependencies:
   # Routing
   go_router: ^13.0.0
   
+  # URL launcher
+  url_launcher: ^6.2.5
+  
   # Code generation annotations
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1

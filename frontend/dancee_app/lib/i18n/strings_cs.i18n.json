@@ -49,7 +49,11 @@
     "openLesson": "Otevřená lekce",
     "eventNotFound": "Akce nenalezena",
     "eventNotFoundDescription": "Akce, kterou hledáte, nebyla nalezena.",
-    "backToEvents": "Zpět na události"
+    "backToEvents": "Zpět na události",
+    "addedToFavorites": "Přidáno do oblíbených",
+    "removedFromFavorites": "Odebráno z oblíbených",
+    "favoriteError": "Nepodařilo se aktualizovat oblíbené",
+    "remove": "Odebrat"
   },
   "eventFilters": {
     "title": "Filtrování & Řazení",

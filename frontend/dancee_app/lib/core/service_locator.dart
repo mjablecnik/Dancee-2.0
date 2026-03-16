@@ -13,6 +13,7 @@ import '../features/events/logic/event_list.dart';
 import '../features/events/logic/favorites.dart';
 import '../features/auth/logic/auth.dart';
 import '../features/settings/logic/settings.dart';
+import '../features/events/logic/event_detail.dart';
 
 final getIt = GetIt.instance;
 
@@ -50,5 +51,13 @@ void setupDependencies() {
 
   getIt.registerFactory<SettingsCubit>(
     () => SettingsCubit(getIt<SettingsRepository>()),
+  );
+
+  getIt.registerFactoryParam<EventDetailCubit, String, void>(
+    (eventId, _) => EventDetailCubit(
+      repository: getIt<EventRepository>(),
+      eventListCubit: getIt<EventListCubit>(),
+      eventId: eventId,
+    ),
   );
 }

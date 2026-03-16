@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
-import '../../logic/event_list.dart';
+import '../../logic/event_detail.dart';
 import '../../../app/layouts.dart';
 import '../event_list/event_list_page.dart';
 import 'sections.dart';
@@ -30,8 +30,9 @@ class EventDetailRoute extends GoRouteData {
 
 /// Page displaying full details of a dance event.
 ///
-/// Uses the [EventListCubit] to find the event by ID from the already-loaded
-/// list. This is a placeholder implementation with no additional backend calls.
+/// Uses [EventDetailCubit] via [BlocProvider] to manage state.
+/// The cubit reads the event from [EventListCubit] and handles
+/// favorite toggling, map navigation, and URL launching.
 class EventDetailPage extends StatelessWidget {
   final String eventId;
 
@@ -39,71 +40,104 @@ class EventDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocBuilder<EventListCubit, EventListState>(
-        bloc: getIt<EventListCubit>(),
-        builder: (context, state) {
-          final event = _findEvent(state);
-
-          if (event == null) {
-            return EventNotFoundSection(
-              onBackPressed: () => const EventListRoute().go(context),
+    return BlocProvider(
+      create: (_) => getIt<EventDetailCubit>(param1: eventId)..loadEvent(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: BlocConsumer<EventDetailCubit, EventDetailState>(
+          listenWhen: (previous, current) {
+            // Listen when isTogglingFavorite transitions from true to false
+            final wasTog = previous is EventDetailLoaded &&
+                previous.isTogglingFavorite;
+            final isDone = current is EventDetailLoaded &&
+                !current.isTogglingFavorite;
+            return wasTog && isDone;
+          },
+          listener: (context, state) {
+            if (state is! EventDetailLoaded) return;
+            final event = state.event;
+            final message = event.isFavorite
+                ? t.eventDetail.addedToFavorites
+                : t.eventDetail.removedFromFavorites;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                duration: const Duration(seconds: 2),
+              ),
             );
-          }
-
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EventDetailHeaderSection(
-                  event: event,
-                  onBackPressed: () => context.pop(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      EventTitleSection(event: event),
-                      const SizedBox(height: 20),
-                      DanceStylesSection(dances: event.dances),
-                      const SizedBox(height: 20),
-                      EventVenueSection(venue: event.venue),
-                      const SizedBox(height: 20),
-                      EventOrganizerSection(organizer: event.organizer),
-                      const SizedBox(height: 20),
-                      EventDescriptionSection(description: event.description),
-                      if (event.info.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        EventInfoSection(info: event.info),
-                      ],
-                      if (event.parts.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        EventPartsSection(parts: event.parts),
-                      ],
-                      const SizedBox(height: 40),
-                    ],
-                  ),
-                ),
-              ],
+          },
+          builder: (context, state) => state.when(
+            initial: () => const Center(child: CircularProgressIndicator()),
+            loaded: (event, isTogglingFavorite) =>
+                _EventDetailContent(event: event),
+            error: (msg) => EventNotFoundSection(
+              onBackPressed: () => const EventListRoute().go(context),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
+}
 
-  Event? _findEvent(EventListState state) {
-    return state.whenOrNull(
-      loaded: (allEvents, todayEvents, tomorrowEvents, upcomingEvents) {
-        try {
-          return allEvents.firstWhere((e) => e.id == eventId);
-        } catch (_) {
-          return null;
-        }
-      },
+/// Wraps the scrollable content of the event detail page.
+///
+/// Separated into its own widget so callbacks can access the
+/// [EventDetailCubit] from the [BlocProvider] above.
+class _EventDetailContent extends StatelessWidget {
+  final Event event;
+
+  const _EventDetailContent({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<EventDetailCubit>();
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          EventDetailHeaderSection(
+            event: event,
+            onBackPressed: () => context.pop(),
+            onFavoritePressed: () => cubit.toggleFavorite(),
+            onMapPressed: () => cubit.openMap(event.venue),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                EventTitleSection(event: event),
+                const SizedBox(height: 20),
+                DanceStylesSection(dances: event.dances),
+                const SizedBox(height: 20),
+                EventVenueSection(
+                  venue: event.venue,
+                  onNavigatePressed: () => cubit.openMap(event.venue),
+                ),
+                const SizedBox(height: 20),
+                EventOrganizerSection(organizer: event.organizer),
+                const SizedBox(height: 20),
+                EventDescriptionSection(description: event.description),
+                if (event.info.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  EventInfoSection(
+                    info: event.info,
+                    onUrlTapped: (url) => cubit.openUrl(url),
+                  ),
+                ],
+                if (event.parts.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  EventPartsSection(parts: event.parts),
+                ],
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
