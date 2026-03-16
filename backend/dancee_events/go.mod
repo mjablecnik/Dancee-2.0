@@ -8,6 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.128.0
+	pgregory.net/rapid v1.2.0
 )
 
 require (

@@ -50,7 +50,7 @@ func main() {
 	// CORS middleware
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if c.Request.Method == "OPTIONS" {
@@ -74,7 +74,10 @@ func main() {
 			events.GET("/favorites", eventHandler.ListFavorites)
 			events.POST("/favorites", eventHandler.AddFavorite)
 			events.DELETE("/favorites/:eventId", eventHandler.RemoveFavorite)
-			events.POST("/seed", eventHandler.SeedEvents) // TODO: Remove once Facebook scraping is implemented
+			events.GET("/:id", eventHandler.GetEvent)
+			events.POST("", eventHandler.CreateEvent)
+			events.PUT("/:id", eventHandler.UpdateEvent)
+			events.DELETE("/:id", eventHandler.DeleteEvent)
 		}
 	}
 

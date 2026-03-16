@@ -17,16 +17,12 @@ type EventRepository struct {
 
 // NewEventRepository creates a new event repository
 func NewEventRepository(client *firebase.Client) *EventRepository {
-	repo := &EventRepository{
+	return &EventRepository{
 		client:         client,
 		collectionName: "events",
 	}
-	
-	// Initialize sample data asynchronously
-	go repo.initializeSampleData()
-	
-	return repo
 }
+
 
 // GetAllEvents retrieves all events from Firestore
 func (r *EventRepository) GetAllEvents() ([]models.Event, error) {
@@ -83,6 +79,42 @@ func (r *EventRepository) EventExists(eventID string) (bool, error) {
 	return doc.Exists(), nil
 }
 
+// CreateEvent creates a new event with a Firestore auto-generated ID.
+// Returns the generated document ID.
+func (r *EventRepository) CreateEvent(event *models.Event) (string, error) {
+	ctx := r.client.Context()
+
+	// Don't store the ID field inside the document
+	event.ID = ""
+
+	docRef, _, err := r.client.Firestore.Collection(r.collectionName).Add(ctx, event)
+	if err != nil {
+		return "", err
+	}
+
+	return docRef.ID, nil
+}
+
+// UpdateEvent overwrites an existing event document by ID.
+func (r *EventRepository) UpdateEvent(eventID string, event *models.Event) error {
+	ctx := r.client.Context()
+
+	// Don't store the ID field inside the document
+	event.ID = ""
+
+	_, err := r.client.Firestore.Collection(r.collectionName).Doc(eventID).Set(ctx, event)
+	return err
+}
+
+// DeleteEvent deletes an event document by ID
+func (r *EventRepository) DeleteEvent(eventID string) error {
+	ctx := r.client.Context()
+	_, err := r.client.Firestore.Collection(r.collectionName).Doc(eventID).Delete(ctx)
+	return err
+}
+
+
+
 // SaveEvent saves or updates an event
 func (r *EventRepository) SaveEvent(event *models.Event) error {
 	ctx := r.client.Context()
@@ -99,21 +131,3 @@ func (r *EventRepository) SaveEvent(event *models.Event) error {
 	return err
 }
 
-// initializeSampleData initializes Firestore with sample data if empty
-func (r *EventRepository) initializeSampleData() {
-	events, err := r.GetAllEvents()
-	if err != nil {
-		log.Printf("Error checking existing events: %v", err)
-		return
-	}
-
-	if len(events) > 0 {
-		log.Printf("Events collection already has %d events", len(events))
-		return
-	}
-
-	log.Println("Initializing Firestore with sample data...")
-	
-	// Sample data will be added here
-	log.Println("Sample data initialization completed")
-}

@@ -93,3 +93,39 @@ func (r *FavoritesRepository) RemoveFavorite(userID, eventID string) error {
 	
 	return err
 }
+
+// RemoveFavoritesByEventID removes a specific event from all users' favorites.
+// Queries all user documents in the favorites collection and deletes the
+// matching event sub-document for each user.
+func (r *FavoritesRepository) RemoveFavoritesByEventID(eventID string) error {
+	ctx := r.client.Context()
+	iter := r.client.Firestore.
+		Collection(r.collectionName).
+		Documents(ctx)
+	defer iter.Stop()
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		userID := doc.Ref.ID
+		_, err = r.client.Firestore.
+			Collection(r.collectionName).
+			Doc(userID).
+			Collection("events").
+			Doc(eventID).
+			Delete(ctx)
+		if err != nil {
+			log.Printf("Error removing favorite event %s for user %s: %v", eventID, userID, err)
+		}
+	}
+
+	log.Printf("Removed event %s from all users' favorites", eventID)
+	return nil
+}
+

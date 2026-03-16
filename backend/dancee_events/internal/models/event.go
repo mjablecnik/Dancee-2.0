@@ -57,3 +57,34 @@ type AddFavoriteRequest struct {
 	UserID  string `json:"userId" binding:"required"`
 	EventID string `json:"eventId" binding:"required"`
 }
+
+// CreateEventRequest represents the request body for creating/updating an event.
+// Uses Gin's binding tags for required field validation.
+type CreateEventRequest struct {
+	Title       string      `json:"title" binding:"required"`
+	Description *string     `json:"description,omitempty"`
+	Organizer   string      `json:"organizer" binding:"required"`
+	Venue       Venue       `json:"venue" binding:"required"`
+	StartTime   string      `json:"startTime" binding:"required"`
+	EndTime     *string     `json:"endTime,omitempty"`
+	Duration    *int64      `json:"duration,omitempty"`
+	Dances      []string    `json:"dances" binding:"required,min=1"`
+	Info        []EventInfo `json:"info,omitempty"`
+	Parts       []EventPart `json:"parts,omitempty"`
+}
+
+// ToEvent converts a CreateEventRequest to an Event model.
+func (r *CreateEventRequest) ToEvent() *Event {
+	return &Event{
+		Title:       r.Title,
+		Description: r.Description,
+		Organizer:   r.Organizer,
+		Venue:       r.Venue,
+		StartTime:   r.StartTime,
+		EndTime:     r.EndTime,
+		Duration:    r.Duration,
+		Dances:      r.Dances,
+		Info:        r.Info,
+		Parts:       r.Parts,
+	}
+}

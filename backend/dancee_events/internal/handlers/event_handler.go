@@ -34,6 +34,84 @@ func (h *EventHandler) ListEvents(c *gin.Context) {
 	c.JSON(http.StatusOK, events)
 }
 
+// GetEvent handles GET /api/events/:id
+func (h *EventHandler) GetEvent(c *gin.Context) {
+	eventID := c.Param("id")
+	userID := c.Query("userId")
+
+	event, err := h.service.GetEventByID(eventID, userID)
+	if err != nil {
+		if err.Error() == "event not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, event)
+}
+
+// CreateEvent handles POST /api/events
+func (h *EventHandler) CreateEvent(c *gin.Context) {
+	var req models.CreateEventRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	event := req.ToEvent()
+
+	created, err := h.service.CreateEvent(event)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, created)
+}
+
+// UpdateEvent handles PUT /api/events/:id
+func (h *EventHandler) UpdateEvent(c *gin.Context) {
+	eventID := c.Param("id")
+
+	var req models.CreateEventRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	event := req.ToEvent()
+
+	updated, err := h.service.UpdateEvent(eventID, event)
+	if err != nil {
+		if err.Error() == "event not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updated)
+}
+
+// DeleteEvent handles DELETE /api/events/:id
+func (h *EventHandler) DeleteEvent(c *gin.Context) {
+	eventID := c.Param("id")
+
+	if err := h.service.DeleteEvent(eventID); err != nil {
+		if err.Error() == "event not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
 // ListFavorites handles GET /api/events/favorites
 func (h *EventHandler) ListFavorites(c *gin.Context) {
 	userID := c.Query("userId")
@@ -97,18 +175,4 @@ func (h *EventHandler) RemoveFavorite(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// SeedEvents handles POST /api/events/seed
-// TODO: Remove this endpoint once Facebook event scraping is fully implemented.
-func (h *EventHandler) SeedEvents(c *gin.Context) {
-	events, err := h.service.SeedEvents()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Successfully seeded events",
-		"count":   len(events),
-		"events":  events,
-	})
-}

@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"dancee_events/internal/models"
@@ -48,6 +47,88 @@ func calculateIsPast(event *models.Event) bool {
 func markEventStatus(event *models.Event) {
 	isPast := calculateIsPast(event)
 	event.IsPast = &isPast
+}
+
+// CreateEvent creates a new event via the repository and returns it with the generated ID
+func (s *EventService) CreateEvent(event *models.Event) (*models.Event, error) {
+	id, err := s.eventRepo.CreateEvent(event)
+	if err != nil {
+		return nil, err
+	}
+
+	event.ID = id
+	return event, nil
+}
+
+// UpdateEvent checks that the event exists, updates it via the repository, and returns the updated event
+func (s *EventService) UpdateEvent(eventID string, event *models.Event) (*models.Event, error) {
+	// Check event exists
+	_, err := s.eventRepo.GetEventByID(eventID)
+	if err != nil {
+		return nil, errors.New("event not found")
+	}
+
+	// Update event via repository
+	if err := s.eventRepo.UpdateEvent(eventID, event); err != nil {
+		return nil, err
+	}
+
+	// Set the ID on the returned event
+	event.ID = eventID
+	return event, nil
+}
+
+// DeleteEvent checks that the event exists, deletes it via the repository,
+// and cascades the deletion to all user favorites
+func (s *EventService) DeleteEvent(eventID string) error {
+	// Check event exists
+	_, err := s.eventRepo.GetEventByID(eventID)
+	if err != nil {
+		return errors.New("event not found")
+	}
+
+	// Delete event via repository
+	if err := s.eventRepo.DeleteEvent(eventID); err != nil {
+		return err
+	}
+
+	// Cascade delete favorites
+	if err := s.favoritesRepo.RemoveFavoritesByEventID(eventID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetEventByID retrieves a single event by ID, optionally marking favorite status for a user
+func (s *EventService) GetEventByID(eventID, userID string) (*models.Event, error) {
+	// Retrieve the event from repository
+	event, err := s.eventRepo.GetEventByID(eventID)
+	if err != nil {
+		return nil, errors.New("event not found")
+	}
+
+	// Mark isPast status
+	markEventStatus(event)
+
+	// If userID provided, check if event is in user's favorites
+	if userID != "" {
+		favorites, err := s.favoritesRepo.GetFavorites(userID)
+		if err != nil {
+			return nil, err
+		}
+
+		isFav := false
+		for _, fav := range favorites {
+			if fav.ID == eventID {
+				isFav = true
+				break
+			}
+		}
+		event.IsFavorite = &isFav
+	}
+
+	return event, nil
 }
 
 // GetAllEvents retrieves all events, optionally marking favorites for a user
@@ -127,94 +208,4 @@ func (s *EventService) RemoveFavorite(userID, eventID string) error {
 	return s.favoritesRepo.RemoveFavorite(userID, eventID)
 }
 
-// SeedEvents generates and saves 10 sample dance events to the database.
-// TODO: Remove this method once Facebook event scraping is fully implemented.
-func (s *EventService) SeedEvents() ([]models.Event, error) {
-	dances := [][]string{
-		{"Salsa", "Bachata"},
-		{"Kizomba", "Semba"},
-		{"Zouk", "Lambada"},
-		{"West Coast Swing"},
-		{"Lindy Hop", "Charleston"},
-		{"Tango"},
-		{"Salsa", "Bachata", "Kizomba"},
-		{"Zouk"},
-		{"West Coast Swing", "Hustle"},
-		{"Lindy Hop", "Balboa", "Blues"},
-	}
 
-	venues := []models.Venue{
-		{Name: "Lucerna Music Bar", Address: models.Address{Street: "Vodičkova 36", City: "Prague", PostalCode: "110 00", Country: "Czech Republic"}},
-		{Name: "SaSaZu", Address: models.Address{Street: "Bubenské nábřeží 306", City: "Prague", PostalCode: "170 00", Country: "Czech Republic"}},
-		{Name: "Jazz Dock", Address: models.Address{Street: "Janáčkovo nábřeží 2", City: "Prague", PostalCode: "150 00", Country: "Czech Republic"}},
-		{Name: "Roxy", Address: models.Address{Street: "Dlouhá 33", City: "Prague", PostalCode: "110 00", Country: "Czech Republic"}},
-		{Name: "Palác Akropolis", Address: models.Address{Street: "Kubelíkova 27", City: "Prague", PostalCode: "130 00", Country: "Czech Republic"}},
-	}
-
-	titles := []string{
-		"Prague Salsa Night",
-		"Kizomba Fever",
-		"Zouk Weekend Party",
-		"WCS Social Night",
-		"Swing Jam Session",
-		"Tango Milonga",
-		"Latin Dance Festival",
-		"Zouk Flow Evening",
-		"Hustle & Swing Night",
-		"Vintage Swing Ball",
-	}
-
-	organizers := []string{
-		"Prague Salsa Club",
-		"Kizomba Prague",
-		"Zouk Academy CZ",
-		"WCS Czech Republic",
-		"Prague Swing Society",
-		"Tango Prague",
-		"Latin Vibes CZ",
-		"Zouk Flow Prague",
-		"Dance Connection CZ",
-		"Swing Time Prague",
-	}
-
-	now := time.Now()
-	var created []models.Event
-
-	for i := 0; i < 10; i++ {
-		startTime := now.AddDate(0, 0, i+1).Truncate(time.Hour).Add(20 * time.Hour)
-		endTime := startTime.Add(5 * time.Hour)
-		endStr := endTime.Format(time.RFC3339)
-		duration := int64(endTime.Sub(startTime).Milliseconds())
-		desc := "Join us for an amazing night of dancing!"
-
-		event := models.Event{
-			ID:          fmt.Sprintf("seed-%d-%d", now.Unix(), i),
-			Title:       titles[i],
-			Description: &desc,
-			Organizer:   organizers[i],
-			Venue:       venues[i%len(venues)],
-			StartTime:   startTime.Format(time.RFC3339),
-			EndTime:     &endStr,
-			Duration:    &duration,
-			Dances:      dances[i],
-			Info: []models.EventInfo{
-				{Type: "price", Key: "Entry Fee", Value: fmt.Sprintf("%d Kč", 150+i*50)},
-			},
-			Parts: []models.EventPart{
-				{
-					Name:      "Social Dancing",
-					Type:      "party",
-					StartTime: startTime.Format(time.RFC3339),
-					EndTime:   &endStr,
-				},
-			},
-		}
-
-		if err := s.eventRepo.SaveEvent(&event); err != nil {
-			return nil, fmt.Errorf("failed to save event %s: %w", event.ID, err)
-		}
-		created = append(created, event)
-	}
-
-	return created, nil
-}
