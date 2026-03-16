@@ -1,7 +1,7 @@
 import 'dart:math';
 
+import 'package:dancee_app/core/routing.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dancee_app/core/auth_redirect.dart';
 
 /// Feature: flutter-architecture-refactor
 /// Property 6: Authentication Redirect

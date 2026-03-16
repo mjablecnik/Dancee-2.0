@@ -133,7 +133,7 @@ Event _randomEvent(Random rng) {
 // ============================================================================
 
 /// Returns a string guaranteed to differ from [original].
-String _differentString(Random rng, String original) {
+String _differentString(Random rng, String? original) {
   String result;
   do {
     result = _randomString(rng);
@@ -141,7 +141,7 @@ String _differentString(Random rng, String original) {
   return result;
 }
 
-double _differentDouble(Random rng, double original) {
+double _differentDouble(Random rng, double? original) {
   double result;
   do {
     result = double.parse(((rng.nextDouble() * 360) - 180).toStringAsFixed(6));
@@ -156,8 +156,8 @@ DateTime _differentDateTime(Random rng, DateTime original) {
   return original.add(Duration(days: 1 + rng.nextInt(30)));
 }
 
-Duration _differentDuration(Random rng, Duration original) {
-  return original + Duration(minutes: 1 + rng.nextInt(60));
+Duration _differentDuration(Random rng, Duration? original) {
+  return original ?? Duration.zero + Duration(minutes: 1 + rng.nextInt(60));
 }
 
 EventInfoType _differentEventInfoType(EventInfoType original) {
@@ -345,7 +345,7 @@ void main() {
               break;
             case 3:
               modified =
-                  ep.copyWith(endTime: _differentDateTime(rng, ep.endTime));
+                  ep.copyWith(endTime: _differentDateTime(rng, ep.endTime!));
               break;
             default:
               // Change description: if null make non-null, if non-null change it
@@ -409,7 +409,7 @@ void main() {
               break;
             case 6:
               modified =
-                  e.copyWith(endTime: _differentDateTime(rng, e.endTime));
+                  e.copyWith(endTime: _differentDateTime(rng, e.endTime!));
               break;
             case 7:
               modified =
