@@ -41,33 +41,41 @@ class EventDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<EventDetailCubit>(param1: eventId),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: BlocConsumer<EventDetailCubit, Event?>(
-          listenWhen: (previous, current) =>
-              previous != null &&
-              current != null &&
-              previous.isFavorite != current.isFavorite,
-          listener: (context, event) {
-            if (event == null) return;
-            final message = event.isFavorite
-                ? t.eventDetail.addedToFavorites
-                : t.eventDetail.removedFromFavorites;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message),
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          },
-          builder: (context, event) {
-            if (event == null) {
-              return EventNotFoundSection(
-                onBackPressed: () => const EventListRoute().go(context),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) {
+            const EventListRoute().go(context);
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: BlocConsumer<EventDetailCubit, Event?>(
+            listenWhen: (previous, current) =>
+                previous != null &&
+                current != null &&
+                previous.isFavorite != current.isFavorite,
+            listener: (context, event) {
+              if (event == null) return;
+              final message = event.isFavorite
+                  ? t.eventDetail.addedToFavorites
+                  : t.eventDetail.removedFromFavorites;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(message),
+                  duration: const Duration(seconds: 2),
+                ),
               );
-            }
-            return _EventDetailContent(event: event);
-          },
+            },
+            builder: (context, event) {
+              if (event == null) {
+                return EventNotFoundSection(
+                  onBackPressed: () => const EventListRoute().go(context),
+                );
+              }
+              return _EventDetailContent(event: event);
+            },
+          ),
         ),
       ),
     );
@@ -93,7 +101,7 @@ class _EventDetailContent extends StatelessWidget {
         children: [
           EventDetailHeaderSection(
             event: event,
-            onBackPressed: () => context.pop(),
+            onBackPressed: () => const EventListRoute().go(context),
             onFavoritePressed: () => cubit.toggleFavorite(),
             onMapPressed: () => cubit.openMap(event.venue),
           ),
