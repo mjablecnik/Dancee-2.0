@@ -93,7 +93,7 @@ class EventListCubit extends Cubit<EventListState> {
     final filteredEvents = currentState.allEvents.where((event) {
       return event.title.toLowerCase().contains(lowerQuery) ||
           event.venue.name.toLowerCase().contains(lowerQuery) ||
-          (event.description?.toLowerCase().contains(lowerQuery) ?? false);
+          event.description.toLowerCase().contains(lowerQuery);
     }).toList();
 
     _emitGrouped(filteredEvents);

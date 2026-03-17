@@ -57,19 +57,12 @@ class EventDetailCubit extends Cubit<Event?> {
 
   /// Opens an external map application with directions to the venue.
   ///
-  /// Uses coordinates when available, falls back to encoded address string.
+  /// Uses venue coordinates for navigation.
   Future<void> openMap(Venue venue) async {
     try {
-      final Uri uri;
-      if (venue.latitude != null && venue.longitude != null) {
-        uri = Uri.parse(
-          'https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}',
-        );
-      } else {
-        uri = Uri.parse(
-          'https://www.google.com/maps/dir/?api=1&destination=${Uri.encodeComponent(venue.address.fullAddress)}',
-        );
-      }
+      final uri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}',
+      );
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       developer.log(

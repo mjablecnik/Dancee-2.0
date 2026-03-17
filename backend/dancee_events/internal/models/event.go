@@ -12,9 +12,9 @@ type Address struct {
 type Venue struct {
 	Name        string   `json:"name" firestore:"name"`
 	Address     Address  `json:"address" firestore:"address"`
-	Description *string  `json:"description,omitempty" firestore:"description,omitempty"`
-	Latitude    *float64 `json:"latitude,omitempty" firestore:"latitude,omitempty"`
-	Longitude   *float64 `json:"longitude,omitempty" firestore:"longitude,omitempty"`
+	Description string  `json:"description" firestore:"description"`
+	Latitude    float64 `json:"latitude" firestore:"latitude"`
+	Longitude   float64 `json:"longitude" firestore:"longitude"`
 }
 
 // EventInfo represents additional event information
@@ -39,7 +39,7 @@ type EventPart struct {
 type Event struct {
 	ID          string       `json:"id" firestore:"-"`
 	Title       string       `json:"title" firestore:"title"`
-	Description *string      `json:"description,omitempty" firestore:"description,omitempty"`
+	Description string       `json:"description" firestore:"description"`
 	Organizer   string       `json:"organizer" firestore:"organizer"`
 	Venue       Venue        `json:"venue" firestore:"venue"`
 	StartTime   string       `json:"startTime" firestore:"startTime"`
@@ -62,7 +62,7 @@ type AddFavoriteRequest struct {
 // Uses Gin's binding tags for required field validation.
 type CreateEventRequest struct {
 	Title       string      `json:"title" binding:"required"`
-	Description *string     `json:"description,omitempty"`
+	Description string      `json:"description" binding:"required"`
 	Organizer   string      `json:"organizer" binding:"required"`
 	Venue       Venue       `json:"venue" binding:"required"`
 	StartTime   string      `json:"startTime" binding:"required"`

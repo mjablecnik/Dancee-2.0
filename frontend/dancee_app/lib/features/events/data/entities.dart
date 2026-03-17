@@ -87,22 +87,22 @@ class Venue extends Equatable {
   /// The physical address of the venue
   final Address address;
 
-  /// A description of the venue (optional — not all venues have one)
-  final String? description;
+  /// A description of the venue
+  final String description;
 
-  /// The latitude coordinate for map integration (optional)
-  final double? latitude;
+  /// The latitude coordinate for map integration
+  final double latitude;
 
-  /// The longitude coordinate for map integration (optional)
-  final double? longitude;
+  /// The longitude coordinate for map integration
+  final double longitude;
 
   /// Creates a Venue with required and optional fields.
   const Venue({
     required this.name,
     required this.address,
-    this.description,
-    this.latitude,
-    this.longitude,
+    required this.description,
+    required this.latitude,
+    required this.longitude,
   });
 
   /// Creates a Venue from a JSON map.
@@ -110,9 +110,9 @@ class Venue extends Equatable {
     return Venue(
       name: json['name'] as String,
       address: Address.fromJson(json['address'] as Map<String, dynamic>),
-      description: json['description'] as String?,
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
+      description: json['description'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
     );
   }
 
@@ -362,8 +362,8 @@ class Event extends Equatable {
   /// The title of the event
   final String title;
 
-  /// A detailed description of the event (optional)
-  final String? description;
+  /// A detailed description of the event
+  final String description;
 
   /// The name of the event organizer
   final String organizer;
@@ -402,7 +402,7 @@ class Event extends Equatable {
   const Event({
     required this.id,
     required this.title,
-    this.description,
+    required this.description,
     required this.organizer,
     required this.venue,
     required this.startTime,
@@ -423,7 +423,7 @@ class Event extends Equatable {
     return Event(
       id: json['id'] as String,
       title: json['title'] as String,
-      description: json['description'] as String?,
+      description: json['description'] as String,
       organizer: json['organizer'] as String,
       venue: Venue.fromJson(json['venue'] as Map<String, dynamic>),
       startTime: DateTime.parse(json['startTime'] as String),

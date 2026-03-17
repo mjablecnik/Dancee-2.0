@@ -290,9 +290,9 @@ class EventVenueSection extends StatelessWidget {
                             color: const Color(0xFF0F172A),
                           ),
                         ),
-                        if (venue.description != null && venue.description!.isNotEmpty)
+                        if (venue.description.isNotEmpty)
                           Text(
-                            venue.description!,
+                            venue.description,
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               color: const Color(0xFF64748B),
@@ -464,13 +464,13 @@ class EventOrganizerSection extends StatelessWidget {
 
 /// Displays the event description text in a styled card.
 class EventDescriptionSection extends StatelessWidget {
-  final String? description;
+  final String description;
 
   const EventDescriptionSection({super.key, required this.description});
 
   @override
   Widget build(BuildContext context) {
-    if (description == null || description!.isEmpty) return const SizedBox.shrink();
+    if (description.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,7 +493,7 @@ class EventDescriptionSection extends StatelessWidget {
             border: Border.all(color: Colors.grey[200]!, width: 2),
           ),
           child: Text(
-            description!,
+            description,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: const Color(0xFF475569),

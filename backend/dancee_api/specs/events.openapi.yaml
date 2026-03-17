@@ -683,6 +683,7 @@ components:
       required:
         - id
         - title
+        - description
         - organizer
         - venue
         - startTime
@@ -753,6 +754,8 @@ components:
       required:
         - name
         - address
+        - latitude
+        - longitude
       properties:
         name:
           type: string
@@ -914,6 +917,7 @@ components:
       type: object
       required:
         - title
+        - description
         - organizer
         - venue
         - startTime

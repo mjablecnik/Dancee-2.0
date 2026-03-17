@@ -390,7 +390,9 @@ func genVenue(t *rapid.T) models.Venue {
 	return models.Venue{
 		Name:        genNonEmptyString(t, "venueName"),
 		Address:     genAddress(t),
-		Description: genOptionalString(t, "venueDescription"),
+		Description: genNonEmptyString(t, "venueDescription"),
+		Latitude:    rapid.Float64Range(-90, 90).Draw(t, "latitude"),
+		Longitude:   rapid.Float64Range(-180, 180).Draw(t, "longitude"),
 	}
 }
 
@@ -426,7 +428,7 @@ func genValidEvent(t *rapid.T) *models.Event {
 
 	return &models.Event{
 		Title:       genNonEmptyString(t, "title"),
-		Description: genOptionalString(t, "description"),
+		Description: genNonEmptyString(t, "description"),
 		Organizer:   genNonEmptyString(t, "organizer"),
 		Venue:       genVenue(t),
 		StartTime:   startTime,
@@ -442,7 +444,7 @@ func genValidCreateRequest(t *rapid.T) *models.CreateEventRequest {
 
 	return &models.CreateEventRequest{
 		Title:       genNonEmptyString(t, "title"),
-		Description: genOptionalString(t, "description"),
+		Description: genNonEmptyString(t, "description"),
 		Organizer:   genNonEmptyString(t, "organizer"),
 		Venue:       genVenue(t),
 		StartTime:   startTime,
@@ -796,17 +798,9 @@ func TestProperty_CreateEventRoundTrip(t *testing.T) {
 			}
 		}
 
-		// Verify optional description
-		if event.Description == nil && retrieved.Description != nil {
-			t.Fatalf("description mismatch: expected nil, got %q", *retrieved.Description)
-		}
-		if event.Description != nil {
-			if retrieved.Description == nil {
-				t.Fatalf("description mismatch: expected %q, got nil", *event.Description)
-			}
-			if *retrieved.Description != *event.Description {
-				t.Fatalf("description mismatch: expected %q, got %q", *event.Description, *retrieved.Description)
-			}
+		// Verify description
+		if retrieved.Description != event.Description {
+			t.Fatalf("description mismatch: expected %q, got %q", event.Description, retrieved.Description)
 		}
 
 		// Verify optional endTime
@@ -822,17 +816,9 @@ func TestProperty_CreateEventRoundTrip(t *testing.T) {
 			}
 		}
 
-		// Verify optional venue description
-		if event.Venue.Description == nil && retrieved.Venue.Description != nil {
-			t.Fatalf("venue description mismatch: expected nil, got %q", *retrieved.Venue.Description)
-		}
-		if event.Venue.Description != nil {
-			if retrieved.Venue.Description == nil {
-				t.Fatalf("venue description mismatch: expected %q, got nil", *event.Venue.Description)
-			}
-			if *retrieved.Venue.Description != *event.Venue.Description {
-				t.Fatalf("venue description mismatch: expected %q, got %q", *event.Venue.Description, *retrieved.Venue.Description)
-			}
+		// Verify venue description
+		if retrieved.Venue.Description != event.Venue.Description {
+			t.Fatalf("venue description mismatch: expected %q, got %q", event.Venue.Description, retrieved.Venue.Description)
 		}
 	})
 }
@@ -894,7 +880,7 @@ func TestProperty_MissingRequiredFieldsValidation(t *testing.T) {
 		reqType := reflect.TypeOf(req)
 
 		// Optional fields should NOT have "required" in their binding tag
-		optionalFields := []string{"Description", "EndTime", "Duration", "Info", "Parts"}
+		optionalFields := []string{"EndTime", "Duration", "Info", "Parts"}
 
 		for _, fieldName := range optionalFields {
 			field, found := reqType.FieldByName(fieldName)
@@ -1081,17 +1067,9 @@ func TestProperty_UpdateEventRoundTrip(t *testing.T) {
 			}
 		}
 
-		// Verify optional description
-		if updatePayload.Description == nil && retrieved.Description != nil {
-			t.Fatalf("description mismatch: expected nil, got %q", *retrieved.Description)
-		}
-		if updatePayload.Description != nil {
-			if retrieved.Description == nil {
-				t.Fatalf("description mismatch: expected %q, got nil", *updatePayload.Description)
-			}
-			if *retrieved.Description != *updatePayload.Description {
-				t.Fatalf("description mismatch: expected %q, got %q", *updatePayload.Description, *retrieved.Description)
-			}
+		// Verify description
+		if retrieved.Description != updatePayload.Description {
+			t.Fatalf("description mismatch: expected %q, got %q", updatePayload.Description, retrieved.Description)
 		}
 
 		// Verify optional endTime
@@ -1107,17 +1085,9 @@ func TestProperty_UpdateEventRoundTrip(t *testing.T) {
 			}
 		}
 
-		// Verify optional venue description
-		if updatePayload.Venue.Description == nil && retrieved.Venue.Description != nil {
-			t.Fatalf("venue description mismatch: expected nil, got %q", *retrieved.Venue.Description)
-		}
-		if updatePayload.Venue.Description != nil {
-			if retrieved.Venue.Description == nil {
-				t.Fatalf("venue description mismatch: expected %q, got nil", *updatePayload.Venue.Description)
-			}
-			if *retrieved.Venue.Description != *updatePayload.Venue.Description {
-				t.Fatalf("venue description mismatch: expected %q, got %q", *updatePayload.Venue.Description, *retrieved.Venue.Description)
-			}
+		// Verify venue description
+		if retrieved.Venue.Description != updatePayload.Venue.Description {
+			t.Fatalf("venue description mismatch: expected %q, got %q", updatePayload.Venue.Description, retrieved.Venue.Description)
 		}
 	})
 }
