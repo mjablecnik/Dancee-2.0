@@ -81,12 +81,9 @@ func main() {
 		}
 	}
 
-	// API routes with /api prefix (new standard)
+	// API routes with /api prefix
 	api := router.Group("/api")
 	registerEventRoutes(api)
-
-	// Legacy routes without /api prefix (for backward compatibility)
-	registerEventRoutes(&router.RouterGroup)
 
 	// Start server
 	port := os.Getenv("PORT")

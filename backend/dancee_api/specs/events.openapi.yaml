@@ -51,8 +51,6 @@ paths:
       summary: List all events
       description: |
         Retrieve all dance events. Optionally mark favorite events for a specific user.
-        
-        This endpoint supports both `/api/events/list` (recommended) and `/events/list` (legacy) formats.
       operationId: listEvents
       parameters:
         - name: userId
@@ -105,35 +103,6 @@ paths:
                         - DJ Maria
                   isFavorite: false
                   isPast: false
-
-  /events/list:
-    get:
-      tags:
-        - Events
-      summary: List all events (legacy)
-      description: |
-        Legacy endpoint for backward compatibility. Use `/api/events/list` instead.
-        
-        Retrieve all dance events. Optionally mark favorite events for a specific user.
-      operationId: listEventsLegacy
-      deprecated: true
-      parameters:
-        - name: userId
-          in: query
-          description: User identifier to mark favorite events
-          required: false
-          schema:
-            type: string
-          example: user123
-      responses:
-        '200':
-          description: List of events retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Event'
 
   /api/events:
     post:
@@ -426,8 +395,6 @@ paths:
       summary: List favorite events
       description: |
         Retrieve all favorite events for a specific user.
-        
-        This endpoint supports both `/api/events/favorites` (recommended) and `/events/favorites` (legacy) formats.
       operationId: listFavorites
       parameters:
         - name: userId
@@ -466,8 +433,6 @@ paths:
       summary: Add favorite event
       description: |
         Add an event to a user's favorites.
-        
-        This endpoint supports both `/api/events/favorites` (recommended) and `/events/favorites` (legacy) formats.
       operationId: addFavorite
       requestBody:
         description: User and event identifiers
@@ -507,78 +472,6 @@ paths:
               example:
                 error: Event not found
 
-  /events/favorites:
-    get:
-      tags:
-        - Favorites
-      summary: List favorite events (legacy)
-      description: |
-        Legacy endpoint for backward compatibility. Use `/api/events/favorites` instead.
-        
-        Retrieve all favorite events for a specific user.
-      operationId: listFavoritesLegacy
-      deprecated: true
-      parameters:
-        - name: userId
-          in: query
-          description: User identifier
-          required: true
-          schema:
-            type: string
-          example: user123
-      responses:
-        '200':
-          description: List of favorite events retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Event'
-        '400':
-          description: Missing required userId parameter
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-    post:
-      tags:
-        - Favorites
-      summary: Add favorite event (legacy)
-      description: |
-        Legacy endpoint for backward compatibility. Use `/api/events/favorites` instead.
-        
-        Add an event to a user's favorites.
-      operationId: addFavoriteLegacy
-      deprecated: true
-      requestBody:
-        description: User and event identifiers
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddFavoriteRequest'
-      responses:
-        '201':
-          description: Favorite added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AddFavoriteResponse'
-        '400':
-          description: Missing required fields
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Event not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
   /api/events/favorites/{eventId}:
     delete:
       tags:
@@ -586,8 +479,6 @@ paths:
       summary: Remove favorite event
       description: |
         Remove an event from a user's favorites.
-        
-        This endpoint supports both `/api/events/favorites/{eventId}` (recommended) and `/events/favorites/{eventId}` (legacy) formats.
       operationId: removeFavorite
       parameters:
         - name: eventId
@@ -623,48 +514,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 error: Event not found
-
-  /events/favorites/{eventId}:
-    delete:
-      tags:
-        - Favorites
-      summary: Remove favorite event (legacy)
-      description: |
-        Legacy endpoint for backward compatibility. Use `/api/events/favorites/{eventId}` instead.
-        
-        Remove an event from a user's favorites.
-      operationId: removeFavoriteLegacy
-      deprecated: true
-      parameters:
-        - name: eventId
-          in: path
-          description: Event identifier to remove
-          required: true
-          schema:
-            type: string
-          example: event-001
-        - name: userId
-          in: query
-          description: User identifier
-          required: true
-          schema:
-            type: string
-          example: user123
-      responses:
-        '204':
-          description: Favorite removed successfully
-        '400':
-          description: Missing required userId parameter
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Event not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
