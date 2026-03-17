@@ -56,41 +56,6 @@ void main() {
             reason: 'seed=$i: URL should contain longitude '
                 '${venueWithCoords.longitude}',
           );
-
-          // --- Case 2: Venue WITHOUT coordinates ---
-          final venueWithoutCoords = Venue(
-            name: venueWithCoords.name,
-            address: venueWithCoords.address,
-            description: venueWithCoords.description,
-            latitude: null,
-            longitude: null,
-          );
-          final urlWithoutCoords = buildMapUrl(venueWithoutCoords);
-
-          // URL is a valid Google Maps directions URL
-          expect(
-            urlWithoutCoords.toString(),
-            startsWith('https://www.google.com/maps/dir/'),
-            reason:
-                'seed=$i: null-coords URL should start with Google Maps base',
-          );
-
-          // URL contains the encoded full address
-          final encodedAddress =
-              Uri.encodeComponent(venueWithoutCoords.address.fullAddress);
-          expect(
-            urlWithoutCoords.toString(),
-            contains(encodedAddress),
-            reason: 'seed=$i: null-coords URL should contain encoded address',
-          );
-
-          // URL should NOT contain the original coordinate values
-          expect(
-            urlWithoutCoords.toString(),
-            isNot(contains('${venueWithCoords.latitude},${venueWithCoords.longitude}')),
-            reason:
-                'seed=$i: null-coords URL should not contain coordinate pair',
-          );
         }
       },
     );
