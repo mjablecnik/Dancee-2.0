@@ -120,8 +120,23 @@ components:
 - **Testing**: Automated tests can validate API contracts
 - **Documentation**: Auto-generated API documentation for developers
 
+## API Path Prefix Convention
+
+**CRITICAL**: All backend API endpoints MUST use the `/api` prefix.
+
+✅ Correct: `/api/events/list`, `/api/events/favorites`, `/api/events/{id}`
+❌ Wrong: `/events/list`, `/events/favorites`, `/events/{id}`
+
+This applies to:
+- Route definitions in all backend services (Go, TypeScript, NestJS, Dart)
+- OpenAPI spec paths in `dancee_api/specs/`
+- Frontend API client calls
+
+Never register routes without the `/api` prefix. Legacy non-prefixed routes have been removed and must not be reintroduced.
+
 ## Common Mistakes to Avoid
 
+❌ **Don't register routes without `/api` prefix** — all endpoints must start with `/api/`
 ❌ **Don't forget to update the spec** after changing an endpoint
 ❌ **Don't update only the service** without updating `dancee_api` specs
 ❌ **Don't create inconsistencies** between implementation and documentation
