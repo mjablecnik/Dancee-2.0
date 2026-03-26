@@ -315,6 +315,8 @@ export const apiService: restate.ServiceDefinition;
 // Steps: scrape → classify → extract parts → extract info → resolve venue → derive organizer → translate (en, es) → store with translations
 //
 // Field mapping:
+//   status               = "published" (default for new events)
+//   translation_status   = "complete" | "partial" | "missing" (computed from translation count)
 //   original_description = raw Facebook event description (from scraped data)
 //   organizer            = hosts[0].name from scraped data (fallback: event name)
 //   translations[cs]     = Czech title + description from extraction, parts/info translations from extraction
@@ -404,6 +406,8 @@ const EventInfoSchema = z.object({
 // Directus events collection (title and description are in events_translations, not here)
 const DirectusEventSchema = z.object({
   id: z.string().optional(),           // Directus-assigned
+  status: z.enum(["published", "draft", "archived"]).default("published"), // Directus built-in status
+  translation_status: z.enum(["complete", "partial", "missing"]), // Auto-set by workflow
   original_description: z.string(),
   organizer: z.string(),
   venue: z.string().optional(),         // Directus relation ID
@@ -479,6 +483,8 @@ erDiagram
     events_translations }o--|| languages : "languages_code (M2O)"
     events {
         string id PK
+        string status
+        string translation_status
         string original_description
         string organizer
         string venue FK
@@ -763,6 +769,24 @@ The `package.json` includes a test script for single-execution test runs:
 
 **Validates: Requirements 22.5**
 
+### Property 22: New events default to published status
+
+*For any* event created by the workflow, the `status` field shall be set to `"published"`. The status field shall only contain one of the allowed values: `"published"`, `"draft"`, or `"archived"`.
+
+**Validates: Requirements 23.1, 23.2**
+
+### Property 23: Translation status reflects actual translation completeness
+
+*For any* event with N translation records (where N is between 0 and 3), the `translation_status` field shall be `"complete"` when N equals 3 (all supported languages), `"partial"` when N is between 1 and 2, and `"missing"` when N is 0.
+
+**Validates: Requirements 24.1, 24.2, 24.3, 24.4**
+
+### Property 24: List events endpoint returns only published events by default
+
+*For any* set of events with mixed statuses (published, draft, archived), the `/api/events/list` endpoint without explicit filters shall return only events where `status` is `"published"`. The count of returned events shall equal the count of published events in the dataset.
+
+**Validates: Requirements 23.4**
+
 ## Error Handling
 
 ### Error Categories
@@ -862,6 +886,9 @@ backend/dancee_workflow/
 │           ├── translation-cs-mapping.test.ts  # Property 19 (Czech extraction → cs record)
 │           ├── translation-array-length.test.ts # Property 20 (parts/info array length match)
 │           └── event-no-title-desc.test.ts     # Property 21 (events collection has no title/description)
+           ├── event-status-default.test.ts    # Property 22 (new events default to published)
+           ├── translation-status.test.ts      # Property 23 (translation_status reflects completeness)
+           └── list-events-published.test.ts   # Property 24 (list endpoint returns only published)
 ```
 
 ### Unit Test Focus Areas
@@ -874,6 +901,9 @@ backend/dancee_workflow/
 - LLM retry behavior on invalid JSON (3 attempts max, for both extraction and translation)
 - Translation prompt parameterization (targetLanguage correctly injected)
 - Translation failure isolation (one language failure doesn't affect others)
+- Translation retry on invalid JSON (up to 2 additional attempts before skipping that language, verify retry count and final error logging)
+- Event status defaults to "published" on creation, list endpoint filters by published status
+- Translation status computed correctly based on number of translation records (complete/partial/missing)
 
 ### Property Test to Design Property Mapping
 
@@ -898,4 +928,7 @@ backend/dancee_workflow/
 | services/translation-cs-mapping.test.ts | Property 19 | Invariant (field equality) |
 | services/translation-array-length.test.ts | Property 20 | Invariant (length match) |
 | services/event-no-title-desc.test.ts | Property 21 | Invariant (schema constraint) |
+| services/event-status-default.test.ts | Property 22 | Invariant (default value) |
+| services/translation-status.test.ts | Property 23 | Invariant (computed from count) |
+| services/list-events-published.test.ts | Property 24 | Invariant (filter constraint) |
 

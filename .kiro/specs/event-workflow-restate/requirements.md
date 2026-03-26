@@ -181,7 +181,7 @@ This feature implements an event processing workflow service (`event-workflow-re
 #### Acceptance Criteria
 
 1. THE Setup_Script SHALL create the following Directus collections: events, venues, groups, errors, languages, and events_translations
-2. THE Setup_Script SHALL create all required fields for the events collection matching the Event schema: original_description, organizer, venue (relation to venues), start_time, end_time, timezone, original_url, parts (JSON field for EventPart array), info (JSON field for EventInfo array), and dances (JSON field for string array, computed by aggregating all unique dance names from the event's parts)
+2. THE Setup_Script SHALL create all required fields for the events collection matching the Event schema: original_description, organizer, venue (relation to venues), start_time, end_time, timezone, original_url, parts (JSON field for EventPart array), info (JSON field for EventInfo array), dances (JSON field for string array, computed by aggregating all unique dance names from the event's parts), status (Directus built-in status field with published/draft/archived, default published), and translation_status (string field with complete/partial/missing)
 3. THE Setup_Script SHALL create all required fields for the venues collection: name, street, number, town, country, postal_code, region, latitude, and longitude
 4. THE Setup_Script SHALL create all required fields for the groups collection: url, type, and updated_at
 5. THE Setup_Script SHALL create all required fields for the errors collection: url, message, and datetime
@@ -286,3 +286,28 @@ This feature implements an event processing workflow service (`event-workflow-re
 3. THE info_translations JSON field SHALL contain an array of objects, each with a `key` field corresponding to the translated EventInfo label at the same index
 4. WHEN creating an event with translations, THE Directus_Client SHALL create the event record and all translation records in a single Directus API call using the nested translations relation
 5. THE events collection SHALL NOT contain `title` or `description` fields directly; these fields SHALL exist only in the events_translations collection
+
+### Requirement 23: Event Status and Visibility
+
+**User Story:** As a CMS editor, I want to control the visibility of events via a status field, so that I can hide events that are incomplete, incorrect, or temporarily unavailable without deleting them.
+
+#### Acceptance Criteria
+
+1. THE events collection SHALL include a `status` field using the Directus built-in status field type with the following allowed values: `published`, `draft`, and `archived`
+2. WHEN a new event is created by the workflow, THE Event_Processor SHALL set `status` to `"published"` by default
+3. A CMS editor MAY change the `status` of any event to `"draft"` or `"archived"` at any time via the Directus admin UI without triggering any workflow action
+4. THE `/api/events/list` endpoint SHALL only return events where `status` is `"published"` unless an explicit filter is provided
+5. THE Setup_Script SHALL create the `status` field on the events collection as a Directus built-in status field with `published` as the default value
+
+### Requirement 24: Translation Status Tracking
+
+**User Story:** As a CMS editor, I want to see the translation completeness of each event at a glance, so that I can identify events with missing translations.
+
+#### Acceptance Criteria
+
+1. THE events collection SHALL include a `translation_status` field with the following allowed values: `complete`, `partial`, and `missing`
+2. WHEN all three supported languages (cs, en, es) have a corresponding events_translations record for an event, THE Event_Processor SHALL set `translation_status` to `"complete"`
+3. WHEN at least one but not all supported languages have a corresponding events_translations record, THE Event_Processor SHALL set `translation_status` to `"partial"`
+4. WHEN no events_translations records exist for an event (which should not occur in normal operation), THE Event_Processor SHALL set `translation_status` to `"missing"`
+5. THE `translation_status` field SHALL be set automatically by the workflow after the translation step completes and SHALL NOT be manually editable by CMS editors
+6. THE Setup_Script SHALL create the `translation_status` field on the events collection as a string field with allowed values `complete`, `partial`, and `missing`
