@@ -412,7 +412,7 @@ const DirectusEventSchema = z.object({
   organizer: z.string(),
   venue: z.string().optional(),         // Directus relation ID
   start_time: z.string(),              // ISO 8601
-  end_time: z.string(),                // ISO 8601
+  end_time: z.string().nullable(),      // ISO 8601 or null when unknown
   timezone: z.string(),
   original_url: z.string(),
   parts: z.array(EventPartSchema),     // JSON field
@@ -489,7 +489,7 @@ erDiagram
         string organizer
         string venue FK
         datetime start_time
-        datetime end_time
+        datetime end_time "nullable"
         string timezone
         string original_url UK
         json parts
@@ -649,9 +649,9 @@ The `package.json` includes a test script for single-execution test runs:
 
 **Validates: Requirements 1.2, 2.2**
 
-### Property 2: End timestamp fallback
+### Property 2: Null end timestamp preservation
 
-*For any* FacebookEvent object where `endTimestamp` is null, undefined, zero, or negative, the processed event's `end_time` shall equal the value derived from `startTimestamp`.
+*For any* FacebookEvent object where `endTimestamp` is null, undefined, zero, or negative, the processed event's `end_time` shall be null.
 
 **Validates: Requirements 1.4**
 
@@ -877,7 +877,7 @@ backend/dancee_workflow/
 │       │   └── group-ordering.test.ts          # Property 13
 │       └── services/
 │           ├── venue-field-mapping.test.ts     # Property 9
-│           ├── end-timestamp-fallback.test.ts  # Property 2
+│           ├── null-end-timestamp.test.ts   # Property 2
 │           ├── api-validation.test.ts          # Property 14
 │           ├── skip-unsupported.test.ts        # Property 5
 │           ├── translation-output.test.ts      # Property 16 (non-empty translation output)
@@ -919,7 +919,7 @@ backend/dancee_workflow/
 | clients/error-dedup.test.ts | Property 12 | Idempotence |
 | clients/group-ordering.test.ts | Property 13 | Invariant (sorted) |
 | services/venue-field-mapping.test.ts | Property 9 | Invariant |
-| services/end-timestamp-fallback.test.ts | Property 2 | Invariant |
+| services/null-end-timestamp.test.ts | Property 2 | Invariant |
 | services/api-validation.test.ts | Property 14 | Error condition |
 | services/skip-unsupported.test.ts | Property 5 | Invariant |
 | services/translation-output.test.ts | Property 16 | Invariant (non-empty output) |

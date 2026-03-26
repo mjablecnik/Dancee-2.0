@@ -124,7 +124,7 @@ Incremental implementation of the Restate-based event processing workflow servic
 
   - [ ]* 4.5 Write property tests for venue resolution
     - **Property 9: Venue resolution field mapping**
-    - **Property 2: End timestamp fallback**
+    - **Property 2: Null end timestamp preservation**
     - **Property 5: Unsupported event types are skipped**
     - **Validates: Requirements 6.2, 6.3, 6.4, 6.5, 1.4, 3.4**
 
@@ -137,7 +137,7 @@ Incremental implementation of the Restate-based event processing workflow servic
     - Store event URL, processing status, and error messages in Restate K/V state
     - Set `status` to `"published"` and compute `translation_status` based on successful translations
     - Store `original_description` from raw Facebook description, Czech extraction output as "cs" translation
-    - Handle `endTimestamp` fallback to `startTimestamp` when null/missing/invalid
+    - Store `end_time` as null when `endTimestamp` is null, missing, or invalid (no fallback to startTimestamp)
     - Use `restate.TerminalError` for permanent failures, let Restate retry transient failures
     - Capture errors to Sentry with context tags (workflow run ID, event URL, step name)
     - On translation failure for a language, log error and continue with remaining languages

@@ -38,7 +38,7 @@ This feature implements an event processing workflow service (`event-workflow-re
 1. WHEN invoked with a Facebook event ID or URL, THE Scraper_Client SHALL send a GET request to the `dancee_scraper` API endpoint `/api/scraper/event/{eventId}` and return the raw FacebookEvent response object
 2. WHEN the `dancee_scraper` API returns an HTTP error status, THE Scraper_Client SHALL propagate a descriptive error containing the HTTP status code and error message
 3. THE Scraper_Client SHALL read the dancee_scraper base URL from the `.env` configuration file
-4. WHEN the raw FacebookEvent data contains an `endTimestamp` that is null, missing, or invalid, THE Event_Processor SHALL fall back to using the `startTimestamp` value as the end time
+4. WHEN the raw FacebookEvent data contains an `endTimestamp` that is null, missing, or invalid, THE Event_Processor SHALL store `end_time` as null rather than falling back to another value
 
 ### Requirement 2: Scrape Event List from dancee_scraper API
 
