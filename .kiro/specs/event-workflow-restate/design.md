@@ -81,6 +81,7 @@ sequenceDiagram
     end
     WF->>AI: Extract event parts
     AI-->>WF: {description, parts[]}
+    Note over WF: description = LLM Czech description<br/>original_description = raw Facebook description
     WF->>AI: Extract event info
     AI-->>WF: EventInfo[]
     WF->>VR: Resolve venue from location
@@ -91,6 +92,7 @@ sequenceDiagram
         VR->>DC: Create venue
     end
     VR-->>WF: Venue (with Directus ID)
+    Note over WF: Derive organizer from hosts[0].name<br/>(fallback: event name)
     WF->>DC: Check event exists (by original_url)
     alt Event is new
         WF->>DC: Create event
@@ -155,7 +157,8 @@ backend/dancee_workflow/
 ├── .env.example
 ├── .gitignore
 ├── docker-compose.yml
-├── Dockerfile
+├── Dockerfile                          # Multi-stage build: Restate server + Node.js app via supervisord
+├── supervisord.conf                    # Manages restate-server and app processes in single container
 ├── package.json
 ├── tsconfig.json
 └── vitest.config.ts
@@ -260,7 +263,12 @@ export const apiService: restate.ServiceDefinition;
 #### services/workflow.ts (Restate workflow)
 ```typescript
 // Durable workflow for single event processing
-// Steps: scrape → classify → extract parts → extract info → resolve venue → store
+// Steps: scrape → classify → extract parts → extract info → resolve venue → derive organizer → store
+//
+// Field mapping:
+//   description       = LLM-generated Czech description (from extractEventParts)
+//   original_description = raw Facebook event description (from scraped data)
+//   organizer          = hosts[0].name from scraped data (fallback: event name)
 export const eventWorkflow: restate.WorkflowDefinition;
 ```
 
@@ -503,6 +511,40 @@ services:
       - "9080:9080"   # Application service
     env_file:
       - .env
+```
+
+### Container Architecture
+
+The Docker container runs both the Restate server and the application process using supervisord, following the AiWorkflow reference pattern:
+
+- **Multi-stage Dockerfile**: Build stage compiles TypeScript, production stage copies the Restate server binary from the official `restatedev/restate:latest` image, installs Node.js and supervisord on a Debian base
+- **supervisord.conf**: Manages two processes — `restate-server` (priority 10, starts first) and the Node.js application (priority 20, starts after Restate server with a short delay)
+- **Exposed ports**: 8080 (Restate ingress), 9070 (Restate dashboard), 9080 (application service)
+
+```
+┌─────────────────────────────────┐
+│         Docker Container        │
+│                                 │
+│  ┌──────────┐  ┌─────────────┐  │
+│  │ Restate  │  │  Node.js    │  │
+│  │ Server   │  │  App        │  │
+│  │ :8080    │  │  :9080      │  │
+│  │ :9070    │  │             │  │
+│  └──────────┘  └─────────────┘  │
+│         supervisord             │
+└─────────────────────────────────┘
+```
+
+### Test Script
+
+The `package.json` includes a test script for single-execution test runs:
+
+```json
+{
+  "scripts": {
+    "test": "vitest --run"
+  }
+}
 ```
 
 

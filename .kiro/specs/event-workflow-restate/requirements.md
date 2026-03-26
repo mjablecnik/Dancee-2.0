@@ -123,9 +123,11 @@ This feature implements an event processing workflow service (`event-workflow-re
 
 #### Acceptance Criteria
 
-1. WHEN a single event URL is submitted for processing, THE Workflow_Service SHALL create a Restate workflow run that orchestrates: scraping the event, classifying the event type, extracting event parts, extracting event info, resolving the venue, and storing the result in Directus
-2. WHEN any step in the workflow fails, THE Workflow_Service SHALL automatically retry the failed step using Restate's built-in retry mechanism
-3. THE Workflow_Service SHALL store the event URL, processing status, and any error messages in Restate K/V state for each workflow run
+1. WHEN a single event URL is submitted for processing, THE Workflow_Service SHALL create a Restate workflow run that orchestrates: scraping the event, classifying the event type, extracting event parts (which returns a Czech description), extracting event info, resolving the venue, deriving the organizer, and storing the result in Directus
+2. THE Event_Processor SHALL store the original Facebook event description (from the scraped data) as `original_description` and the LLM-generated Czech description (from event parts extraction) as `description` on the stored event
+3. THE Event_Processor SHALL derive the `organizer` field from the scraped FacebookEvent `hosts` array: if hosts are present, use the name of the first host; if hosts are empty or missing, use the Facebook event name as a fallback
+4. WHEN any step in the workflow fails, THE Workflow_Service SHALL automatically retry the failed step using Restate's built-in retry mechanism
+5. THE Workflow_Service SHALL store the event URL, processing status, and any error messages in Restate K/V state for each workflow run
 
 ### Requirement 10: Batch Event Processing Workflow
 
@@ -205,6 +207,9 @@ This feature implements an event processing workflow service (`event-workflow-re
 3. THE project SHALL use the Restate SDK for workflow orchestration
 4. THE project SHALL structure source code under a `src/` directory organized into `core/` (configuration, schemas, prompts), `clients/` (HTTP clients for external services), and `services/` (Restate workflows, business logic) subdirectories
 5. THE project SHALL include a `docker-compose.yml` file for running the service alongside Restate server and Directus
+6. THE project SHALL include a `Dockerfile` that runs both the Restate server binary and the application process using supervisord, following the pattern established by the AiWorkflow reference project (multi-stage build with Restate server binary copied from the official Restate Docker image)
+7. THE project SHALL include a `supervisord.conf` file that manages the Restate server and the application as two supervised processes within a single container
+8. THE `package.json` SHALL include a `test` script configured as `vitest --run` for single-execution test runs
 
 ### Requirement 17: LLM Integration via OpenRouter
 
