@@ -4,7 +4,7 @@
 
 This service (`event-workflow-restate`) replaces the existing `serinus_service` (Dart/SurrealDB) with a TypeScript/Bun implementation using Restate for durable workflow orchestration, Directus CMS for data storage, OpenRouter for LLM integration, and Nominatim for reverse geocoding.
 
-The service automates the pipeline: scrape Facebook events → classify via LLM → extract parts & info via LLM → resolve venues → store in Directus. It follows the project structure established by the `AiWorkflow` reference project.
+The service automates the pipeline: scrape Facebook events → classify via LLM → extract parts & info via LLM → translate to multiple languages via LLM → resolve venues → store in Directus. It follows the project structure established by the `AiWorkflow` reference project. All LLM prompts are written in English, with explicit `outputLanguage`/`targetLanguage` parameters controlling the language of generated content.
 
 ### Key Technology Decisions
 
@@ -67,6 +67,7 @@ sequenceDiagram
     participant WF as Workflow
     participant SC as Scraper Client
     participant AI as Event Parser
+    participant TR as Event Translator
     participant VR as Venue Resolver
     participant DC as Directus Client
 
@@ -79,9 +80,9 @@ sequenceDiagram
     alt Unsupported type
         WF-->>API: Skip (log reason)
     end
-    WF->>AI: Extract event parts
-    AI-->>WF: {description, parts[]}
-    Note over WF: description = LLM Czech description<br/>original_description = raw Facebook description
+    WF->>AI: Extract event parts (output: Czech)
+    AI-->>WF: {title, description, parts[]}
+    Note over WF: title + description = LLM Czech output<br/>original_description = raw Facebook description
     WF->>AI: Extract event info
     AI-->>WF: EventInfo[]
     WF->>VR: Resolve venue from location
@@ -95,7 +96,12 @@ sequenceDiagram
     Note over WF: Derive organizer from hosts[0].name<br/>(fallback: event name)
     WF->>DC: Check event exists (by original_url)
     alt Event is new
-        WF->>DC: Create event
+        Note over WF: Czech content becomes "cs" translation
+        WF->>TR: Translate to English (targetLanguage: "en")
+        TR-->>WF: EN translations
+        WF->>TR: Translate to Spanish (targetLanguage: "es")
+        TR-->>WF: ES translations
+        WF->>DC: Create event with all translations (cs, en, es)
     end
     WF-->>API: Processed event
     API-->>C: 200 OK {event}
@@ -141,19 +147,20 @@ backend/dancee_workflow/
 │   ├── core/
 │   │   ├── config.ts                   # Environment configuration (dotenv) + Sentry initialization
 │   │   ├── schemas.ts                  # Zod schemas and TypeScript interfaces
-│   │   └── prompts.ts                  # LLM prompt templates (Czech)
+│   │   └── prompts.ts                  # LLM prompt templates (all in English, with outputLanguage/targetLanguage params)
 │   ├── clients/
 │   │   ├── scraper-client.ts           # HTTP client for dancee_scraper API
-│   │   ├── directus-client.ts          # Directus CMS REST API (events, venues, groups, errors)
+│   │   ├── directus-client.ts          # Directus CMS REST API (events, venues, groups, errors, translations)
 │   │   └── nominatim-client.ts         # Nominatim reverse geocoding HTTP client
 │   ├── services/
 │   │   ├── api.ts                      # Restate service: HTTP API handlers
-│   │   ├── workflow.ts                 # Restate workflow: single event processing
+│   │   ├── workflow.ts                 # Restate workflow: single event processing (incl. translation step)
 │   │   ├── batch.ts                    # Restate service: batch processing orchestration
 │   │   ├── event-parser.ts             # LLM-based event classification and extraction (OpenAI SDK)
+│   │   ├── event-translator.ts         # LLM-based translation of event content to target languages
 │   │   └── venue-resolver.ts           # Venue resolution logic (uses directus-client + nominatim-client)
 ├── scripts/
-│   └── setup-directus.ts              # CLI script to create Directus collections
+│   └── setup-directus.ts              # CLI script to create Directus collections (incl. languages, events_translations)
 ├── .env.example
 ├── .gitignore
 ├── docker-compose.yml
@@ -165,6 +172,18 @@ backend/dancee_workflow/
 ```
 
 ### Component Interfaces
+
+#### core/prompts.ts
+```typescript
+// All prompts are written in English.
+// Extraction prompts use an outputLanguage parameter to instruct the LLM to produce Czech output.
+// Translation prompt uses a targetLanguage parameter to control the output language.
+
+export function getEventTypeClassificationPrompt(): string;
+export function getEventPartsExtractionPrompt(outputLanguage: string): string;
+export function getEventInfoExtractionPrompt(): string;
+export function getTranslationPrompt(targetLanguage: string): string;
+```
 
 #### core/config.ts
 ```typescript
@@ -210,15 +229,41 @@ const openai = new OpenAI({
 });
 
 export async function classifyEventType(description: string): Promise<EventType>;
-export async function extractEventParts(description: string): Promise<{ description: string; parts: EventPart[] }>;
+export async function extractEventParts(description: string): Promise<{ title: string; description: string; parts: EventPart[] }>;
 export async function extractEventInfo(description: string): Promise<EventInfo[]>;
+```
+
+#### services/event-translator.ts
+```typescript
+// LLM-based translation of event content to target languages via OpenRouter
+// Uses a single parameterized English prompt with targetLanguage parameter
+// Translates: title, description, EventPart name/description, EventInfo key
+// Does NOT translate: dates, times, coordinates, URLs, price values, dance names, lectors, DJs, organizer, venue names
+import OpenAI from "openai";
+
+export interface TranslatedEventContent {
+  title: string;
+  description: string;
+  parts_translations: Array<{ name: string; description: string }>;
+  info_translations: Array<{ key: string }>;
+}
+
+export async function translateEventContent(
+  content: {
+    title: string;
+    description: string;
+    parts: EventPart[];
+    info: EventInfo[];
+  },
+  targetLanguage: string,
+): Promise<TranslatedEventContent>;
 ```
 
 #### clients/directus-client.ts
 ```typescript
-// All Directus CMS REST API operations (events, venues, groups, errors)
+// All Directus CMS REST API operations (events, venues, groups, errors, translations)
 
-// Events
+// Events (created with nested translations via Directus M2Any relation)
 export async function createEvent(event: DirectusEvent): Promise<DirectusEvent>;
 export async function findEventByOriginalUrl(originalUrl: string): Promise<DirectusEvent | null>;
 export async function listEvents(): Promise<DirectusEvent[]>;
@@ -236,6 +281,10 @@ export async function updateGroupTimestamp(groupId: string): Promise<void>;
 // Errors
 export async function createError(url: string, message: string): Promise<void>;
 export async function findErrorByUrl(url: string): Promise<DirectusError | null>;
+
+// Languages
+export async function getLanguages(): Promise<DirectusLanguage[]>;
+export async function createLanguage(code: string, name: string): Promise<DirectusLanguage>;
 ```
 
 #### services/venue-resolver.ts
@@ -263,12 +312,14 @@ export const apiService: restate.ServiceDefinition;
 #### services/workflow.ts (Restate workflow)
 ```typescript
 // Durable workflow for single event processing
-// Steps: scrape → classify → extract parts → extract info → resolve venue → derive organizer → store
+// Steps: scrape → classify → extract parts → extract info → resolve venue → derive organizer → translate (en, es) → store with translations
 //
 // Field mapping:
-//   description       = LLM-generated Czech description (from extractEventParts)
 //   original_description = raw Facebook event description (from scraped data)
-//   organizer          = hosts[0].name from scraped data (fallback: event name)
+//   organizer            = hosts[0].name from scraped data (fallback: event name)
+//   translations[cs]     = Czech title + description from extraction, parts/info translations from extraction
+//   translations[en]     = English translations via LLM
+//   translations[es]     = Spanish translations via LLM
 export const eventWorkflow: restate.WorkflowDefinition;
 ```
 
@@ -350,11 +401,9 @@ const EventInfoSchema = z.object({
 #### Directus Collection Schemas
 
 ```typescript
-// Directus events collection
+// Directus events collection (title and description are in events_translations, not here)
 const DirectusEventSchema = z.object({
   id: z.string().optional(),           // Directus-assigned
-  title: z.string(),
-  description: z.string(),
   original_description: z.string(),
   organizer: z.string(),
   venue: z.string().optional(),         // Directus relation ID
@@ -365,6 +414,29 @@ const DirectusEventSchema = z.object({
   parts: z.array(EventPartSchema),     // JSON field
   info: z.array(EventInfoSchema),      // JSON field
   dances: z.array(z.string()),         // JSON field, computed from parts
+  translations: z.array(DirectusEventTranslationSchema).optional(), // Nested M2Any for create
+});
+
+// Directus events_translations collection
+const DirectusEventTranslationSchema = z.object({
+  id: z.string().optional(),           // Directus-assigned
+  events_id: z.string().optional(),    // FK to events (set by Directus on nested create)
+  languages_code: z.string(),          // FK to languages (e.g., "cs", "en", "es")
+  title: z.string(),
+  description: z.string(),
+  parts_translations: z.array(z.object({  // Translated EventPart name/description per part
+    name: z.string(),
+    description: z.string(),
+  })),
+  info_translations: z.array(z.object({   // Translated EventInfo key per item
+    key: z.string(),
+  })),
+});
+
+// Directus languages collection
+const DirectusLanguageSchema = z.object({
+  code: z.string(),                    // PK (e.g., "cs", "en", "es")
+  name: z.string(),                    // e.g., "Čeština", "English", "Español"
 });
 
 // Directus venues collection
@@ -403,10 +475,10 @@ const DirectusErrorSchema = z.object({
 ```mermaid
 erDiagram
     events ||--o| venues : "venue (M2O)"
+    events ||--o{ events_translations : "translations (O2M)"
+    events_translations }o--|| languages : "languages_code (M2O)"
     events {
         string id PK
-        string title
-        string description
         string original_description
         string organizer
         string venue FK
@@ -417,6 +489,19 @@ erDiagram
         json parts
         json info
         json dances
+    }
+    events_translations {
+        string id PK
+        string events_id FK
+        string languages_code FK
+        string title
+        string description
+        json parts_translations
+        json info_translations
+    }
+    languages {
+        string code PK
+        string name
     }
     venues {
         string id PK
@@ -495,7 +580,7 @@ function parseJsonResponse(raw: string): unknown {
 }
 ```
 
-Retry logic: up to 2 additional attempts on invalid JSON for event parts extraction.
+Retry logic: up to 2 additional attempts on invalid JSON for event parts extraction and translation.
 
 ### Docker Compose Setup
 
@@ -642,6 +727,42 @@ The `package.json` includes a test script for single-execution test runs:
 
 **Validates: Requirements 20.1, 20.2, 20.3**
 
+### Property 16: Translation produces non-empty content for all supported languages
+
+*For any* valid event content (non-empty title, description, parts, and info), translating it to any supported target language ("en" or "es") shall produce a `TranslatedEventContent` where `title` and `description` are non-empty strings, `parts_translations` has the same length as the input parts array with non-empty `name` and `description` for each entry, and `info_translations` has the same length as the input info array with a non-empty `key` for each entry.
+
+**Validates: Requirements 21.1, 21.2**
+
+### Property 17: Translation preserves non-translatable fields
+
+*For any* event content with EventPart objects containing dances, lectors, DJs, and date_time_range fields, and EventInfo objects containing value fields, the translation process shall not modify these fields. The original parts and info arrays on the event shall remain unchanged after translation.
+
+**Validates: Requirements 21.3**
+
+### Property 18: Translation failure isolation
+
+*For any* set of target languages where one translation fails, the successfully completed translations shall still be available and stored. A failure translating to language X shall not affect the translation for language Y.
+
+**Validates: Requirements 21.6**
+
+### Property 19: Czech extraction output maps to "cs" translation record
+
+*For any* event processed through the extraction step, the Czech title, description, EventPart names/descriptions, and EventInfo keys from the extraction output shall be stored as the "cs" language translation record with matching field values.
+
+**Validates: Requirements 21.5, 22.1**
+
+### Property 20: Translation parts_translations array length matches parts array
+
+*For any* event with N EventPart objects, each translation record's `parts_translations` JSON array shall have exactly N entries, maintaining index correspondence with the original parts array. Similarly, for M EventInfo objects, `info_translations` shall have exactly M entries.
+
+**Validates: Requirements 22.2, 22.3**
+
+### Property 21: Events collection does not contain title or description fields
+
+*For any* event stored in Directus, the event record itself shall not contain `title` or `description` fields. These fields shall exist only in the associated events_translations records.
+
+**Validates: Requirements 22.5**
+
 ## Error Handling
 
 ### Error Categories
@@ -651,6 +772,8 @@ The `package.json` includes a test script for single-execution test runs:
 | Scraper HTTP errors | Propagate with status code + message, Restate retries | dancee_scraper returns 404 |
 | LLM invalid JSON | Retry up to 2 additional times, then propagate | OpenRouter returns malformed response |
 | LLM unrecognized type | Default to "other", skip processing | LLM returns "concert" |
+| Translation LLM failure | Retry up to 2 times, log error, skip that language | OpenRouter returns invalid JSON for EN translation |
+| Translation partial failure | Store successful translations, log failed ones, continue | ES translation fails but CS and EN succeed |
 | Nominatim failure | Set region to "Other", use available data | Nominatim rate limited or down |
 | Directus API errors | Propagate, Restate retries | Directus returns 500 |
 | Unsupported event type | Skip event, log reason, continue batch | Event classified as "lesson" |
@@ -732,17 +855,25 @@ backend/dancee_workflow/
 │           ├── venue-field-mapping.test.ts     # Property 9
 │           ├── end-timestamp-fallback.test.ts  # Property 2
 │           ├── api-validation.test.ts          # Property 14
-│           └── skip-unsupported.test.ts        # Property 5
+│           ├── skip-unsupported.test.ts        # Property 5
+│           ├── translation-output.test.ts      # Property 16 (non-empty translation output)
+│           ├── translation-preserves.test.ts   # Property 17 (non-translatable fields unchanged)
+│           ├── translation-isolation.test.ts   # Property 18 (failure isolation)
+│           ├── translation-cs-mapping.test.ts  # Property 19 (Czech extraction → cs record)
+│           ├── translation-array-length.test.ts # Property 20 (parts/info array length match)
+│           └── event-no-title-desc.test.ts     # Property 21 (events collection has no title/description)
 ```
 
 ### Unit Test Focus Areas
 
 - API endpoint integration tests (POST /api/event, GET /api/events/process, GET /api/events/list)
-- Directus client CRUD operations with mocked HTTP
-- Workflow step orchestration order
+- Directus client CRUD operations with mocked HTTP (including translations nested create)
+- Workflow step orchestration order (including translation step after extraction, before storage)
 - Sentry initialization with/without DSN
-- Setup script collection creation and idempotency
-- LLM retry behavior on invalid JSON (3 attempts max)
+- Setup script collection creation and idempotency (including languages, events_translations collections and language seeding)
+- LLM retry behavior on invalid JSON (3 attempts max, for both extraction and translation)
+- Translation prompt parameterization (targetLanguage correctly injected)
+- Translation failure isolation (one language failure doesn't affect others)
 
 ### Property Test to Design Property Mapping
 
@@ -761,4 +892,10 @@ backend/dancee_workflow/
 | services/end-timestamp-fallback.test.ts | Property 2 | Invariant |
 | services/api-validation.test.ts | Property 14 | Error condition |
 | services/skip-unsupported.test.ts | Property 5 | Invariant |
+| services/translation-output.test.ts | Property 16 | Invariant (non-empty output) |
+| services/translation-preserves.test.ts | Property 17 | Invariant (unchanged fields) |
+| services/translation-isolation.test.ts | Property 18 | Error condition (failure isolation) |
+| services/translation-cs-mapping.test.ts | Property 19 | Invariant (field equality) |
+| services/translation-array-length.test.ts | Property 20 | Invariant (length match) |
+| services/event-no-title-desc.test.ts | Property 21 | Invariant (schema constraint) |
 

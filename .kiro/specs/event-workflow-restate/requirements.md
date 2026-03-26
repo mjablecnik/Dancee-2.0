@@ -9,13 +9,16 @@ This feature implements an event processing workflow service (`event-workflow-re
 - **Workflow_Service**: The Restate-based durable workflow service that orchestrates the full event processing pipeline from scraping through LLM-based event parsing to storage in Directus
 - **Scraper_Client**: The HTTP client module that sends requests to the `dancee_scraper` API to retrieve raw Facebook event data
 - **Event_Parser**: The module that uses an LLM via OpenRouter to classify event types, extract event parts (workshops, parties, open lessons), generate descriptions, and extract event info (prices, registration URLs)
+- **Event_Translator**: The module that uses an LLM via OpenRouter to translate event content (titles, descriptions, event part names/descriptions, event info keys) into target languages
 - **Directus_Client**: The HTTP client module that communicates with the Directus CMS REST API to create, read, and update events, venues, groups, and errors
 - **Event_Processor**: The core processing module that transforms raw scraped Facebook event data into the structured event format defined by the Dancee Events OpenAPI schema
 - **Venue_Resolver**: The module that resolves venue information from raw Facebook location data, including reverse geocoding via the Nominatim API (OpenStreetMap) to determine the address and administrative region
 - **Group_Manager**: The module that manages Facebook page/group URLs used as sources for event discovery
 - **Error_Tracker**: The module that logs processing errors for individual event URLs into Directus for later review
 - **Setup_Script**: A CLI script that creates the required collections and fields in a fresh Directus instance
-- **Event**: A structured dance event object containing title, description, venue, date/time range, organizer, event parts, event info, original URL, and a computed dances field (aggregated unique dance names from all event parts). Events use Directus-assigned IDs
+- **Event**: A structured dance event object containing venue, date/time range, organizer, event parts, event info, original URL, and a computed dances field (aggregated unique dance names from all event parts). Translatable fields (title, description) are stored in the events_translations collection. Events use Directus-assigned IDs
+- **Events_Translations**: A Directus translations collection that stores per-language versions of translatable event fields (title, description) and translated EventPart names/descriptions and EventInfo keys as JSON. Linked to events via `events_id` and to languages via `languages_code`
+- **Languages**: A Directus collection storing supported languages with `code` as primary key (e.g., "cs", "en", "es") and `name` (e.g., "Čeština", "English", "Español")
 - **Venue**: A location object containing name, street, town, country, postal code, region (administrative area level 1 from reverse geocoding, universal across countries), and coordinates. Venues use Directus-assigned IDs and are deduplicated by name, street, and town
 - **EventPart**: A sub-event within an Event (e.g., workshop, party, open lesson) with its own time range, dances, lectors, and DJs
 - **EventInfo**: Additional event metadata such as price or registration URL
@@ -64,7 +67,7 @@ This feature implements an event processing workflow service (`event-workflow-re
 
 #### Acceptance Criteria
 
-1. WHEN a raw event description is provided, THE Event_Parser SHALL send the description to the LLM via OpenRouter with the event parts extraction prompt and return a structured object containing a Czech description and a list of EventPart objects
+1. WHEN a raw event description is provided, THE Event_Parser SHALL send the description to the LLM via OpenRouter with the event parts extraction prompt and return a structured object containing a Czech title, Czech description, and a list of EventPart objects (with Czech names and descriptions)
 2. EACH returned EventPart SHALL contain: name, description, type (party/workshop/openLesson), dances list, date_time_range (start and end in ISO 8601 UTC), lectors list, and DJs list
 3. WHEN the LLM returns invalid JSON, THE Event_Parser SHALL retry the request up to 2 additional times before propagating an error
 
@@ -123,8 +126,8 @@ This feature implements an event processing workflow service (`event-workflow-re
 
 #### Acceptance Criteria
 
-1. WHEN a single event URL is submitted for processing, THE Workflow_Service SHALL create a Restate workflow run that orchestrates: scraping the event, classifying the event type, extracting event parts (which returns a Czech description), extracting event info, resolving the venue, deriving the organizer, and storing the result in Directus
-2. THE Event_Processor SHALL store the original Facebook event description (from the scraped data) as `original_description` and the LLM-generated Czech description (from event parts extraction) as `description` on the stored event
+1. WHEN a single event URL is submitted for processing, THE Workflow_Service SHALL create a Restate workflow run that orchestrates: scraping the event, classifying the event type, extracting event parts (which returns a Czech description), extracting event info, resolving the venue, deriving the organizer, translating content to English and Spanish, and storing the result with all translations in Directus
+2. THE Event_Processor SHALL store the original Facebook event description (from the scraped data) as `original_description` on the stored event. The LLM-generated Czech title and description (from event parts extraction) SHALL be stored as the "cs" translation record in events_translations
 3. THE Event_Processor SHALL derive the `organizer` field from the scraped FacebookEvent `hosts` array: if hosts are present, use the name of the first host; if hosts are empty or missing, use the Facebook event name as a fallback
 4. WHEN any step in the workflow fails, THE Workflow_Service SHALL automatically retry the failed step using Restate's built-in retry mechanism
 5. THE Workflow_Service SHALL store the event URL, processing status, and any error messages in Restate K/V state for each workflow run
@@ -177,13 +180,17 @@ This feature implements an event processing workflow service (`event-workflow-re
 
 #### Acceptance Criteria
 
-1. THE Setup_Script SHALL create the following Directus collections: events, venues, groups, and errors
-2. THE Setup_Script SHALL create all required fields for the events collection matching the Event schema: title, description, original_description, organizer, venue (relation to venues), start_time, end_time, timezone, original_url, parts (JSON field for EventPart array), info (JSON field for EventInfo array), and dances (JSON field for string array, computed by aggregating all unique dance names from the event's parts)
+1. THE Setup_Script SHALL create the following Directus collections: events, venues, groups, errors, languages, and events_translations
+2. THE Setup_Script SHALL create all required fields for the events collection matching the Event schema: original_description, organizer, venue (relation to venues), start_time, end_time, timezone, original_url, parts (JSON field for EventPart array), info (JSON field for EventInfo array), and dances (JSON field for string array, computed by aggregating all unique dance names from the event's parts)
 3. THE Setup_Script SHALL create all required fields for the venues collection: name, street, number, town, country, postal_code, region, latitude, and longitude
 4. THE Setup_Script SHALL create all required fields for the groups collection: url, type, and updated_at
 5. THE Setup_Script SHALL create all required fields for the errors collection: url, message, and datetime
-6. THE Setup_Script SHALL read the Directus base URL and admin token from the `.env` configuration file
-7. WHEN a collection already exists in Directus, THE Setup_Script SHALL skip creating that collection and log a message
+6. THE Setup_Script SHALL create the languages collection with `code` (primary key) and `name` fields
+7. THE Setup_Script SHALL create the events_translations collection with `events_id` (foreign key to events), `languages_code` (foreign key to languages), `title`, `description`, `parts_translations` (JSON field for translated EventPart name/description per part), and `info_translations` (JSON field for translated EventInfo key per item)
+8. THE Setup_Script SHALL set up the Directus translations relation (M2Any) between the events collection and the events_translations collection
+9. THE Setup_Script SHALL seed the languages collection with initial records: `{code: "cs", name: "Čeština"}`, `{code: "en", name: "English"}`, `{code: "es", name: "Español"}`
+10. THE Setup_Script SHALL read the Directus base URL and admin token from the `.env` configuration file
+11. WHEN a collection already exists in Directus, THE Setup_Script SHALL skip creating that collection and log a message
 
 ### Requirement 15: Environment Configuration
 
@@ -220,7 +227,8 @@ This feature implements an event processing workflow service (`event-workflow-re
 1. THE Event_Parser SHALL send LLM requests to the OpenRouter API using the configured API key
 2. THE Event_Parser SHALL use a configurable model identifier defaulting to a capable model (e.g., Google Gemini 2.0 Flash)
 3. WHEN the LLM response contains markdown code fences around JSON, THE Event_Parser SHALL strip the code fences before parsing the JSON
-4. THE Event_Parser SHALL include system prompts in Czech matching the existing prompt templates from the serinus_service for event type classification, event parts extraction, and event info extraction
+4. THE Event_Parser SHALL include system prompts written in English for event type classification, event parts extraction, and event info extraction, using an explicit `outputLanguage` parameter to instruct the LLM to produce Czech output for the extraction step
+5. THE Event_Translator SHALL use a single parameterized English prompt template that accepts a `targetLanguage` parameter to control the output language of translations
 
 ### Requirement 18: Sentry Error Monitoring
 
@@ -252,3 +260,29 @@ This feature implements an event processing workflow service (`event-workflow-re
 1. WHEN an Event is being prepared for storage, THE Event_Processor SHALL compute the `dances` field by collecting all dance names from all EventPart objects and deduplicating them into a unique set
 2. THE computed `dances` field SHALL be stored as a JSON array of strings in the Directus events collection
 3. WHEN an Event has no parts or no dances in any part, THE `dances` field SHALL be stored as an empty array
+
+### Requirement 21: Multi-Language Translation of Event Content
+
+**User Story:** As a developer, I want event content to be translated into multiple languages (English, Czech, Spanish), so that users can view events in their preferred language.
+
+#### Acceptance Criteria
+
+1. WHEN the extraction step produces Czech event content (title, description, EventPart names/descriptions, EventInfo keys), THE Event_Translator SHALL translate the content into English and Spanish via separate LLM calls
+2. THE Event_Translator SHALL translate the following fields: event title, event description, EventPart name and description for each part, and EventInfo key (label) for each info item
+3. THE Event_Translator SHALL NOT translate the following fields: dates, times, coordinates, URLs, price values, dance names, lectors, DJs, organizer, original_url, original_description, and venue names
+4. FOR EACH target language, THE Event_Translator SHALL store the translated content in the events_translations collection linked to the event and the target language
+5. THE Event_Translator SHALL store the Czech extraction output as the "cs" translation record, and produce separate "en" and "es" translation records via LLM translation
+6. WHEN a translation for a specific language fails, THE Event_Translator SHALL log the error and continue with the remaining languages without losing already completed translations
+7. WHEN the LLM returns invalid JSON for a translation, THE Event_Translator SHALL retry the request up to 2 additional times before logging the error and skipping that language
+
+### Requirement 22: Translation Data Storage in Directus
+
+**User Story:** As a developer, I want translations stored using the Directus built-in translations pattern, so that multi-language content is managed consistently through the CMS.
+
+#### Acceptance Criteria
+
+1. THE Directus_Client SHALL store event translations in the events_translations collection with fields: events_id (FK to events), languages_code (FK to languages), title, description, parts_translations (JSON), and info_translations (JSON)
+2. THE parts_translations JSON field SHALL contain an array of objects, each with `name` and `description` fields corresponding to the translated EventPart at the same index
+3. THE info_translations JSON field SHALL contain an array of objects, each with a `key` field corresponding to the translated EventInfo label at the same index
+4. WHEN creating an event with translations, THE Directus_Client SHALL create the event record and all translation records in a single Directus API call using the nested translations relation
+5. THE events collection SHALL NOT contain `title` or `description` fields directly; these fields SHALL exist only in the events_translations collection
