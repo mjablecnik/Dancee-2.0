@@ -1,0 +1,13 @@
+.git
+node_modules
+dist
+docs
+*.md
+*.test.ts
+*.spec.ts
+src/**/*.test.ts
+src/**/*.spec.ts
+bun.lock
+.env
+.env.*
+!.env.example

@@ -1,0 +1,211 @@
+import { describe, it, expect, vi, afterEach } from "vitest";
+import fc from "fast-check";
+
+// Mock config before importing the service
+vi.mock("../../core/config", () => ({
+  config: { openRouterApiKey: "test-key", openRouterModel: "test-model" },
+}));
+
+const { mockCreate } = vi.hoisted(() => ({ mockCreate: vi.fn() }));
+vi.mock("openai", () => {
+  return {
+    default: vi.fn().mockImplementation(() => ({
+      chat: {
+        completions: {
+          create: mockCreate,
+        },
+      },
+    })),
+  };
+});
+
+import { translateEventContent } from "../../services/event-translator";
+import type { EventContentInput } from "../../services/event-translator";
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+// Arbitraries for EventPart and EventInfo
+const eventPartArb = fc.record({
+  name: fc.string({ minLength: 1, maxLength: 40 }),
+  description: fc.string({ minLength: 1, maxLength: 100 }),
+  type: fc.constantFrom("party", "workshop", "openLesson" as const),
+  dances: fc.array(fc.string({ minLength: 1, maxLength: 20 }), { maxLength: 5 }),
+  date_time_range: fc.record({
+    start: fc.constant("2025-01-01T10:00:00Z"),
+    end: fc.constant("2025-01-01T12:00:00Z"),
+  }),
+  lectors: fc.array(fc.string({ minLength: 1, maxLength: 30 }), { maxLength: 3 }),
+  djs: fc.array(fc.string({ minLength: 1, maxLength: 30 }), { maxLength: 3 }),
+});
+
+const eventInfoArb = fc.record({
+  type: fc.constantFrom("url", "price" as const),
+  key: fc.string({ minLength: 1, maxLength: 30 }),
+  value: fc.string({ minLength: 1, maxLength: 100 }),
+});
+
+function makeMockLlmResponse(content: EventContentInput) {
+  const response = {
+    title: `Translated: ${content.title}`,
+    description: `Translated: ${content.description}`,
+    parts_translations: content.parts.map((p) => ({
+      name: `Translated: ${p.name}`,
+      description: `Translated: ${p.description}`,
+    })),
+    info_translations: content.info.map((i) => ({
+      key: `Translated: ${i.key}`,
+    })),
+  };
+  return {
+    choices: [{ message: { content: JSON.stringify(response) } }],
+  };
+}
+
+describe("Property 16: Translation produces non-empty content for all supported languages", () => {
+  it("returns non-empty title and description for any target language", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.constantFrom("en", "es", "de", "fr", "pl"),
+        fc.record({
+          title: fc.string({ minLength: 1, maxLength: 50 }),
+          description: fc.string({ minLength: 1, maxLength: 200 }),
+          parts: fc.array(eventPartArb, { maxLength: 3 }),
+          info: fc.array(eventInfoArb, { maxLength: 3 }),
+        }),
+        async (targetLanguage, content) => {
+          mockCreate.mockResolvedValue(makeMockLlmResponse(content));
+          const result = await translateEventContent(content, targetLanguage);
+          expect(result.title.length).toBeGreaterThan(0);
+          expect(result.description.length).toBeGreaterThan(0);
+        }
+      )
+    );
+  });
+
+  it("returns non-empty parts_translations entries for all parts", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.constantFrom("en", "es"),
+        fc.array(eventPartArb, { minLength: 1, maxLength: 4 }),
+        async (targetLanguage, parts) => {
+          const content: EventContentInput = {
+            title: "Test event",
+            description: "Test description",
+            parts,
+            info: [],
+          };
+          mockCreate.mockResolvedValue(makeMockLlmResponse(content));
+          const result = await translateEventContent(content, targetLanguage);
+          for (const pt of result.parts_translations) {
+            expect(pt.name.length).toBeGreaterThan(0);
+            expect(pt.description.length).toBeGreaterThan(0);
+          }
+        }
+      )
+    );
+  });
+});
+
+describe("Property 17: Translation preserves non-translatable fields", () => {
+  it("does not send dances, lectors, djs, or date_time_range to the LLM", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(eventPartArb, { minLength: 1, maxLength: 3 }),
+        async (parts) => {
+          const content: EventContentInput = {
+            title: "Dance event",
+            description: "A great event",
+            parts,
+            info: [],
+          };
+          mockCreate.mockResolvedValue(makeMockLlmResponse(content));
+          await translateEventContent(content, "en");
+
+          const callArgs = mockCreate.mock.calls[0][0];
+          const userMessage = callArgs.messages.find((m: { role: string }) => m.role === "user");
+          const sentPayload = JSON.parse(userMessage.content);
+
+          // parts_translations in the LLM payload should only have name and description
+          for (const pt of sentPayload.parts_translations) {
+            expect(Object.keys(pt)).toEqual(["name", "description"]);
+            expect("dances" in pt).toBe(false);
+            expect("lectors" in pt).toBe(false);
+            expect("djs" in pt).toBe(false);
+            expect("date_time_range" in pt).toBe(false);
+          }
+        }
+      )
+    );
+  });
+
+  it("does not send info value to the LLM — only the key is translated", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(eventInfoArb, { minLength: 1, maxLength: 4 }),
+        async (info) => {
+          const content: EventContentInput = {
+            title: "Event",
+            description: "Desc",
+            parts: [],
+            info,
+          };
+          mockCreate.mockResolvedValue(makeMockLlmResponse(content));
+          await translateEventContent(content, "es");
+
+          const callArgs = mockCreate.mock.calls[0][0];
+          const userMessage = callArgs.messages.find((m: { role: string }) => m.role === "user");
+          const sentPayload = JSON.parse(userMessage.content);
+
+          // info_translations in the LLM payload should only have key, not value or type
+          for (const it of sentPayload.info_translations) {
+            expect(Object.keys(it)).toEqual(["key"]);
+            expect("value" in it).toBe(false);
+            expect("type" in it).toBe(false);
+          }
+        }
+      )
+    );
+  });
+});
+
+describe("Property 20: Translation parts_translations array length matches parts array", () => {
+  it("returned parts_translations length equals input parts length", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(eventPartArb, { maxLength: 6 }),
+        async (parts) => {
+          const content: EventContentInput = {
+            title: "Event",
+            description: "Description",
+            parts,
+            info: [],
+          };
+          mockCreate.mockResolvedValue(makeMockLlmResponse(content));
+          const result = await translateEventContent(content, "en");
+          expect(result.parts_translations.length).toBe(parts.length);
+        }
+      )
+    );
+  });
+
+  it("returned info_translations length equals input info length", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(eventInfoArb, { maxLength: 6 }),
+        async (info) => {
+          const content: EventContentInput = {
+            title: "Event",
+            description: "Description",
+            parts: [],
+            info,
+          };
+          mockCreate.mockResolvedValue(makeMockLlmResponse(content));
+          const result = await translateEventContent(content, "en");
+          expect(result.info_translations.length).toBe(info.length);
+        }
+      )
+    );
+  });
+});

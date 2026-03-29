@@ -1,0 +1,378 @@
+openapi: 3.0.0
+info:
+  title: Dancee Workflow API
+  version: 1.0.0
+  description: |
+    REST API for the dancee_workflow service.
+
+    This service processes Facebook dance events through an AI-powered workflow:
+    it scrapes event data, classifies the event type, extracts parts and info,
+    resolves the venue via reverse geocoding, stores the result in Directus CMS,
+    and generates multilingual translations (CS, EN, ES).
+
+    All endpoints are served through the Restate ingress and are addressed using
+    Restate's service-call URL pattern: `/ApiService/<handler>`.
+
+servers:
+  - url: http://localhost:8080
+    description: Restate ingress (development)
+  - url: https://workflow.dancee.app
+    description: Restate ingress (production)
+
+tags:
+  - name: Events
+    description: Single-event and batch event processing
+  - name: Listing
+    description: Querying stored events
+
+paths:
+  /ApiService/processEvent:
+    post:
+      tags:
+        - Events
+      summary: Process a single Facebook event
+      description: |
+        Submits a single Facebook event URL for AI-powered processing.
+
+        The workflow:
+        1. Scrapes the event from the dancee_scraper API
+        2. Classifies the event type (party, workshop, festival, holiday — unsupported types are skipped)
+        3. Extracts event parts (structured sections with dates, lectors, DJs)
+        4. Extracts event info (prices, URLs)
+        5. Resolves the venue via Nominatim reverse geocoding
+        6. Checks for duplicate events
+        7. Translates event content to English and Spanish
+        8. Stores the event in Directus CMS
+
+        The workflow key is a random UUID, so calling this endpoint multiple times
+        with the same URL will create multiple workflow executions.
+      operationId: processEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessEventRequest'
+            example:
+              url: "https://www.facebook.com/events/1234567890"
+      responses:
+        '200':
+          description: Event processed successfully (or skipped if unsupported type or duplicate)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DirectusEvent'
+                  - type: 'null'
+              example:
+                id: 42
+                original_url: "https://www.facebook.com/events/1234567890"
+                organizer: "Prague Salsa Club"
+                start_time: "2024-02-15T20:00:00.000Z"
+                end_time: "2024-02-16T02:00:00.000Z"
+                timezone: "UTC"
+                status: "published"
+                translation_status: "complete"
+                dances: ["Salsa", "Bachata"]
+        '400':
+          description: Missing or invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Missing required field: 'url'"
+                code: 400
+
+  /ApiService/processBatch:
+    get:
+      tags:
+        - Events
+      summary: Trigger batch processing of all groups
+      description: |
+        Kicks off the batch processing workflow, which iterates over all groups
+        stored in Directus (ordered by `updated_at` ascending) and processes
+        any new Facebook events found for each group.
+
+        The batch workflow:
+        1. Fetches all groups from Directus ordered by `updated_at`
+        2. For each group, scrapes the event list from the dancee_scraper API
+        3. For each event not already in Directus, submits it to the EventWorkflow
+        4. Updates the group's `updated_at` timestamp after processing
+        5. Logs errors to Directus (deduplicating by URL) and Sentry
+
+        This endpoint returns immediately with an acknowledgement. Processing
+        continues asynchronously in the background via Restate.
+      operationId: processBatch
+      responses:
+        '200':
+          description: Batch processing acknowledged and started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAcknowledgement'
+              example:
+                acknowledged: true
+                message: "Batch processing started"
+
+  /ApiService/listEvents:
+    get:
+      tags:
+        - Listing
+      summary: List published events
+      description: |
+        Returns all published events from Directus CMS.
+
+        By default only events with `status = "published"` are returned.
+        Pass an explicit `filter` query parameter (Directus filter syntax,
+        JSON-encoded) to override the default filter and query events with
+        any status or other criteria.
+      operationId: listEvents
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          description: |
+            Optional Directus filter object (JSON-encoded). When provided, it
+            replaces the default `{ status: { _eq: "published" } }` filter.
+            Example: `{"status":{"_eq":"draft"}}`
+          schema:
+            type: string
+          example: '{"status":{"_eq":"draft"}}'
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusEvent'
+
+components:
+  schemas:
+    ProcessEventRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Facebook event URL to process
+          example: "https://www.facebook.com/events/1234567890"
+
+    BatchAcknowledgement:
+      type: object
+      required:
+        - acknowledged
+        - message
+      properties:
+        acknowledged:
+          type: boolean
+          description: Whether the batch request was accepted
+          example: true
+        message:
+          type: string
+          description: Human-readable status message
+          example: "Batch processing started"
+
+    DirectusEvent:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Directus record ID
+          example: 42
+        original_description:
+          type: string
+          description: Original Facebook event description
+        organizer:
+          type: string
+          description: Event organizer name (first host or event title)
+          example: "Prague Salsa Club"
+        venue:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Foreign key to the venues collection
+          example: 7
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: Event start time in ISO 8601 format
+          example: "2024-02-15T20:00:00.000Z"
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: Event end time in ISO 8601 format
+          example: "2024-02-16T02:00:00.000Z"
+        timezone:
+          type: string
+          description: IANA timezone string
+          example: "Europe/Prague"
+        original_url:
+          type: string
+          description: Original Facebook event URL
+          example: "https://www.facebook.com/events/1234567890"
+        parts:
+          type: array
+          description: Structured event parts (workshops, parties, open lessons)
+          items:
+            $ref: '#/components/schemas/EventPart'
+        info:
+          type: array
+          description: Extracted event info items (prices, URLs)
+          items:
+            $ref: '#/components/schemas/EventInfo'
+        dances:
+          type: array
+          description: Computed list of unique dance styles across all parts
+          items:
+            type: string
+          example: ["Salsa", "Bachata"]
+        status:
+          type: string
+          enum: [published, draft, archived]
+          description: Directus publishing status
+          example: "published"
+        translation_status:
+          type: string
+          enum: [complete, partial, missing]
+          description: Translation completeness across CS/EN/ES
+          example: "complete"
+        translations:
+          type: array
+          description: Multilingual translations for this event
+          items:
+            $ref: '#/components/schemas/DirectusEventTranslation'
+
+    EventPart:
+      type: object
+      required:
+        - name
+        - description
+        - type
+        - dances
+        - date_time_range
+        - lectors
+        - djs
+      properties:
+        name:
+          type: string
+          description: Part name
+          example: "Social Dancing"
+        description:
+          type: string
+          description: Part description
+        type:
+          type: string
+          enum: [party, workshop, openLesson]
+          example: "party"
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["Salsa"]
+        date_time_range:
+          type: object
+          required: [start, end]
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        lectors:
+          type: array
+          items:
+            type: string
+        djs:
+          type: array
+          items:
+            type: string
+          example: ["DJ Carlos"]
+
+    EventInfo:
+      type: object
+      required:
+        - type
+        - key
+        - value
+      properties:
+        type:
+          type: string
+          enum: [url, price]
+          example: "price"
+        key:
+          type: string
+          example: "Entry Fee"
+        value:
+          type: string
+          example: "200 Kč"
+
+    DirectusEventTranslation:
+      type: object
+      required:
+        - languages_code
+        - title
+        - description
+        - parts_translations
+        - info_translations
+      properties:
+        id:
+          type: integer
+          description: Translation record ID
+        events_id:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Parent event ID
+        languages_code:
+          type: string
+          description: BCP-47 language code
+          example: "cs"
+        title:
+          type: string
+          description: Translated event title
+          example: "Pražská Salsa Noc"
+        description:
+          type: string
+          description: Translated event description
+        parts_translations:
+          type: array
+          items:
+            type: object
+            required: [name, description]
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+        info_translations:
+          type: array
+          items:
+            type: object
+            required: [key]
+            properties:
+              key:
+                type: string
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Missing required field: 'url'"
+        code:
+          type: integer
+          description: HTTP error code
+          example: 400

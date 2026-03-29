@@ -1,0 +1,60 @@
+version: '3'
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+      - bun install
+
+  dev:
+    desc: Start development server with hot reload
+    cmds:
+      - bun run dev
+
+  build:
+    desc: Build TypeScript to JavaScript
+    cmds:
+      - bun run build
+
+  start:
+    desc: Start production server
+    cmds:
+      - bun run start
+
+  test:
+    desc: Run all tests
+    cmds:
+      - bun test
+
+  setup-directus:
+    desc: Create Directus collections and seed languages
+    cmds:
+      - bun scripts/setup-directus.ts
+
+  docker-build:
+    desc: Build Docker image
+    cmds:
+      - docker compose build
+
+  docker-up:
+    desc: Start service with Docker Compose
+    cmds:
+      - docker compose up
+
+  docker-down:
+    desc: Stop Docker Compose service
+    cmds:
+      - docker compose down
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf dist/
+      - rm -rf node_modules/
+
+  clean-build:
+    desc: Clean and rebuild
+    cmds:
+      - task: clean
+      - task: install
+      - task: build
