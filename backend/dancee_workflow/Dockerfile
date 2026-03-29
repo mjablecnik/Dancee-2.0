@@ -1,15 +1,15 @@
 # Build stage
-FROM node:20-slim AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY tsconfig.json ./
 COPY src ./src
 
-RUN npm run build
+RUN bun run build
 
 # Runtime stage
 FROM debian:bookworm-slim

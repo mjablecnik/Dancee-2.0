@@ -103,7 +103,7 @@ async function setupEventsCollection(): Promise<void> {
     interface: "input",
   }, { is_nullable: true, max_length: 255 });
 
-  await createFieldIfNotExists("events", "venue", "uuid", {
+  await createFieldIfNotExists("events", "venue", "integer", {
     interface: "select-dropdown-m2o",
   }, { is_nullable: true });
 

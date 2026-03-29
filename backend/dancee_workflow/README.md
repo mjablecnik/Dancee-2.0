@@ -80,11 +80,11 @@ All endpoints are exposed via Restate ingress on port 8080.
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/ApiService/processEvent` | Process a single Facebook event by URL |
-| `GET` | `/ApiService/processBatch` | Trigger batch processing of all groups |
-| `GET` | `/ApiService/listEvents` | List published events |
+| `POST` | `/api/event` | Process a single Facebook event by URL |
+| `GET` | `/api/events/process` | Trigger batch processing of all groups |
+| `GET` | `/api/events/list` | List published events |
 
-### POST /ApiService/processEvent
+### POST /api/event
 
 ```json
 { "url": "https://www.facebook.com/events/123456789" }

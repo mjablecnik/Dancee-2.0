@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { ZodError } from "zod";
 import { config } from "../core/config";
 import {
   parseEventType,
@@ -15,6 +16,10 @@ import {
   getEventInfoExtractionPrompt,
 } from "../core/prompts";
 import { z } from "zod";
+
+function isJsonOrValidationError(err: unknown): boolean {
+  return err instanceof SyntaxError || err instanceof ZodError;
+}
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -57,6 +62,7 @@ export async function extractEventParts(
       const parsed = parseJsonResponse(raw);
       return ExtractedPartsSchema.parse(parsed);
     } catch (err) {
+      if (!isJsonOrValidationError(err)) throw err;
       lastError = err;
     }
   }
@@ -79,6 +85,7 @@ export async function extractEventInfo(description: string): Promise<EventInfo[]
       const parsed = parseJsonResponse(raw);
       return filterEventInfo(parsed as unknown[]);
     } catch (err) {
+      if (!isJsonOrValidationError(err)) throw err;
       lastError = err;
     }
   }

@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { ZodError } from "zod";
 import { config } from "../core/config";
 import { parseJsonResponse } from "../core/schemas";
 import { getTranslationPrompt } from "../core/prompts";
@@ -60,6 +61,7 @@ export async function translateEventContent(
       const parsed = parseJsonResponse(raw);
       return TranslatedEventContentSchema.parse(parsed);
     } catch (err) {
+      if (!(err instanceof SyntaxError || err instanceof ZodError)) throw err;
       lastError = err;
     }
   }
