@@ -45,6 +45,7 @@ export async function translateEventContent(
   return retryOnJsonError(async () => {
     const response = await getOpenAI().chat.completions.create({
       model: config.openRouterModel,
+      temperature: config.llmTemperature,
       messages: [
         { role: "system", content: getTranslationPrompt(targetLanguage) },
         { role: "user", content: JSON.stringify(input) },

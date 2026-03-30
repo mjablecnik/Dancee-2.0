@@ -18,6 +18,9 @@ export const config = {
   directusTimeoutMs: parseInt(process.env.DIRECTUS_TIMEOUT_MS ?? "30000", 10),
   scraperTimeoutMs: parseInt(process.env.SCRAPER_TIMEOUT_MS ?? "30000", 10),
   nominatimTimeoutMs: parseInt(process.env.NOMINATIM_TIMEOUT_MS ?? "10000", 10),
+  // LLM temperature for structured output (classification, extraction, translation).
+  // Lower values reduce non-determinism and improve JSON reliability.
+  llmTemperature: parseFloat(process.env.LLM_TEMPERATURE ?? "0.1"),
 };
 
 export function validateConfig(): void {

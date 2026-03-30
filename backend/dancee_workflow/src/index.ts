@@ -79,3 +79,22 @@ const server = http2.createServer(
 server.listen(config.appPort, () => {
   console.log(`Restate endpoint listening on port ${config.appPort}`);
 });
+
+// Graceful shutdown: finish in-flight requests before exiting.
+// Restate's durable execution handles retries, but this avoids
+// dropping connections mid-response during deploys.
+function shutdown(signal: string) {
+  console.log(`Received ${signal}, shutting down gracefully...`);
+  server.close(() => {
+    console.log("Server closed.");
+    process.exit(0);
+  });
+  // Force exit after 10s if connections don't drain
+  setTimeout(() => {
+    console.error("Graceful shutdown timed out, forcing exit.");
+    process.exit(1);
+  }, 10_000).unref();
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

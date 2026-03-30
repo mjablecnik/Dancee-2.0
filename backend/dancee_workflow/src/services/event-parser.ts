@@ -37,6 +37,7 @@ export async function retryOnJsonError<T>(fn: () => Promise<T>, maxAttempts = 3)
 export async function classifyEventType(description: string): Promise<EventType> {
   const response = await getOpenAI().chat.completions.create({
     model: config.openRouterModel,
+    temperature: config.llmTemperature,
     messages: [
       { role: "system", content: getEventTypeClassificationPrompt() },
       { role: "user", content: description },
@@ -59,6 +60,7 @@ export async function extractEventParts(
   return retryOnJsonError(async () => {
     const response = await getOpenAI().chat.completions.create({
       model: config.openRouterModel,
+      temperature: config.llmTemperature,
       messages: [
         { role: "system", content: prompt },
         { role: "user", content: description },
@@ -80,6 +82,7 @@ export async function extractEventInfo(description: string): Promise<EventInfo[]
   return retryOnJsonError(async () => {
     const response = await getOpenAI().chat.completions.create({
       model: config.openRouterModel,
+      temperature: config.llmTemperature,
       messages: [
         { role: "system", content: prompt },
         { role: "user", content: description },

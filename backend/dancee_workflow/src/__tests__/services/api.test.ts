@@ -196,7 +196,8 @@ describe("Property 24: List events endpoint returns only published events by def
     const mockEvents = [{ id: 2, status: "published" }];
     mockListPublishedEvents.mockResolvedValue(mockEvents);
 
-    const extraFilter = { category: { _eq: "dance" } };
+    // Use an allowed filter field (sanitizeFilter strips disallowed fields)
+    const extraFilter = { dances: { _contains: "salsa" } };
     const ctx = makeMockCtx({ "x-dancee-filter": JSON.stringify(extraFilter) });
     const result = await serviceDef.handlers.listEvents(ctx);
 
@@ -223,5 +224,27 @@ describe("Property 24: List events endpoint returns only published events by def
     const [extraFilter] = mockListPublishedEvents.mock.calls[0] as [unknown];
     expect(extraFilter).toBeUndefined();
     expect(result).toEqual(mockEvents);
+  });
+
+  it("strips disallowed filter fields and logs a warning for each", async () => {
+    const mockEvents = [{ id: 4, status: "published" }];
+    mockListPublishedEvents.mockResolvedValue(mockEvents);
+
+    // Mix of allowed (dances) and disallowed (status, secret_field) fields
+    const filter = { dances: { _contains: "bachata" }, status: { _eq: "draft" }, secret_field: "x" };
+    const ctx = makeMockCtx({ "x-dancee-filter": JSON.stringify(filter) });
+    await serviceDef.handlers.listEvents(ctx);
+
+    expect(mockListPublishedEvents).toHaveBeenCalledOnce();
+    const [calledFilter] = mockListPublishedEvents.mock.calls[0] as [Record<string, unknown>];
+    // Only the allowed field should pass through
+    expect(calledFilter).toEqual({ dances: { _contains: "bachata" } });
+    // Warnings logged for each stripped field
+    expect(mockLog).toHaveBeenCalledWith(
+      expect.objectContaining({ level: "warn", message: expect.stringContaining("status") }),
+    );
+    expect(mockLog).toHaveBeenCalledWith(
+      expect.objectContaining({ level: "warn", message: expect.stringContaining("secret_field") }),
+    );
   });
 });
