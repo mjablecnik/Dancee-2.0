@@ -24,8 +24,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Restate server binary
-COPY --from=restatedev/restate:latest /restate /usr/local/bin/restate-server
+# Download Restate server binary
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "amd64" ]; then RESTATE_ARCH="x86_64-unknown-linux-musl"; \
+    elif [ "$ARCH" = "arm64" ]; then RESTATE_ARCH="aarch64-unknown-linux-musl"; \
+    else echo "Unsupported architecture: $ARCH" && exit 1; fi && \
+    curl -L -o /usr/local/bin/restate-server \
+    "https://restate.gateway.scarf.sh/latest/restate-server-${RESTATE_ARCH}" && \
+    chmod +x /usr/local/bin/restate-server
 
 # Set up application
 WORKDIR /app
