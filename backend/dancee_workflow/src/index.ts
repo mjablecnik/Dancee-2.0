@@ -21,6 +21,7 @@ const allowedOrigins = config.corsOrigins === "*"
   : config.corsOrigins.split(",").map((o) => o.trim());
 
 const server = http2.createServer(
+  { allowHTTP1: true },
   (req: http2.Http2ServerRequest, res: http2.Http2ServerResponse) => {
     const origin = req.headers["origin"] as string | undefined;
 
