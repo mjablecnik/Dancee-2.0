@@ -208,4 +208,71 @@ describe("Property 20: Translation parts_translations array length matches parts
       )
     );
   });
+
+  it("retries and eventually throws when LLM returns wrong parts_translations length", async () => {
+    const parts = [
+      { name: "Workshop", description: "A dance workshop", type: "workshop" as const, dances: ["salsa"], date_time_range: { start: "2025-01-01T10:00:00Z", end: "2025-01-01T12:00:00Z" }, lectors: [], djs: [] },
+      { name: "Party", description: "A dance party", type: "party" as const, dances: ["bachata"], date_time_range: { start: "2025-01-01T20:00:00Z", end: "2025-01-01T23:00:00Z" }, lectors: [], djs: [] },
+    ];
+    const content: EventContentInput = {
+      title: "Dance Event",
+      description: "Two parts",
+      parts,
+      info: [],
+    };
+
+    // LLM always returns only 1 part_translation instead of the expected 2
+    const mismatchedResponse = {
+      choices: [{
+        message: {
+          content: JSON.stringify({
+            title: "Translated Title",
+            description: "Translated Desc",
+            parts_translations: [{ name: "Workshop Translated", description: "Desc" }], // 1 instead of 2
+            info_translations: [],
+          }),
+        },
+      }],
+    };
+    mockCreate.mockResolvedValue(mismatchedResponse);
+
+    await expect(translateEventContent(content, "en")).rejects.toThrow(
+      "parts_translations length mismatch"
+    );
+    // Should have retried 3 times total (initial + 2 retries)
+    expect(mockCreate).toHaveBeenCalledTimes(3);
+  });
+
+  it("retries and eventually throws when LLM returns wrong info_translations length", async () => {
+    const info = [
+      { type: "price" as const, key: "Entry fee", value: "500 CZK" },
+      { type: "url" as const, key: "Registration", value: "https://example.com" },
+    ];
+    const content: EventContentInput = {
+      title: "Dance Event",
+      description: "Two info items",
+      parts: [],
+      info,
+    };
+
+    // LLM always returns only 1 info_translation instead of the expected 2
+    const mismatchedResponse = {
+      choices: [{
+        message: {
+          content: JSON.stringify({
+            title: "Translated Title",
+            description: "Translated Desc",
+            parts_translations: [],
+            info_translations: [{ key: "Entry fee translated" }], // 1 instead of 2
+          }),
+        },
+      }],
+    };
+    mockCreate.mockResolvedValue(mismatchedResponse);
+
+    await expect(translateEventContent(content, "en")).rejects.toThrow(
+      "info_translations length mismatch"
+    );
+    expect(mockCreate).toHaveBeenCalledTimes(3);
+  });
 });

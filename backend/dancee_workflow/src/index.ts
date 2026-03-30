@@ -1,11 +1,12 @@
 import * as http2 from "http2";
 import * as restate from "@restatedev/restate-sdk";
-import { initSentry } from "./core/config";
+import { initSentry, validateConfig } from "./core/config";
 import { config } from "./core/config";
 import { apiService } from "./services/api";
 import { eventWorkflow } from "./services/workflow";
 import { batchService } from "./services/batch";
 
+validateConfig();
 initSentry();
 
 const restateHandler = restate

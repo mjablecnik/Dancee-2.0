@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { log } from "./logger";
 
 // ---- Facebook schemas ----
 
@@ -7,7 +8,15 @@ export const FacebookEventSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   startTimestamp: z.number(),
-  endTimestamp: z.number().nullable().optional(),
+  // Transform: values <= 0 are treated as null (same rule as toIsoOrNull).
+  // Facebook never schedules events at Unix epoch; a zero/negative timestamp
+  // means unset/invalid data. This encodes the constraint at the schema level
+  // so consumers receive null rather than a misleading zero.
+  endTimestamp: z
+    .number()
+    .nullable()
+    .optional()
+    .transform((ts) => (ts !== null && ts !== undefined && ts <= 0 ? null : ts)),
   timezone: z.string().optional(),
   location: z
     .object({
@@ -81,7 +90,13 @@ export type EventInfo = z.infer<typeof EventInfoSchema>;
 
 export function filterEventInfo(items: unknown[]): EventInfo[] {
   return items
-    .map((item) => EventInfoSchema.safeParse(item))
+    .map((item) => {
+      const result = EventInfoSchema.safeParse(item);
+      if (!result.success) {
+        log({ level: "warn", message: "filterEventInfo: dropping item that failed validation", item, error: result.error.message });
+      }
+      return result;
+    })
     .filter((result): result is { success: true; data: EventInfo } => result.success)
     .map((result) => result.data)
     .filter((item) => item.value !== "" && item.value !== null);
@@ -115,6 +130,8 @@ export const DirectusEventSchema = z.object({
   id: z.union([z.number(), z.string()]).optional(),
   original_description: z.string(),
   organizer: z.string(),
+  // Directus may return venue IDs as number (auto-increment) or string (UUID).
+  // Align with DirectusVenueSchema.id to avoid type mismatch at runtime.
   venue: z.union([z.number(), z.string()]).nullable().optional(),
   start_time: z.string(),
   end_time: z.string().nullable().optional(),
@@ -165,7 +182,7 @@ export const DirectusErrorSchema = z.object({
   id: z.union([z.number(), z.string()]).optional(),
   url: z.string(),
   message: z.string(),
-  datetime: z.string().optional(),
+  datetime: z.string(),
 });
 
 export type DirectusError = z.infer<typeof DirectusErrorSchema>;
@@ -195,6 +212,10 @@ export type NominatimResponse = z.infer<typeof NominatimResponseSchema>;
 // ---- Date/time utilities ----
 
 export function toIsoOrNull(timestamp: number | null | undefined): string | null {
+  // Treating 0 and negative values as null is intentional: Requirement 1.4 says
+  // null/missing/invalid timestamps map to null. While 0 (Unix epoch) is technically
+  // valid, Facebook never schedules events at 1970-01-01T00:00:00Z — a zero timestamp
+  // is always invalid/unset data in practice. This is a documented practical decision.
   if (timestamp === null || timestamp === undefined || timestamp <= 0) return null;
   try {
     const d = new Date(timestamp * 1000);
@@ -208,10 +229,11 @@ export function toIsoOrNull(timestamp: number | null | undefined): string | null
 // ---- JSON parsing ----
 
 export function parseJsonResponse(raw: string): unknown {
-  const stripped = raw
-    .trim()
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
-  return JSON.parse(stripped);
+  // Find the first code fence block anywhere in the response (LLMs may return
+  // explanatory text before the fence, or use leading whitespace/newlines).
+  const fenceMatch = raw.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/i);
+  if (fenceMatch) {
+    return JSON.parse(fenceMatch[1].trim());
+  }
+  return JSON.parse(raw.trim());
 }

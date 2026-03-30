@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import fc from "fast-check";
 import {
   parseEventType,
@@ -7,6 +7,7 @@ import {
   computeDances,
   SUPPORTED_EVENT_TYPES,
   EventPartSchema,
+  FacebookEventSchema,
 } from "../../core/schemas";
 
 describe("parseEventType", () => {
@@ -57,6 +58,20 @@ describe("parseJsonResponse", () => {
     expect(parseJsonResponse("```\n" + json + "\n```")).toEqual(obj);
   });
 
+  it("handles leading text/whitespace before code fence", () => {
+    const obj = { key: "value" };
+    const json = JSON.stringify(obj);
+
+    // Leading newlines before fence
+    expect(parseJsonResponse("\n\n```json\n" + json + "\n```")).toEqual(obj);
+
+    // Explanatory text before fence
+    expect(parseJsonResponse("Here is the result:\n```json\n" + json + "\n```")).toEqual(obj);
+
+    // Leading whitespace and language-less fence
+    expect(parseJsonResponse("  ```\n" + json + "\n```")).toEqual(obj);
+  });
+
   it("parses plain JSON without fences", () => {
     fc.assert(
       // Exclude values containing -0 since JSON.stringify(-0) === "0", breaking round-trips
@@ -80,6 +95,22 @@ describe("parseJsonResponse", () => {
 });
 
 describe("filterEventInfo", () => {
+  it("logs a warning for each item that fails schema validation", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    filterEventInfo([{ type: "invalid-type", key: "x", value: "y" }]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("dropping item that failed validation"),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("does not warn for valid items", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    filterEventInfo([{ type: "url", key: "Registration", value: "https://example.com" }]);
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
   it("Property 8: filters out entries with empty or null values", () => {
     const items = [
       { type: "url", key: "Registration", value: "https://example.com" },
@@ -175,5 +206,52 @@ describe("computeDances", () => {
     expect(result).toContain("Salsa");
     expect(result).toContain("Bachata");
     expect(result).toContain("Kizomba");
+  });
+});
+
+// Helper to build a minimal valid FacebookEvent for schema parsing
+function makeFbEventRaw(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: "123",
+    name: "Test Event",
+    startTimestamp: 1700000000,
+    url: "https://facebook.com/events/123",
+    ...overrides,
+  };
+}
+
+describe("FacebookEventSchema.endTimestamp: <= 0 transforms to null", () => {
+  it("transforms 0 endTimestamp to null", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw({ endTimestamp: 0 }));
+    expect(result.endTimestamp).toBeNull();
+  });
+
+  it("transforms negative endTimestamp to null", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw({ endTimestamp: -1 }));
+    expect(result.endTimestamp).toBeNull();
+  });
+
+  it("keeps positive endTimestamp as-is", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw({ endTimestamp: 1700010000 }));
+    expect(result.endTimestamp).toBe(1700010000);
+  });
+
+  it("keeps null endTimestamp as null", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw({ endTimestamp: null }));
+    expect(result.endTimestamp).toBeNull();
+  });
+
+  it("keeps undefined endTimestamp as undefined when field is absent", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw());
+    expect(result.endTimestamp).toBeUndefined();
+  });
+
+  it("Property: any endTimestamp <= 0 is transformed to null", () => {
+    fc.assert(
+      fc.property(fc.integer({ max: 0 }), (ts) => {
+        const result = FacebookEventSchema.parse(makeFbEventRaw({ endTimestamp: ts }));
+        expect(result.endTimestamp).toBeNull();
+      })
+    );
   });
 });

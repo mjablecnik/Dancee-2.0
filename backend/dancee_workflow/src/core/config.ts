@@ -13,7 +13,32 @@ export const config = {
   sentryDsn: process.env.SENTRY_DSN ?? "",
   corsOrigins: process.env.CORS_ORIGINS ?? "*",
   appPort: parseInt(process.env.APP_PORT ?? "9080", 10),
+  // Request timeout in milliseconds for each external service.
+  // These prevent hanging workflows when a downstream service is unresponsive.
+  directusTimeoutMs: parseInt(process.env.DIRECTUS_TIMEOUT_MS ?? "30000", 10),
+  scraperTimeoutMs: parseInt(process.env.SCRAPER_TIMEOUT_MS ?? "30000", 10),
+  nominatimTimeoutMs: parseInt(process.env.NOMINATIM_TIMEOUT_MS ?? "10000", 10),
 };
+
+export function validateConfig(): void {
+  const required: Array<{ key: keyof typeof config; envVar: string }> = [
+    { key: "openRouterApiKey", envVar: "OPENROUTER_API_KEY" },
+    { key: "directusBaseUrl", envVar: "DIRECTUS_BASE_URL" },
+    { key: "directusAccessToken", envVar: "DIRECTUS_ACCESS_TOKEN" },
+    { key: "scraperBaseUrl", envVar: "SCRAPER_BASE_URL" },
+  ];
+
+  const missing = required
+    .filter(({ key }) => !config[key])
+    .map(({ envVar }) => envVar);
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missing.join(", ")}. ` +
+      "Set these variables before starting the service.",
+    );
+  }
+}
 
 export function initSentry(): void {
   if (!config.sentryDsn) {

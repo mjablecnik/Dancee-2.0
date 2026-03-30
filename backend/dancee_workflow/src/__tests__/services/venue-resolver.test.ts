@@ -7,6 +7,8 @@ vi.mock("../../core/config", () => ({
     directusBaseUrl: "http://directus-test",
     directusAccessToken: "test-token",
     nominatimBaseUrl: "http://nominatim-test",
+    directusTimeoutMs: 5000,
+    nominatimTimeoutMs: 5000,
   },
 }));
 
@@ -136,6 +138,56 @@ describe("Property 9: Venue resolution field mapping", () => {
     });
 
     expect(result.region).toBe("Other");
+  });
+
+  it("returns null when reverseGeocode throws and no location fields are available", async () => {
+    mockFindVenueByCoordinates.mockResolvedValue(null);
+    mockFindVenue.mockResolvedValue(null);
+    mockReverseGeocode.mockRejectedValue(new Error("Nominatim rate limit"));
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const result = await resolveVenue({ latitude: 50.0, longitude: 14.0 });
+    warnSpy.mockRestore();
+
+    // All identifying fields are empty after Nominatim failure → null, no venue created
+    expect(result).toBeNull();
+    expect(mockCreateVenue).not.toHaveBeenCalled();
+  });
+
+  it("logs a warning when reverseGeocode fails", async () => {
+    mockFindVenueByCoordinates.mockResolvedValue(null);
+    mockFindVenue.mockResolvedValue(null);
+    mockReverseGeocode.mockRejectedValue(new Error("Nominatim timeout"));
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await resolveVenue({ latitude: 50.0, longitude: 14.0 });
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("reverseGeocode failed"),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("creates venue when Nominatim resolves location fields even without Facebook fields", async () => {
+    mockFindVenueByCoordinates.mockResolvedValue(null);
+    mockFindVenue.mockResolvedValue(null);
+    mockReverseGeocode.mockResolvedValue({
+      address: {
+        road: "Geocoded Road",
+        city: "Geocoded City",
+        country_code: "CZ",
+        state: "Jihomoravský kraj",
+      },
+    });
+    mockCreateVenue.mockImplementation((v: unknown) =>
+      Promise.resolve({ ...(v as object), id: 99 })
+    );
+
+    const result = await resolveVenue({ latitude: 50.0, longitude: 14.0 });
+
+    expect(result).not.toBeNull();
+    expect(mockCreateVenue).toHaveBeenCalledOnce();
+    expect(result!.region).toBe("Jihomoravský kraj");
   });
 
   it("returns existing venue by coordinates without calling createVenue", async () => {

@@ -29,19 +29,21 @@ vi.mock("@restatedev/restate-sdk", () => ({
 const mockScrapeEvent = vi.fn();
 const mockFindEventByOriginalUrl = vi.fn();
 const mockCreateEvent = vi.fn();
+const mockFindErrorByUrl = vi.fn();
+const mockCreateError = vi.fn();
 const mockClassifyEventType = vi.fn();
 const mockExtractEventParts = vi.fn();
 const mockExtractEventInfo = vi.fn();
 const mockTranslateEventContent = vi.fn();
 const mockResolveVenue = vi.fn();
-const mockComputeDances = vi.fn();
-
 vi.mock("../../clients/scraper-client", () => ({
   scrapeEvent: (...args: unknown[]) => mockScrapeEvent(...args),
 }));
 vi.mock("../../clients/directus-client", () => ({
   findEventByOriginalUrl: (...args: unknown[]) => mockFindEventByOriginalUrl(...args),
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
+  findErrorByUrl: (...args: unknown[]) => mockFindErrorByUrl(...args),
+  createError: (...args: unknown[]) => mockCreateError(...args),
 }));
 vi.mock("../../services/event-parser", () => ({
   classifyEventType: (...args: unknown[]) => mockClassifyEventType(...args),
@@ -54,16 +56,11 @@ vi.mock("../../services/event-translator", () => ({
 vi.mock("../../services/venue-resolver", () => ({
   resolveVenue: (...args: unknown[]) => mockResolveVenue(...args),
 }));
-vi.mock("../../core/schemas", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../core/schemas")>();
-  return {
-    ...actual,
-    computeDances: (...args: unknown[]) => mockComputeDances(...args),
-  };
-});
+// No mock for computeDances — it is a pure function with no side effects,
+// so the real implementation is used directly in workflow tests.
 
 // Import workflow AFTER mocks are set up
-import { eventWorkflow } from "../../services/workflow";
+import { eventWorkflow, computeTranslationStatus } from "../../services/workflow";
 
 // Helper: create a minimal mock Restate WorkflowContext
 function makeMockCtx(key = "test-run-id") {
@@ -131,8 +128,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   // Default mock implementations
   mockFindEventByOriginalUrl.mockResolvedValue(null);
+  mockFindErrorByUrl.mockResolvedValue(null);
+  mockCreateError.mockResolvedValue({ id: 1, url: "", message: "", datetime: new Date().toISOString() });
   mockResolveVenue.mockResolvedValue({ id: 1, name: "Test Venue" });
-  mockComputeDances.mockReturnValue(["salsa", "bachata"]);
   mockCreateEvent.mockImplementation((event: unknown) =>
     Promise.resolve({ ...(event as object), id: 99 })
   );
@@ -356,7 +354,6 @@ describe("Property 23: Translation status reflects actual translation completene
       vi.clearAllMocks();
       mockFindEventByOriginalUrl.mockResolvedValue(null);
       mockResolveVenue.mockResolvedValue({ id: 1 });
-      mockComputeDances.mockReturnValue([]);
       mockCreateEvent.mockImplementation((e: unknown) => Promise.resolve({ ...(e as object), id: 99 }));
 
       const ctx = makeMockCtx();
@@ -408,8 +405,7 @@ describe("Property 18: Translation failure isolation", () => {
           vi.clearAllMocks();
           mockFindEventByOriginalUrl.mockResolvedValue(null);
           mockResolveVenue.mockResolvedValue({ id: 1 });
-          mockComputeDances.mockReturnValue([]);
-          mockCreateEvent.mockImplementation((e: unknown) => Promise.resolve({ ...(e as object), id: 99 }));
+              mockCreateEvent.mockImplementation((e: unknown) => Promise.resolve({ ...(e as object), id: 99 }));
 
           const ctx = makeMockCtx();
           mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
@@ -443,7 +439,7 @@ describe("Property 18: Translation failure isolation", () => {
     );
   });
 
-  it("unsupported event type returns null without calling createEvent", async () => {
+  it("unsupported event type returns skipped response without calling createEvent", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.constantFrom("other", "lesson", "course"),
@@ -457,10 +453,239 @@ describe("Property 18: Translation failure isolation", () => {
 
           const result = await runWorkflow(ctx, "https://facebook.com/events/123");
 
-          expect(result).toBeNull();
+          expect(result).toEqual({ status: "skipped", reason: `Unsupported event type: ${unsupportedType}` });
           expect(mockCreateEvent).not.toHaveBeenCalled();
         }
       )
     );
+  });
+});
+
+// ---- Early startTimestamp validation ----
+
+describe("Early startTimestamp validation: rejects invalid timestamps before LLM calls", () => {
+  it("throws TerminalError immediately for zero startTimestamp without calling classify", async () => {
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent({ startTimestamp: 0 }));
+
+    await expect(runWorkflow(ctx, "https://facebook.com/events/123")).rejects.toThrow(
+      "Invalid startTimestamp"
+    );
+    expect(mockClassifyEventType).not.toHaveBeenCalled();
+  });
+
+  it("throws TerminalError immediately for negative startTimestamp without calling classify", async () => {
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent({ startTimestamp: -1 }));
+
+    await expect(runWorkflow(ctx, "https://facebook.com/events/123")).rejects.toThrow(
+      "Invalid startTimestamp"
+    );
+    expect(mockClassifyEventType).not.toHaveBeenCalled();
+  });
+
+  it("proceeds normally for positive startTimestamp", async () => {
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent({ startTimestamp: 1700000000 }));
+    mockClassifyEventType.mockResolvedValue("party");
+    mockExtractEventParts.mockResolvedValue({ title: "T", description: "D", parts: [] });
+    mockExtractEventInfo.mockResolvedValue([]);
+    mockTranslateEventContent.mockResolvedValue({
+      title: "EN",
+      description: "EN",
+      parts_translations: [],
+      info_translations: [],
+    });
+
+    await expect(runWorkflow(ctx, "https://facebook.com/events/123")).resolves.toBeDefined();
+    expect(mockClassifyEventType).toHaveBeenCalledOnce();
+  });
+});
+
+// ---- Venue id warning ----
+
+describe("Venue id warning: warns when resolveVenue returns venue without id", () => {
+  it("logs a warning when venue has no id and stores null as venue association", async () => {
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+    mockClassifyEventType.mockResolvedValue("party");
+    mockExtractEventParts.mockResolvedValue({ title: "T", description: "D", parts: [] });
+    mockExtractEventInfo.mockResolvedValue([]);
+    // Return a venue without an id field
+    mockResolveVenue.mockResolvedValue({ name: "No ID Venue" });
+    mockTranslateEventContent.mockResolvedValue({
+      title: "EN",
+      description: "EN",
+      parts_translations: [],
+      info_translations: [],
+    });
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    await runWorkflow(ctx, "https://facebook.com/events/123");
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("resolveVenue returned a venue without an id"),
+    );
+    // venue stored as null because venue.id is undefined
+    const [createdEvent] = mockCreateEvent.mock.calls[0] as [{ venue: unknown }];
+    expect(createdEvent.venue).toBeNull();
+
+    warnSpy.mockRestore();
+  });
+
+  it("does not warn when resolveVenue returns a venue with an id", async () => {
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+    mockClassifyEventType.mockResolvedValue("party");
+    mockExtractEventParts.mockResolvedValue({ title: "T", description: "D", parts: [] });
+    mockExtractEventInfo.mockResolvedValue([]);
+    mockResolveVenue.mockResolvedValue({ id: 42, name: "Venue With ID" });
+    mockTranslateEventContent.mockResolvedValue({
+      title: "EN",
+      description: "EN",
+      parts_translations: [],
+      info_translations: [],
+    });
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    await runWorkflow(ctx, "https://facebook.com/events/123");
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining("resolveVenue returned a venue without an id"),
+    );
+    warnSpy.mockRestore();
+  });
+});
+
+// ---- Error tracking catch block ----
+
+describe("Error tracking: catch block logs failure via findErrorByUrl / createError", () => {
+  it("calls createError when workflow throws and no existing error record exists", async () => {
+    const ctx = makeMockCtx();
+    const scrapeError = new Error("Scraper unavailable");
+    mockScrapeEvent.mockRejectedValue(scrapeError);
+    mockFindErrorByUrl.mockResolvedValue(null);
+
+    await expect(runWorkflow(ctx, "https://facebook.com/events/err1")).rejects.toThrow(
+      "Scraper unavailable"
+    );
+
+    expect(mockFindErrorByUrl).toHaveBeenCalledWith("https://facebook.com/events/err1");
+    expect(mockCreateError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: "https://facebook.com/events/err1",
+        message: "Scraper unavailable",
+      })
+    );
+  });
+
+  it("skips createError when an error record already exists for the URL", async () => {
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockRejectedValue(new Error("Network error"));
+    mockFindErrorByUrl.mockResolvedValue({
+      id: 42,
+      url: "https://facebook.com/events/err2",
+      message: "previous error",
+      datetime: "2025-01-01T00:00:00.000Z",
+    });
+
+    await expect(runWorkflow(ctx, "https://facebook.com/events/err2")).rejects.toThrow(
+      "Network error"
+    );
+
+    expect(mockFindErrorByUrl).toHaveBeenCalledWith("https://facebook.com/events/err2");
+    expect(mockCreateError).not.toHaveBeenCalled();
+  });
+
+  it("re-throws the original error after logging it", async () => {
+    const ctx = makeMockCtx();
+    const originalError = new Error("LLM timeout");
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+    mockClassifyEventType.mockRejectedValue(originalError);
+    mockFindErrorByUrl.mockResolvedValue(null);
+
+    await expect(runWorkflow(ctx, "https://facebook.com/events/err3")).rejects.toThrow(
+      "LLM timeout"
+    );
+
+    expect(mockCreateError).toHaveBeenCalledOnce();
+  });
+});
+
+// ---- computeTranslationStatus unit tests (Property 24: business rule per Requirement 24) ----
+
+describe("computeTranslationStatus: direct unit tests (Requirement 24)", () => {
+  it("returns 'complete' when cs, en, and es are all present", () => {
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "en", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "es", title: "T", description: "D", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("complete");
+  });
+
+  it("returns 'partial' when only cs and en are present", () => {
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "en", title: "T", description: "D", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("partial");
+  });
+
+  it("returns 'partial' when only cs and es are present", () => {
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "es", title: "T", description: "D", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("partial");
+  });
+
+  it("returns 'partial' when only cs is present", () => {
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("partial");
+  });
+
+  it("returns 'missing' when no translations are present", () => {
+    expect(computeTranslationStatus([])).toBe("missing");
+  });
+
+  it("returns 'partial' when only en is present (no cs)", () => {
+    const translations = [
+      { languages_code: "en", title: "T", description: "D", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("partial");
+  });
+
+  it("deduplicates: duplicate language codes do not inflate the count", () => {
+    // Two cs entries but still missing en and es → partial (not complete)
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "cs", title: "T2", description: "D2", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("partial");
+  });
+
+  it("returns 'partial' when an unexpected language code is present alongside cs", () => {
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "fr", title: "T", description: "D", parts_translations: [], info_translations: [] },
+    ];
+    // cs present but not en+es → partial
+    expect(computeTranslationStatus(translations)).toBe("partial");
+  });
+
+  it("returns 'complete' when all three codes are present with duplicates", () => {
+    // All three languages present, plus a duplicate cs — duplicates do not affect the result
+    const translations = [
+      { languages_code: "cs", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "en", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "es", title: "T", description: "D", parts_translations: [], info_translations: [] },
+      { languages_code: "cs", title: "T2", description: "D2", parts_translations: [], info_translations: [] },
+    ];
+    expect(computeTranslationStatus(translations)).toBe("complete");
   });
 });

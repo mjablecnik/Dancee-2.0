@@ -1,15 +1,10 @@
-import OpenAI from "openai";
-import { ZodError } from "zod";
 import { config } from "../core/config";
+import { getOpenAI } from "../core/openai";
 import { parseJsonResponse } from "../core/schemas";
 import { getTranslationPrompt } from "../core/prompts";
+import { retryOnJsonError } from "./event-parser";
 import { z } from "zod";
 import type { EventPart, EventInfo } from "../core/schemas";
-
-const openai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: config.openRouterApiKey,
-});
 
 const TranslatedPartSchema = z.object({
   name: z.string(),
@@ -47,23 +42,27 @@ export async function translateEventContent(
     info_translations: content.info.map((i) => ({ key: i.key })),
   };
 
-  let lastError: unknown;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const response = await openai.chat.completions.create({
-        model: config.openRouterModel,
-        messages: [
-          { role: "system", content: getTranslationPrompt(targetLanguage) },
-          { role: "user", content: JSON.stringify(input) },
-        ],
-      });
-      const raw = response.choices[0]?.message?.content ?? "";
-      const parsed = parseJsonResponse(raw);
-      return TranslatedEventContentSchema.parse(parsed);
-    } catch (err) {
-      if (!(err instanceof SyntaxError || err instanceof ZodError)) throw err;
-      lastError = err;
+  return retryOnJsonError(async () => {
+    const response = await getOpenAI().chat.completions.create({
+      model: config.openRouterModel,
+      messages: [
+        { role: "system", content: getTranslationPrompt(targetLanguage) },
+        { role: "user", content: JSON.stringify(input) },
+      ],
+    });
+    const raw = response.choices[0]?.message?.content ?? "";
+    const parsed = parseJsonResponse(raw);
+    const result = TranslatedEventContentSchema.parse(parsed);
+    if (result.parts_translations.length !== content.parts.length) {
+      throw new SyntaxError(
+        `Translation parts_translations length mismatch: expected ${content.parts.length}, got ${result.parts_translations.length}`,
+      );
     }
-  }
-  throw lastError;
+    if (result.info_translations.length !== content.info.length) {
+      throw new SyntaxError(
+        `Translation info_translations length mismatch: expected ${content.info.length}, got ${result.info_translations.length}`,
+      );
+    }
+    return result;
+  });
 }

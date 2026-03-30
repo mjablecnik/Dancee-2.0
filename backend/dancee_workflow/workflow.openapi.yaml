@@ -1,7 +1,11 @@
 openapi: "3.0.3"
 info:
-  title: dancee_workflow API
+  title: dancee_workflow API (LOCAL DEVELOPMENT REFERENCE — DEPRECATED)
   description: |
+    **DEPRECATED**: This file is a local development reference copy only.
+    The canonical API specification is maintained in `backend/dancee_api/specs/workflow.openapi.yaml`.
+    Do NOT use this file to generate clients or documentation — it may be out of date.
+
     Restate-based event processing workflow service for Dancee.
     All endpoints are exposed via the `/api` prefix on the Restate ingress (port 8080).
     The ingress rewrites `/api/*` paths to the corresponding Restate service handlers internally.

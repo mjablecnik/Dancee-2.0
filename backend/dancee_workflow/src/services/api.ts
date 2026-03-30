@@ -1,6 +1,7 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listEvents } from "../clients/directus-client";
+import { listPublishedEvents } from "../clients/directus-client";
 import { config } from "../core/config";
+import { log } from "../core/logger";
 import type { EventWorkflow } from "./workflow";
 import type { BatchService } from "./batch";
 
@@ -37,16 +38,21 @@ export const apiService = restate.service({
     },
 
     listEvents: async (ctx: restate.Context) => {
-      let filter: Record<string, unknown> | undefined;
+      // Always enforce the published-only restriction via listPublishedEvents.
+      // The extraFilter is merged inside listPublishedEvents using _and so that
+      // status:published is always enforced regardless of caller input.
       const filterHeader = ctx.request().headers.get("x-dancee-filter");
+      let extraFilter: Record<string, unknown> | undefined;
       if (filterHeader) {
         try {
-          filter = JSON.parse(filterHeader) as Record<string, unknown>;
+          extraFilter = JSON.parse(filterHeader) as Record<string, unknown>;
         } catch {
-          // Invalid JSON in filter header — fall through to default
+          // Invalid JSON in filter header — fall through to published-only default
+          log({ level: "warn", message: "listEvents: x-dancee-filter header contains invalid JSON, ignoring filter", header: filterHeader });
         }
       }
-      const events = await listEvents(filter ?? { status: { _eq: "published" } });
+
+      const events = await listPublishedEvents(extraFilter);
       return events;
     },
   },

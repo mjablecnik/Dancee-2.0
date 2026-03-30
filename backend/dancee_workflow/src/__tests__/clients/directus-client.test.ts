@@ -3,7 +3,7 @@ import fc from "fast-check";
 
 // Mock config before importing the client
 vi.mock("../../core/config", () => ({
-  config: { directusBaseUrl: "http://directus-test", directusAccessToken: "test-token" },
+  config: { directusBaseUrl: "http://directus-test", directusAccessToken: "test-token", directusTimeoutMs: 5000 },
 }));
 
 import {
@@ -12,7 +12,11 @@ import {
   findEventByOriginalUrl,
   findErrorByUrl,
   createError,
+  createVenue,
+  updateGroupTimestamp,
   getGroupsOrderedByUpdatedAt,
+  listEvents,
+  listPublishedEvents,
 } from "../../clients/directus-client";
 
 afterEach(() => {
@@ -55,6 +59,71 @@ function makeEvent(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+// ---- Property 24: listPublishedEvents always enforces published filter ----
+
+describe("Property 24: listPublishedEvents always enforces published filter", () => {
+  it("uses status=published filter when called without extra filter", async () => {
+    let capturedUrl = "";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((url: string) => {
+        capturedUrl = url;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ data: [] }),
+        });
+      })
+    );
+    await listPublishedEvents();
+    const params = new URL(capturedUrl).searchParams;
+    const filter = JSON.parse(params.get("filter") ?? "{}") as Record<string, unknown>;
+    expect((filter as { status?: { _eq?: string } }).status?._eq).toBe("published");
+  });
+
+  it("merges extra filter with published filter using _and", async () => {
+    let capturedUrl = "";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((url: string) => {
+        capturedUrl = url;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ data: [] }),
+        });
+      })
+    );
+    const extraFilter = { category: { _eq: "dance" } };
+    await listPublishedEvents(extraFilter);
+    const params = new URL(capturedUrl).searchParams;
+    const filter = JSON.parse(params.get("filter") ?? "{}") as { _and?: Array<Record<string, unknown>> };
+    expect(filter._and).toBeDefined();
+    expect(filter._and?.[0]).toEqual({ status: { _eq: "published" } });
+    expect(filter._and?.[1]).toEqual(extraFilter);
+  });
+
+  it("listEvents passes the raw filter without enforcing published", async () => {
+    let capturedUrl = "";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((url: string) => {
+        capturedUrl = url;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ data: [] }),
+        });
+      })
+    );
+    const rawFilter = { status: { _eq: "draft" } };
+    await listEvents(rawFilter);
+    const params = new URL(capturedUrl).searchParams;
+    const filter = JSON.parse(params.get("filter") ?? "{}") as Record<string, unknown>;
+    expect((filter as { status?: { _eq?: string } }).status?._eq).toBe("draft");
+  });
+});
 
 describe("Property 10: Venue deduplication", () => {
   it("returns existing venue by coordinates when found", async () => {
@@ -212,6 +281,7 @@ describe("Property 12: Error deduplication by URL", () => {
             "https://facebook.com/events/333"
           ),
           message: fc.string({ minLength: 1, maxLength: 100 }),
+          datetime: fc.constant("2025-01-01T00:00:00.000Z"),
         }),
         async (error) => {
           vi.stubGlobal(
@@ -353,5 +423,109 @@ describe("Property 13: Groups ordered by updated_at ascending", () => {
         }
       )
     );
+  });
+});
+
+describe("Directus response envelope validator: throws on missing data field", () => {
+  it("throws a descriptive error when response has no data field (e.g. auth error shape)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ errors: [{ message: "Forbidden" }] }),
+      })
+    );
+    await expect(findEventByOriginalUrl("https://facebook.com/events/123")).rejects.toThrow(
+      /Unexpected Directus response shape/
+    );
+  });
+
+  it("throws with context name in error message", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ errors: [{ message: "Forbidden" }] }),
+      })
+    );
+    let errorMessage = "";
+    try {
+      await findEventByOriginalUrl("https://facebook.com/events/123");
+    } catch (e) {
+      errorMessage = (e as Error).message;
+    }
+    expect(errorMessage).toContain("findEventByOriginalUrl");
+  });
+});
+
+describe("POST/PATCH error messages include truncated request body", () => {
+  it("createVenue (POST) error includes body preview", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        text: async () => "Validation error",
+      })
+    );
+    const venue = {
+      name: "Club Test",
+      street: "Main St",
+      number: "1",
+      town: "Prague",
+      country: "CZ",
+      postal_code: "11000",
+      region: "Prague",
+      latitude: 50.0,
+      longitude: 14.0,
+    };
+    await expect(createVenue(venue)).rejects.toThrow(/body:/);
+  });
+
+  it("updateGroupTimestamp (PATCH) error includes body preview", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: async () => "Server error",
+      })
+    );
+    await expect(updateGroupTimestamp(1, "2025-01-01T00:00:00Z")).rejects.toThrow(/body:/);
+  });
+
+  it("body preview is truncated to 200 characters", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        text: async () => "Bad request",
+      })
+    );
+    const largeVenue = {
+      name: "A".repeat(300),
+      street: "B".repeat(300),
+      number: "1",
+      town: "C".repeat(300),
+      country: "CZ",
+      postal_code: "11000",
+      region: "Prague",
+      latitude: 50.0,
+      longitude: 14.0,
+    };
+    let errorMessage = "";
+    try {
+      await createVenue(largeVenue);
+    } catch (e) {
+      errorMessage = (e as Error).message;
+    }
+    // Extract the body preview part from the error message: "(body: <preview>)"
+    const bodyMatch = errorMessage.match(/\(body: (.+)\)$/);
+    expect(bodyMatch).not.toBeNull();
+    // The body preview should be at most 200 chars
+    expect(bodyMatch![1].length).toBeLessThanOrEqual(200);
   });
 });

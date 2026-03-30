@@ -4,10 +4,10 @@ import {
   updateGroupTimestamp,
   findEventByOriginalUrl,
   createError,
-  findErrorByUrl,
 } from "../clients/directus-client";
-import { scrapeEventList } from "../clients/scraper-client";
+import { scrapeEventList, buildFacebookEventUrl } from "../clients/scraper-client";
 import { captureError } from "../core/config";
+import { log } from "../core/logger";
 import type { EventWorkflow } from "./workflow";
 
 export const batchService = restate.service({
@@ -16,6 +16,9 @@ export const batchService = restate.service({
     processAll: async (ctx: restate.Context) => {
       const groups = await ctx.run("getGroups", () => getGroupsOrderedByUpdatedAt());
 
+      let eventsScheduled = 0;
+      let schedulingErrors = 0;
+
       for (const group of groups) {
         const groupId = String(group.id ?? group.url);
         try {
@@ -23,8 +26,11 @@ export const batchService = restate.service({
             scrapeEventList(group.url)
           );
 
+          log({ level: "info", message: `Processing group: ${events.length} event(s) found from scraper`, url: group.url });
+
+          let groupScheduled = 0;
           for (const event of events) {
-            const eventUrl = event.url ?? `https://www.facebook.com/events/${event.id}`;
+            const eventUrl = event.url ?? buildFacebookEventUrl(event.id);
 
             // Duplicate check errors propagate to Restate for retry — a transient
             // Directus failure here should not cause the event to be permanently skipped.
@@ -33,34 +39,32 @@ export const batchService = restate.service({
             );
 
             if (!existing) {
+              const workflowKey = ctx.rand.uuidv4();
+              // Fire-and-forget pattern (Requirement 10.5 trade-off):
+              // workflowSendClient schedules the EventWorkflow asynchronously without
+              // awaiting completion. Per-event execution errors are handled inside the
+              // EventWorkflow's own catch block, which writes failures to the Directus
+              // errors collection and re-throws to let Restate retry. Scheduling errors
+              // (e.g. a Restate infrastructure failure) are caught here and tracked in
+              // Directus explicitly to satisfy Requirement 10.5.
               try {
-                const workflowKey = ctx.rand.uuidv4();
                 ctx
                   .workflowSendClient<EventWorkflow>({ name: "EventWorkflow" }, workflowKey)
                   .run(eventUrl);
-              } catch (err) {
-                console.error(`Failed to process event ${eventUrl}:`, err);
-                captureError(err instanceof Error ? err : new Error(String(err)), {
-                  groupId,
-                  eventUrl,
-                  step: "processEvent",
-                });
-                const existingError = await ctx.run(`checkError_${event.id}`, () =>
-                  findErrorByUrl(eventUrl)
+                eventsScheduled++;
+                groupScheduled++;
+              } catch (scheduleErr) {
+                schedulingErrors++;
+                const error = scheduleErr instanceof Error ? scheduleErr : new Error(String(scheduleErr));
+                captureError(error, { eventUrl, step: "scheduleEventWorkflow" });
+                await ctx.run(`scheduleError_${event.id}`, () =>
+                  createError({ url: eventUrl, message: error.message })
                 );
-                if (!existingError) {
-                  const errorDatetime = await ctx.run(`errorDatetime_${event.id}`, () => new Date().toISOString());
-                  await ctx.run(`createError_${event.id}`, () =>
-                    createError({
-                      url: eventUrl,
-                      message: err instanceof Error ? err.message : String(err),
-                      datetime: errorDatetime,
-                    })
-                  );
-                }
               }
             }
           }
+
+          log({ level: "info", message: `Group processed: scheduled ${groupScheduled} new workflow(s) out of ${events.length} event(s)`, url: group.url });
 
           if (group.id !== undefined) {
             const groupTimestamp = await ctx.run(`groupTimestamp_${groupId}`, () => new Date().toISOString());
@@ -68,15 +72,18 @@ export const batchService = restate.service({
               updateGroupTimestamp(group.id!, groupTimestamp)
             );
           } else {
-            console.warn(`Skipping timestamp update for group without id: ${group.url}`);
+            log({ level: "warn", message: `Skipping timestamp update for group without id: ${group.url}` });
           }
         } catch (err) {
-          console.error(`Failed to process group ${group.url}:`, err);
+          log({ level: "error", message: `Failed to process group`, url: group.url, error: String(err) });
           captureError(err instanceof Error ? err : new Error(String(err)), { groupId, step: "processGroup" });
+          await ctx.run(`groupError_${groupId}`, () =>
+            createError({ url: group.url, message: String(err) })
+          );
         }
       }
 
-      return { processed: groups.length };
+      return { groups: groups.length, eventsScheduled, schedulingErrors };
     },
   },
 });

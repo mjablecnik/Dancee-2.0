@@ -1,14 +1,38 @@
 import * as restate from "@restatedev/restate-sdk";
 import { scrapeEvent } from "../clients/scraper-client";
-import { findEventByOriginalUrl, createEvent } from "../clients/directus-client";
+import { findEventByOriginalUrl, createEvent, findErrorByUrl, createError } from "../clients/directus-client";
 import { classifyEventType, extractEventParts, extractEventInfo } from "./event-parser";
 import { translateEventContent } from "./event-translator";
 import { resolveVenue } from "./venue-resolver";
 import { computeDances, SUPPORTED_EVENT_TYPES, toIsoOrNull } from "../core/schemas";
 import { captureError } from "../core/config";
+import { log } from "../core/logger";
 import type { DirectusEvent, DirectusEventTranslation } from "../core/schemas";
 
-function computeTranslationStatus(
+/**
+ * Wraps ctx.run with consistent captureError + rethrow handling.
+ * All workflow steps that should abort on failure use this helper
+ * instead of repeating the same try/catch boilerplate.
+ */
+async function runStep<T>(
+  ctx: restate.WorkflowContext,
+  stepName: string,
+  eventUrl: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await ctx.run(stepName, fn);
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), {
+      workflowRunId: ctx.key,
+      eventUrl,
+      step: stepName,
+    });
+    throw err;
+  }
+}
+
+export function computeTranslationStatus(
   translations: DirectusEventTranslation[],
 ): "complete" | "partial" | "missing" {
   const codes = translations.map((t) => t.languages_code);
@@ -27,80 +51,68 @@ export const eventWorkflow = restate.workflow({
       ctx.set("url", eventUrl);
       ctx.set("status", "started");
 
-      // Step 1: Scrape event
-      let facebookEvent;
       try {
-        facebookEvent = await ctx.run("scrape", () => scrapeEvent(eventUrl));
+      return await runWorkflow(ctx, eventUrl);
       } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), {
-          workflowRunId: ctx.key,
-          eventUrl,
-          step: "scrape",
-        });
+        // Track the failure in Directus so the batch service can observe it
+        // without needing to await the fire-and-forget workflowSendClient call.
+        const existingError = await ctx.run("checkError", () => findErrorByUrl(eventUrl));
+        if (!existingError) {
+          await ctx.run("createError", () =>
+            createError({
+              url: eventUrl,
+              message: err instanceof Error ? err.message : String(err),
+            })
+          );
+        }
         throw err;
       }
+    },
+  },
+});
+
+async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
+      // Step 1: Scrape event
+      const facebookEvent = await runStep(ctx, "scrape", eventUrl, () => scrapeEvent(eventUrl));
       ctx.set("status", "scraped");
+
+      // Step 1b: Early validation — reject events with invalid startTimestamp before
+      // any LLM or external API calls to avoid wasting resources.
+      if (facebookEvent.startTimestamp <= 0) {
+        throw new restate.TerminalError(
+          `Invalid startTimestamp for event ${eventUrl}: value must be positive`,
+        );
+      }
 
       // Step 2: Classify event type
       const description = facebookEvent.description ?? facebookEvent.name;
-      let eventType;
-      try {
-        eventType = await ctx.run("classify", () => classifyEventType(description));
-      } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), {
-          workflowRunId: ctx.key,
-          eventUrl,
-          step: "classify",
-        });
-        throw err;
-      }
+      const eventType = await runStep(ctx, "classify", eventUrl, () => classifyEventType(description));
 
       // Step 3: Skip if unsupported type
       if (!(SUPPORTED_EVENT_TYPES as readonly string[]).includes(eventType)) {
+        const skipReason = `Unsupported event type: ${eventType}`;
         ctx.set("status", "skipped");
-        ctx.set("skipReason", `Unsupported event type: ${eventType}`);
-        console.log(`Skipping event ${eventUrl}: unsupported type "${eventType}"`);
-        return null;
+        ctx.set("skipReason", skipReason);
+        log({ level: "info", message: `Skipping event: unsupported type "${eventType}"`, url: eventUrl, reason: skipReason });
+        return { status: "skipped" as const, reason: skipReason };
       }
 
       // Step 4: Extract event parts (Czech output)
-      let extracted;
-      try {
-        extracted = await ctx.run("extractParts", () => extractEventParts(description));
-      } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), {
-          workflowRunId: ctx.key,
-          eventUrl,
-          step: "extractParts",
-        });
-        throw err;
-      }
+      const extracted = await runStep(ctx, "extractParts", eventUrl, () => extractEventParts(description));
 
       // Step 5: Extract event info
-      let info;
-      try {
-        info = await ctx.run("extractInfo", () => extractEventInfo(description));
-      } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), {
-          workflowRunId: ctx.key,
-          eventUrl,
-          step: "extractInfo",
-        });
-        throw err;
-      }
+      const info = await runStep(ctx, "extractInfo", eventUrl, () => extractEventInfo(description));
 
       // Step 6: Resolve venue
       let venue = null;
       if (facebookEvent.location) {
-        try {
-          venue = await ctx.run("resolveVenue", () => resolveVenue(facebookEvent.location!));
-        } catch (err) {
-          captureError(err instanceof Error ? err : new Error(String(err)), {
-            workflowRunId: ctx.key,
-            eventUrl,
-            step: "resolveVenue",
+        venue = await runStep(ctx, "resolveVenue", eventUrl, () => resolveVenue(facebookEvent.location!));
+        if (venue !== null && venue.id === undefined) {
+          log({
+            level: "warn",
+            message: "resolveVenue returned a venue without an id for event — venue association will be stored as null. This may indicate a Directus API issue.",
+            url: eventUrl,
           });
-          throw err;
         }
       }
 
@@ -108,23 +120,13 @@ export const eventWorkflow = restate.workflow({
       const organizer = facebookEvent.hosts?.[0]?.name ?? facebookEvent.name;
 
       // Step 8: Check for duplicate
-      const originalUrl = facebookEvent.url ?? eventUrl;
-      let existing;
-      try {
-        existing = await ctx.run("checkDuplicate", () =>
-          findEventByOriginalUrl(originalUrl)
-        );
-      } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), {
-          workflowRunId: ctx.key,
-          eventUrl: originalUrl,
-          step: "checkDuplicate",
-        });
-        throw err;
-      }
+      const originalUrl = facebookEvent.url;
+      const existing = await runStep(ctx, "checkDuplicate", originalUrl, () =>
+        findEventByOriginalUrl(originalUrl)
+      );
       if (existing) {
         ctx.set("status", "duplicate");
-        console.log(`Event already exists: ${originalUrl}`);
+        log({ level: "info", message: "Event already exists, skipping", url: originalUrl });
         return existing;
       }
 
@@ -167,7 +169,7 @@ export const eventWorkflow = restate.workflow({
             info_translations: translated.info_translations,
           });
         } catch (err) {
-          console.error(`Translation to ${lang.code} failed for ${originalUrl}:`, err);
+          log({ level: "error", message: `Translation to ${lang.code} failed`, url: originalUrl, error: String(err) });
           captureError(err instanceof Error ? err : new Error(String(err)), {
             workflowRunId: ctx.key,
             eventUrl: originalUrl,
@@ -182,10 +184,8 @@ export const eventWorkflow = restate.workflow({
       const translationStatus = computeTranslationStatus(translations);
 
       // Step 11: Build and store event
-      const startTime = toIsoOrNull(facebookEvent.startTimestamp ?? undefined);
-      if (startTime === null) {
-        throw new restate.TerminalError(`Invalid startTimestamp for event ${originalUrl}`);
-      }
+      // startTimestamp > 0 was validated in Step 1b, so toIsoOrNull is guaranteed non-null here
+      const startTime = toIsoOrNull(facebookEvent.startTimestamp) as string;
       const endTime = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
 
       const newEvent: DirectusEvent = {
@@ -204,23 +204,11 @@ export const eventWorkflow = restate.workflow({
         translations,
       };
 
-      let createdEvent;
-      try {
-        createdEvent = await ctx.run("createEvent", () => createEvent(newEvent));
-      } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), {
-          workflowRunId: ctx.key,
-          eventUrl: originalUrl,
-          step: "createEvent",
-        });
-        throw err;
-      }
+      const createdEvent = await runStep(ctx, "createEvent", originalUrl, () => createEvent(newEvent));
       ctx.set("status", "completed");
       ctx.set("eventId", String(createdEvent.id ?? ""));
 
       return createdEvent;
-    },
-  },
-});
+}
 
 export type EventWorkflow = typeof eventWorkflow;

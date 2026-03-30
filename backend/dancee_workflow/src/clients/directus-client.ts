@@ -13,6 +13,22 @@ import {
 } from "../core/schemas";
 import { z } from "zod";
 
+/**
+ * Validates that a Directus API response contains the expected `data` envelope field
+ * and returns its value. Throws a descriptive error if the shape is unexpected
+ * (e.g. auth error, wrong endpoint, or API version mismatch) so that callers receive
+ * a meaningful message instead of a confusing Zod parse failure downstream.
+ */
+function extractDirectusData(response: unknown, context: string): unknown {
+  if (typeof response !== "object" || response === null || !("data" in response)) {
+    throw new Error(
+      `Unexpected Directus response shape in ${context}: ` +
+      `expected object with 'data' field, got: ${JSON.stringify(response)?.slice(0, 100)}`,
+    );
+  }
+  return (response as { data: unknown }).data;
+}
+
 function authHeaders(): Record<string, string> {
   return {
     "Content-Type": "application/json",
@@ -23,6 +39,7 @@ function authHeaders(): Record<string, string> {
 async function directusGet(path: string): Promise<unknown> {
   const response = await fetch(`${config.directusBaseUrl}${path}`, {
     headers: authHeaders(),
+    signal: AbortSignal.timeout(config.directusTimeoutMs),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
@@ -36,10 +53,12 @@ async function directusPost(path: string, body: unknown): Promise<unknown> {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(config.directusTimeoutMs),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
-    throw new Error(`Directus POST ${path} error ${response.status}: ${text}`);
+    const bodyPreview = JSON.stringify(body).slice(0, 200);
+    throw new Error(`Directus POST ${path} error ${response.status}: ${text} (body: ${bodyPreview})`);
   }
   return response.json();
 }
@@ -49,10 +68,12 @@ async function directusPatch(path: string, body: unknown): Promise<unknown> {
     method: "PATCH",
     headers: authHeaders(),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(config.directusTimeoutMs),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
-    throw new Error(`Directus PATCH ${path} error ${response.status}: ${text}`);
+    const bodyPreview = JSON.stringify(body).slice(0, 200);
+    throw new Error(`Directus PATCH ${path} error ${response.status}: ${text} (body: ${bodyPreview})`);
   }
   return response.json();
 }
@@ -61,23 +82,32 @@ async function directusPatch(path: string, body: unknown): Promise<unknown> {
 
 export async function createEvent(event: DirectusEvent): Promise<DirectusEvent> {
   const data = await directusPost("/items/events", event);
-  return DirectusEventSchema.parse((data as { data: unknown }).data);
+  return DirectusEventSchema.parse(extractDirectusData(data, "createEvent"));
 }
 
 export async function findEventByOriginalUrl(originalUrl: string): Promise<DirectusEvent | null> {
   const encoded = encodeURIComponent(originalUrl);
   const data = await directusGet(`/items/events?filter[original_url][_eq]=${encoded}&limit=1`);
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "findEventByOriginalUrl") as unknown[];
   if (!items || items.length === 0) return null;
   return DirectusEventSchema.parse(items[0]);
 }
 
-export async function listEvents(filter?: Record<string, unknown>): Promise<DirectusEvent[]> {
-  const defaultFilter = { status: { _eq: "published" } };
-  const appliedFilter = filter ?? defaultFilter;
-  const encoded = encodeURIComponent(JSON.stringify(appliedFilter));
+export async function listPublishedEvents(extraFilter?: Record<string, unknown>): Promise<DirectusEvent[]> {
+  const publishedFilter = { status: { _eq: "published" } };
+  const effectiveFilter = extraFilter
+    ? { _and: [publishedFilter, extraFilter] }
+    : publishedFilter;
+  const encoded = encodeURIComponent(JSON.stringify(effectiveFilter));
   const data = await directusGet(`/items/events?filter=${encoded}`);
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "listPublishedEvents") as unknown[];
+  return z.array(DirectusEventSchema).parse(items);
+}
+
+export async function listEvents(filter: Record<string, unknown>): Promise<DirectusEvent[]> {
+  const encoded = encodeURIComponent(JSON.stringify(filter));
+  const data = await directusGet(`/items/events?filter=${encoded}`);
+  const items = extractDirectusData(data, "listEvents") as unknown[];
   return z.array(DirectusEventSchema).parse(items);
 }
 
@@ -85,7 +115,7 @@ export async function listEvents(filter?: Record<string, unknown>): Promise<Dire
 
 export async function createVenue(venue: DirectusVenue): Promise<DirectusVenue> {
   const data = await directusPost("/items/venues", venue);
-  return DirectusVenueSchema.parse((data as { data: unknown }).data);
+  return DirectusVenueSchema.parse(extractDirectusData(data, "createVenue"));
 }
 
 export async function findVenue(
@@ -102,7 +132,7 @@ export async function findVenue(
   };
   const encoded = encodeURIComponent(JSON.stringify(filter));
   const data = await directusGet(`/items/venues?filter=${encoded}&limit=1`);
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "findVenue") as unknown[];
   if (!items || items.length === 0) return null;
   return DirectusVenueSchema.parse(items[0]);
 }
@@ -116,7 +146,7 @@ export async function findVenueByCoordinates(
   };
   const encoded = encodeURIComponent(JSON.stringify(filter));
   const data = await directusGet(`/items/venues?filter=${encoded}&limit=1`);
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "findVenueByCoordinates") as unknown[];
   if (!items || items.length === 0) return null;
   return DirectusVenueSchema.parse(items[0]);
 }
@@ -133,12 +163,12 @@ export async function findVenueByCoordinates(
  */
 export async function createGroup(group: DirectusGroup): Promise<DirectusGroup> {
   const data = await directusPost("/items/groups", group);
-  return DirectusGroupSchema.parse((data as { data: unknown }).data);
+  return DirectusGroupSchema.parse(extractDirectusData(data, "createGroup"));
 }
 
 export async function getGroupsOrderedByUpdatedAt(): Promise<DirectusGroup[]> {
   const data = await directusGet("/items/groups?sort=updated_at");
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "getGroupsOrderedByUpdatedAt") as unknown[];
   return z.array(DirectusGroupSchema).parse(items);
 }
 
@@ -147,24 +177,27 @@ export async function updateGroupTimestamp(
   updatedAt: string,
 ): Promise<DirectusGroup> {
   const data = await directusPatch(`/items/groups/${id}`, { updated_at: updatedAt });
-  return DirectusGroupSchema.parse((data as { data: unknown }).data);
+  return DirectusGroupSchema.parse(extractDirectusData(data, "updateGroupTimestamp"));
 }
 
 // ---- Errors ----
 
-export async function createError(entry: Omit<DirectusError, "id">): Promise<DirectusError> {
+export async function createError(
+  entry: Omit<DirectusError, "id" | "datetime"> & { datetime?: string },
+): Promise<DirectusError> {
   const existing = await findErrorByUrl(entry.url);
   if (existing) {
     return existing;
   }
-  const data = await directusPost("/items/errors", entry);
-  return DirectusErrorSchema.parse((data as { data: unknown }).data);
+  const fullEntry = { ...entry, datetime: entry.datetime ?? new Date().toISOString() };
+  const data = await directusPost("/items/errors", fullEntry);
+  return DirectusErrorSchema.parse(extractDirectusData(data, "createError"));
 }
 
 export async function findErrorByUrl(url: string): Promise<DirectusError | null> {
   const encoded = encodeURIComponent(url);
   const data = await directusGet(`/items/errors?filter[url][_eq]=${encoded}&limit=1`);
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "findErrorByUrl") as unknown[];
   if (!items || items.length === 0) return null;
   return DirectusErrorSchema.parse(items[0]);
 }
@@ -173,7 +206,7 @@ export async function findErrorByUrl(url: string): Promise<DirectusError | null>
 
 export async function getLanguages(): Promise<DirectusLanguage[]> {
   const data = await directusGet("/items/languages");
-  const items = (data as { data: unknown[] }).data;
+  const items = extractDirectusData(data, "getLanguages") as unknown[];
   return z.array(DirectusLanguageSchema).parse(items);
 }
 
@@ -182,5 +215,5 @@ export async function createLanguage(
   name: string,
 ): Promise<DirectusLanguage> {
   const data = await directusPost("/items/languages", { code, name });
-  return DirectusLanguageSchema.parse((data as { data: unknown }).data);
+  return DirectusLanguageSchema.parse(extractDirectusData(data, "createLanguage"));
 }

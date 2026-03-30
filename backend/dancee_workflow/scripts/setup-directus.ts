@@ -5,11 +5,6 @@ dotenv.config();
 const DIRECTUS_BASE_URL = process.env.DIRECTUS_BASE_URL ?? "";
 const DIRECTUS_ACCESS_TOKEN = process.env.DIRECTUS_ACCESS_TOKEN ?? "";
 
-if (!DIRECTUS_BASE_URL || !DIRECTUS_ACCESS_TOKEN) {
-  console.error("DIRECTUS_BASE_URL and DIRECTUS_ACCESS_TOKEN must be set in .env");
-  process.exit(1);
-}
-
 function authHeaders(): Record<string, string> {
   return {
     "Content-Type": "application/json",
@@ -20,6 +15,7 @@ function authHeaders(): Record<string, string> {
 async function directusGet(path: string): Promise<unknown> {
   const response = await fetch(`${DIRECTUS_BASE_URL}${path}`, {
     headers: authHeaders(),
+    signal: AbortSignal.timeout(30000),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
@@ -33,6 +29,7 @@ async function directusPost(path: string, body: unknown): Promise<unknown> {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(30000),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
@@ -444,6 +441,10 @@ async function seedLanguages(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  if (!DIRECTUS_BASE_URL || !DIRECTUS_ACCESS_TOKEN) {
+    throw new Error("DIRECTUS_BASE_URL and DIRECTUS_ACCESS_TOKEN must be set in .env");
+  }
+
   console.log("Setting up Directus collections...\n");
 
   await setupEventsCollection();
@@ -459,7 +460,8 @@ async function main(): Promise<void> {
   console.log("\nDirectus setup complete.");
 }
 
-main().catch((err) => {
+// Export the promise so tests can await full completion before inspecting side effects.
+export const ready = main().catch((err) => {
   console.error("Setup failed:", err);
   process.exit(1);
 });

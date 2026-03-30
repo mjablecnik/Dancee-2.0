@@ -10,14 +10,15 @@ info:
     resolves the venue via reverse geocoding, stores the result in Directus CMS,
     and generates multilingual translations (CS, EN, ES).
 
-    All endpoints are served through the Restate ingress and are addressed using
-    Restate's service-call URL pattern: `/ApiService/<handler>`.
+    All endpoints are exposed via the `/api` prefix. The HTTP server internally
+    rewrites `/api/*` paths to Restate's service-call URL pattern
+    (`/ApiService/<handler>`) before forwarding to the Restate handler.
 
 servers:
   - url: http://localhost:8080
-    description: Restate ingress (development)
+    description: Application HTTP server (development)
   - url: https://workflow.dancee.app
-    description: Restate ingress (production)
+    description: Application HTTP server (production)
 
 tags:
   - name: Events
@@ -26,7 +27,7 @@ tags:
     description: Querying stored events
 
 paths:
-  /ApiService/processEvent:
+  /api/event:
     post:
       tags:
         - Events
@@ -46,6 +47,9 @@ paths:
 
         The workflow key is a random UUID, so calling this endpoint multiple times
         with the same URL will create multiple workflow executions.
+
+        Internally the HTTP server rewrites `/api/event` → `/ApiService/processEvent`
+        before forwarding to the Restate handler.
       operationId: processEvent
       requestBody:
         required: true
@@ -84,7 +88,7 @@ paths:
                 message: "Missing required field: 'url'"
                 code: 400
 
-  /ApiService/processBatch:
+  /api/events/process:
     get:
       tags:
         - Events
@@ -103,6 +107,8 @@ paths:
 
         This endpoint returns immediately with an acknowledgement. Processing
         continues asynchronously in the background via Restate.
+
+        Internally the HTTP server rewrites `/api/events/process` → `/ApiService/processBatch`.
       operationId: processBatch
       responses:
         '200':
@@ -115,7 +121,7 @@ paths:
                 acknowledged: true
                 message: "Batch processing started"
 
-  /ApiService/listEvents:
+  /api/events/list:
     get:
       tags:
         - Listing
@@ -127,6 +133,8 @@ paths:
         Pass an explicit `filter` query parameter (Directus filter syntax,
         JSON-encoded) to override the default filter and query events with
         any status or other criteria.
+
+        Internally the HTTP server rewrites `/api/events/list` → `/ApiService/listEvents`.
       operationId: listEvents
       parameters:
         - name: filter

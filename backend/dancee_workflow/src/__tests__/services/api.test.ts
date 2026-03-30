@@ -26,9 +26,14 @@ vi.mock("@restatedev/restate-sdk", () => ({
   },
 }));
 
-const mockListEvents = vi.fn();
+const mockListPublishedEvents = vi.fn();
 vi.mock("../../clients/directus-client", () => ({
-  listEvents: (...args: unknown[]) => mockListEvents(...args),
+  listPublishedEvents: (...args: unknown[]) => mockListPublishedEvents(...args),
+}));
+
+const mockLog = vi.fn();
+vi.mock("../../core/logger", () => ({
+  log: (...args: unknown[]) => mockLog(...args),
 }));
 
 // Import after mocks
@@ -125,20 +130,21 @@ describe("Property 14: Missing URL field returns 400", () => {
 // ---- Property 24: List events endpoint returns only published events by default ----
 
 describe("Property 24: List events endpoint returns only published events by default", () => {
-  it("listEvents is called with published status filter", async () => {
+  it("listPublishedEvents is called with no extra filter when no header is present", async () => {
+    // The API service always enforces status:published via listPublishedEvents.
     const mockEvents = [{ id: 1, status: "published" }];
-    mockListEvents.mockResolvedValue(mockEvents);
+    mockListPublishedEvents.mockResolvedValue(mockEvents);
 
     const ctx = makeMockCtx();
     const result = await serviceDef.handlers.listEvents(ctx);
 
-    expect(mockListEvents).toHaveBeenCalledOnce();
-    const [filter] = mockListEvents.mock.calls[0] as [{ status: { _eq: string } }];
-    expect(filter.status._eq).toBe("published");
+    expect(mockListPublishedEvents).toHaveBeenCalledOnce();
+    const [extraFilter] = mockListPublishedEvents.mock.calls[0] as [unknown];
+    expect(extraFilter).toBeUndefined();
     expect(result).toEqual(mockEvents);
   });
 
-  it("always filters by published status regardless of stored events", async () => {
+  it("always uses listPublishedEvents regardless of stored events", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.array(
@@ -150,16 +156,14 @@ describe("Property 24: List events endpoint returns only published events by def
         ),
         async (events) => {
           vi.clearAllMocks();
-          // Return only published events (simulating Directus filtering)
           const published = events.filter((e) => e.status === "published");
-          mockListEvents.mockResolvedValue(published);
+          mockListPublishedEvents.mockResolvedValue(published);
 
           const ctx = makeMockCtx();
           await serviceDef.handlers.listEvents(ctx);
 
-          expect(mockListEvents).toHaveBeenCalledOnce();
-          const [filter] = mockListEvents.mock.calls[0] as [{ status: { _eq: string } }];
-          expect(filter.status._eq).toBe("published");
+          // API layer always uses listPublishedEvents (status:published enforced inside it)
+          expect(mockListPublishedEvents).toHaveBeenCalledOnce();
         }
       )
     );
@@ -177,7 +181,7 @@ describe("Property 24: List events endpoint returns only published events by def
         ),
         async (events) => {
           vi.clearAllMocks();
-          mockListEvents.mockResolvedValue(events);
+          mockListPublishedEvents.mockResolvedValue(events);
 
           const ctx = makeMockCtx();
           const result = await serviceDef.handlers.listEvents(ctx);
@@ -188,17 +192,36 @@ describe("Property 24: List events endpoint returns only published events by def
     );
   });
 
-  it("forwards an explicit filter override when provided via x-dancee-filter header", async () => {
-    const mockEvents = [{ id: 2, status: "draft" }];
-    mockListEvents.mockResolvedValue(mockEvents);
+  it("passes the parsed x-dancee-filter as extraFilter to listPublishedEvents", async () => {
+    const mockEvents = [{ id: 2, status: "published" }];
+    mockListPublishedEvents.mockResolvedValue(mockEvents);
 
-    const customFilter = { status: { _eq: "draft" } };
-    const ctx = makeMockCtx({ "x-dancee-filter": JSON.stringify(customFilter) });
+    const extraFilter = { category: { _eq: "dance" } };
+    const ctx = makeMockCtx({ "x-dancee-filter": JSON.stringify(extraFilter) });
     const result = await serviceDef.handlers.listEvents(ctx);
 
-    expect(mockListEvents).toHaveBeenCalledOnce();
-    const [filter] = mockListEvents.mock.calls[0] as [Record<string, unknown>];
-    expect(filter).toEqual(customFilter);
+    expect(mockListPublishedEvents).toHaveBeenCalledOnce();
+    const [calledExtraFilter] = mockListPublishedEvents.mock.calls[0] as [Record<string, unknown>];
+    // The extra filter is passed to listPublishedEvents which merges it with published filter
+    expect(calledExtraFilter).toEqual(extraFilter);
+    expect(result).toEqual(mockEvents);
+  });
+
+  it("logs a warning and falls back to no extra filter when x-dancee-filter header is invalid JSON", async () => {
+    const mockEvents = [{ id: 3, status: "published" }];
+    mockListPublishedEvents.mockResolvedValue(mockEvents);
+
+    const ctx = makeMockCtx({ "x-dancee-filter": "not-valid-json{" });
+    const result = await serviceDef.handlers.listEvents(ctx);
+
+    // Warning logged about invalid JSON
+    expect(mockLog).toHaveBeenCalledWith(
+      expect.objectContaining({ level: "warn", message: expect.stringContaining("invalid JSON") }),
+    );
+    // Still calls listPublishedEvents with no extra filter
+    expect(mockListPublishedEvents).toHaveBeenCalledOnce();
+    const [extraFilter] = mockListPublishedEvents.mock.calls[0] as [unknown];
+    expect(extraFilter).toBeUndefined();
     expect(result).toEqual(mockEvents);
   });
 });
