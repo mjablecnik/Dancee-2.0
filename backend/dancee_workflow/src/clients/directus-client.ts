@@ -178,8 +178,9 @@ export async function getLanguages(): Promise<DirectusLanguage[]> {
 }
 
 export async function createLanguage(
-  language: DirectusLanguage,
+  code: string,
+  name: string,
 ): Promise<DirectusLanguage> {
-  const data = await directusPost("/items/languages", language);
+  const data = await directusPost("/items/languages", { code, name });
   return DirectusLanguageSchema.parse((data as { data: unknown }).data);
 }

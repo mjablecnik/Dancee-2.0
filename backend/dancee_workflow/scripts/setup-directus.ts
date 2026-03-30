@@ -373,6 +373,45 @@ async function setupTranslationsRelation(): Promise<void> {
   }
 }
 
+async function setupVenueRelation(): Promise<void> {
+  // Check if relation already exists
+  try {
+    const data = await directusGet("/relations/events/venue") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "events.venue" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "events",
+      field: "venue",
+      related_collection: "venues",
+      meta: {
+        one_collection: "venues",
+        many_collection: "events",
+        many_field: "venue",
+        one_field: null,
+      },
+      schema: {
+        on_delete: "SET NULL",
+      },
+    });
+    console.log(`Created relation events.venue -> venues.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409")) {
+      console.log(`Relation events.venue -> venues already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+
 async function seedLanguages(): Promise<void> {
   const languages = [
     { code: "cs", name: "Čeština" },
@@ -414,6 +453,7 @@ async function main(): Promise<void> {
   await setupLanguagesCollection();
   await setupEventsTranslationsCollection();
   await setupTranslationsRelation();
+  await setupVenueRelation();
   await seedLanguages();
 
   console.log("\nDirectus setup complete.");
