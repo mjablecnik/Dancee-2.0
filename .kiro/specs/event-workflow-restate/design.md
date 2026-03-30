@@ -276,10 +276,11 @@ export async function findVenueByCoordinates(lat: number, lng: number): Promise<
 // Groups
 export async function createGroup(group: DirectusGroup): Promise<DirectusGroup>;
 export async function getGroupsOrderedByUpdatedAt(): Promise<DirectusGroup[]>;
-export async function updateGroupTimestamp(groupId: string): Promise<void>;
+export async function updateGroupTimestamp(id: string | number, updatedAt: string): Promise<DirectusGroup>;
 
 // Errors
-export async function createError(url: string, message: string): Promise<void>;
+// NOTE: datetime is auto-generated internally when not provided by caller
+export async function createError(entry: Omit<DirectusError, "id" | "datetime"> & { datetime?: string }): Promise<DirectusError>;
 export async function findErrorByUrl(url: string): Promise<DirectusError | null>;
 
 // Languages
@@ -858,6 +859,10 @@ This project uses both unit tests and property-based tests for comprehensive cov
 
 ### Test Structure
 
+> **NOTE**: The implementation uses a consolidated test file layout (fewer files with grouped properties)
+> rather than the one-file-per-property structure originally planned. This is intentional — consolidated
+> files are more maintainable. The mapping table below reflects the actual layout.
+
 Test directory mirrors the `src/` structure:
 
 ```
@@ -865,30 +870,15 @@ backend/dancee_workflow/
 ├── src/
 │   └── __tests__/
 │       ├── core/
-│       │   ├── compute-dances.test.ts          # Property 15
-│       │   ├── parse-json-response.test.ts     # Property 6
-│       │   ├── event-type-parsing.test.ts      # Property 4
-│       │   └── filter-event-info.test.ts       # Property 8
+│       │   └── schemas.test.ts               # Properties 4, 6, 8, 15 (consolidated)
 │       ├── clients/
-│       │   ├── scraper-client.test.ts          # Properties 1, 3 + unit tests
-│       │   ├── venue-dedup.test.ts             # Property 10 (with mock Directus)
-│       │   ├── event-dedup.test.ts             # Property 11 (with mock Directus)
-│       │   ├── error-dedup.test.ts             # Property 12 (with mock Directus)
-│       │   └── group-ordering.test.ts          # Property 13
+│       │   ├── scraper-client.test.ts        # Properties 1, 3 + unit tests
+│       │   └── directus-client.test.ts       # Properties 10, 11, 12, 13 (consolidated)
 │       └── services/
-│           ├── venue-field-mapping.test.ts     # Property 9
-│           ├── null-end-timestamp.test.ts   # Property 2
-│           ├── api-validation.test.ts          # Property 14
-│           ├── skip-unsupported.test.ts        # Property 5
-│           ├── translation-output.test.ts      # Property 16 (non-empty translation output)
-│           ├── translation-preserves.test.ts   # Property 17 (non-translatable fields unchanged)
-│           ├── translation-isolation.test.ts   # Property 18 (failure isolation)
-│           ├── translation-cs-mapping.test.ts  # Property 19 (Czech extraction → cs record)
-│           ├── translation-array-length.test.ts # Property 20 (parts/info array length match)
-│           └── event-no-title-desc.test.ts     # Property 21 (events collection has no title/description)
-           ├── event-status-default.test.ts    # Property 22 (new events default to published)
-           ├── translation-status.test.ts      # Property 23 (translation_status reflects completeness)
-           └── list-events-published.test.ts   # Property 24 (list endpoint returns only published)
+│           ├── venue-resolver.test.ts        # Properties 2, 5, 9 (consolidated)
+│           ├── event-translator.test.ts      # Properties 16, 17 (consolidated)
+│           ├── api.test.ts                   # Property 14 + unit tests
+│           └── workflow.test.ts              # Properties 18, 19, 21, 22, 23 + error-tracking
 ```
 
 ### Unit Test Focus Areas
@@ -907,28 +897,13 @@ backend/dancee_workflow/
 
 ### Property Test to Design Property Mapping
 
-| Test File | Design Property | Pattern |
+| Test File | Design Properties | Pattern |
 |---|---|---|
-| core/compute-dances.test.ts | Property 15 | Invariant (set uniqueness) |
-| core/parse-json-response.test.ts | Property 6 | Round-trip |
-| core/event-type-parsing.test.ts | Property 4 | Error condition / invariant |
-| core/filter-event-info.test.ts | Property 8 | Metamorphic (length ≤ original) |
+| core/schemas.test.ts | Properties 4, 6, 8, 15 | Invariant / Round-trip / Metamorphic |
 | clients/scraper-client.test.ts | Properties 1, 3 | Invariant |
-| clients/venue-dedup.test.ts | Property 10 | Idempotence |
-| clients/event-dedup.test.ts | Property 11 | Idempotence |
-| clients/error-dedup.test.ts | Property 12 | Idempotence |
-| clients/group-ordering.test.ts | Property 13 | Invariant (sorted) |
-| services/venue-field-mapping.test.ts | Property 9 | Invariant |
-| services/null-end-timestamp.test.ts | Property 2 | Invariant |
-| services/api-validation.test.ts | Property 14 | Error condition |
-| services/skip-unsupported.test.ts | Property 5 | Invariant |
-| services/translation-output.test.ts | Property 16 | Invariant (non-empty output) |
-| services/translation-preserves.test.ts | Property 17 | Invariant (unchanged fields) |
-| services/translation-isolation.test.ts | Property 18 | Error condition (failure isolation) |
-| services/translation-cs-mapping.test.ts | Property 19 | Invariant (field equality) |
-| services/translation-array-length.test.ts | Property 20 | Invariant (length match) |
-| services/event-no-title-desc.test.ts | Property 21 | Invariant (schema constraint) |
-| services/event-status-default.test.ts | Property 22 | Invariant (default value) |
-| services/translation-status.test.ts | Property 23 | Invariant (computed from count) |
-| services/list-events-published.test.ts | Property 24 | Invariant (filter constraint) |
+| clients/directus-client.test.ts | Properties 10, 11, 12, 13 | Idempotence / Invariant (sorted) |
+| services/venue-resolver.test.ts | Properties 2, 5, 9 | Invariant |
+| services/event-translator.test.ts | Properties 16, 17 | Invariant (non-empty / unchanged fields) |
+| services/api.test.ts | Property 14 | Error condition |
+| services/workflow.test.ts | Properties 18, 19, 21, 22, 23 | Error condition / Invariant / error-tracking |
 
