@@ -76,8 +76,8 @@ const server = http2.createServer(
   },
 );
 
-server.listen(config.appPort, () => {
-  console.log(`Restate endpoint listening on port ${config.appPort}`);
+server.listen(config.appPort, "0.0.0.0", () => {
+  console.log(`Restate endpoint listening on 0.0.0.0:${config.appPort}`);
 });
 
 // Graceful shutdown: finish in-flight requests before exiting.
