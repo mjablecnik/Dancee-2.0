@@ -43,6 +43,8 @@ WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY package.json ./
+COPY scripts/register-deployment.sh ./scripts/
+RUN chmod +x /app/scripts/register-deployment.sh
 
 # Copy supervisord configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

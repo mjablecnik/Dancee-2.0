@@ -3,6 +3,7 @@ node_modules
 dist
 docs
 scripts
+!scripts/register-deployment.sh
 *.md
 *.test.ts
 *.spec.ts

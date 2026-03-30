@@ -1,4 +1,4 @@
-import * as http2 from "http2";
+import * as http from "http";
 import * as restate from "@restatedev/restate-sdk";
 import { initSentry, validateConfig } from "./core/config";
 import { config } from "./core/config";
@@ -9,88 +9,145 @@ import { batchService } from "./services/batch";
 validateConfig();
 initSentry();
 
-const restateHandler = restate
+// Restate HTTP/2 endpoint on internal port (not exposed to Fly.io proxy)
+const RESTATE_PORT = 9081;
+
+const restateEndpoint = restate
   .endpoint()
   .bind(apiService)
   .bind(eventWorkflow)
-  .bind(batchService)
-  .http2Handler();
+  .bind(batchService);
 
+restateEndpoint.listen(RESTATE_PORT).then(() => {
+  console.log(`Restate endpoint listening on port ${RESTATE_PORT}`);
+  registerDeployment();
+});
+
+async function registerDeployment() {
+  const maxRetries = 30;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const res = await fetch(`http://localhost:9070/deployments`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ uri: `http://localhost:${RESTATE_PORT}` }),
+      });
+      if (res.ok) {
+        console.log("Deployment registered with Restate server.");
+        return;
+      }
+      const text = await res.text();
+      // Already registered is fine
+      if (text.includes("already exists")) {
+        console.log("Deployment already registered.");
+        return;
+      }
+      console.log(`Registration attempt ${i + 1} failed (${res.status}): ${text}`);
+    } catch (err) {
+      console.log(`Registration attempt ${i + 1} failed: ${err}`);
+    }
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  console.error("Failed to register deployment after all retries.");
+}
+
+// HTTP/1.1 proxy server exposed to Fly.io on config.appPort
 const allowedOrigins = config.corsOrigins === "*"
   ? null
   : config.corsOrigins.split(",").map((o) => o.trim());
 
-const server = http2.createServer(
-  { allowHTTP1: true },
-  (req: http2.Http2ServerRequest, res: http2.Http2ServerResponse) => {
-    const origin = req.headers["origin"] as string | undefined;
+// Map /api/* paths to Restate service handler paths
+const apiRoutes: Record<string, string> = {
+  "/api/event": "/ApiService/processEvent",
+  "/api/events/process": "/ApiService/processBatch",
+  "/api/events/list": "/ApiService/listEvents",
+};
 
-    if (origin) {
-      if (allowedOrigins === null || allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-      }
-    } else if (allowedOrigins === null) {
-      res.setHeader("Access-Control-Allow-Origin", "*");
+// Restate server ingress port (HTTP/1.1 compatible)
+const RESTATE_INGRESS_PORT = 8080;
+
+const server = http.createServer((req, res) => {
+  const origin = req.headers["origin"] as string | undefined;
+
+  if (origin) {
+    if (allowedOrigins === null || allowedOrigins.includes(origin)) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
     }
+  } else if (allowedOrigins === null) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
 
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization",
-    );
-    res.setHeader("Access-Control-Max-Age", "86400");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Max-Age", "86400");
 
-    if (req.method === "OPTIONS") {
-      res.writeHead(204);
-      res.end();
-      return;
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  const fullUrl = req.url ?? "";
+  const qIndex = fullUrl.indexOf("?");
+  const pathname = qIndex >= 0 ? fullUrl.slice(0, qIndex) : fullUrl;
+  const queryString = qIndex >= 0 ? fullUrl.slice(qIndex + 1) : "";
+  const mappedPath = apiRoutes[pathname];
+
+  if (!mappedPath) {
+    // Proxy everything else to Restate admin UI/API (port 9070)
+    const targetUrl = `http://localhost:9070${pathname}${queryString ? "?" + queryString : ""}`;
+
+    const proxyReq = http.request(targetUrl, { method: req.method, headers: { ...req.headers, host: "localhost:9070" } }, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode ?? 200, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+    proxyReq.on("error", (err) => {
+      res.writeHead(502, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Restate admin unavailable", details: err.message }));
+    });
+    req.pipe(proxyReq);
+    return;
+  }
+
+  const targetPath = queryString ? `${mappedPath}?${queryString}` : mappedPath;
+
+  // Forward to Restate server ingress (port 8080) via HTTP/1.1
+  const proxyReq = http.request(
+    `http://localhost:8080${targetPath}`,
+    { method: "POST", headers: { "content-type": "application/json" } },
+    (proxyRes) => {
+      res.writeHead(proxyRes.statusCode ?? 200, proxyRes.headers);
+      proxyRes.pipe(res);
+    },
+  );
+
+  proxyReq.on("error", (err) => {
+    res.writeHead(502, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Upstream error", details: err.message }));
+  });
+
+  // Forward filter header for listEvents
+  if (pathname === "/api/events/list" && queryString) {
+    const params = new URLSearchParams(queryString);
+    const filterParam = params.get("filter");
+    if (filterParam) {
+      proxyReq.setHeader("x-dancee-filter", filterParam);
     }
+  }
 
-    // Map /api/* paths to Restate service handler paths (Requirement 13)
-    const apiRoutes: Record<string, string> = {
-      "/api/event": "/ApiService/processEvent",
-      "/api/events/process": "/ApiService/processBatch",
-      "/api/events/list": "/ApiService/listEvents",
-    };
-    const fullUrl = req.url ?? "";
-    const qIndex = fullUrl.indexOf("?");
-    const pathname = qIndex >= 0 ? fullUrl.slice(0, qIndex) : fullUrl;
-    const queryString = qIndex >= 0 ? fullUrl.slice(qIndex + 1) : "";
-    const mappedPath = apiRoutes[pathname];
-    if (mappedPath) {
-      req.url = queryString ? `${mappedPath}?${queryString}` : mappedPath;
-
-      // For listEvents, parse the filter query param and forward it as a custom
-      // header so the Restate handler can read it (GET bodies are non-standard).
-      if (pathname === "/api/events/list" && queryString) {
-        const params = new URLSearchParams(queryString);
-        const filterParam = params.get("filter");
-        if (filterParam) {
-          (req.headers as Record<string, string | string[] | undefined>)[
-            "x-dancee-filter"
-          ] = filterParam;
-        }
-      }
-    }
-
-    restateHandler(req, res);
-  },
-);
-
-server.listen(config.appPort, "0.0.0.0", () => {
-  console.log(`Restate endpoint listening on 0.0.0.0:${config.appPort}`);
+  req.pipe(proxyReq);
 });
 
-// Graceful shutdown: finish in-flight requests before exiting.
-// Restate's durable execution handles retries, but this avoids
-// dropping connections mid-response during deploys.
+server.listen(config.appPort, "0.0.0.0", () => {
+  console.log(`HTTP proxy listening on 0.0.0.0:${config.appPort}`);
+});
+
 function shutdown(signal: string) {
   console.log(`Received ${signal}, shutting down gracefully...`);
   server.close(() => {
     console.log("Server closed.");
     process.exit(0);
   });
-  // Force exit after 10s if connections don't drain
   setTimeout(() => {
     console.error("Graceful shutdown timed out, forcing exit.");
     process.exit(1);
