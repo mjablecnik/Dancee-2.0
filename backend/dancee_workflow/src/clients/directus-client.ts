@@ -93,6 +93,20 @@ export async function findEventByOriginalUrl(originalUrl: string): Promise<Direc
   return DirectusEventSchema.parse(items[0]);
 }
 
+export async function getEventById(id: string | number): Promise<DirectusEvent | null> {
+  try {
+    const data = await directusGet(`/items/events/${id}?fields=*,translations.*`);
+    return DirectusEventSchema.parse(extractDirectusData(data, "getEventById"));
+  } catch {
+    return null;
+  }
+}
+
+export async function updateEvent(id: string | number, patch: Partial<DirectusEvent>): Promise<DirectusEvent> {
+  const data = await directusPatch(`/items/events/${id}`, patch);
+  return DirectusEventSchema.parse(extractDirectusData(data, "updateEvent"));
+}
+
 export async function listPublishedEvents(extraFilter?: Record<string, unknown>): Promise<DirectusEvent[]> {
   const publishedFilter = { status: { _eq: "published" } };
   const effectiveFilter = extraFilter

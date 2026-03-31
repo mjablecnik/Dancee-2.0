@@ -1,8 +1,13 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents, findEventByOriginalUrl } from "../clients/directus-client";
+import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent } from "../clients/directus-client";
 import { config } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
+import { extractEventParts, extractEventInfo } from "./event-parser";
+import { translateEventContent } from "./event-translator";
+import { computeDances } from "../core/schemas";
+import { computeTranslationStatus } from "./workflow";
+import type { DirectusEventTranslation } from "../core/schemas";
 import type { EventWorkflow } from "./workflow";
 import type { BatchService } from "./batch";
 
@@ -86,6 +91,109 @@ export const apiService = restate.service({
         .processAll();
 
       return { acknowledged: true, message: "Batch processing started" };
+    },
+
+    reprocessEvent: async (
+      ctx: restate.Context,
+      request: { id?: string | number; steps?: string[] },
+    ) => {
+      if (!request?.id) {
+        throw new restate.TerminalError("Missing required field: 'id'", { errorCode: 400 });
+      }
+
+      const validSteps = ["parts", "info", "translations", "dances"];
+      const steps = request.steps?.length
+        ? request.steps.filter((s) => validSteps.includes(s))
+        : validSteps; // default: reprocess everything
+
+      if (steps.length === 0) {
+        throw new restate.TerminalError(
+          `Invalid steps. Valid values: ${validSteps.join(", ")}`,
+          { errorCode: 400 },
+        );
+      }
+
+      const event = await ctx.run("getEvent", () => getEventById(request.id!));
+      if (!event) {
+        throw new restate.TerminalError(`Event ${request.id} not found`, { errorCode: 404 });
+      }
+
+      const description = event.original_description;
+      const patch: Record<string, unknown> = {};
+
+      // Re-extract parts
+      let parts = event.parts;
+      let title = event.title;
+      if (steps.includes("parts")) {
+        const extracted = await ctx.run("extractParts", () => extractEventParts(description));
+        parts = extracted.parts;
+        title = extracted.title;
+        patch.parts = extracted.parts;
+        patch.title = extracted.title;
+      }
+
+      // Re-extract info
+      let info = event.info;
+      if (steps.includes("info")) {
+        const newInfo = await ctx.run("extractInfo", () => extractEventInfo(description));
+        info = newInfo;
+        patch.info = newInfo;
+      }
+
+      // Recompute dances from parts
+      if (steps.includes("dances") || steps.includes("parts")) {
+        patch.dances = computeDances(parts);
+      }
+
+      // Re-translate
+      if (steps.includes("translations")) {
+        const contentInput = {
+          title: title ?? "",
+          description: typeof event.translations?.[0] === "object" && "description" in event.translations[0]
+            ? (event.translations[0] as { description: string }).description
+            : description,
+          parts,
+          info,
+        };
+
+        const translations: DirectusEventTranslation[] = [
+          {
+            languages_code: "cs",
+            title: title ?? "",
+            description: contentInput.description,
+            parts_translations: parts.map((p) => ({ name: p.name, description: p.description })),
+            info_translations: info.map((i) => ({ key: i.key })),
+          },
+        ];
+
+        const langs = [
+          { code: "en", name: "English" },
+          { code: "es", name: "Spanish" },
+        ];
+
+        for (const lang of langs) {
+          try {
+            const translated = await ctx.run(`translate_${lang.code}`, () =>
+              translateEventContent(contentInput, lang.name),
+            );
+            translations.push({
+              languages_code: lang.code,
+              title: translated.title,
+              description: translated.description,
+              parts_translations: translated.parts_translations,
+              info_translations: translated.info_translations,
+            });
+          } catch (err) {
+            log({ level: "error", message: `Reprocess: translation to ${lang.code} failed`, error: String(err) });
+          }
+        }
+
+        patch.translations = translations;
+        patch.translation_status = computeTranslationStatus(translations);
+      }
+
+      const updated = await ctx.run("updateEvent", () => updateEvent(request.id!, patch));
+      return updated;
     },
 
     listEvents: async (ctx: restate.Context) => {

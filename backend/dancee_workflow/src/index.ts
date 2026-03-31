@@ -59,6 +59,7 @@ const allowedOrigins = config.corsOrigins === "*"
 // Map /api/* paths to Restate service handler paths
 const apiRoutes: Record<string, string> = {
   "/api/event": "/ApiService/processEvent",
+  "/api/event/reprocess": "/ApiService/reprocessEvent",
   "/api/events/process": "/ApiService/processBatch",
   "/api/events/list": "/ApiService/listEvents",
 };
@@ -78,7 +79,7 @@ const server = http.createServer((req, res) => {
   }
 
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-dancee-filter, x-dancee-lang, x-dancee-include");
   res.setHeader("Access-Control-Max-Age", "86400");
 
   if (req.method === "OPTIONS") {
@@ -126,7 +127,14 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({ error: "Upstream error", details: err.message }));
   });
 
-  // Forward filter header for listEvents
+  // Forward all x-dancee-* headers to Restate
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (key.startsWith("x-dancee-") && value) {
+      proxyReq.setHeader(key, value as string);
+    }
+  }
+
+  // Forward filter from query string as header for listEvents
   if (pathname === "/api/events/list" && queryString) {
     const params = new URLSearchParams(queryString);
     const filterParam = params.get("filter");

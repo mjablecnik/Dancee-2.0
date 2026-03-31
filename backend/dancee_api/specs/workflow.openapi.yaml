@@ -128,6 +128,73 @@ paths:
     get:
       tags:
         - Listing
+
+  /api/event/reprocess:
+    post:
+      tags:
+        - Events
+      summary: Reprocess parts of an existing event
+      description: |
+        Re-runs selected processing steps on an existing event in Directus.
+        Useful for fixing bad translations, re-extracting parts/info after
+        prompt changes, or recomputing dances.
+
+        By default all steps are re-run. Use the `steps` array to select
+        specific steps.
+
+        Available steps:
+        - `parts` — re-extract event parts and title from original_description via LLM
+        - `info` — re-extract event info (prices, URLs) from original_description via LLM
+        - `translations` — re-translate to EN and ES (uses current parts/info)
+        - `dances` — recompute the dances array from current parts
+
+        Note: `parts` automatically triggers `dances` recomputation as well.
+      operationId: reprocessEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReprocessEventRequest'
+            examples:
+              allSteps:
+                summary: Reprocess everything
+                value:
+                  id: "019710af-52bf-7e9a-baeb-666322a932a9"
+              translationsOnly:
+                summary: Only redo translations
+                value:
+                  id: "019710af-52bf-7e9a-baeb-666322a932a9"
+                  steps: ["translations"]
+              partsAndDances:
+                summary: Re-extract parts and recompute dances
+                value:
+                  id: "019710af-52bf-7e9a-baeb-666322a932a9"
+                  steps: ["parts", "dances"]
+      responses:
+        '200':
+          description: Event reprocessed and updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusEvent'
+        '400':
+          description: Missing ID or invalid steps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/events/list:
+    get:
+      tags:
+        - Listing
       summary: List published events
       description: |
         Returns all published events from Directus CMS with expanded translations and venue.
@@ -402,6 +469,27 @@ components:
             properties:
               key:
                 type: string
+
+    ReprocessEventRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+          description: Directus event ID to reprocess
+          example: "019710af-52bf-7e9a-baeb-666322a932a9"
+        steps:
+          type: array
+          description: |
+            Which steps to re-run. If omitted, all steps are executed.
+            Valid values: parts, info, translations, dances.
+          items:
+            type: string
+            enum: [parts, info, translations, dances]
+          example: ["translations"]
 
     ErrorResponse:
       type: object
