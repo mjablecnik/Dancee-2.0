@@ -1,6 +1,6 @@
 import * as restate from "@restatedev/restate-sdk";
 import { scrapeEvent } from "../clients/scraper-client";
-import { findEventByOriginalUrl, createEvent, findErrorByUrl, createError } from "../clients/directus-client";
+import { findEventByOriginalUrl, createEvent, createError } from "../clients/directus-client";
 import { classifyEventType, extractEventParts, extractEventInfo } from "./event-parser";
 import { translateEventContent } from "./event-translator";
 import { resolveVenue } from "./venue-resolver";
@@ -62,15 +62,13 @@ export const eventWorkflow = restate.workflow({
       } catch (err) {
         // Track the failure in Directus so the batch service can observe it
         // without needing to await the fire-and-forget workflowSendClient call.
-        const existingError = await ctx.run("checkError", () => findErrorByUrl(eventUrl));
-        if (!existingError) {
-          await ctx.run("createError", () =>
-            createError({
-              url: eventUrl,
-              message: err instanceof Error ? err.message : String(err),
-            })
-          );
-        }
+        // createError handles upsert — inserts new or updates existing row for this URL.
+        await ctx.run("createError", () =>
+          createError({
+            url: eventUrl,
+            message: err instanceof Error ? err.message : String(err),
+          })
+        );
         throw err;
       }
     },

@@ -217,11 +217,17 @@ export async function updateGroupTimestamp(
 export async function createError(
   entry: Omit<DirectusError, "id" | "datetime"> & { datetime?: string },
 ): Promise<DirectusError> {
+  const now = entry.datetime ?? new Date().toISOString();
   const existing = await findErrorByUrl(entry.url);
   if (existing) {
-    return existing;
+    // Update the existing row with the latest message and timestamp
+    const data = await directusPatch(`/items/errors/${existing.id}`, {
+      message: entry.message,
+      datetime: now,
+    });
+    return DirectusErrorSchema.parse(extractDirectusData(data, "createError:update"));
   }
-  const fullEntry = { ...entry, datetime: entry.datetime ?? new Date().toISOString() };
+  const fullEntry = { ...entry, datetime: now };
   const data = await directusPost("/items/errors", fullEntry);
   return DirectusErrorSchema.parse(extractDirectusData(data, "createError"));
 }
