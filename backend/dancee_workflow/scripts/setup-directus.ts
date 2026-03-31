@@ -231,6 +231,20 @@ async function setupErrorsCollection(): Promise<void> {
     interface: "input-multiline",
   }, { is_nullable: true });
 
+  await createFieldIfNotExists("errors", "type", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { text: "Scrape Failed", value: "scrape_failed" },
+        { text: "Parse Failed", value: "parse_failed" },
+        { text: "LLM Parse Failed", value: "llm_parse_failed" },
+        { text: "Workflow Failed", value: "workflow_failed" },
+        { text: "Schedule Failed", value: "schedule_failed" },
+        { text: "Unknown", value: "unknown" },
+      ],
+    },
+  }, { is_nullable: true, default_value: "unknown" });
+
   await createFieldIfNotExists("errors", "datetime", "dateTime", {
     interface: "datetime",
   }, { is_nullable: true });
@@ -346,7 +360,7 @@ async function setupTranslationsRelation(): Promise<void> {
     console.log(`Created relation events <-> events_translations.`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("already exists") || msg.includes("409")) {
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
       console.log(`Relation events <-> events_translations already exists, skipping.`);
     } else {
       throw err;
@@ -370,7 +384,7 @@ async function setupTranslationsRelation(): Promise<void> {
     console.log(`Created relation events_translations <-> languages.`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("already exists") || msg.includes("409")) {
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
       console.log(`Relation events_translations <-> languages already exists, skipping.`);
     } else {
       throw err;
@@ -408,7 +422,7 @@ async function setupVenueRelation(): Promise<void> {
     console.log(`Created relation events.venue -> venues.`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("already exists") || msg.includes("409")) {
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
       console.log(`Relation events.venue -> venues already exists, skipping.`);
     } else {
       throw err;
