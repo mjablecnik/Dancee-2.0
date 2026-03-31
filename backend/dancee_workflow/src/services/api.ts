@@ -1,5 +1,5 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents } from "../clients/directus-client";
+import { listPublishedEvents, findEventByOriginalUrl } from "../clients/directus-client";
 import { config } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
@@ -64,11 +64,17 @@ export const apiService = restate.service({
         return result;
       } catch (err) {
         // 409 means the workflow was already invoked with this key.
-        // Retrieve the existing result instead of failing.
+        // Look up the event in Directus instead of failing.
         if (err instanceof restate.TerminalError && err.code === 409) {
-          log({ level: "info", message: "Workflow already invoked, fetching existing output", url: request.url });
-          const output = await wfClient.workflowOutput();
-          return output;
+          log({ level: "info", message: "Workflow already invoked, checking Directus for existing event", url: request.url });
+          const existing = await ctx.run("lookupExisting", () =>
+            findEventByOriginalUrl(normalizedUrl)
+          );
+          if (existing) {
+            return existing;
+          }
+          // Workflow ran but event not in Directus (maybe it was skipped or failed)
+          return { status: "already_processing" as const, url: request.url };
         }
         throw err;
       }

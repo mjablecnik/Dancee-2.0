@@ -91,6 +91,10 @@ async function setupEventsCollection(): Promise<void> {
     sort_field: null,
   });
 
+  await createFieldIfNotExists("events", "title", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 512 });
+
   await createFieldIfNotExists("events", "original_description", "text", {
     interface: "input-multiline",
     display: "raw",

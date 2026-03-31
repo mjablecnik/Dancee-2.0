@@ -169,6 +169,7 @@ export type DirectusEventTranslation = z.infer<typeof DirectusEventTranslationSc
 
 export const DirectusEventSchema = z.object({
   id: z.union([z.number(), z.string()]).optional(),
+  title: z.string().optional(),
   original_description: z.string(),
   organizer: z.string(),
   // Directus may return venue IDs as number (auto-increment) or string (UUID).

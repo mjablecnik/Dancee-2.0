@@ -191,6 +191,7 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       const endTime = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
 
       const newEvent: DirectusEvent = {
+        title: extracted.title,
         original_description: facebookEvent.description ?? "",
         organizer,
         venue: venue?.id ?? null,
