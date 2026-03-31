@@ -85,7 +85,7 @@ export async function extractEventParts(
 /**
  * Validates and fixes part date_time_range values.
  * If a part's time is clearly outside the event's time range (wrong year/month),
- * set it to null rather than keeping a hallucinated date.
+ * fall back to the event's own start/end time.
  */
 function validatePartTimes(
   parts: EventPart[],
@@ -107,15 +107,19 @@ function validatePartTimes(
     if (start) {
       const d = new Date(start);
       if (isNaN(d.getTime()) || d < minStart || d > maxEnd) {
-        start = null;
+        start = eventStartTime;
       }
+    } else {
+      start = eventStartTime;
     }
 
     if (end) {
       const d = new Date(end);
       if (isNaN(d.getTime()) || d < minStart || d > maxEnd) {
-        end = null;
+        end = eventEndTime;
       }
+    } else {
+      end = eventEndTime;
     }
 
     return { ...part, date_time_range: { start, end } };

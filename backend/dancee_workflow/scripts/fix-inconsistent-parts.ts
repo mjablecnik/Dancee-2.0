@@ -123,6 +123,8 @@ async function migrate(): Promise<void> {
 
     const hasInconsistent = event.parts.some((p) =>
       isPartTimeInconsistent(p, eventStart, eventEnd)
+      || !p.date_time_range.start
+      || !p.date_time_range.end
     );
 
     if (!hasInconsistent) {
@@ -130,15 +132,25 @@ async function migrate(): Promise<void> {
       continue;
     }
 
-    // Nullify inconsistent part times
+    // Fill inconsistent part times with event's own times
     const fixedParts = event.parts.map((p) => {
       if (isPartTimeInconsistent(p, eventStart, eventEnd)) {
         return {
           ...p,
-          date_time_range: { start: null, end: null },
+          date_time_range: {
+            start: event.start_time,
+            end: event.end_time ?? event.start_time,
+          },
         };
       }
-      return p;
+      // Also fill nulls with event times
+      return {
+        ...p,
+        date_time_range: {
+          start: p.date_time_range.start ?? event.start_time,
+          end: p.date_time_range.end ?? (event.end_time ?? event.start_time),
+        },
+      };
     });
 
     const badCount = event.parts.filter((p) =>
