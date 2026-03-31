@@ -298,6 +298,7 @@ class DanceStyleChip extends StatelessWidget {
 /// Card displaying a single piece of event info (price, text, url).
 ///
 /// When [onTap] is provided, the card becomes tappable (used for URL-type items).
+/// URL-type cards use a vertical layout with truncated URL to prevent overflow.
 class EventInfoCard extends StatelessWidget {
   final EventInfo info;
   final VoidCallback? onTap;
@@ -307,6 +308,7 @@ class EventInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = _getInfoCardColors(info.type);
+    final iconColor = _getInfoIconColor(info.type);
 
     final card = Container(
       padding: const EdgeInsets.all(16),
@@ -322,34 +324,9 @@ class EventInfoCard extends StatelessWidget {
           width: 2,
         ),
       ),
-      child: Row(
-        children: [
-          Icon(
-            _getInfoIcon(info.type),
-            size: 20,
-            color: _getInfoIconColor(info.type),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              info.key,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
-              ),
-            ),
-          ),
-          Text(
-            info.value,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: _getInfoIconColor(info.type),
-            ),
-          ),
-        ],
-      ),
+      child: info.type == EventInfoType.url
+          ? _UrlInfoCardContent(info: info, iconColor: iconColor)
+          : _DefaultInfoCardContent(info: info, iconColor: iconColor),
     );
 
     if (onTap != null) {
@@ -357,6 +334,95 @@ class EventInfoCard extends StatelessWidget {
     }
 
     return card;
+  }
+}
+
+/// Default layout for price/text info cards — key left, value right.
+class _DefaultInfoCardContent extends StatelessWidget {
+  final EventInfo info;
+  final Color iconColor;
+
+  const _DefaultInfoCardContent({
+    required this.info,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(_getInfoIcon(info.type), size: 20, color: iconColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            info.key,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF0F172A),
+            ),
+          ),
+        ),
+        Text(
+          info.value,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: iconColor,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Vertical layout for URL info cards — label on top, truncated URL below.
+class _UrlInfoCardContent extends StatelessWidget {
+  final EventInfo info;
+  final Color iconColor;
+
+  const _UrlInfoCardContent({
+    required this.info,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(_getInfoIcon(info.type), size: 20, color: iconColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                info.key,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                info.value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: iconColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: iconColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(Icons.open_in_new, size: 16, color: iconColor),
+      ],
+    );
   }
 }
 

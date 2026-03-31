@@ -160,12 +160,14 @@ class EventTitleSection extends StatelessWidget {
                         color: Color(0xFF6366F1),
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        event.venue.name,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF64748B),
+                      Flexible(
+                        child: Text(
+                          event.venue.name,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF64748B),
+                          ),
                         ),
                       ),
                     ],
