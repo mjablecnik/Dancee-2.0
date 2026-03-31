@@ -169,7 +169,7 @@ export const apiService = restate.service({
       let title = event.title;
       if (steps.includes("parts")) {
         try {
-          const extracted = await ctx.run("extractParts", () => extractEventParts(description));
+          const extracted = await ctx.run("extractParts", () => extractEventParts(description, event.start_time, event.end_time ?? null));
           parts = extracted.parts;
           title = extracted.title;
           patch.parts = extracted.parts;

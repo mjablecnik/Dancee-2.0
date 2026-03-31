@@ -145,12 +145,19 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         return { status: "skipped" as const, reason: skipReason };
       }
 
+      // Compute event times early — needed by parts extraction for date context
+      const startTimeUtc = toIsoOrNull(facebookEvent.startTimestamp) as string;
+      const endTimeUtc = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
+      const eventTimezone = facebookEvent.timezone ?? "UTC";
+      const startTime = convertToLocalTime(startTimeUtc, eventTimezone);
+      const endTime = endTimeUtc ? convertToLocalTime(endTimeUtc, eventTimezone) : null;
+
       // Step 4: Extract event parts (Czech output)
       // If extraction fails after retries, continue with empty parts and mark as incomplete.
       let extracted: { title: string; description: string; parts: import("../core/schemas").EventPart[] };
       let partsIncomplete = false;
       try {
-        extracted = await runStep(ctx, "extractParts", eventUrl, () => extractEventParts(description));
+        extracted = await runStep(ctx, "extractParts", eventUrl, () => extractEventParts(description, startTime, endTime));
       } catch (err) {
         log({ level: "warn", message: "extractParts failed, continuing with empty parts", url: eventUrl, error: String(err) });
         extracted = { title: facebookEvent.name, description: description, parts: [] };
@@ -241,15 +248,6 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       const translationStatus = computeTranslationStatus(translations);
 
       // Step 11: Build and store event
-      // startTimestamp > 0 was validated in Step 1b, so toIsoOrNull is guaranteed non-null here
-      const startTimeUtc = toIsoOrNull(facebookEvent.startTimestamp) as string;
-      const endTimeUtc = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
-      const eventTimezone = facebookEvent.timezone ?? "UTC";
-
-      // Convert UTC times to local "wall clock" time of the event venue
-      const startTime = convertToLocalTime(startTimeUtc, eventTimezone);
-      const endTime = endTimeUtc ? convertToLocalTime(endTimeUtc, eventTimezone) : null;
-
       const newEvent: DirectusEvent = {
         title: extracted.title,
         original_description: facebookEvent.description ?? "",

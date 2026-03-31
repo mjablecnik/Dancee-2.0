@@ -13,8 +13,15 @@ Classify the event into exactly one of the following types:
 Respond with only the type name (lowercase), nothing else.`;
 }
 
-export function getEventPartsExtractionPrompt(outputLanguage: string): string {
+export function getEventPartsExtractionPrompt(outputLanguage: string, eventStartTime: string, eventEndTime: string | null): string {
+  const timeContext = eventEndTime
+    ? `The event starts at ${eventStartTime} and ends at ${eventEndTime}.`
+    : `The event starts at ${eventStartTime}.`;
+
   return `You are an expert in dance events. Your task is to extract structured information from a dance event description.
+
+${timeContext}
+All part times MUST fall within the event's start and end time range. Do NOT invent dates from the description text — use the provided event times as reference.
 
 Extract the event into a JSON object with the following structure:
 {
@@ -27,8 +34,8 @@ Extract the event into a JSON object with the following structure:
       "type": "party | workshop | openLesson",
       "dances": ["string - dance style names (keep original names, do not translate)"],
       "date_time_range": {
-        "start": "ISO 8601 UTC datetime string or null if unknown",
-        "end": "ISO 8601 UTC datetime string or null if unknown"
+        "start": "ISO 8601 datetime string (same date as event) or null if unknown",
+        "end": "ISO 8601 datetime string (same date as event) or null if unknown"
       },
       "lectors": ["string - lector names (keep original names)"],
       "djs": ["string - DJ names (keep original names)"]
@@ -40,7 +47,9 @@ Important rules:
 - Output title and description in ${outputLanguage}
 - Output part names and descriptions in ${outputLanguage}
 - Do NOT translate dance names, lector names, or DJ names
-- Use ISO 8601 format for all dates and times (e.g., "2024-03-15T18:00:00Z")
+- Part date_time_range values MUST use the same date as the event start time (${eventStartTime})
+- If the description mentions specific hours (e.g. "20:00-02:00"), combine them with the event date
+- If no specific times are mentioned for a part, set date_time_range start and end to null
 - If no specific parts can be identified, create one part representing the whole event
 - Respond with only valid JSON, no markdown fences or additional text`;
 }

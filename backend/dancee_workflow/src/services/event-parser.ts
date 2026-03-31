@@ -58,8 +58,10 @@ const ExtractedPartsSchema = z.object({
 
 export async function extractEventParts(
   description: string,
+  eventStartTime: string,
+  eventEndTime: string | null,
 ): Promise<{ title: string; description: string; parts: EventPart[] }> {
-  const prompt = getEventPartsExtractionPrompt("Czech");
+  const prompt = getEventPartsExtractionPrompt("Czech", eventStartTime, eventEndTime);
   return retryOnJsonError(async () => {
     const response = await getOpenAI().chat.completions.create({
       model: config.openRouterModel,
@@ -71,7 +73,52 @@ export async function extractEventParts(
     });
     const raw = response.choices[0]?.message?.content ?? "";
     const parsed = parseJsonResponse(raw);
-    return ExtractedPartsSchema.parse(parsed);
+    const result = ExtractedPartsSchema.parse(parsed);
+
+    // Post-processing: validate part times are consistent with event times
+    result.parts = validatePartTimes(result.parts, eventStartTime, eventEndTime);
+
+    return result;
+  });
+}
+
+/**
+ * Validates and fixes part date_time_range values.
+ * If a part's time is clearly outside the event's time range (wrong year/month),
+ * set it to null rather than keeping a hallucinated date.
+ */
+function validatePartTimes(
+  parts: EventPart[],
+  eventStartTime: string,
+  eventEndTime: string | null,
+): EventPart[] {
+  const eventStart = new Date(eventStartTime);
+  // Allow parts up to 7 days after event start (for festivals)
+  const maxEnd = eventEndTime
+    ? new Date(new Date(eventEndTime).getTime() + 24 * 60 * 60 * 1000)
+    : new Date(eventStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+  // Allow parts to start up to 1 day before event start (setup/pre-party)
+  const minStart = new Date(eventStart.getTime() - 24 * 60 * 60 * 1000);
+
+  return parts.map((part) => {
+    let start = part.date_time_range.start;
+    let end = part.date_time_range.end;
+
+    if (start) {
+      const d = new Date(start);
+      if (isNaN(d.getTime()) || d < minStart || d > maxEnd) {
+        start = null;
+      }
+    }
+
+    if (end) {
+      const d = new Date(end);
+      if (isNaN(d.getTime()) || d < minStart || d > maxEnd) {
+        end = null;
+      }
+    }
+
+    return { ...part, date_time_range: { start, end } };
   });
 }
 
