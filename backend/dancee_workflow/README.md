@@ -76,11 +76,12 @@ The container exposes:
 
 ## API Endpoints
 
-All endpoints are exposed via Restate ingress on port 8080.
+All endpoints are exposed via the HTTP proxy on `APP_PORT` (default 9080).
 
 | Method | Path | Description |
 |---|---|---|
 | `POST` | `/api/event` | Process a single Facebook event by URL |
+| `POST` | `/api/event/reprocess` | Reprocess parts of an existing event |
 | `GET` | `/api/events/process` | Trigger batch processing of all groups |
 | `GET` | `/api/events/list` | List published events |
 
@@ -90,7 +91,26 @@ All endpoints are exposed via Restate ingress on port 8080.
 { "url": "https://www.facebook.com/events/123456789" }
 ```
 
-Returns the processed event object or `null` if skipped (unsupported type or duplicate).
+Uses a deterministic workflow key — repeated calls with the same URL return the existing result.
+
+### POST /api/event/reprocess
+
+```json
+{ "id": 70, "steps": ["translations"], "lang": "en" }
+```
+
+Re-runs selected processing steps on an existing event. Valid steps: `parts`, `info`, `translations`, `dances`. Omit `steps` to reprocess everything. Use `lang` to translate a single language. Supports `translationId` instead of `id` when called from translation detail.
+
+### GET /api/events/list
+
+Custom headers:
+- `x-dancee-lang: cs` — flatten translation for a specific language onto each event
+- `x-dancee-include: original_description` — include the original Facebook description
+- `x-dancee-filter: {"dances":{"_contains":"Salsa"}}` — Directus filter (allowed fields: dances, start_time, end_time, venue, organizer, translation_status)
+
+## Scripts
+
+See [docs/SCRIPTS.md](docs/SCRIPTS.md) for documentation on all available scripts.
 
 ## Testing
 
