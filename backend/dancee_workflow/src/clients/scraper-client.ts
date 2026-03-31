@@ -81,9 +81,12 @@ export function extractEventId(eventIdOrUrl: string): string {
 }
 
 export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> {
-  // Pass the full URL or ID to the scraper — the scraper service handles both.
-  // We encode the entire value as a path segment.
-  const url = `${config.scraperBaseUrl}/api/scraper/event/${encodeURIComponent(eventIdOrUrl)}`;
+  // Build a full Facebook URL if only an ID was provided
+  const eventUrl = eventIdOrUrl.startsWith("http")
+    ? eventIdOrUrl
+    : buildFacebookEventUrl(eventIdOrUrl);
+  const params = new URLSearchParams({ url: eventUrl });
+  const url = `${config.scraperBaseUrl}/api/scraper/event?${params.toString()}`;
   const data = await fetchJson(url);
   return FacebookEventSchema.parse(data);
 }

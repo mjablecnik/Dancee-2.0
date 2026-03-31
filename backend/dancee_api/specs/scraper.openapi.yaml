@@ -53,13 +53,12 @@ paths:
                 message: Facebook Event Scraper API
                 version: 1.0.0
                 endpoints:
-                  GET /api/scraper/event/:eventId:
+                  GET /api/scraper/event:
                     description: Scrape a single Facebook event
                     parameters:
-                      eventId: Facebook event ID or full URL (must be public)
+                      url: Full Facebook event URL (required, event must be public)
                     examples:
-                      - GET /api/scraper/event/1987385505448084
-                      - GET /api/scraper/event/https://www.facebook.com/events/1987385505448084
+                      - GET /api/scraper/event?url=https://www.facebook.com/events/1987385505448084
                   GET /api/scraper/events:
                     description: Scrape a list of events from a page/group/profile
                     parameters:
@@ -74,40 +73,41 @@ paths:
                   - Rate limiting may apply
                   - Use at your own risk - Facebook ToS prohibit automated scraping
 
-  /api/scraper/event/{eventId}:
+  /api/scraper/event:
     get:
       tags:
         - Scraper
       summary: Scrape a single Facebook event
       description: |
-        Scrape detailed information about a single Facebook event by providing either
-        the event ID or the full Facebook event URL.
+        Scrape detailed information about a single Facebook event by providing
+        the full Facebook event URL as a query parameter.
         
         The event must be public and accessible. Private or deleted events will result in an error.
         
-        **Supported formats:**
-        - Event ID: `1987385505448084`
-        - Full URL: `https://www.facebook.com/events/1987385505448084`
-        - Short URL: `https://fb.com/events/1987385505448084`
+        **Supported URL formats:**
+        - `https://www.facebook.com/events/1987385505448084`
+        - `https://facebook.com/events/1987385505448084`
+        - `https://fb.com/events/1987385505448084`
       operationId: scrapeEvent
       parameters:
-        - name: eventId
-          in: path
+        - name: url
+          in: query
           description: |
-            Facebook event ID or full event URL.
+            Full Facebook event URL.
             
-            Can be either a numeric event ID (e.g., "1987385505448084") or a complete
-            Facebook event URL (e.g., "https://www.facebook.com/events/1987385505448084").
+            Must be a complete Facebook event URL
+            (e.g., "https://www.facebook.com/events/1987385505448084").
           required: true
           schema:
             type: string
+            format: uri
           examples:
-            eventId:
-              value: "1987385505448084"
-              summary: Event ID only
-            eventUrl:
+            facebookUrl:
               value: "https://www.facebook.com/events/1987385505448084"
-              summary: Full event URL
+              summary: Standard Facebook event URL
+            shortUrl:
+              value: "https://fb.com/events/1987385505448084"
+              summary: Short Facebook event URL
       responses:
         '200':
           description: Event data scraped successfully

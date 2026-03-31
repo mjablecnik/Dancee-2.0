@@ -17,14 +17,13 @@ export class ScraperController {
       message: 'Facebook Event Scraper API',
       version: '1.0.0',
       endpoints: {
-        'GET /api/scraper/event/:eventId': {
+        'GET /api/scraper/event': {
           description: 'Scrape a single Facebook event',
           parameters: {
-            eventId: 'Facebook event ID or full URL (must be public)'
+            url: 'Full Facebook event URL (required, event must be public)'
           },
           examples: [
-            'GET /api/scraper/event/1987385505448084',
-            'GET /api/scraper/event/https://www.facebook.com/events/1987385505448084'
+            'GET /api/scraper/event?url=https://www.facebook.com/events/1987385505448084'
           ]
         },
         'GET /api/scraper/events': {
@@ -49,13 +48,21 @@ export class ScraperController {
   };
 
   /**
-   * GET /api/scraper/event/:eventId
-   * Scrape a single Facebook event by ID or URL
+   * GET /api/scraper/event?url=xxx
+   * Scrape a single Facebook event by its full URL
    */
   scrapeEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { eventId } = req.params;
-      const eventData = await this.scraperService.scrapeEvent(eventId);
+      const { url } = req.query;
+
+      if (!url || typeof url !== 'string') {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'url query parameter is required'
+        });
+      }
+
+      const eventData = await this.scraperService.scrapeEvent(url);
       res.json(eventData);
     } catch (error) {
       next(error);

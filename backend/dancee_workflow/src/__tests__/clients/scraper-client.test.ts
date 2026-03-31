@@ -106,8 +106,8 @@ describe("extractEventId: rejects invalid URLs and empty IDs", () => {
   });
 });
 
-describe("scrapeEvent: uses only event ID in path, not full URL", () => {
-  it("passes bare event ID directly in path", async () => {
+describe("scrapeEvent: passes full URL as query parameter", () => {
+  it("converts bare event ID to full Facebook URL in query param", async () => {
     let capturedUrl = "";
     vi.stubGlobal(
       "fetch",
@@ -121,11 +121,12 @@ describe("scrapeEvent: uses only event ID in path, not full URL", () => {
       })
     );
     await expect(scrapeEvent("123456789")).rejects.toThrow();
-    expect(capturedUrl).toContain("/api/scraper/event/123456789");
-    expect(capturedUrl).not.toContain("http%3A");
+    const parsed = new URL(capturedUrl);
+    expect(parsed.searchParams.get("url")).toBe("https://www.facebook.com/events/123456789");
+    expect(parsed.pathname).toBe("/api/scraper/event");
   });
 
-  it("extracts event ID from full Facebook URL before encoding", async () => {
+  it("passes full Facebook URL directly as query param", async () => {
     let capturedUrl = "";
     vi.stubGlobal(
       "fetch",
@@ -138,9 +139,11 @@ describe("scrapeEvent: uses only event ID in path, not full URL", () => {
         });
       })
     );
-    await expect(scrapeEvent("https://www.facebook.com/events/123456789")).rejects.toThrow();
-    expect(capturedUrl).toContain("/api/scraper/event/123456789");
-    expect(capturedUrl).not.toContain("http%3A");
+    const fbUrl = "https://www.facebook.com/events/123456789";
+    await expect(scrapeEvent(fbUrl)).rejects.toThrow();
+    const parsed = new URL(capturedUrl);
+    expect(parsed.searchParams.get("url")).toBe(fbUrl);
+    expect(parsed.pathname).toBe("/api/scraper/event");
   });
 });
 

@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       'GET /api/scraper': 'API information',
-      'GET /api/scraper/event/:eventId': 'Scrape single event',
+      'GET /api/scraper/event?url=xxx': 'Scrape single event',
       'GET /api/scraper/events': 'Scrape event list from page/group'
     }
   });

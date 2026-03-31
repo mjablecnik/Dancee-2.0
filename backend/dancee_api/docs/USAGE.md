@@ -130,7 +130,7 @@ http://localhost:3003
 - Production: `https://dancee-scraper.fly.dev`
 
 **Key Endpoints**:
-- `GET /scraper/event/{eventId}` - Scrape single event
+- `GET /scraper/event?url={facebookEventUrl}` - Scrape single event
 - `GET /scraper/events` - Scrape multiple events
 - `GET /scraper/health` - Check scraper status
 

@@ -26,15 +26,15 @@ npm start
 ### GET /api/scraper
 Get API information and usage examples.
 
-### GET /api/scraper/event/:eventId
+### GET /api/scraper/event
 Scrape a single Facebook event.
 
-**Parameters:**
-- `eventId` - Facebook event ID or full URL
+**Query Parameters:**
+- `url` (required) - Full Facebook event URL
 
 **Example:**
 ```bash
-curl http://localhost:3002/api/scraper/event/1987385505448084
+curl "http://localhost:3002/api/scraper/event?url=https://www.facebook.com/events/1987385505448084"
 ```
 
 ### GET /api/scraper/events

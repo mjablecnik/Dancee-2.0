@@ -216,30 +216,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiInfoResponse'
 
-  /api/scraper/event/{eventId}:
+  /api/scraper/event:
     get:
       tags:
         - Scraper - Facebook Scraping
       summary: Scrape a single Facebook event
       description: |
-        Scrape detailed information about a single Facebook event by providing either
-        the event ID or the full Facebook event URL.
+        Scrape detailed information about a single Facebook event by providing
+        the full Facebook event URL as a query parameter.
         
-        **Supported formats:**
-        - Event ID: `1987385505448084`
-        - Full URL: `https://www.facebook.com/events/1987385505448084`
+        **Supported URL formats:**
+        - `https://www.facebook.com/events/1987385505448084`
+        - `https://facebook.com/events/1987385505448084`
       operationId: scrapeEvent
       servers:
         - url: https://dancee-scraper.fly.dev
         - url: http://localhost:3002
       parameters:
-        - name: eventId
-          in: path
-          description: Facebook event ID or full event URL
+        - name: url
+          in: query
+          description: Full Facebook event URL
           required: true
           schema:
             type: string
-          example: "1987385505448084"
+            format: uri
+          example: "https://www.facebook.com/events/1987385505448084"
       responses:
         '200':
           description: Event data scraped successfully

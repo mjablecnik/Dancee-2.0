@@ -1,37 +1,25 @@
 import {
   scrapeFbEvent,
-  scrapeFbEventFromFbid,
   scrapeFbEventList,
   EventType
 } from 'facebook-event-scraper';
 
 export class ScraperService {
   /**
-   * Scrape a single Facebook event by ID or URL
-   * @param eventId - Facebook event ID or URL
+   * Scrape a single Facebook event by URL
+   * @param eventUrl - Full Facebook event URL
    * @returns Scraped event data
    */
-  async scrapeEvent(eventId: string): Promise<any> {
+  async scrapeEvent(eventUrl: string): Promise<any> {
     try {
-      console.log(`Scraping event: ${eventId}`);
-
-      let eventData;
-
-      // Check if it's a URL or just an ID
-      if (eventId.includes('facebook.com') || eventId.includes('fb.com')) {
-        // It's a URL
-        eventData = await scrapeFbEvent(eventId);
-      } else {
-        // It's just an ID
-        eventData = await scrapeFbEventFromFbid(eventId);
-      }
-
-      console.log(`Successfully scraped event: ${eventId}`);
+      console.log(`Scraping event: ${eventUrl}`);
+      const eventData = await scrapeFbEvent(eventUrl);
+      console.log(`Successfully scraped event: ${eventUrl}`);
       return eventData;
     } catch (error: any) {
-      console.error(`Failed to scrape event ${eventId}:`, error.message);
+      console.error(`Failed to scrape event ${eventUrl}:`, error.message);
       throw new Error(
-        `Failed to scrape event: ${error.message}. Make sure the event is public and the ID/URL is correct.`
+        `Failed to scrape event: ${error.message}. Make sure the event is public and the URL is correct.`
       );
     }
   }
