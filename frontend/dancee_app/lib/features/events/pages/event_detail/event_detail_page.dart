@@ -85,51 +85,49 @@ class _EventDetailContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<EventDetailCubit>();
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          EventDetailHeaderSection(
-            event: event,
-            onBackPressed: () => context.pop(),
+    return CustomScrollView(
+      slivers: [
+        EventDetailHeaderSection(
+          onBackPressed: () => context.pop(),
+        ),
+        SliverToBoxAdapter(
+          child: QuickActionsSection(
+            isFavorite: event.isFavorite,
             onFavoritePressed: () => cubit.toggleFavorite(),
             onMapPressed: () => cubit.openMap(event.venue),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              EventTitleSection(event: event),
+              const SizedBox(height: 20),
+              DanceStylesSection(dances: event.dances),
+              const SizedBox(height: 20),
+              EventVenueSection(
+                venue: event.venue,
+                onNavigatePressed: () => cubit.openMap(event.venue),
+              ),
+              const SizedBox(height: 20),
+              EventOrganizerSection(organizer: event.organizer),
+              const SizedBox(height: 20),
+              EventDescriptionSection(description: event.description),
+              if (event.info.isNotEmpty) ...[
                 const SizedBox(height: 20),
-                EventTitleSection(event: event),
-                const SizedBox(height: 20),
-                DanceStylesSection(dances: event.dances),
-                const SizedBox(height: 20),
-                EventVenueSection(
-                  venue: event.venue,
-                  onNavigatePressed: () => cubit.openMap(event.venue),
+                EventInfoSection(
+                  info: event.info,
+                  onUrlTapped: (url) => cubit.openUrl(url),
                 ),
-                const SizedBox(height: 20),
-                EventOrganizerSection(organizer: event.organizer),
-                const SizedBox(height: 20),
-                EventDescriptionSection(description: event.description),
-                if (event.info.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  EventInfoSection(
-                    info: event.info,
-                    onUrlTapped: (url) => cubit.openUrl(url),
-                  ),
-                ],
-                if (event.parts.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  EventPartsSection(parts: event.parts),
-                ],
-                const SizedBox(height: 40),
               ],
-            ),
+              if (event.parts.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                EventPartsSection(parts: event.parts),
+              ],
+            ]),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -6,95 +6,81 @@ import '../../data/entities.dart';
 import 'components.dart';
 
 // ============================================================================
-// EventDetailHeaderSection
+// EventDetailHeaderSection (pinned SliverAppBar)
 // ============================================================================
 
-/// Gradient header with back button, title, and quick action buttons
-/// (favorite, map). Matches the design from event-detail.html.
+/// Pinned SliverAppBar with gradient background, back button, and title.
+/// Stays visible during scrolling, matching the event list header pattern.
 class EventDetailHeaderSection extends StatelessWidget {
-  final Event event;
   final VoidCallback onBackPressed;
-  final VoidCallback onFavoritePressed;
-  final VoidCallback onMapPressed;
 
   const EventDetailHeaderSection({
     super.key,
-    required this.event,
     required this.onBackPressed,
-    required this.onFavoritePressed,
-    required this.onMapPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          child: Column(
-            children: [
-              _HeaderTopRow(onBackPressed: onBackPressed),
-              const SizedBox(height: 12),
-              _QuickActionsRow(
-                isFavorite: event.isFavorite,
-                onFavoritePressed: onFavoritePressed,
-                onMapPressed: onMapPressed,
-              ),
-            ],
+    return SliverAppBar(
+      floating: false,
+      pinned: true,
+      automaticallyImplyLeading: false,
+      backgroundColor: const Color(0xFF6366F1),
+      toolbarHeight: 56,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Top row of the header with back button and title.
-class _HeaderTopRow extends StatelessWidget {
-  final VoidCallback onBackPressed;
-
-  const _HeaderTopRow({required this.onBackPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        HeaderActionButton(
-          icon: Icons.arrow_back,
-          onPressed: onBackPressed,
-        ),
-        Expanded(
-          child: Center(
-            child: Text(
-              t.eventDetail.title,
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                HeaderActionButton(
+                  icon: Icons.arrow_back,
+                  onPressed: onBackPressed,
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      t.eventDetail.title,
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 40),
+              ],
             ),
           ),
         ),
-        const SizedBox(width: 40),
-      ],
+      ),
     );
   }
 }
 
-/// Quick action buttons row (favorite + map).
-class _QuickActionsRow extends StatelessWidget {
+// ============================================================================
+// QuickActionsSection (scrollable, scrolls away like search/filters)
+// ============================================================================
+
+/// Quick action buttons (favorite, map) with gradient background.
+/// Scrolls away during scrolling, similar to SearchAndFiltersSection
+/// on the event list page.
+class QuickActionsSection extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onFavoritePressed;
   final VoidCallback onMapPressed;
 
-  const _QuickActionsRow({
+  const QuickActionsSection({
+    super.key,
     required this.isFavorite,
     required this.onFavoritePressed,
     required this.onMapPressed,
@@ -102,24 +88,35 @@ class _QuickActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: QuickActionButton(
-            icon: isFavorite ? Icons.favorite : Icons.favorite_border,
-            label: t.eventDetail.favorite,
-            onPressed: onFavoritePressed,
-          ),
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: QuickActionButton(
-            icon: Icons.map,
-            label: t.eventDetail.map,
-            onPressed: onMapPressed,
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+      child: Row(
+        children: [
+          Expanded(
+            child: QuickActionButton(
+              icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+              label: t.eventDetail.favorite,
+              onPressed: onFavoritePressed,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 8),
+          Expanded(
+            child: QuickActionButton(
+              icon: Icons.map,
+              label: t.eventDetail.map,
+              onPressed: onMapPressed,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
