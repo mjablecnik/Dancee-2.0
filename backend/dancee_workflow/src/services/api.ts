@@ -52,20 +52,26 @@ export const apiService = restate.service({
         );
       }
 
-      // Use a deterministic workflow key derived from the normalised URL.
-      // This way Restate deduplicates: if the same URL was already processed
-      // (or is in progress), it returns the existing result instead of
-      // starting a new workflow. If the previous run failed, Restate resumes
-      // from the last successful step.
       const normalizedUrl = normalizeEventUrl(request.url);
       const workflowKey = normalizedUrl
         .replace(/[^a-zA-Z0-9]/g, "_")
         .slice(0, 128);
-      const result = await ctx
-        .workflowClient<EventWorkflow>({ name: "EventWorkflow" }, workflowKey)
-        .run(request.url);
 
-      return result;
+      const wfClient = ctx.workflowClient<EventWorkflow>({ name: "EventWorkflow" }, workflowKey);
+
+      try {
+        const result = await wfClient.run(request.url);
+        return result;
+      } catch (err) {
+        // 409 means the workflow was already invoked with this key.
+        // Retrieve the existing result instead of failing.
+        if (err instanceof restate.TerminalError && err.code === 409) {
+          log({ level: "info", message: "Workflow already invoked, fetching existing output", url: request.url });
+          const output = await wfClient.workflowOutput();
+          return output;
+        }
+        throw err;
+      }
     },
 
     processBatch: async (ctx: restate.Context) => {

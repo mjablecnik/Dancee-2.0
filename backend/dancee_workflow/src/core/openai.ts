@@ -11,6 +11,10 @@ export function getOpenAI(): OpenAI {
     _openai = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
       apiKey: config.openRouterApiKey,
+      defaultHeaders: {
+        "X-Title": "Dancee Workflow",
+        "HTTP-Referer": "https://dancee-workflow.fly.dev",
+      },
     });
   }
   return _openai;
