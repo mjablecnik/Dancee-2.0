@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+import { TerminalError } from "@restatedev/restate-sdk";
 import { config } from "../core/config";
 import { getOpenAI } from "../core/openai";
 import {
@@ -31,7 +32,9 @@ export async function retryOnJsonError<T>(fn: () => Promise<T>, maxAttempts = 3)
       lastError = err;
     }
   }
-  throw lastError;
+  // All retry attempts exhausted — this is a permanent parse failure
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new TerminalError(`Parse failed after ${maxAttempts} attempts: ${message}`);
 }
 
 export async function classifyEventType(description: string): Promise<EventType> {

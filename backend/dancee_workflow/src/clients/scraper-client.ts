@@ -1,5 +1,6 @@
 import { log } from "../core/logger";
 import { TerminalError } from "@restatedev/restate-sdk";
+import { ZodError } from "zod";
 import { FacebookEventSchema, FacebookEventListItemSchema, type FacebookEvent, type FacebookEventListItem } from "../core/schemas";
 import { scrapeFacebookEvent, scrapeFacebookEventList } from "../services/scraper";
 
@@ -25,10 +26,13 @@ const PERMANENT_ERROR_PATTERNS = [
 
 /**
  * Checks if a scraper error is permanent (should not be retried by Restate).
- * Permanent errors include: page not found, invalid URL, no event data, etc.
+ * Permanent errors include: page not found, invalid URL, no event data,
+ * and Zod validation failures (malformed response data won't fix on retry).
  * Transient errors (timeouts, network issues) should be retried.
  */
-function isPermanentScraperError(message: string): boolean {
+function isPermanentScraperError(err: unknown): boolean {
+  if (err instanceof ZodError) return true;
+  const message = err instanceof Error ? err.message : String(err);
   const lower = message.toLowerCase();
   return PERMANENT_ERROR_PATTERNS.some((p) => lower.includes(p.toLowerCase()));
 }
@@ -93,9 +97,9 @@ export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> 
     const data = await scrapeFacebookEvent(eventUrl);
     return FacebookEventSchema.parse(data);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (isPermanentScraperError(message)) {
-      throw new TerminalError(message);
+    if (isPermanentScraperError(err)) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new TerminalError(`Failed to scrape/parse event [${eventUrl}]: ${message}`);
     }
     throw err;
   }
@@ -109,14 +113,14 @@ export async function scrapeEventList(
   try {
     data = await scrapeFacebookEventList(pageUrl, eventType);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (isPermanentScraperError(message)) {
-      throw new TerminalError(message);
+    if (isPermanentScraperError(err)) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new TerminalError(`Failed to scrape event list [${pageUrl}]: ${message}`);
     }
     throw err;
   }
   if (!Array.isArray(data)) {
-    throw new TerminalError("Scraper returned unexpected response: expected array");
+    throw new TerminalError(`Scraper returned unexpected response for [${pageUrl}]: expected array`);
   }
   const events: FacebookEventListItem[] = [];
   for (const item of data) {
