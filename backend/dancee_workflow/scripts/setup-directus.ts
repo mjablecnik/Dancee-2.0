@@ -308,13 +308,17 @@ async function setupTranslationsRelation(): Promise<void> {
     // Not found, proceed to create
   }
 
-  // Create the translations field on events (M2A — Directus translations pattern)
+  // Create the translations field on events (O2M list interface for browsable translations)
   await createFieldIfNotExists("events", "translations", "alias", {
-    interface: "translations",
+    interface: "list-o2m",
     options: {
-      languageField: "code",
-      languageDirectionField: null,
-      defaultLanguage: "cs",
+      template: "{{languages_code}} — {{title}}",
+      enableCreate: false,
+      enableSelect: false,
+    },
+    display: "related-values",
+    display_options: {
+      template: "{{languages_code}} — {{title}}",
     },
     special: ["translations"],
   }, null);
