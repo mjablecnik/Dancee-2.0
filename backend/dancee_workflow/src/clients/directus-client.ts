@@ -107,6 +107,24 @@ export async function updateEvent(id: string | number, patch: Partial<DirectusEv
   return DirectusEventSchema.parse(extractDirectusData(data, "updateEvent"));
 }
 
+export async function deleteEventTranslations(eventId: string | number): Promise<void> {
+  // Fetch existing translation IDs for this event
+  const data = await directusGet(
+    `/items/events_translations?filter[events_id][_eq]=${eventId}&fields=id`,
+  );
+  const items = extractDirectusData(data, "deleteEventTranslations") as { id: number }[];
+  if (!items || items.length === 0) return;
+
+  // Delete each translation
+  for (const item of items) {
+    await fetch(`${config.directusBaseUrl}/items/events_translations/${item.id}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+      signal: AbortSignal.timeout(config.directusTimeoutMs),
+    });
+  }
+}
+
 export async function listPublishedEvents(extraFilter?: Record<string, unknown>): Promise<DirectusEvent[]> {
   const publishedFilter = { status: { _eq: "published" } };
   const effectiveFilter = extraFilter

@@ -1,5 +1,5 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent } from "../clients/directus-client";
+import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations } from "../clients/directus-client";
 import { config } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
@@ -147,26 +147,28 @@ export const apiService = restate.service({
 
       // Re-translate
       if (steps.includes("translations")) {
+        // Find existing Czech translation for the description base
+        const existingCs = Array.isArray(event.translations)
+          ? event.translations.find(
+              (t) => typeof t === "object" && t !== null && "languages_code" in t &&
+                (t as { languages_code: string }).languages_code === "cs",
+            )
+          : undefined;
+        const csDescription = existingCs && typeof existingCs === "object" && "description" in existingCs
+          ? (existingCs as { description: string }).description
+          : description;
+
         const contentInput = {
           title: title ?? "",
-          description: typeof event.translations?.[0] === "object" && "description" in event.translations[0]
-            ? (event.translations[0] as { description: string }).description
-            : description,
+          description: csDescription,
           parts,
           info,
         };
 
-        const translations: DirectusEventTranslation[] = [
-          {
-            languages_code: "cs",
-            title: title ?? "",
-            description: contentInput.description,
-            parts_translations: parts.map((p) => ({ name: p.name, description: p.description })),
-            info_translations: info.map((i) => ({ key: i.key })),
-          },
-        ];
+        const translations: DirectusEventTranslation[] = [];
 
         const langs = [
+          { code: "cs", name: "Czech" },
           { code: "en", name: "English" },
           { code: "es", name: "Spanish" },
         ];
@@ -188,7 +190,22 @@ export const apiService = restate.service({
           }
         }
 
-        patch.translations = translations;
+        // Map new translations onto existing translation IDs so Directus
+        // updates in place instead of creating duplicates.
+        const idByLang = new Map<string, number | string>();
+        if (Array.isArray(event.translations)) {
+          for (const t of event.translations) {
+            if (typeof t === "object" && t !== null && "languages_code" in t && "id" in t) {
+              const obj = t as { id: number | string; languages_code: string };
+              idByLang.set(obj.languages_code, obj.id);
+            }
+          }
+        }
+
+        patch.translations = translations.map((t) => ({
+          ...t,
+          ...(idByLang.has(t.languages_code) ? { id: idByLang.get(t.languages_code) } : {}),
+        }));
         patch.translation_status = computeTranslationStatus(translations);
       }
 
