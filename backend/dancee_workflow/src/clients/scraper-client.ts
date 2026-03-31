@@ -1,5 +1,5 @@
 import { log } from "../core/logger";
-import { FacebookEventSchema, type FacebookEvent } from "../core/schemas";
+import { FacebookEventSchema, FacebookEventListItemSchema, type FacebookEvent, type FacebookEventListItem } from "../core/schemas";
 import { scrapeFacebookEvent, scrapeFacebookEventList } from "../services/scraper";
 
 /** Base URL for Facebook event pages. Used to construct canonical event URLs
@@ -74,14 +74,14 @@ export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> 
 export async function scrapeEventList(
   pageUrl: string,
   eventType?: "upcoming" | "past",
-): Promise<FacebookEvent[]> {
+): Promise<FacebookEventListItem[]> {
   const data = await scrapeFacebookEventList(pageUrl, eventType);
   if (!Array.isArray(data)) {
     throw new Error("Scraper returned unexpected response: expected array");
   }
-  const events: FacebookEvent[] = [];
+  const events: FacebookEventListItem[] = [];
   for (const item of data) {
-    const result = FacebookEventSchema.safeParse(item);
+    const result = FacebookEventListItemSchema.safeParse(item);
     if (result.success) {
       events.push(result.data);
     } else {

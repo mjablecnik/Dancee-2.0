@@ -89,6 +89,23 @@ export const FacebookEventSchema = z
 export type FacebookEvent = z.infer<typeof FacebookEventSchema>;
 export type FacebookLocation = NonNullable<FacebookEvent["location"]>;
 
+// ---- Facebook event list item schema ----
+// scrapeFbEventList returns a simpler object than scrapeFbEvent.
+// It only contains { id, name, url, date, isCanceled, isPast }.
+// This schema is used by scrapeEventList (batch processing) where
+// only id and url are needed to schedule individual EventWorkflows.
+
+export const FacebookEventListItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  url: z.string(),
+  date: z.string().optional(),
+  isCanceled: z.boolean().optional(),
+  isPast: z.boolean().optional(),
+});
+
+export type FacebookEventListItem = z.infer<typeof FacebookEventListItemSchema>;
+
 // ---- Event type ----
 
 export const SUPPORTED_EVENT_TYPES = ["party", "workshop", "festival", "holiday"] as const;

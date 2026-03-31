@@ -55,10 +55,10 @@ describe("scrapeEventList: calls local scraper and filters results", () => {
     const validEvent = {
       id: "123",
       name: "Valid Event",
-      startTimestamp: 1700000000,
       url: "https://facebook.com/events/123",
+      date: "Saturday, March 15",
     };
-    const malformedEvent = { id: "bad" };
+    const malformedEvent = { name: "no id" };
 
     mockScrapeFacebookEventList.mockResolvedValue([validEvent, malformedEvent]);
 
@@ -83,7 +83,7 @@ describe("scrapeEventList: calls local scraper and filters results", () => {
   });
 
   it("logs a warning for each malformed item", async () => {
-    const malformed = [{ id: "bad1" }, { id: "bad2" }];
+    const malformed = [{ name: "bad1" }, { name: "bad2" }];
     mockScrapeFacebookEventList.mockResolvedValue(malformed);
 
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
