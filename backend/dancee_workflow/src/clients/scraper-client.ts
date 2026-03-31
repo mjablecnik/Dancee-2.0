@@ -36,20 +36,30 @@ const KNOWN_NON_ID_SEGMENTS = new Set([
 
 export function extractEventId(eventIdOrUrl: string): string {
   // If a full URL is provided (e.g. https://www.facebook.com/events/123456),
-  // extract the event ID from the last path segment.
-  // Plain event IDs are returned as-is.
+  // extract the event ID from the path segments after /events/.
+  // For URLs like /events/123/456/ the first numeric segment (123) is the
+  // parent event ID; the second is a sibling instance (event_time_id).
   try {
     const parsed = new URL(eventIdOrUrl);
     const segments = parsed.pathname.split("/").filter(Boolean);
+
+    // Find the "events" segment and take the first ID after it
+    const eventsIdx = segments.indexOf("events");
+    if (eventsIdx !== -1 && eventsIdx + 1 < segments.length) {
+      const candidate = segments[eventsIdx + 1];
+      if (candidate && !candidate.includes(".") && !KNOWN_NON_ID_SEGMENTS.has(candidate)) {
+        return candidate;
+      }
+    }
+
+    // Fallback: take the last segment
     const last = segments[segments.length - 1];
-    // Reject empty or hostname-like segments (contain dots, e.g. "www.facebook.com")
     if (!last || last.includes(".")) {
       throw new Error(
         `Cannot extract event ID from URL "${eventIdOrUrl}": ` +
           "the URL does not contain a valid event ID path segment.",
       );
     }
-    // Reject known route components that are not event IDs
     if (KNOWN_NON_ID_SEGMENTS.has(last)) {
       throw new Error(
         `Cannot extract event ID from URL "${eventIdOrUrl}": ` +
@@ -71,8 +81,9 @@ export function extractEventId(eventIdOrUrl: string): string {
 }
 
 export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> {
-  const eventId = extractEventId(eventIdOrUrl);
-  const url = `${config.scraperBaseUrl}/api/scraper/event/${encodeURIComponent(eventId)}`;
+  // Pass the full URL or ID to the scraper — the scraper service handles both.
+  // We encode the entire value as a path segment.
+  const url = `${config.scraperBaseUrl}/api/scraper/event/${encodeURIComponent(eventIdOrUrl)}`;
   const data = await fetchJson(url);
   return FacebookEventSchema.parse(data);
 }

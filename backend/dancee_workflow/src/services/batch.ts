@@ -98,6 +98,45 @@ export const batchService = restate.service({
 
       return { groups: groups.length, eventsScheduled, schedulingErrors };
     },
+
+    processSingle: async (ctx: restate.Context, groupUrl: string) => {
+      const events = await ctx.run("scrapeGroup", () => scrapeEventList(groupUrl));
+
+      log({ level: "info", message: `Processing single group: ${events.length} event(s) found`, url: groupUrl });
+
+      const seenUrls = new Set<string>();
+      let eventsScheduled = 0;
+
+      for (const event of events) {
+        const rawUrl = event.url ?? buildFacebookEventUrl(event.id);
+        const eventUrl = normalizeEventUrl(rawUrl);
+
+        if (seenUrls.has(eventUrl)) continue;
+        seenUrls.add(eventUrl);
+
+        const existing = await ctx.run(`checkEvent_${event.id}`, () =>
+          findEventByOriginalUrl(eventUrl)
+        );
+
+        if (!existing) {
+          const workflowKey = ctx.rand.uuidv4();
+          try {
+            ctx
+              .workflowSendClient<EventWorkflow>({ name: "EventWorkflow" }, workflowKey)
+              .run(eventUrl);
+            eventsScheduled++;
+          } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            captureError(error, { eventUrl, step: "scheduleEventWorkflow" });
+            await ctx.run(`scheduleError_${event.id}`, () =>
+              createError({ url: eventUrl, message: error.message })
+            );
+          }
+        }
+      }
+
+      return { eventsFound: events.length, eventsScheduled };
+    },
   },
 });
 

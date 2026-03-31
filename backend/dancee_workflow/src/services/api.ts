@@ -93,6 +93,21 @@ export const apiService = restate.service({
       return { acknowledged: true, message: "Batch processing started" };
     },
 
+    processGroup: async (
+      ctx: restate.Context,
+      request: { url?: string },
+    ) => {
+      if (!request?.url) {
+        throw new restate.TerminalError("Missing required field: 'url'", { errorCode: 400 });
+      }
+
+      ctx
+        .serviceSendClient<BatchService>({ name: "BatchService" })
+        .processSingle(request.url);
+
+      return { acknowledged: true, message: `Processing group: ${request.url}` };
+    },
+
     reprocessEvent: async (
       ctx: restate.Context,
       request: { id?: string | number; translationId?: string | number; steps?: string[]; lang?: string },

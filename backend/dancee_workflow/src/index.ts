@@ -61,6 +61,7 @@ const apiRoutes: Record<string, string> = {
   "/api/event": "/ApiService/processEvent",
   "/api/event/reprocess": "/ApiService/reprocessEvent",
   "/api/events/process": "/ApiService/processBatch",
+  "/api/events/process-group": "/ApiService/processGroup",
   "/api/events/list": "/ApiService/listEvents",
 };
 
