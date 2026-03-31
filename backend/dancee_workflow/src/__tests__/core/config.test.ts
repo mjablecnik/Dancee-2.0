@@ -45,7 +45,6 @@ describe("validateConfig: no throw when all required vars are present", () => {
       OPENROUTER_API_KEY: "key",
       DIRECTUS_BASE_URL: "http://directus",
       DIRECTUS_ACCESS_TOKEN: "token",
-      SCRAPER_BASE_URL: "http://scraper",
     });
     expect(() => validateConfig()).not.toThrow();
   });
@@ -57,7 +56,6 @@ describe("validateConfig: throws for each missing required var individually", ()
       OPENROUTER_API_KEY: undefined,
       DIRECTUS_BASE_URL: "http://directus",
       DIRECTUS_ACCESS_TOKEN: "token",
-      SCRAPER_BASE_URL: "http://scraper",
     });
     expect(() => validateConfig()).toThrow("OPENROUTER_API_KEY");
   });
@@ -67,7 +65,6 @@ describe("validateConfig: throws for each missing required var individually", ()
       OPENROUTER_API_KEY: "key",
       DIRECTUS_BASE_URL: undefined,
       DIRECTUS_ACCESS_TOKEN: "token",
-      SCRAPER_BASE_URL: "http://scraper",
     });
     expect(() => validateConfig()).toThrow("DIRECTUS_BASE_URL");
   });
@@ -77,19 +74,8 @@ describe("validateConfig: throws for each missing required var individually", ()
       OPENROUTER_API_KEY: "key",
       DIRECTUS_BASE_URL: "http://directus",
       DIRECTUS_ACCESS_TOKEN: undefined,
-      SCRAPER_BASE_URL: "http://scraper",
     });
     expect(() => validateConfig()).toThrow("DIRECTUS_ACCESS_TOKEN");
-  });
-
-  it("throws when SCRAPER_BASE_URL is missing", async () => {
-    const { validateConfig } = await importConfig({
-      OPENROUTER_API_KEY: "key",
-      DIRECTUS_BASE_URL: "http://directus",
-      DIRECTUS_ACCESS_TOKEN: "token",
-      SCRAPER_BASE_URL: undefined,
-    });
-    expect(() => validateConfig()).toThrow("SCRAPER_BASE_URL");
   });
 });
 
@@ -99,7 +85,6 @@ describe("validateConfig: throws with all missing var names when multiple are mi
       OPENROUTER_API_KEY: undefined,
       DIRECTUS_BASE_URL: undefined,
       DIRECTUS_ACCESS_TOKEN: "token",
-      SCRAPER_BASE_URL: "http://scraper",
     });
     let errorMessage = "";
     try {
@@ -110,7 +95,6 @@ describe("validateConfig: throws with all missing var names when multiple are mi
     expect(errorMessage).toContain("OPENROUTER_API_KEY");
     expect(errorMessage).toContain("DIRECTUS_BASE_URL");
     expect(errorMessage).not.toContain("DIRECTUS_ACCESS_TOKEN");
-    expect(errorMessage).not.toContain("SCRAPER_BASE_URL");
   });
 
   it("error message contains instruction to set the variables", async () => {
@@ -118,7 +102,6 @@ describe("validateConfig: throws with all missing var names when multiple are mi
       OPENROUTER_API_KEY: undefined,
       DIRECTUS_BASE_URL: "http://directus",
       DIRECTUS_ACCESS_TOKEN: "token",
-      SCRAPER_BASE_URL: "http://scraper",
     });
     expect(() => validateConfig()).toThrow(/Set these variables before starting/);
   });

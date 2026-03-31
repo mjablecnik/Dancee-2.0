@@ -11,7 +11,6 @@ export interface ServerConfig {
   host: string;
   nodeEnv: string;
   eventsServiceUrl: string;
-  scraperServiceUrl: string;
   corsOrigins: string[];
 }
 
@@ -47,7 +46,6 @@ export const appConfig: ServerConfig = {
   host: process.env.HOST || 'localhost',
   nodeEnv: process.env.NODE_ENV || 'development',
   eventsServiceUrl: process.env.EVENTS_SERVICE_URL || 'http://localhost:8080',
-  scraperServiceUrl: process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002',
   corsOrigins: parseCorsOrigins(process.env.CORS_ORIGINS),
 };
 
@@ -68,10 +66,6 @@ function validateConfig(): void {
 
   if (!appConfig.eventsServiceUrl || !isValidUrl(appConfig.eventsServiceUrl)) {
     errors.push(`Invalid EVENTS_SERVICE_URL: ${appConfig.eventsServiceUrl}`);
-  }
-
-  if (!appConfig.scraperServiceUrl || !isValidUrl(appConfig.scraperServiceUrl)) {
-    errors.push(`Invalid SCRAPER_SERVICE_URL: ${appConfig.scraperServiceUrl}`);
   }
 
   if (errors.length > 0) {

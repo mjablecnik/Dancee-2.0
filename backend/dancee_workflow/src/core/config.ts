@@ -8,7 +8,6 @@ export const config = {
   openRouterModel: process.env.OPENROUTER_MODEL ?? "google/gemini-2.0-flash-001",
   directusBaseUrl: process.env.DIRECTUS_BASE_URL ?? "",
   directusAccessToken: process.env.DIRECTUS_ACCESS_TOKEN ?? "",
-  scraperBaseUrl: process.env.SCRAPER_BASE_URL ?? "",
   nominatimBaseUrl: process.env.NOMINATIM_BASE_URL ?? "https://nominatim.openstreetmap.org",
   sentryDsn: process.env.SENTRY_DSN ?? "",
   corsOrigins: process.env.CORS_ORIGINS ?? "*",
@@ -16,7 +15,6 @@ export const config = {
   // Request timeout in milliseconds for each external service.
   // These prevent hanging workflows when a downstream service is unresponsive.
   directusTimeoutMs: parseInt(process.env.DIRECTUS_TIMEOUT_MS ?? "30000", 10),
-  scraperTimeoutMs: parseInt(process.env.SCRAPER_TIMEOUT_MS ?? "30000", 10),
   nominatimTimeoutMs: parseInt(process.env.NOMINATIM_TIMEOUT_MS ?? "10000", 10),
   // LLM temperature for structured output (classification, extraction, translation).
   // Lower values reduce non-determinism and improve JSON reliability.
@@ -28,7 +26,6 @@ export function validateConfig(): void {
     { key: "openRouterApiKey", envVar: "OPENROUTER_API_KEY" },
     { key: "directusBaseUrl", envVar: "DIRECTUS_BASE_URL" },
     { key: "directusAccessToken", envVar: "DIRECTUS_ACCESS_TOKEN" },
-    { key: "scraperBaseUrl", envVar: "SCRAPER_BASE_URL" },
   ];
 
   const missing = required

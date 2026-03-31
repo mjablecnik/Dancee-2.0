@@ -1,6 +1,6 @@
-import { config } from "../core/config";
 import { log } from "../core/logger";
 import { FacebookEventSchema, type FacebookEvent } from "../core/schemas";
+import { scrapeFacebookEvent, scrapeFacebookEventList } from "../services/scraper";
 
 /** Base URL for Facebook event pages. Used to construct canonical event URLs
  * when the scraper returns an event without a `url` field. */
@@ -9,17 +9,6 @@ export const FACEBOOK_EVENTS_BASE_URL = "https://www.facebook.com/events";
 /** Builds a canonical Facebook event URL from an event ID. */
 export function buildFacebookEventUrl(eventId: string): string {
   return `${FACEBOOK_EVENTS_BASE_URL}/${eventId}`;
-}
-
-async function fetchJson(url: string): Promise<unknown> {
-  const response = await fetch(url, {
-    signal: AbortSignal.timeout(config.scraperTimeoutMs),
-  });
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(`Scraper API error ${response.status}: ${text}`);
-  }
-  return response.json();
 }
 
 // Known Facebook (and generic) URL path segments that are route names, not event IDs.
@@ -35,15 +24,10 @@ const KNOWN_NON_ID_SEGMENTS = new Set([
 ]);
 
 export function extractEventId(eventIdOrUrl: string): string {
-  // If a full URL is provided (e.g. https://www.facebook.com/events/123456),
-  // extract the event ID from the path segments after /events/.
-  // For URLs like /events/123/456/ the first numeric segment (123) is the
-  // parent event ID; the second is a sibling instance (event_time_id).
   try {
     const parsed = new URL(eventIdOrUrl);
     const segments = parsed.pathname.split("/").filter(Boolean);
 
-    // Find the "events" segment and take the first ID after it
     const eventsIdx = segments.indexOf("events");
     if (eventsIdx !== -1 && eventsIdx + 1 < segments.length) {
       const candidate = segments[eventsIdx + 1];
@@ -52,7 +36,6 @@ export function extractEventId(eventIdOrUrl: string): string {
       }
     }
 
-    // Fallback: take the last segment
     const last = segments[segments.length - 1];
     if (!last || last.includes(".")) {
       throw new Error(
@@ -81,13 +64,10 @@ export function extractEventId(eventIdOrUrl: string): string {
 }
 
 export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> {
-  // Build a full Facebook URL if only an ID was provided
   const eventUrl = eventIdOrUrl.startsWith("http")
     ? eventIdOrUrl
     : buildFacebookEventUrl(eventIdOrUrl);
-  const params = new URLSearchParams({ url: eventUrl });
-  const url = `${config.scraperBaseUrl}/api/scraper/event?${params.toString()}`;
-  const data = await fetchJson(url);
+  const data = await scrapeFacebookEvent(eventUrl);
   return FacebookEventSchema.parse(data);
 }
 
@@ -95,14 +75,9 @@ export async function scrapeEventList(
   pageUrl: string,
   eventType?: "upcoming" | "past",
 ): Promise<FacebookEvent[]> {
-  const params = new URLSearchParams({ url: pageUrl });
-  if (eventType !== undefined) {
-    params.set("eventType", eventType);
-  }
-  const url = `${config.scraperBaseUrl}/api/scraper/events?${params.toString()}`;
-  const data = await fetchJson(url);
+  const data = await scrapeFacebookEventList(pageUrl, eventType);
   if (!Array.isArray(data)) {
-    throw new Error("Scraper API returned unexpected response: expected array");
+    throw new Error("Scraper returned unexpected response: expected array");
   }
   const events: FacebookEvent[] = [];
   for (const item of data) {

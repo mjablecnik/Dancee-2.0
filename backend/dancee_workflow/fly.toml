@@ -15,7 +15,6 @@ primary_region = 'fra'
   LLM_TEMPERATURE = '0.1'
   NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org'
   NOMINATIM_TIMEOUT_MS = '10000'
-  SCRAPER_TIMEOUT_MS = '30000'
 
 [http_service]
   internal_port = 9080

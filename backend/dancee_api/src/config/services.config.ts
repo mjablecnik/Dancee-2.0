@@ -59,15 +59,6 @@ export const serviceConfig: ServiceConfig = {
       enabled: true, 
     },
     {
-      id: 'dancee-scraper',
-      name: 'Dancee Scraper API',
-      version: '1.0.0',
-      description: 'Facebook event scraping API',
-      baseUrl: appConfig.scraperServiceUrl,
-      specFile: 'scraper.openapi.yaml',
-      enabled: true, 
-    },
-    {
       id: 'test-api',
       name: 'Test API',
       version: '1.0.0',
