@@ -1,4 +1,4 @@
-app = 'martin-directus'
+app = 'dancee-directus'
 primary_region = 'fra'
 
 [build]
