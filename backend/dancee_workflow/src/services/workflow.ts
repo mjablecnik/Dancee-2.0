@@ -8,7 +8,25 @@ import { computeDances, SUPPORTED_EVENT_TYPES, toIsoOrNull } from "../core/schem
 import { captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
-import type { DirectusEvent, DirectusEventTranslation } from "../core/schemas";
+import type { DirectusEvent, DirectusEventTranslation, ErrorType } from "../core/schemas";
+
+/**
+ * Determines the error type based on the workflow step name and error message.
+ */
+function classifyErrorType(stepName: string, message: string): ErrorType {
+  if (stepName === "scrape") {
+    // Distinguish between "no data" (scrape_failed) and "bad data shape" (parse_failed)
+    const lower = message.toLowerCase();
+    if (lower.includes("parse") || lower.includes("invalid_union") || lower.includes("expected")) {
+      return "parse_failed";
+    }
+    return "scrape_failed";
+  }
+  if (stepName === "classify" || stepName === "extractParts" || stepName === "extractInfo") {
+    return "llm_parse_failed";
+  }
+  return "workflow_failed";
+}
 
 /**
  * Wraps ctx.run with consistent captureError + rethrow handling.
@@ -34,6 +52,7 @@ async function runStep<T>(
     // (Directus error records, logs) always show which URL failed.
     const enriched = new Error(`[${eventUrl}] ${stepName}: ${original.message}`);
     enriched.cause = original;
+    (enriched as any).stepName = stepName;
     throw enriched;
   }
 }
@@ -63,10 +82,14 @@ export const eventWorkflow = restate.workflow({
         // Track the failure in Directus so the batch service can observe it
         // without needing to await the fire-and-forget workflowSendClient call.
         // createError handles upsert — inserts new or updates existing row for this URL.
+        const message = err instanceof Error ? err.message : String(err);
+        const stepName = (err as any)?.stepName ?? "unknown";
+        const errorType = classifyErrorType(stepName, message);
         await ctx.run("createError", () =>
           createError({
             url: eventUrl,
-            message: err instanceof Error ? err.message : String(err),
+            message,
+            type: errorType,
           })
         );
         throw err;

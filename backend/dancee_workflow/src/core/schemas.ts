@@ -247,10 +247,22 @@ export const DirectusGroupSchema = z.object({
 
 export type DirectusGroup = z.infer<typeof DirectusGroupSchema>;
 
+export const ERROR_TYPES = [
+  "scrape_failed",       // Scraper returned no data / page not found
+  "parse_failed",        // Scraper returned data but it couldn't be parsed (Zod/JSON)
+  "llm_parse_failed",    // LLM returned invalid output after retries
+  "workflow_failed",     // General workflow step failure
+  "schedule_failed",     // Failed to schedule a workflow in Restate
+  "unknown",             // Uncategorized error
+] as const;
+
+export type ErrorType = (typeof ERROR_TYPES)[number];
+
 export const DirectusErrorSchema = z.object({
   id: z.union([z.number(), z.string()]).optional(),
   url: z.string(),
   message: z.string(),
+  type: z.string().optional(),
   datetime: z.string(),
 });
 

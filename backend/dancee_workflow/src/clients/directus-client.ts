@@ -220,14 +220,15 @@ export async function createError(
   const now = entry.datetime ?? new Date().toISOString();
   const existing = await findErrorByUrl(entry.url);
   if (existing) {
-    // Update the existing row with the latest message and timestamp
+    // Update the existing row with the latest message, type, and timestamp
     const data = await directusPatch(`/items/errors/${existing.id}`, {
       message: entry.message,
+      type: entry.type ?? "unknown",
       datetime: now,
     });
     return DirectusErrorSchema.parse(extractDirectusData(data, "createError:update"));
   }
-  const fullEntry = { ...entry, datetime: now };
+  const fullEntry = { ...entry, type: entry.type ?? "unknown", datetime: now };
   const data = await directusPost("/items/errors", fullEntry);
   return DirectusErrorSchema.parse(extractDirectusData(data, "createError"));
 }

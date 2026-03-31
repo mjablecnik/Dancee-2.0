@@ -85,7 +85,7 @@ export const apiService = restate.service({
         const error = err instanceof Error ? err : new Error(String(err));
         captureError(error, { url: normalizedUrl, step: "processEvent" });
         await ctx.run("createError", () =>
-          createError({ url: normalizedUrl, message: error.message })
+          createError({ url: normalizedUrl, message: error.message, type: "workflow_failed" })
         );
         throw err;
       }
@@ -178,7 +178,7 @@ export const apiService = restate.service({
           const error = err instanceof Error ? err : new Error(String(err));
           captureError(error, { eventUrl, step: "reprocess:extractParts" });
           await ctx.run("extractPartsError", () =>
-            createError({ url: eventUrl, message: `Reprocess extractParts failed: ${error.message}` })
+            createError({ url: eventUrl, message: `Reprocess extractParts failed: ${error.message}`, type: "llm_parse_failed" })
           );
           throw err;
         }
@@ -195,7 +195,7 @@ export const apiService = restate.service({
           const error = err instanceof Error ? err : new Error(String(err));
           captureError(error, { eventUrl, step: "reprocess:extractInfo" });
           await ctx.run("extractInfoError", () =>
-            createError({ url: eventUrl, message: `Reprocess extractInfo failed: ${error.message}` })
+            createError({ url: eventUrl, message: `Reprocess extractInfo failed: ${error.message}`, type: "llm_parse_failed" })
           );
           throw err;
         }

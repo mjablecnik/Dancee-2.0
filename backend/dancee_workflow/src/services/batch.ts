@@ -9,6 +9,7 @@ import { scrapeEventList, buildFacebookEventUrl } from "../clients/scraper-clien
 import { captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
+import type { ErrorType } from "../core/schemas";
 import type { EventWorkflow } from "./workflow";
 
 export const batchService = restate.service({
@@ -71,7 +72,7 @@ export const batchService = restate.service({
                 const error = scheduleErr instanceof Error ? scheduleErr : new Error(String(scheduleErr));
                 captureError(error, { eventUrl, step: "scheduleEventWorkflow" });
                 await ctx.run(`scheduleError_${event.id}`, () =>
-                  createError({ url: eventUrl, message: error.message })
+                  createError({ url: eventUrl, message: error.message, type: "schedule_failed" })
                 );
               }
             }
@@ -91,7 +92,7 @@ export const batchService = restate.service({
           log({ level: "error", message: `Failed to process group`, url: group.url, error: String(err) });
           captureError(err instanceof Error ? err : new Error(String(err)), { groupId, step: "processGroup" });
           await ctx.run(`groupError_${groupId}`, () =>
-            createError({ url: group.url, message: String(err) })
+            createError({ url: group.url, message: String(err), type: "scrape_failed" })
           );
         }
       }
@@ -108,7 +109,7 @@ export const batchService = restate.service({
         log({ level: "error", message: "Failed to scrape group", url: groupUrl, error: error.message });
         captureError(error, { groupUrl, step: "scrapeGroup" });
         await ctx.run("scrapeGroupError", () =>
-          createError({ url: groupUrl, message: error.message })
+          createError({ url: groupUrl, message: error.message, type: "scrape_failed" })
         );
         throw err;
       }
@@ -135,7 +136,7 @@ export const batchService = restate.service({
           log({ level: "error", message: "Failed to check duplicate event", url: eventUrl, error: error.message });
           captureError(error, { eventUrl, step: "checkEvent" });
           await ctx.run(`checkEventError_${event.id}`, () =>
-            createError({ url: eventUrl, message: `Duplicate check failed: ${error.message}` })
+            createError({ url: eventUrl, message: `Duplicate check failed: ${error.message}`, type: "workflow_failed" })
           );
           continue;
         }
@@ -151,7 +152,7 @@ export const batchService = restate.service({
             const error = err instanceof Error ? err : new Error(String(err));
             captureError(error, { eventUrl, step: "scheduleEventWorkflow" });
             await ctx.run(`scheduleError_${event.id}`, () =>
-              createError({ url: eventUrl, message: error.message })
+              createError({ url: eventUrl, message: error.message, type: "schedule_failed" })
             );
           }
         }
