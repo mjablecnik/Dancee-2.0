@@ -250,6 +250,26 @@ async function setupErrorsCollection(): Promise<void> {
   }, { is_nullable: true });
 }
 
+async function setupSkippedEventsCollection(): Promise<void> {
+  await createCollectionIfNotExists("skipped_events", { singleton: false });
+
+  await createFieldIfNotExists("skipped_events", "original_url", "string", {
+    interface: "input",
+  }, { is_nullable: false, max_length: 2048 });
+
+  await createFieldIfNotExists("skipped_events", "reason", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 512 });
+
+  await createFieldIfNotExists("skipped_events", "event_type", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 64 });
+
+  await createFieldIfNotExists("skipped_events", "datetime", "dateTime", {
+    interface: "datetime",
+  }, { is_nullable: true });
+}
+
 async function setupLanguagesCollection(): Promise<void> {
   if (await collectionExists("languages")) {
     console.log(`Collection "languages" already exists, skipping.`);
@@ -473,6 +493,7 @@ async function main(): Promise<void> {
   await setupVenuesCollection();
   await setupGroupsCollection();
   await setupErrorsCollection();
+  await setupSkippedEventsCollection();
   await setupLanguagesCollection();
   await setupEventsTranslationsCollection();
   await setupTranslationsRelation();

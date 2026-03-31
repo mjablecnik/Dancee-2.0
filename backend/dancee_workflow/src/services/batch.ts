@@ -3,6 +3,7 @@ import {
   getGroupsOrderedByUpdatedAt,
   updateGroupTimestamp,
   findEventByOriginalUrl,
+  findSkippedEventByUrl,
   createError,
 } from "../clients/directus-client";
 import { scrapeEventList, buildFacebookEventUrl } from "../clients/scraper-client";
@@ -52,7 +53,14 @@ export const batchService = restate.service({
               findEventByOriginalUrl(eventUrl)
             );
 
-            if (!existing) {
+            if (existing) continue;
+
+            // Skip events that were previously classified as unsupported
+            const skipped = await ctx.run(`checkSkipped_${event.id}`, () =>
+              findSkippedEventByUrl(eventUrl)
+            );
+
+            if (!skipped) {
               const workflowKey = ctx.rand.uuidv4();
               // Fire-and-forget pattern (Requirement 10.5 trade-off):
               // workflowSendClient schedules the EventWorkflow asynchronously without
@@ -141,7 +149,14 @@ export const batchService = restate.service({
           continue;
         }
 
-        if (!existing) {
+        if (existing) continue;
+
+        // Skip events that were previously classified as unsupported
+        const skipped = await ctx.run(`checkSkipped_${event.id}`, () =>
+          findSkippedEventByUrl(eventUrl)
+        );
+
+        if (!skipped) {
           const workflowKey = ctx.rand.uuidv4();
           try {
             ctx

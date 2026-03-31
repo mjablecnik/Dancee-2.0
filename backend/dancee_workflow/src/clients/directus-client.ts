@@ -4,11 +4,13 @@ import {
   DirectusVenueSchema,
   DirectusGroupSchema,
   DirectusErrorSchema,
+  DirectusSkippedEventSchema,
   DirectusLanguageSchema,
   type DirectusEvent,
   type DirectusVenue,
   type DirectusGroup,
   type DirectusError,
+  type DirectusSkippedEvent,
   type DirectusLanguage,
 } from "../core/schemas";
 import { z } from "zod";
@@ -239,6 +241,29 @@ export async function findErrorByUrl(url: string): Promise<DirectusError | null>
   const items = extractDirectusData(data, "findErrorByUrl") as unknown[];
   if (!items || items.length === 0) return null;
   return DirectusErrorSchema.parse(items[0]);
+}
+
+// ---- Skipped Events ----
+
+export async function findSkippedEventByUrl(originalUrl: string): Promise<DirectusSkippedEvent | null> {
+  const encoded = encodeURIComponent(originalUrl);
+  const data = await directusGet(`/items/skipped_events?filter[original_url][_eq]=${encoded}&limit=1`);
+  const items = extractDirectusData(data, "findSkippedEventByUrl") as unknown[];
+  if (!items || items.length === 0) return null;
+  return DirectusSkippedEventSchema.parse(items[0]);
+}
+
+export async function createSkippedEvent(
+  entry: Omit<DirectusSkippedEvent, "id" | "datetime"> & { datetime?: string },
+): Promise<DirectusSkippedEvent> {
+  const now = entry.datetime ?? new Date().toISOString();
+  const existing = await findSkippedEventByUrl(entry.original_url);
+  if (existing) {
+    return existing;
+  }
+  const fullEntry = { ...entry, datetime: now };
+  const data = await directusPost("/items/skipped_events", fullEntry);
+  return DirectusSkippedEventSchema.parse(extractDirectusData(data, "createSkippedEvent"));
 }
 
 // ---- Languages ----

@@ -270,6 +270,18 @@ export const DirectusErrorSchema = z.object({
 
 export type DirectusError = z.infer<typeof DirectusErrorSchema>;
 
+// ---- Skipped events ----
+
+export const DirectusSkippedEventSchema = z.object({
+  id: z.union([z.number(), z.string()]).optional(),
+  original_url: z.string(),
+  reason: z.string(),
+  event_type: z.string(),
+  datetime: z.string(),
+});
+
+export type DirectusSkippedEvent = z.infer<typeof DirectusSkippedEventSchema>;
+
 // ---- Nominatim schema ----
 
 export const NominatimResponseSchema = z.object({

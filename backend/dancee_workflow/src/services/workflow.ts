@@ -1,6 +1,6 @@
 import * as restate from "@restatedev/restate-sdk";
 import { scrapeEvent } from "../clients/scraper-client";
-import { findEventByOriginalUrl, createEvent, createError } from "../clients/directus-client";
+import { findEventByOriginalUrl, createEvent, createError, createSkippedEvent } from "../clients/directus-client";
 import { classifyEventType, extractEventParts, extractEventInfo } from "./event-parser";
 import { translateEventContent } from "./event-translator";
 import { resolveVenue } from "./venue-resolver";
@@ -127,9 +127,17 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       const description = facebookEvent.description ?? facebookEvent.name;
       const eventType = await runStep(ctx, "classify", eventUrl, () => classifyEventType(description));
 
-      // Step 3: Skip if unsupported type
+      // Step 3: Skip if unsupported type — save to skipped_events so we never
+      // scrape/classify this URL again in future batch runs.
       if (!(SUPPORTED_EVENT_TYPES as readonly string[]).includes(eventType)) {
         const skipReason = `Unsupported event type: ${eventType}`;
+        await runStep(ctx, "createSkipped", eventUrl, () =>
+          createSkippedEvent({
+            original_url: normalizeEventUrl(facebookEvent.url),
+            reason: skipReason,
+            event_type: eventType,
+          })
+        );
         ctx.set("status", "skipped");
         ctx.set("skipReason", skipReason);
         log({ level: "info", message: `Skipping event: unsupported type "${eventType}"`, url: eventUrl, reason: skipReason });
