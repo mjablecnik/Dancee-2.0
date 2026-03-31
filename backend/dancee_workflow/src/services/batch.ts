@@ -100,7 +100,18 @@ export const batchService = restate.service({
     },
 
     processSingle: async (ctx: restate.Context, groupUrl: string) => {
-      const events = await ctx.run("scrapeGroup", () => scrapeEventList(groupUrl));
+      let events: Awaited<ReturnType<typeof scrapeEventList>>;
+      try {
+        events = await ctx.run("scrapeGroup", () => scrapeEventList(groupUrl));
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        log({ level: "error", message: "Failed to scrape group", url: groupUrl, error: error.message });
+        captureError(error, { groupUrl, step: "scrapeGroup" });
+        await ctx.run("scrapeGroupError", () =>
+          createError({ url: groupUrl, message: error.message })
+        );
+        throw err;
+      }
 
       log({ level: "info", message: `Processing single group: ${events.length} event(s) found`, url: groupUrl });
 
@@ -114,9 +125,20 @@ export const batchService = restate.service({
         if (seenUrls.has(eventUrl)) continue;
         seenUrls.add(eventUrl);
 
-        const existing = await ctx.run(`checkEvent_${event.id}`, () =>
-          findEventByOriginalUrl(eventUrl)
-        );
+        let existing;
+        try {
+          existing = await ctx.run(`checkEvent_${event.id}`, () =>
+            findEventByOriginalUrl(eventUrl)
+          );
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          log({ level: "error", message: "Failed to check duplicate event", url: eventUrl, error: error.message });
+          captureError(error, { eventUrl, step: "checkEvent" });
+          await ctx.run(`checkEventError_${event.id}`, () =>
+            createError({ url: eventUrl, message: `Duplicate check failed: ${error.message}` })
+          );
+          continue;
+        }
 
         if (!existing) {
           const workflowKey = ctx.rand.uuidv4();

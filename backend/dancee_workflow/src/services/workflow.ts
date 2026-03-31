@@ -84,7 +84,7 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       // any LLM or external API calls to avoid wasting resources.
       if (facebookEvent.startTimestamp <= 0) {
         throw new restate.TerminalError(
-          `Invalid startTimestamp for event ${eventUrl}: value must be positive`,
+          `[${eventUrl}] Invalid startTimestamp: value must be positive`,
         );
       }
 

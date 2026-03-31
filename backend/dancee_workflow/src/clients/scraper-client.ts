@@ -1,4 +1,5 @@
 import { log } from "../core/logger";
+import { TerminalError } from "@restatedev/restate-sdk";
 import { FacebookEventSchema, FacebookEventListItemSchema, type FacebookEvent, type FacebookEventListItem } from "../core/schemas";
 import { scrapeFacebookEvent, scrapeFacebookEventList } from "../services/scraper";
 
@@ -9,6 +10,27 @@ export const FACEBOOK_EVENTS_BASE_URL = "https://www.facebook.com/events";
 /** Builds a canonical Facebook event URL from an event ID. */
 export function buildFacebookEventUrl(eventId: string): string {
   return `${FACEBOOK_EVENTS_BASE_URL}/${eventId}`;
+}
+
+// Error message patterns that indicate a permanent failure (no point retrying).
+const PERMANENT_ERROR_PATTERNS = [
+  "No event data found",
+  "not a valid URL",
+  "Cannot extract event ID",
+  "not an event ID",
+  "page not found",
+  "content not available",
+  "this content isn't available",
+];
+
+/**
+ * Checks if a scraper error is permanent (should not be retried by Restate).
+ * Permanent errors include: page not found, invalid URL, no event data, etc.
+ * Transient errors (timeouts, network issues) should be retried.
+ */
+function isPermanentScraperError(message: string): boolean {
+  const lower = message.toLowerCase();
+  return PERMANENT_ERROR_PATTERNS.some((p) => lower.includes(p.toLowerCase()));
 }
 
 // Known Facebook (and generic) URL path segments that are route names, not event IDs.
@@ -67,17 +89,34 @@ export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> 
   const eventUrl = eventIdOrUrl.startsWith("http")
     ? eventIdOrUrl
     : buildFacebookEventUrl(eventIdOrUrl);
-  const data = await scrapeFacebookEvent(eventUrl);
-  return FacebookEventSchema.parse(data);
+  try {
+    const data = await scrapeFacebookEvent(eventUrl);
+    return FacebookEventSchema.parse(data);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (isPermanentScraperError(message)) {
+      throw new TerminalError(message);
+    }
+    throw err;
+  }
 }
 
 export async function scrapeEventList(
   pageUrl: string,
   eventType?: "upcoming" | "past",
 ): Promise<FacebookEventListItem[]> {
-  const data = await scrapeFacebookEventList(pageUrl, eventType);
+  let data: unknown[];
+  try {
+    data = await scrapeFacebookEventList(pageUrl, eventType);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (isPermanentScraperError(message)) {
+      throw new TerminalError(message);
+    }
+    throw err;
+  }
   if (!Array.isArray(data)) {
-    throw new Error("Scraper returned unexpected response: expected array");
+    throw new TerminalError("Scraper returned unexpected response: expected array");
   }
   const events: FacebookEventListItem[] = [];
   for (const item of data) {

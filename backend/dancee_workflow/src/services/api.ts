@@ -1,6 +1,6 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations } from "../clients/directus-client";
-import { config } from "../core/config";
+import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError } from "../clients/directus-client";
+import { config, captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
 import { extractEventParts, extractEventInfo } from "./event-parser";
@@ -81,6 +81,12 @@ export const apiService = restate.service({
           // Workflow ran but event not in Directus (maybe it was skipped or failed)
           return { status: "already_processing" as const, url: request.url };
         }
+        // Log the failure to Directus so it shows up in the errors table
+        const error = err instanceof Error ? err : new Error(String(err));
+        captureError(error, { url: normalizedUrl, step: "processEvent" });
+        await ctx.run("createError", () =>
+          createError({ url: normalizedUrl, message: error.message })
+        );
         throw err;
       }
     },
@@ -155,25 +161,44 @@ export const apiService = restate.service({
       }
 
       const description = event.original_description;
+      const eventUrl = event.original_url ?? `event:${eventId}`;
       const patch: Record<string, unknown> = {};
 
       // Re-extract parts
       let parts = event.parts;
       let title = event.title;
       if (steps.includes("parts")) {
-        const extracted = await ctx.run("extractParts", () => extractEventParts(description));
-        parts = extracted.parts;
-        title = extracted.title;
-        patch.parts = extracted.parts;
-        patch.title = extracted.title;
+        try {
+          const extracted = await ctx.run("extractParts", () => extractEventParts(description));
+          parts = extracted.parts;
+          title = extracted.title;
+          patch.parts = extracted.parts;
+          patch.title = extracted.title;
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          captureError(error, { eventUrl, step: "reprocess:extractParts" });
+          await ctx.run("extractPartsError", () =>
+            createError({ url: eventUrl, message: `Reprocess extractParts failed: ${error.message}` })
+          );
+          throw err;
+        }
       }
 
       // Re-extract info
       let info = event.info;
       if (steps.includes("info")) {
-        const newInfo = await ctx.run("extractInfo", () => extractEventInfo(description));
-        info = newInfo;
-        patch.info = newInfo;
+        try {
+          const newInfo = await ctx.run("extractInfo", () => extractEventInfo(description));
+          info = newInfo;
+          patch.info = newInfo;
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          captureError(error, { eventUrl, step: "reprocess:extractInfo" });
+          await ctx.run("extractInfoError", () =>
+            createError({ url: eventUrl, message: `Reprocess extractInfo failed: ${error.message}` })
+          );
+          throw err;
+        }
       }
 
       // Recompute dances from parts
