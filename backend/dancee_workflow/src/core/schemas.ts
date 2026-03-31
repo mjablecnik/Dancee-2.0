@@ -216,7 +216,7 @@ export const DirectusEventSchema = z.object({
   parts: z.array(EventPartSchema),
   info: z.array(EventInfoSchema),
   dances: z.array(z.string()),
-  status: z.enum(["published", "draft", "archived"]).optional(),
+  status: z.enum(["published", "draft", "archived", "incomplete"]).optional(),
   translation_status: z.enum(["complete", "partial", "missing"]).optional(),
   // Directus returns translations as full objects when expanded (?fields=*.*),
   // but as an array of IDs (numbers/strings) when not expanded. Accept both.

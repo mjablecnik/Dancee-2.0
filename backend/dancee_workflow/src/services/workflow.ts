@@ -145,10 +145,30 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       }
 
       // Step 4: Extract event parts (Czech output)
-      const extracted = await runStep(ctx, "extractParts", eventUrl, () => extractEventParts(description));
+      // If extraction fails after retries, continue with empty parts and mark as incomplete.
+      let extracted: { title: string; description: string; parts: import("../core/schemas").EventPart[] };
+      let partsIncomplete = false;
+      try {
+        extracted = await runStep(ctx, "extractParts", eventUrl, () => extractEventParts(description));
+      } catch (err) {
+        log({ level: "warn", message: "extractParts failed, continuing with empty parts", url: eventUrl, error: String(err) });
+        extracted = { title: facebookEvent.name, description: description, parts: [] };
+        partsIncomplete = true;
+      }
 
       // Step 5: Extract event info
-      const info = await runStep(ctx, "extractInfo", eventUrl, () => extractEventInfo(description));
+      // If extraction fails after retries, continue with empty info and mark as incomplete.
+      let info: import("../core/schemas").EventInfo[];
+      let infoIncomplete = false;
+      try {
+        info = await runStep(ctx, "extractInfo", eventUrl, () => extractEventInfo(description));
+      } catch (err) {
+        log({ level: "warn", message: "extractInfo failed, continuing with empty info", url: eventUrl, error: String(err) });
+        info = [];
+        infoIncomplete = true;
+      }
+
+      const isIncomplete = partsIncomplete || infoIncomplete;
 
       // Step 6: Resolve venue
       let venue = null;
@@ -236,7 +256,7 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         parts: extracted.parts,
         info,
         dances,
-        status: "published",
+        status: isIncomplete ? "incomplete" : "published",
         translation_status: translationStatus,
         translations,
       };
