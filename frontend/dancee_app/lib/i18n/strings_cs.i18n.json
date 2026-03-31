@@ -53,7 +53,9 @@
     "addedToFavorites": "Přidáno do oblíbených",
     "removedFromFavorites": "Odebráno z oblíbených",
     "favoriteError": "Nepodařilo se aktualizovat oblíbené",
-    "remove": "Odebrat"
+    "remove": "Odebrat",
+    "originalSource": "Původní zdroj",
+    "viewOriginal": "Zobrazit původní událost"
   },
   "eventFilters": {
     "title": "Filtrování & Řazení",

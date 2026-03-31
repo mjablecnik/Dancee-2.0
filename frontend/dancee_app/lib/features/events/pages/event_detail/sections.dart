@@ -574,6 +574,78 @@ class EventPartsSection extends StatelessWidget {
 }
 
 // ============================================================================
+// EventSourceSection
+// ============================================================================
+
+/// Tappable link to the original event source (e.g. Facebook).
+/// Only shown when [sourceUrl] is not null.
+class EventSourceSection extends StatelessWidget {
+  final String sourceUrl;
+  final VoidCallback onTap;
+
+  const EventSourceSection({
+    super.key,
+    required this.sourceUrl,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.indigo[50]!, Colors.blue[50]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.indigo[200]!, width: 2),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.launch, size: 20, color: Colors.indigo[600]),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    t.eventDetail.originalSource,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    sourceUrl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.indigo[600],
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.indigo[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.open_in_new, size: 16, color: Colors.indigo[600]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
 // EventNotFoundSection
 // ============================================================================
 

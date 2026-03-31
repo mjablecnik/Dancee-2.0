@@ -53,7 +53,9 @@
     "addedToFavorites": "Added to favorites",
     "removedFromFavorites": "Removed from favorites",
     "favoriteError": "Failed to update favorite",
-    "remove": "Remove"
+    "remove": "Remove",
+    "originalSource": "Original Source",
+    "viewOriginal": "View original event"
   },
   "eventFilters": {
     "title": "Filter & Sort",

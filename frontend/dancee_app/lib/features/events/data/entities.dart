@@ -284,6 +284,7 @@ class Event extends Equatable {
   final bool isFavorite;
   final bool isPast;
   final String? badge;
+  final String? sourceUrl;
 
   const Event({
     required this.id,
@@ -300,6 +301,7 @@ class Event extends Equatable {
     this.isFavorite = false,
     this.isPast = false,
     this.badge,
+    this.sourceUrl,
   });
 
   /// Creates an Event from a Directus API response.
@@ -391,6 +393,7 @@ class Event extends Equatable {
       parts: parts,
       isFavorite: favoriteIds.contains(id),
       isPast: isPast,
+      sourceUrl: json['original_url'] as String?,
     );
   }
 
@@ -410,6 +413,7 @@ class Event extends Equatable {
       'isFavorite': isFavorite,
       'isPast': isPast,
       'badge': badge,
+      'sourceUrl': sourceUrl,
     };
   }
 
@@ -428,6 +432,7 @@ class Event extends Equatable {
     bool? isFavorite,
     bool? isPast,
     String? badge,
+    String? sourceUrl,
   }) {
     return Event(
       id: id ?? this.id,
@@ -444,12 +449,13 @@ class Event extends Equatable {
       isFavorite: isFavorite ?? this.isFavorite,
       isPast: isPast ?? this.isPast,
       badge: badge ?? this.badge,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
     );
   }
 
   @override
   List<Object?> get props => [
         id, title, description, organizer, venue, startTime, endTime,
-        duration, dances, info, parts, isFavorite, isPast, badge,
+        duration, dances, info, parts, isFavorite, isPast, badge, sourceUrl,
       ];
 }

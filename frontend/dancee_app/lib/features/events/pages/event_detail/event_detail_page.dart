@@ -124,6 +124,13 @@ class _EventDetailContent extends StatelessWidget {
                 const SizedBox(height: 20),
                 EventPartsSection(parts: event.parts),
               ],
+              if (event.sourceUrl != null && event.sourceUrl!.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                EventSourceSection(
+                  sourceUrl: event.sourceUrl!,
+                  onTap: () => cubit.openUrl(event.sourceUrl!),
+                ),
+              ],
             ]),
           ),
         ),
