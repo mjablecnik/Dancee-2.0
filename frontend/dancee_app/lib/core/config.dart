@@ -8,10 +8,11 @@ import '../config.dart';
 ///
 /// All code should import this file for configuration access.
 class AppConfig {
-  /// Base URL for the backend API service.
-  ///
-  /// Imported from sensitive config (config.dart) - environment-specific.
-  static const String baseUrl = Config.baseUrl;
+  /// Base URL for the Directus CMS API.
+  static const String directusBaseUrl = Config.directusBaseUrl;
+
+  /// Directus access token for API authentication.
+  static const String directusAccessToken = Config.directusAccessToken;
 
   /// Hardcoded user ID for initial implementation.
   ///

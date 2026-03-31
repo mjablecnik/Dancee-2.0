@@ -13,10 +13,10 @@ import 'entities.dart';
 /// - Convert JSON to UserSettings entity via UserSettings.fromJson()
 /// - Throw custom exceptions on errors
 class SettingsRepository {
-  final ApiClient _apiClient;
+  final DirectusClient _client;
 
-  /// Creates a SettingsRepository with the provided API client.
-  SettingsRepository(this._apiClient);
+  /// Creates a SettingsRepository with the provided Directus client.
+  SettingsRepository(this._client);
 
   /// Returns the current user's settings.
   ///

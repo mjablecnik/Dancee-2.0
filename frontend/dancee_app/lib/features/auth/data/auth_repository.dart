@@ -13,10 +13,10 @@ import 'entities.dart';
 /// - Convert JSON to User entity via User.fromJson()
 /// - Throw custom exceptions on errors
 class AuthRepository {
-  final ApiClient _apiClient;
+  final DirectusClient _client;
 
-  /// Creates an AuthRepository with the provided API client.
-  AuthRepository(this._apiClient);
+  /// Creates an AuthRepository with the provided Directus client.
+  AuthRepository(this._client);
 
   /// Authenticates a user with email and password.
   ///

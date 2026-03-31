@@ -7,14 +7,13 @@
 /// 2. Update the values with your actual configuration
 /// 3. The real config.dart is in .gitignore and won't be committed
 class Config {
-  /// Base URL for the backend API service.
-  ///
-  /// IMPORTANT: Do NOT include /api in the base URL.
-  /// The /api prefix is added automatically by the repository layer.
+  /// Base URL for the Directus CMS API.
   ///
   /// Examples:
-  /// - Local development: 'http://localhost:8080'
-  /// - Android Emulator: 'http://10.0.2.2:8080'
-  /// - Production: 'https://dancee-events.fly.dev'
-  static const String baseUrl = 'YOUR_API_BASE_URL_HERE';
+  /// - Local: 'http://localhost:8055'
+  /// - Production: 'https://dancee-directus.fly.dev'
+  static const String directusBaseUrl = 'YOUR_DIRECTUS_BASE_URL_HERE';
+
+  /// Directus static access token for API authentication.
+  static const String directusAccessToken = 'YOUR_DIRECTUS_ACCESS_TOKEN_HERE';
 }

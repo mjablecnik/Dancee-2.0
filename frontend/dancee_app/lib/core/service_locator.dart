@@ -18,22 +18,25 @@ import '../features/events/logic/event_detail.dart';
 final getIt = GetIt.instance;
 
 void setupDependencies() {
-  // Register ApiClient as lazy singleton
-  getIt.registerLazySingleton<ApiClient>(
-    () => ApiClient(baseUrl: AppConfig.baseUrl),
+  // Register DirectusClient as lazy singleton
+  getIt.registerLazySingleton<DirectusClient>(
+    () => DirectusClient(
+      baseUrl: AppConfig.directusBaseUrl,
+      accessToken: AppConfig.directusAccessToken,
+    ),
   );
 
   // Register repositories as lazy singletons
   getIt.registerLazySingleton<EventRepository>(
-    () => EventRepository(getIt<ApiClient>()),
+    () => EventRepository(getIt<DirectusClient>()),
   );
 
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepository(getIt<ApiClient>()),
+    () => AuthRepository(getIt<DirectusClient>()),
   );
 
   getIt.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepository(getIt<ApiClient>()),
+    () => SettingsRepository(getIt<DirectusClient>()),
   );
 
   // Register cubits
