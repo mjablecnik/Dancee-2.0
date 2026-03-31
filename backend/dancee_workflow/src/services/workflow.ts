@@ -24,12 +24,17 @@ async function runStep<T>(
   try {
     return await ctx.run(stepName, fn);
   } catch (err) {
-    captureError(err instanceof Error ? err : new Error(String(err)), {
+    const original = err instanceof Error ? err : new Error(String(err));
+    captureError(original, {
       workflowRunId: ctx.key,
       eventUrl,
       step: stepName,
     });
-    throw err;
+    // Enrich the error message with URL context so downstream handlers
+    // (Directus error records, logs) always show which URL failed.
+    const enriched = new Error(`[${eventUrl}] ${stepName}: ${original.message}`);
+    enriched.cause = original;
+    throw enriched;
   }
 }
 

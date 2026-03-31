@@ -18,7 +18,7 @@ export async function scrapeFacebookEvent(eventUrl: string): Promise<unknown> {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Failed to scrape event ${eventUrl}:`, message);
     throw new Error(
-      `Failed to scrape event: ${message}. Make sure the event is public and the URL is correct.`,
+      `Failed to scrape event [${eventUrl}]: ${message}`,
     );
   }
 }
@@ -48,7 +48,7 @@ export async function scrapeFacebookEventList(
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Failed to scrape event list from ${pageUrl}:`, message);
     throw new Error(
-      `Failed to scrape event list: ${message}. Make sure the page/group/profile is public and the URL is correct.`,
+      `Failed to scrape event list [${pageUrl}]: ${message}`,
     );
   }
 }
