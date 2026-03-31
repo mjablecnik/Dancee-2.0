@@ -37,7 +37,10 @@ async function api(method: string, path: string, body?: unknown) {
   return json as { data: Record<string, unknown> };
 }
 
-const FLOW_NAMES = ["Reprocess All", "Retranslate", "Re-extract Parts", "Re-extract Info"];
+const FLOW_NAMES = [
+  "Reprocess All", "Retranslate", "Re-extract Parts", "Re-extract Info",
+  "Retranslate This Language",
+];
 
 async function clean() {
   console.log("Cleaning existing reprocess flows...");
@@ -56,12 +59,13 @@ interface FlowDef {
   name: string;
   icon: string;
   color: string;
-  steps: string[];
   description: string;
+  collection: string;
+  body: Record<string, unknown>;
 }
 
 async function createFlow(def: FlowDef) {
-  console.log(`Creating flow: ${def.name}...`);
+  console.log(`Creating flow: ${def.name} (${def.collection})...`);
 
   const flowRes = await api("POST", "/flows", {
     name: def.name,
@@ -71,7 +75,7 @@ async function createFlow(def: FlowDef) {
     status: "active",
     trigger: "manual",
     options: {
-      collections: ["events"],
+      collections: [def.collection],
       location: "item",
       requireConfirmation: true,
       confirmationDescription: `Are you sure you want to run: ${def.name}?`,
@@ -81,12 +85,7 @@ async function createFlow(def: FlowDef) {
   const flowId = flowRes.data.id as string;
   console.log(`  Flow created: ${flowId}`);
 
-  // The body must be a JSON string that Directus will send as the webhook payload.
-  // {{$trigger.body.keys[0]}} is a Directus template variable resolved at runtime.
-  const webhookBody = JSON.stringify({
-    id: "{{$trigger.body.keys[0]}}",
-    steps: def.steps,
-  });
+  const webhookBody = JSON.stringify(def.body);
 
   const opRes = await api("POST", "/operations", {
     name: "Call Reprocess API",
@@ -104,8 +103,6 @@ async function createFlow(def: FlowDef) {
   });
 
   const opId = opRes.data.id as string;
-
-  // Link operation as the first step of the flow
   await api("PATCH", `/flows/${flowId}`, { operation: opId });
   console.log(`  Operation linked: ${opId}`);
 }
@@ -116,33 +113,47 @@ async function main() {
   }
 
   const flows: FlowDef[] = [
+    // Event-level flows
     {
       name: "Reprocess All",
       icon: "autorenew",
       color: "#6644FF",
-      steps: ["parts", "info", "translations", "dances"],
       description: "Re-extract parts, info, translations, and dances",
+      collection: "events",
+      body: { id: "{{$trigger.body.keys[0]}}", steps: ["parts", "info", "translations", "dances"] },
     },
     {
       name: "Retranslate",
       icon: "translate",
       color: "#2ECDA7",
-      steps: ["translations"],
       description: "Re-translate event to CS, EN, and ES",
+      collection: "events",
+      body: { id: "{{$trigger.body.keys[0]}}", steps: ["translations"] },
     },
     {
       name: "Re-extract Parts",
       icon: "category",
       color: "#FFA439",
-      steps: ["parts", "dances"],
       description: "Re-extract event parts and recompute dances",
+      collection: "events",
+      body: { id: "{{$trigger.body.keys[0]}}", steps: ["parts", "dances"] },
     },
     {
       name: "Re-extract Info",
       icon: "info",
       color: "#3399FF",
-      steps: ["info"],
       description: "Re-extract event info (prices, URLs)",
+      collection: "events",
+      body: { id: "{{$trigger.body.keys[0]}}", steps: ["info"] },
+    },
+    // Translation-level flow
+    {
+      name: "Retranslate This Language",
+      icon: "translate",
+      color: "#E040FB",
+      description: "Re-translate this specific language only",
+      collection: "events_translations",
+      body: { translationId: "{{$trigger.body.keys[0]}}", steps: ["translations"] },
     },
   ];
 

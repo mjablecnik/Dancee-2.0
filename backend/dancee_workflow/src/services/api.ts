@@ -95,10 +95,31 @@ export const apiService = restate.service({
 
     reprocessEvent: async (
       ctx: restate.Context,
-      request: { id?: string | number; steps?: string[] },
+      request: { id?: string | number; translationId?: string | number; steps?: string[]; lang?: string },
     ) => {
-      if (!request?.id) {
-        throw new restate.TerminalError("Missing required field: 'id'", { errorCode: 400 });
+      // Support calling from events_translations detail: look up parent event
+      let eventId = request.id;
+      let targetLang = request.lang;
+
+      if (!eventId && request.translationId) {
+        const trData = await ctx.run("getTranslation", async () => {
+          const res = await fetch(
+            `${config.directusBaseUrl}/items/events_translations/${request.translationId}?fields=events_id,languages_code`,
+            { headers: { Authorization: `Bearer ${config.directusAccessToken}`, "Content-Type": "application/json" } },
+          );
+          if (!res.ok) return null;
+          const json = await res.json() as { data: { events_id: number | string; languages_code: string } };
+          return json.data;
+        });
+        if (!trData) {
+          throw new restate.TerminalError(`Translation ${request.translationId} not found`, { errorCode: 404 });
+        }
+        eventId = trData.events_id;
+        targetLang = targetLang ?? trData.languages_code;
+      }
+
+      if (!eventId) {
+        throw new restate.TerminalError("Missing required field: 'id' or 'translationId'", { errorCode: 400 });
       }
 
       const validSteps = ["parts", "info", "translations", "dances"];
@@ -113,9 +134,9 @@ export const apiService = restate.service({
         );
       }
 
-      const event = await ctx.run("getEvent", () => getEventById(request.id!));
+      const event = await ctx.run("getEvent", () => getEventById(eventId!));
       if (!event) {
-        throw new restate.TerminalError(`Event ${request.id} not found`, { errorCode: 404 });
+        throw new restate.TerminalError(`Event ${eventId} not found`, { errorCode: 404 });
       }
 
       const description = event.original_description;
@@ -167,11 +188,22 @@ export const apiService = restate.service({
 
         const translations: DirectusEventTranslation[] = [];
 
-        const langs = [
+        const allLangs = [
           { code: "cs", name: "Czech" },
           { code: "en", name: "English" },
           { code: "es", name: "Spanish" },
         ];
+
+        const langs = targetLang
+          ? allLangs.filter((l) => l.code === targetLang)
+          : allLangs;
+
+        if (langs.length === 0) {
+          throw new restate.TerminalError(
+            `Invalid lang: ${targetLang}. Valid values: cs, en, es`,
+            { errorCode: 400 },
+          );
+        }
 
         for (const lang of langs) {
           try {
@@ -209,7 +241,7 @@ export const apiService = restate.service({
         patch.translation_status = computeTranslationStatus(translations);
       }
 
-      const updated = await ctx.run("updateEvent", () => updateEvent(request.id!, patch));
+      const updated = await ctx.run("updateEvent", () => updateEvent(eventId!, patch));
       return updated;
     },
 
