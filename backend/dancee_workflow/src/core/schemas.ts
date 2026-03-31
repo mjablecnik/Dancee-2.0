@@ -129,8 +129,8 @@ export const EventPartSchema = z.object({
   type: z.enum(["party", "workshop", "openLesson"]),
   dances: z.array(z.string()),
   date_time_range: z.object({
-    start: z.string(),
-    end: z.string(),
+    start: z.string().optional(),
+    end: z.string().optional(),
   }),
   lectors: z.array(z.string()),
   djs: z.array(z.string()),

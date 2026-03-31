@@ -27,8 +27,8 @@ Extract the event into a JSON object with the following structure:
       "type": "party | workshop | openLesson",
       "dances": ["string - dance style names (keep original names, do not translate)"],
       "date_time_range": {
-        "start": "ISO 8601 UTC datetime string",
-        "end": "ISO 8601 UTC datetime string"
+        "start": "ISO 8601 UTC datetime string or null if unknown",
+        "end": "ISO 8601 UTC datetime string or null if unknown"
       },
       "lectors": ["string - lector names (keep original names)"],
       "djs": ["string - DJ names (keep original names)"]
