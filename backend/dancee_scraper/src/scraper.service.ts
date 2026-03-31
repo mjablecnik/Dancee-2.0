@@ -26,16 +26,16 @@ export class ScraperService {
 
   /**
    * Scrape a list of events from a Facebook page, group, or profile
-   * @param pageId - Facebook page/group/profile ID or URL
+   * @param pageUrl - Full Facebook page/group/profile URL
    * @param eventType - Filter by 'upcoming' or 'past' events (optional)
    * @returns List of scraped events
    */
   async scrapeEventList(
-    pageId: string,
+    pageUrl: string,
     eventType?: 'upcoming' | 'past'
   ): Promise<any[]> {
     try {
-      console.log(`Scraping event list from: ${pageId} (type: ${eventType || 'all'})`);
+      console.log(`Scraping event list from: ${pageUrl} (type: ${eventType || 'all'})`);
 
       // Convert string to EventType enum
       let fbEventType: EventType | undefined;
@@ -45,13 +45,13 @@ export class ScraperService {
         fbEventType = EventType.Past;
       }
 
-      const events = await scrapeFbEventList(pageId, fbEventType);
-      console.log(`Successfully scraped ${events.length} events from: ${pageId}`);
+      const events = await scrapeFbEventList(pageUrl, fbEventType);
+      console.log(`Successfully scraped ${events.length} events from: ${pageUrl}`);
       return events;
     } catch (error: any) {
-      console.error(`Failed to scrape event list from ${pageId}:`, error.message);
+      console.error(`Failed to scrape event list from ${pageUrl}:`, error.message);
       throw new Error(
-        `Failed to scrape event list: ${error.message}. Make sure the page/group/profile is public and the ID/URL is correct.`
+        `Failed to scrape event list: ${error.message}. Make sure the page/group/profile is public and the URL is correct.`
       );
     }
   }

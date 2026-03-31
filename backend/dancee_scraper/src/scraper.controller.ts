@@ -27,14 +27,14 @@ export class ScraperController {
           ]
         },
         'GET /api/scraper/events': {
-          description: 'Scrape a list of events from a page/group/profile',
+          description: 'Scrape a list of events from a Facebook page/group/profile',
           parameters: {
-            pageId: 'Facebook page/group/profile ID or URL (required)',
+            url: 'Full Facebook page/group/profile URL (required)',
             eventType: 'Filter by "upcoming" or "past" (optional)'
           },
           examples: [
-            'GET /api/scraper/events?pageId=123456789&eventType=upcoming',
-            'GET /api/scraper/events?pageId=https://www.facebook.com/yourpage'
+            'GET /api/scraper/events?url=https://www.facebook.com/yourpage&eventType=upcoming',
+            'GET /api/scraper/events?url=https://www.facebook.com/yourpage'
           ]
         }
       },
@@ -70,17 +70,17 @@ export class ScraperController {
   };
 
   /**
-   * GET /api/scraper/events?pageId=xxx&eventType=upcoming
+   * GET /api/scraper/events?url=xxx&eventType=upcoming
    * Scrape a list of events from a Facebook page, group, or profile
    */
   scrapeEventList = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { pageId, eventType } = req.query;
+      const { url, eventType } = req.query;
 
-      if (!pageId || typeof pageId !== 'string') {
+      if (!url || typeof url !== 'string') {
         return res.status(400).json({
           error: 'Bad Request',
-          message: 'pageId query parameter is required'
+          message: 'url query parameter is required'
         });
       }
 
@@ -88,7 +88,7 @@ export class ScraperController {
         ? eventType 
         : undefined;
 
-      const events = await this.scraperService.scrapeEventList(pageId, validEventType);
+      const events = await this.scraperService.scrapeEventList(url, validEventType);
       res.json(events);
     } catch (error) {
       next(error);

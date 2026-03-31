@@ -131,7 +131,7 @@ http://localhost:3003
 
 **Key Endpoints**:
 - `GET /scraper/event?url={facebookEventUrl}` - Scrape single event
-- `GET /scraper/events` - Scrape multiple events
+- `GET /scraper/events?url={facebookPageUrl}` - Scrape multiple events
 - `GET /scraper/health` - Check scraper status
 
 **Use Cases**:

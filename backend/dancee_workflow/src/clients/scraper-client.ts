@@ -92,10 +92,10 @@ export async function scrapeEvent(eventIdOrUrl: string): Promise<FacebookEvent> 
 }
 
 export async function scrapeEventList(
-  pageId: string,
+  pageUrl: string,
   eventType?: "upcoming" | "past",
 ): Promise<FacebookEvent[]> {
-  const params = new URLSearchParams({ pageId });
+  const params = new URLSearchParams({ url: pageUrl });
   if (eventType !== undefined) {
     params.set("eventType", eventType);
   }

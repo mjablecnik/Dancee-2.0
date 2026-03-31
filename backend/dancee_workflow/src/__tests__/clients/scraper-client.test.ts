@@ -215,7 +215,7 @@ describe("Property 3: Event type query parameter inclusion", () => {
           await scrapeEventList(pageId, eventType);
           const parsed = new URL(capturedUrl);
           expect(parsed.searchParams.get("eventType")).toBe(eventType);
-          expect(parsed.searchParams.get("pageId")).toBe(pageId);
+          expect(parsed.searchParams.get("url")).toBe(pageId);
         }
       )
     );

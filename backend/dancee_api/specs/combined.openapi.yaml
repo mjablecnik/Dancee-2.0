@@ -269,22 +269,22 @@ paths:
       description: |
         Scrape a list of events from a Facebook page, group, or profile.
         
-        **Supported formats for pageId:**
-        - Page ID: `123456789`
-        - Full URL: `https://www.facebook.com/yourpage`
-        - Username: `yourpage`
+        **Supported URL formats:**
+        - `https://www.facebook.com/yourpage`
+        - `https://facebook.com/yourpage`
       operationId: scrapeEventList
       servers:
         - url: https://dancee-scraper.fly.dev
         - url: http://localhost:3002
       parameters:
-        - name: pageId
+        - name: url
           in: query
-          description: Facebook page, group, or profile ID or URL
+          description: Full Facebook page, group, or profile URL
           required: true
           schema:
             type: string
-          example: "123456789"
+            format: uri
+          example: "https://www.facebook.com/praguesalsaclub"
         - name: eventType
           in: query
           description: Filter events by type (upcoming or past)
@@ -305,7 +305,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/FacebookEvent'
         '400':
-          description: Missing or invalid pageId parameter
+          description: Missing or invalid url parameter
           content:
             application/json:
               schema:

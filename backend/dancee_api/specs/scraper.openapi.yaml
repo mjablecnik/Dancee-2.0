@@ -60,13 +60,13 @@ paths:
                     examples:
                       - GET /api/scraper/event?url=https://www.facebook.com/events/1987385505448084
                   GET /api/scraper/events:
-                    description: Scrape a list of events from a page/group/profile
+                    description: Scrape a list of events from a Facebook page/group/profile
                     parameters:
-                      pageId: Facebook page/group/profile ID or URL (required)
+                      url: Full Facebook page/group/profile URL (required)
                       eventType: Filter by "upcoming" or "past" (optional)
                     examples:
-                      - GET /api/scraper/events?pageId=123456789&eventType=upcoming
-                      - GET /api/scraper/events?pageId=https://www.facebook.com/yourpage
+                      - GET /api/scraper/events?url=https://www.facebook.com/yourpage&eventType=upcoming
+                      - GET /api/scraper/events?url=https://www.facebook.com/yourpage
                 notes:
                   - Only PUBLIC Facebook events can be scraped
                   - Events must be active and accessible
@@ -178,32 +178,25 @@ paths:
         This endpoint retrieves all public events associated with the specified Facebook entity.
         You can optionally filter events by type (upcoming or past).
         
-        **Supported formats for pageId:**
-        - Page ID: `123456789`
-        - Full URL: `https://www.facebook.com/yourpage`
-        - Username: `yourpage`
+        **Supported URL formats:**
+        - `https://www.facebook.com/yourpage`
+        - `https://facebook.com/yourpage`
       operationId: scrapeEventList
       parameters:
-        - name: pageId
+        - name: url
           in: query
           description: |
-            Facebook page, group, or profile ID or URL.
+            Full Facebook page, group, or profile URL.
             
-            Can be a numeric ID, a username, or a complete Facebook URL.
             The page/group/profile must be public and have accessible events.
           required: true
           schema:
             type: string
+            format: uri
           examples:
-            pageId:
-              value: "123456789"
-              summary: Page ID
             pageUrl:
               value: "https://www.facebook.com/praguesalsaclub"
               summary: Page URL
-            username:
-              value: "praguesalsaclub"
-              summary: Page username
         - name: eventType
           in: query
           description: |
@@ -258,14 +251,14 @@ paths:
                   url: https://www.facebook.com/events/2123456789012345
                   isOnline: false
         '400':
-          description: Missing or invalid pageId parameter
+          description: Missing or invalid url parameter
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 error: Bad Request
-                message: pageId query parameter is required
+                message: url query parameter is required
         '404':
           description: Page not found or not accessible
           content:

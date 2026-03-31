@@ -41,12 +41,12 @@ curl "http://localhost:3002/api/scraper/event?url=https://www.facebook.com/event
 Scrape a list of events from a Facebook page/group/profile.
 
 **Query Parameters:**
-- `pageId` (required) - Facebook page/group/profile ID or URL
+- `url` (required) - Full Facebook page/group/profile URL
 - `eventType` (optional) - Filter by "upcoming" or "past"
 
 **Example:**
 ```bash
-curl "http://localhost:3002/api/scraper/events?pageId=123456789&eventType=upcoming"
+curl "http://localhost:3002/api/scraper/events?url=https://www.facebook.com/yourpage&eventType=upcoming"
 ```
 
 ## Environment Variables
