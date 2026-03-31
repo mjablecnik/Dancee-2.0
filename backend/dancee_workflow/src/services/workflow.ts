@@ -5,6 +5,7 @@ import { classifyEventType, extractEventParts, extractEventInfo } from "./event-
 import { translateEventContent } from "./event-translator";
 import { resolveVenue } from "./venue-resolver";
 import { computeDances, SUPPORTED_EVENT_TYPES, toIsoOrNull } from "../core/schemas";
+import { convertToLocalTime } from "../core/timezone";
 import { captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
@@ -241,8 +242,13 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
 
       // Step 11: Build and store event
       // startTimestamp > 0 was validated in Step 1b, so toIsoOrNull is guaranteed non-null here
-      const startTime = toIsoOrNull(facebookEvent.startTimestamp) as string;
-      const endTime = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
+      const startTimeUtc = toIsoOrNull(facebookEvent.startTimestamp) as string;
+      const endTimeUtc = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
+      const eventTimezone = facebookEvent.timezone ?? "UTC";
+
+      // Convert UTC times to local "wall clock" time of the event venue
+      const startTime = convertToLocalTime(startTimeUtc, eventTimezone);
+      const endTime = endTimeUtc ? convertToLocalTime(endTimeUtc, eventTimezone) : null;
 
       const newEvent: DirectusEvent = {
         title: extracted.title,
@@ -251,7 +257,7 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         venue: venue?.id ?? null,
         start_time: startTime,
         end_time: endTime,
-        timezone: facebookEvent.timezone ?? "UTC",
+        timezone: eventTimezone,
         original_url: originalUrl,
         parts: extracted.parts,
         info,

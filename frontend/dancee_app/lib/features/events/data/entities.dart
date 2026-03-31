@@ -285,6 +285,7 @@ class Event extends Equatable {
   final bool isPast;
   final String? badge;
   final String? sourceUrl;
+  final String? timezone;
 
   const Event({
     required this.id,
@@ -302,6 +303,7 @@ class Event extends Equatable {
     this.isPast = false,
     this.badge,
     this.sourceUrl,
+    this.timezone,
   });
 
   /// Creates an Event from a Directus API response.
@@ -394,6 +396,7 @@ class Event extends Equatable {
       isFavorite: favoriteIds.contains(id),
       isPast: isPast,
       sourceUrl: json['original_url'] as String?,
+      timezone: json['timezone'] as String?,
     );
   }
 
@@ -414,6 +417,7 @@ class Event extends Equatable {
       'isPast': isPast,
       'badge': badge,
       'sourceUrl': sourceUrl,
+      'timezone': timezone,
     };
   }
 
@@ -433,6 +437,7 @@ class Event extends Equatable {
     bool? isPast,
     String? badge,
     String? sourceUrl,
+    String? timezone,
   }) {
     return Event(
       id: id ?? this.id,
@@ -450,6 +455,7 @@ class Event extends Equatable {
       isPast: isPast ?? this.isPast,
       badge: badge ?? this.badge,
       sourceUrl: sourceUrl ?? this.sourceUrl,
+      timezone: timezone ?? this.timezone,
     );
   }
 
@@ -457,5 +463,6 @@ class Event extends Equatable {
   List<Object?> get props => [
         id, title, description, organizer, venue, startTime, endTime,
         duration, dances, info, parts, isFavorite, isPast, badge, sourceUrl,
+        timezone,
       ];
 }

@@ -880,7 +880,7 @@ func TestProperty_MissingRequiredFieldsValidation(t *testing.T) {
 		reqType := reflect.TypeOf(req)
 
 		// Optional fields should NOT have "required" in their binding tag
-		optionalFields := []string{"EndTime", "Duration", "Info", "Parts"}
+		optionalFields := []string{"EndTime", "Duration", "Info", "Parts", "Timezone"}
 
 		for _, fieldName := range optionalFields {
 			field, found := reqType.FieldByName(fieldName)

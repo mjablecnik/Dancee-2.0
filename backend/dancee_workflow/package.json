@@ -11,6 +11,7 @@
   },
   "type": "commonjs",
   "devDependencies": {
+    "@types/luxon": "^3.7.1",
     "@types/node": "^20.0.0",
     "fast-check": "^3.0.0",
     "typescript": "^5.0.0",
@@ -21,6 +22,7 @@
     "@sentry/node": "^8.0.0",
     "dotenv": "^16.0.0",
     "facebook-event-scraper": "^0.2.6",
+    "luxon": "^3.7.2",
     "openai": "^4.0.0",
     "zod": "^3.0.0"
   }

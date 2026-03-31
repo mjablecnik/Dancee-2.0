@@ -48,6 +48,7 @@ type Event struct {
 	Dances      []string     `json:"dances" firestore:"dances"`
 	Info        []EventInfo  `json:"info,omitempty" firestore:"info,omitempty"`
 	Parts       []EventPart  `json:"parts,omitempty" firestore:"parts,omitempty"`
+	Timezone    string       `json:"timezone,omitempty" firestore:"timezone,omitempty"`
 	IsFavorite  *bool        `json:"isFavorite,omitempty" firestore:"isFavorite,omitempty"`
 	IsPast      *bool        `json:"isPast,omitempty" firestore:"-"`
 }
@@ -71,6 +72,7 @@ type CreateEventRequest struct {
 	Dances      []string    `json:"dances" binding:"required,min=1"`
 	Info        []EventInfo `json:"info,omitempty"`
 	Parts       []EventPart `json:"parts,omitempty"`
+	Timezone    string      `json:"timezone,omitempty"`
 }
 
 // ToEvent converts a CreateEventRequest to an Event model.
@@ -86,5 +88,6 @@ func (r *CreateEventRequest) ToEvent() *Event {
 		Dances:      r.Dances,
 		Info:        r.Info,
 		Parts:       r.Parts,
+		Timezone:    r.Timezone,
 	}
 }
