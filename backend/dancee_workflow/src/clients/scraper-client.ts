@@ -22,6 +22,8 @@ const PERMANENT_ERROR_PATTERNS = [
   "page not found",
   "content not available",
   "this content isn't available",
+  "Cannot read properties of null",
+  "Cannot read properties of undefined",
 ];
 
 /**

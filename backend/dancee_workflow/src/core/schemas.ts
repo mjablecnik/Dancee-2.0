@@ -52,8 +52,10 @@ const FacebookEventObjectSchema = z.object({
           latitude: z.number().optional(),
           longitude: z.number().optional(),
         })
+        .nullable()
         .optional(),
     })
+    .nullable()
     .optional()
     // Flatten coordinates into top-level latitude/longitude when present.
     .transform((loc) => {
