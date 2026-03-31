@@ -7,6 +7,7 @@ import { resolveVenue } from "./venue-resolver";
 import { computeDances, SUPPORTED_EVENT_TYPES, toIsoOrNull } from "../core/schemas";
 import { captureError } from "../core/config";
 import { log } from "../core/logger";
+import { normalizeEventUrl } from "../core/utils";
 import type { DirectusEvent, DirectusEventTranslation } from "../core/schemas";
 
 /**
@@ -84,6 +85,18 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         );
       }
 
+      // Step 1c: Early duplicate check — run right after scraping to avoid
+      // wasting LLM calls and external API requests on events we already have.
+      const originalUrl = normalizeEventUrl(facebookEvent.url);
+      const existing = await runStep(ctx, "checkDuplicate", originalUrl, () =>
+        findEventByOriginalUrl(originalUrl)
+      );
+      if (existing) {
+        ctx.set("status", "duplicate");
+        log({ level: "info", message: "Event already exists, skipping", url: originalUrl });
+        return existing;
+      }
+
       // Step 2: Classify event type
       const description = facebookEvent.description ?? facebookEvent.name;
       const eventType = await runStep(ctx, "classify", eventUrl, () => classifyEventType(description));
@@ -119,18 +132,7 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       // Step 7: Derive organizer
       const organizer = facebookEvent.hosts?.[0]?.name ?? facebookEvent.name;
 
-      // Step 8: Check for duplicate
-      const originalUrl = facebookEvent.url;
-      const existing = await runStep(ctx, "checkDuplicate", originalUrl, () =>
-        findEventByOriginalUrl(originalUrl)
-      );
-      if (existing) {
-        ctx.set("status", "duplicate");
-        log({ level: "info", message: "Event already exists, skipping", url: originalUrl });
-        return existing;
-      }
-
-      // Step 9: Translate to EN and ES
+      // Step 8: Translate to EN and ES
       const contentInput = {
         title: extracted.title,
         description: extracted.description,

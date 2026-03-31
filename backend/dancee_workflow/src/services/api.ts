@@ -2,6 +2,7 @@ import * as restate from "@restatedev/restate-sdk";
 import { listPublishedEvents } from "../clients/directus-client";
 import { config } from "../core/config";
 import { log } from "../core/logger";
+import { normalizeEventUrl } from "../core/utils";
 import type { EventWorkflow } from "./workflow";
 import type { BatchService } from "./batch";
 
@@ -51,7 +52,15 @@ export const apiService = restate.service({
         );
       }
 
-      const workflowKey = ctx.rand.uuidv4();
+      // Use a deterministic workflow key derived from the normalised URL.
+      // This way Restate deduplicates: if the same URL was already processed
+      // (or is in progress), it returns the existing result instead of
+      // starting a new workflow. If the previous run failed, Restate resumes
+      // from the last successful step.
+      const normalizedUrl = normalizeEventUrl(request.url);
+      const workflowKey = normalizedUrl
+        .replace(/[^a-zA-Z0-9]/g, "_")
+        .slice(0, 128);
       const result = await ctx
         .workflowClient<EventWorkflow>({ name: "EventWorkflow" }, workflowKey)
         .run(request.url);
@@ -83,7 +92,16 @@ export const apiService = restate.service({
         }
       }
 
+      const includeOriginal = ctx.request().headers.get("x-dancee-include") === "original_description";
+
       const events = await listPublishedEvents(extraFilter);
+
+      // Strip the potentially large original_description by default.
+      // Clients can request it via the x-dancee-include: original_description header.
+      if (!includeOriginal) {
+        return events.map(({ original_description, ...rest }) => rest);
+      }
+
       return events;
     },
   },

@@ -8,6 +8,7 @@ import {
 import { scrapeEventList, buildFacebookEventUrl } from "../clients/scraper-client";
 import { captureError } from "../core/config";
 import { log } from "../core/logger";
+import { normalizeEventUrl } from "../core/utils";
 import type { EventWorkflow } from "./workflow";
 
 export const batchService = restate.service({
@@ -28,9 +29,21 @@ export const batchService = restate.service({
 
           log({ level: "info", message: `Processing group: ${events.length} event(s) found from scraper`, url: group.url });
 
+          // Track URLs already seen in this batch run to avoid scheduling
+          // duplicate workflows for sibling (recurring) events.
+          const seenUrls = new Set<string>();
+
           let groupScheduled = 0;
           for (const event of events) {
-            const eventUrl = event.url ?? buildFacebookEventUrl(event.id);
+            const rawUrl = event.url ?? buildFacebookEventUrl(event.id);
+            const eventUrl = normalizeEventUrl(rawUrl);
+
+            // Skip if we already processed this normalised URL in this batch
+            if (seenUrls.has(eventUrl)) {
+              log({ level: "info", message: "Skipping sibling event (already seen in batch)", url: eventUrl });
+              continue;
+            }
+            seenUrls.add(eventUrl);
 
             // Duplicate check errors propagate to Restate for retry — a transient
             // Directus failure here should not cause the event to be permanently skipped.

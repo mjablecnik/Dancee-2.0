@@ -3,7 +3,8 @@ import { log } from "./logger";
 
 // ---- Facebook schemas ----
 
-export const FacebookEventSchema = z.object({
+// Inner schema for a single Facebook event object.
+const FacebookEventObjectSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
@@ -20,30 +21,70 @@ export const FacebookEventSchema = z.object({
   timezone: z.string().optional(),
   location: z
     .object({
-      name: z.string().optional(),
-      address: z.string().optional(),
-      city: z.string().optional(),
-      country: z.string().optional(),
+      name: z.string().nullable().optional().transform((v) => v ?? undefined),
+      address: z.string().nullable().optional().transform((v) => v ?? undefined),
+      // Facebook sometimes returns city as an object (e.g. { name: "Prague", id: "123" }),
+      // a plain string, or null. We normalise it to a string | undefined here.
+      city: z
+        .union([
+          z.string(),
+          z.object({ name: z.string() }).transform((obj) => obj.name),
+          z.null().transform(() => undefined),
+          z.object({}).transform(() => undefined),
+        ])
+        .optional(),
+      country: z.string().nullable().optional().transform((v) => v ?? undefined),
       // NOTE: design specifies only `country`, but Facebook returns `countryCode`
       // (ISO alpha-2 code). Implementation uses countryCode which is more precise
       // and correct for the venue-resolver mapping. This is an intentional improvement.
-      countryCode: z.string().optional(),
+      // Facebook can also return null explicitly, so we accept and coerce it.
+      countryCode: z
+        .string()
+        .nullable()
+        .optional()
+        .transform((v) => v ?? undefined),
+      // Facebook nests lat/lng inside a `coordinates` object. We accept both
+      // flat (latitude/longitude directly on location) and nested formats.
       latitude: z.number().optional(),
       longitude: z.number().optional(),
+      coordinates: z
+        .object({
+          latitude: z.number().optional(),
+          longitude: z.number().optional(),
+        })
+        .optional(),
     })
-    .optional(),
+    .optional()
+    // Flatten coordinates into top-level latitude/longitude when present.
+    .transform((loc) => {
+      if (!loc) return loc;
+      const { coordinates, ...rest } = loc;
+      return {
+        ...rest,
+        latitude: rest.latitude ?? coordinates?.latitude,
+        longitude: rest.longitude ?? coordinates?.longitude,
+      };
+    }),
   hosts: z
     .array(
       z.object({
         name: z.string(),
         id: z.string(),
-        url: z.string(),
+        url: z.string().nullable().optional().transform((v) => v ?? ""),
         type: z.string(),
       })
     )
     .optional(),
   url: z.string(),
 });
+
+// The scraper API wraps the event in a `{ payload: ... }` envelope.
+// Accept both the wrapped and unwrapped formats for resilience.
+export const FacebookEventSchema = z
+  .union([
+    z.object({ payload: FacebookEventObjectSchema }).transform((d) => d.payload),
+    FacebookEventObjectSchema,
+  ]);
 
 export type FacebookEvent = z.infer<typeof FacebookEventSchema>;
 export type FacebookLocation = NonNullable<FacebookEvent["location"]>;
@@ -142,7 +183,17 @@ export const DirectusEventSchema = z.object({
   dances: z.array(z.string()),
   status: z.enum(["published", "draft", "archived"]).optional(),
   translation_status: z.enum(["complete", "partial", "missing"]).optional(),
-  translations: z.array(DirectusEventTranslationSchema).optional(),
+  // Directus returns translations as full objects when expanded (?fields=*.*),
+  // but as an array of IDs (numbers/strings) when not expanded. Accept both.
+  translations: z
+    .array(
+      z.union([
+        DirectusEventTranslationSchema,
+        z.number(),
+        z.string(),
+      ])
+    )
+    .optional(),
 });
 
 export type DirectusEvent = z.infer<typeof DirectusEventSchema>;
