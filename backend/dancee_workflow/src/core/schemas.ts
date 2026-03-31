@@ -167,14 +167,29 @@ export const DirectusEventTranslationSchema = z.object({
 
 export type DirectusEventTranslation = z.infer<typeof DirectusEventTranslationSchema>;
 
+export const DirectusVenueSchema = z.object({
+  id: z.union([z.number(), z.string()]).optional(),
+  name: z.string(),
+  street: z.string(),
+  number: z.string(),
+  town: z.string(),
+  country: z.string(),
+  postal_code: z.string(),
+  region: z.string(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
+});
+
+export type DirectusVenue = z.infer<typeof DirectusVenueSchema>;
+
 export const DirectusEventSchema = z.object({
   id: z.union([z.number(), z.string()]).optional(),
   title: z.string().optional(),
   original_description: z.string(),
   organizer: z.string(),
-  // Directus may return venue IDs as number (auto-increment) or string (UUID).
-  // Align with DirectusVenueSchema.id to avoid type mismatch at runtime.
-  venue: z.union([z.number(), z.string()]).nullable().optional(),
+  // Directus may return venue as an ID (number/string) or as an expanded object
+  // when queried with fields=*,venue.*
+  venue: z.union([z.number(), z.string(), DirectusVenueSchema]).nullable().optional(),
   start_time: z.string(),
   end_time: z.string().nullable().optional(),
   timezone: z.string(),
@@ -205,21 +220,6 @@ export const DirectusLanguageSchema = z.object({
 });
 
 export type DirectusLanguage = z.infer<typeof DirectusLanguageSchema>;
-
-export const DirectusVenueSchema = z.object({
-  id: z.union([z.number(), z.string()]).optional(),
-  name: z.string(),
-  street: z.string(),
-  number: z.string(),
-  town: z.string(),
-  country: z.string(),
-  postal_code: z.string(),
-  region: z.string(),
-  latitude: z.number().nullable(),
-  longitude: z.number().nullable(),
-});
-
-export type DirectusVenue = z.infer<typeof DirectusVenueSchema>;
 
 export const DirectusGroupSchema = z.object({
   id: z.union([z.number(), z.string()]).optional(),

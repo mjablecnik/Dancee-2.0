@@ -99,7 +99,7 @@ export async function listPublishedEvents(extraFilter?: Record<string, unknown>)
     ? { _and: [publishedFilter, extraFilter] }
     : publishedFilter;
   const encoded = encodeURIComponent(JSON.stringify(effectiveFilter));
-  const data = await directusGet(`/items/events?filter=${encoded}`);
+  const data = await directusGet(`/items/events?filter=${encoded}&fields=*,translations.*,venue.*`);
   const items = extractDirectusData(data, "listPublishedEvents") as unknown[];
   return z.array(DirectusEventSchema).parse(items);
 }

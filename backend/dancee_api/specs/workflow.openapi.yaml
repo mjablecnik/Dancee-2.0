@@ -37,16 +37,19 @@ paths:
 
         The workflow:
         1. Scrapes the event from the dancee_scraper API
-        2. Classifies the event type (party, workshop, festival, holiday — unsupported types are skipped)
-        3. Extracts event parts (structured sections with dates, lectors, DJs)
-        4. Extracts event info (prices, URLs)
-        5. Resolves the venue via Nominatim reverse geocoding
-        6. Checks for duplicate events
+        2. Checks for duplicate events (early, right after scraping)
+        3. Classifies the event type (party, workshop, festival, holiday — unsupported types are skipped)
+        4. Extracts event parts (structured sections with dates, lectors, DJs)
+        5. Extracts event info (prices, URLs)
+        6. Resolves the venue via Nominatim reverse geocoding
         7. Translates event content to English and Spanish
         8. Stores the event in Directus CMS
 
-        The workflow key is a random UUID, so calling this endpoint multiple times
-        with the same URL will create multiple workflow executions.
+        The workflow key is deterministic (derived from the normalised URL), so
+        calling this endpoint multiple times with the same URL will return the
+        existing result instead of creating a new workflow. If the workflow is
+        still running, Restate waits for completion. If it previously failed,
+        Restate resumes from the last successful step.
 
         Internally the HTTP server rewrites `/api/event` → `/ApiService/processEvent`
         before forwarding to the Restate handler.
@@ -127,26 +130,49 @@ paths:
         - Listing
       summary: List published events
       description: |
-        Returns all published events from Directus CMS.
+        Returns all published events from Directus CMS with expanded translations and venue.
 
         By default only events with `status = "published"` are returned.
-        Pass an explicit `filter` query parameter (Directus filter syntax,
-        JSON-encoded) to override the default filter and query events with
-        any status or other criteria.
+        The `original_description` field is omitted by default to reduce payload size.
+
+        Use request headers to control the response:
+        - `x-dancee-filter`: JSON-encoded Directus filter (only allowed fields: dances, start_time, end_time, venue, organizer, translation_status)
+        - `x-dancee-lang`: Language code (cs, en, es) — flattens the matching translation onto each event and removes the translations array
+        - `x-dancee-include: original_description` — includes the original Facebook description
 
         Internally the HTTP server rewrites `/api/events/list` → `/ApiService/listEvents`.
       operationId: listEvents
       parameters:
-        - name: filter
-          in: query
+        - name: x-dancee-filter
+          in: header
           required: false
           description: |
-            Optional Directus filter object (JSON-encoded). When provided, it
-            replaces the default `{ status: { _eq: "published" } }` filter.
-            Example: `{"status":{"_eq":"draft"}}`
+            JSON-encoded Directus filter object. Only allowed fields:
+            dances, start_time, end_time, venue, organizer, translation_status.
           schema:
             type: string
-          example: '{"status":{"_eq":"draft"}}'
+          example: '{"dances":{"_contains":"Salsa"}}'
+        - name: x-dancee-lang
+          in: header
+          required: false
+          description: |
+            Language code (cs, en, es). When provided, the matching translation
+            is flattened onto each event (title, description, parts_translations,
+            info_translations) and the translations array is removed.
+          schema:
+            type: string
+            enum: [cs, en, es]
+          example: cs
+        - name: x-dancee-include
+          in: header
+          required: false
+          description: |
+            Set to `original_description` to include the original Facebook
+            description in the response (omitted by default).
+          schema:
+            type: string
+            enum: [original_description]
+          example: original_description
       responses:
         '200':
           description: List of events
@@ -193,9 +219,13 @@ components:
             - type: string
           description: Directus record ID
           example: 42
+        title:
+          type: string
+          description: Event title (Czech, from LLM extraction)
+          example: "Pražská Salsa Noc"
         original_description:
           type: string
-          description: Original Facebook event description
+          description: Original Facebook event description (omitted by default, use x-dancee-include header)
         organizer:
           type: string
           description: Event organizer name (first host or event title)
@@ -203,10 +233,12 @@ components:
         venue:
           oneOf:
             - type: integer
+              description: Venue ID (when not expanded)
             - type: string
+              description: Venue UUID (when not expanded)
+            - $ref: '#/components/schemas/DirectusVenue'
             - type: 'null'
-          description: Foreign key to the venues collection
-          example: 7
+          description: Venue — expanded object in list responses, ID in other contexts
         start_time:
           type: string
           format: date-time
@@ -384,3 +416,41 @@ components:
           type: integer
           description: HTTP error code
           example: 400
+
+    DirectusVenue:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Venue record ID
+        name:
+          type: string
+          example: "Lucerna Music Bar"
+        street:
+          type: string
+          example: "Vodičkova"
+        number:
+          type: string
+          example: "36"
+        town:
+          type: string
+          example: "Prague"
+        country:
+          type: string
+          example: "CZ"
+        postal_code:
+          type: string
+          example: "110 00"
+        region:
+          type: string
+          example: "Hlavní město Praha"
+        latitude:
+          type: number
+          nullable: true
+          example: 50.0813
+        longitude:
+          type: number
+          nullable: true
+          example: 14.4258

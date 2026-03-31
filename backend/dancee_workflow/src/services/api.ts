@@ -89,9 +89,6 @@ export const apiService = restate.service({
     },
 
     listEvents: async (ctx: restate.Context) => {
-      // Always enforce the published-only restriction via listPublishedEvents.
-      // The extraFilter is merged inside listPublishedEvents using _and so that
-      // status:published is always enforced regardless of caller input.
       const filterHeader = ctx.request().headers.get("x-dancee-filter");
       let extraFilter: Record<string, unknown> | undefined;
       if (filterHeader) {
@@ -99,22 +96,39 @@ export const apiService = restate.service({
           const parsed = JSON.parse(filterHeader) as Record<string, unknown>;
           extraFilter = sanitizeFilter(parsed);
         } catch {
-          // Invalid JSON in filter header — fall through to published-only default
           log({ level: "warn", message: "listEvents: x-dancee-filter header contains invalid JSON, ignoring filter", header: filterHeader });
         }
       }
 
       const includeOriginal = ctx.request().headers.get("x-dancee-include") === "original_description";
+      const lang = ctx.request().headers.get("x-dancee-lang"); // e.g. "cs", "en", "es"
 
       const events = await listPublishedEvents(extraFilter);
 
-      // Strip the potentially large original_description by default.
-      // Clients can request it via the x-dancee-include: original_description header.
-      if (!includeOriginal) {
-        return events.map(({ original_description, ...rest }) => rest);
-      }
+      return events.map((event) => {
+        const { original_description, translations, ...rest } = event;
 
-      return events;
+        // If a language is requested, find the matching translation and flatten
+        // its fields (title, description) onto the event object.
+        let translatedFields: Record<string, unknown> = {};
+        if (lang && Array.isArray(translations)) {
+          const match = translations.find(
+            (t) => typeof t === "object" && t !== null && "languages_code" in t && t.languages_code === lang,
+          );
+          if (match && typeof match === "object" && "title" in match) {
+            const { languages_code, events_id, id: _tid, ...fields } = match as Record<string, unknown>;
+            translatedFields = fields;
+          }
+        }
+
+        return {
+          ...rest,
+          ...translatedFields,
+          ...(includeOriginal ? { original_description } : {}),
+          // Keep translations array only when no specific language is requested
+          ...(lang ? {} : { translations }),
+        };
+      });
     },
   },
 });
