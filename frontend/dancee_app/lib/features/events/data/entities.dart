@@ -71,6 +71,7 @@ class Venue extends Equatable {
   final String description;
   final double latitude;
   final double longitude;
+  final String region;
 
   const Venue({
     required this.name,
@@ -78,6 +79,7 @@ class Venue extends Equatable {
     required this.description,
     required this.latitude,
     required this.longitude,
+    this.region = '',
   });
 
   /// Creates a Venue from a Directus venue JSON (expanded via `venue.*`).
@@ -88,6 +90,7 @@ class Venue extends Equatable {
       description: '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      region: json['region'] as String? ?? '',
     );
   }
 
@@ -98,6 +101,7 @@ class Venue extends Equatable {
       'description': description,
       'latitude': latitude,
       'longitude': longitude,
+      'region': region,
     };
   }
 
@@ -107,6 +111,7 @@ class Venue extends Equatable {
     String? description,
     double? latitude,
     double? longitude,
+    String? region,
   }) {
     return Venue(
       name: name ?? this.name,
@@ -114,11 +119,12 @@ class Venue extends Equatable {
       description: description ?? this.description,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      region: region ?? this.region,
     );
   }
 
   @override
-  List<Object?> get props => [name, address, description, latitude, longitude];
+  List<Object?> get props => [name, address, description, latitude, longitude, region];
 }
 
 // ============================================================================
@@ -332,6 +338,7 @@ class Event extends Equatable {
         description: '',
         latitude: 0,
         longitude: 0,
+        region: '',
       );
     }
 
