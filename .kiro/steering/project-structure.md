@@ -19,7 +19,6 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 │       │   ├── design/      # Shared design system
 │       │   ├── features/    # Feature modules
 │       │   └── i18n/        # Localization (slang)
-│       ├── test/            # Test files
 │       ├── android/         # Android-specific files
 │       ├── ios/             # iOS-specific files
 │       ├── web/             # Web-specific files
@@ -28,7 +27,6 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 │       └── pubspec.yaml     # Flutter dependencies
 ├── backend/
 │   ├── dancee_api/          # TypeScript API Gateway (Express)
-│   ├── dancee_events/       # Go events service (Gin + Firebase)
 │   ├── dancee_workflow/     # TypeScript workflow service (Restate)
 │   └── dancee_cms/          # Directus CMS (headless)
 └── shared/                  # Shared resources (currently empty)
@@ -36,10 +34,11 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 
 ## Backend Services
 
-### � dancee_api (TypeScript/Express)
+### 🔀 dancee_api (TypeScript/Express)
 - **Technology**: Node.js with Express framework (TypeScript)
 - **Purpose**: API Gateway — centralized routing, OpenAPI spec aggregation, and single source of truth for all API documentation
 - **Location**: `backend/dancee_api/`
+- **Deployment**: Fly.io
 - **Key Features**:
   - OpenAPI spec aggregation and validation
   - Swagger UI for API documentation
@@ -52,7 +51,7 @@ backend/dancee_api/
 ├── src/
 │   ├── aggregator/        # OpenAPI spec aggregation & validation
 │   ├── config/            # App and services configuration
-│   ├── middleware/         # CORS, error handling
+│   ├── middleware/        # CORS, error handling
 │   ├── routes/            # Health, services, spec routes
 │   ├── index.ts           # Entry point
 │   └── server.ts          # Express server setup
@@ -61,34 +60,12 @@ backend/dancee_api/
 │   ├── events.openapi.yaml
 │   └── workflow.openapi.yaml
 ├── docs/                  # Documentation
+├── taskfile.yaml
 └── package.json
 ```
 
-### 🎪 dancee_events (Go)
-- **Technology**: Go with Gin framework + Firebase/Firestore
-- **Purpose**: Event data service — CRUD operations for dance events, favorites management
-- **Location**: `backend/dancee_events/`
-- **Port**: 8080
-- **Deployment**: Fly.io (Amsterdam region)
-
-#### dancee_events Structure:
-```
-backend/dancee_events/
-├── internal/
-│   ├── config/            # Environment configuration
-│   ├── firebase/          # Firebase client initialization
-│   ├── handlers/          # HTTP handlers (Gin)
-│   ├── models/            # Data models
-│   ├── repositories/      # Firestore data access (events, favorites)
-│   └── services/          # Business logic
-├── docs/                  # API, changelog, deployment, troubleshooting
-├── main.go                # Entry point
-├── Dockerfile
-└── fly.toml
-```
-
 ### ⚙️ dancee_workflow (TypeScript/Restate)
-- **Technology**: Node.js with TypeScript, Restate SDK, OpenAI, Zod
+- **Technology**: Node.js with TypeScript, Restate SDK, OpenAI, Zod, Vitest
 - **Purpose**: Event processing workflow — scraping, AI-powered parsing/translation, geocoding, batch processing
 - **Location**: `backend/dancee_workflow/`
 - **Port**: 9080
@@ -100,6 +77,7 @@ backend/dancee_events/
   - Directus CMS integration for event storage
   - Restate durable execution for reliable workflows
   - Sentry error monitoring
+  - Supervisord for process management in Docker
 
 #### dancee_workflow Structure:
 ```
@@ -115,6 +93,7 @@ backend/dancee_workflow/
 │   │   ├── openai.ts
 │   │   ├── prompts.ts
 │   │   ├── schemas.ts
+│   │   ├── timezone.ts
 │   │   └── utils.ts
 │   ├── services/          # Business logic and workflow handlers
 │   │   ├── api.ts
@@ -128,6 +107,10 @@ backend/dancee_workflow/
 │   └── index.ts           # Entry point
 ├── scripts/               # Setup and seed scripts
 ├── docs/                  # Documentation
+├── workflow.openapi.yaml  # OpenAPI spec for this service
+├── supervisord.conf       # Process management config
+├── vitest.config.ts       # Test configuration
+├── taskfile.yaml
 ├── Dockerfile
 ├── docker-compose.yml
 └── fly.toml
@@ -150,6 +133,74 @@ backend/dancee_cms/
 ├── fly.toml               # Fly.io deployment config
 ├── .env.example           # Environment template
 └── README.md
+```
+
+## Frontend — dancee_app (Flutter)
+
+- **Technology**: Flutter (Dart)
+- **Purpose**: Mobile and web application for dance event discovery
+- **Location**: `frontend/dancee_app/`
+- **Platforms**: Android, iOS, Web
+
+### Flutter lib/ Structure:
+```
+frontend/dancee_app/lib/
+├── config.dart            # Sensitive config (gitignored)
+├── config.example.dart    # Config template (committed)
+├── main.dart              # App entry point
+├── core/
+│   ├── clients.dart       # API client (Dio)
+│   ├── config.dart        # Public config (imports from lib/config.dart)
+│   ├── exceptions.dart    # Custom exceptions
+│   ├── routing.dart       # Go Router setup
+│   └── service_locator.dart  # Dependency injection (get_it)
+├── design/
+│   ├── colors.dart
+│   ├── theme.dart
+│   ├── typography.dart
+│   └── widgets.dart       # Shared design widgets
+├── features/
+│   ├── app/               # Core app feature (layouts, initial page, error pages)
+│   │   ├── layouts.dart
+│   │   └── pages/
+│   │       ├── error_page.dart
+│   │       ├── initial_page.dart
+│   │       └── not_found_page.dart
+│   ├── auth/              # Authentication
+│   │   ├── data/
+│   │   │   ├── auth_repository.dart
+│   │   │   └── entities.dart
+│   │   ├── logic/
+│   │   │   └── auth.dart  # AuthCubit + AuthState (freezed)
+│   │   └── pages/
+│   │       ├── login/
+│   │       └── register/
+│   ├── events/            # Dance events
+│   │   ├── data/
+│   │   │   ├── entities.dart
+│   │   │   └── event_repository.dart
+│   │   ├── logic/
+│   │   │   ├── event_detail.dart
+│   │   │   ├── event_list.dart  # EventListCubit + State (freezed)
+│   │   │   └── favorites.dart   # FavoritesCubit + State (freezed)
+│   │   └── pages/
+│   │       ├── event_detail/    # Complex page (sections + components)
+│   │       ├── event_list/      # Complex page (sections + components)
+│   │       ├── event_filters_page.dart  # Simple page
+│   │       └── favorites_page.dart      # Simple page
+│   └── settings/          # User settings
+│       ├── data/
+│       │   ├── entities.dart
+│       │   └── settings_repository.dart
+│       ├── logic/
+│       │   └── settings.dart  # SettingsCubit + State (freezed)
+│       └── pages/
+│           └── settings_page.dart
+└── i18n/                  # Translations (slang_flutter)
+    ├── strings.i18n.json      # English (base)
+    ├── strings_cs.i18n.json   # Czech
+    ├── strings_es.i18n.json   # Spanish
+    └── strings.g.dart         # Generated translations
 ```
 
 ## Platform Support
