@@ -1,4 +1,6 @@
+import 'package:dancee_app/features/auth/pages/login/components.dart';
 import 'package:dancee_app/features/auth/pages/login/login_page.dart';
+import 'package:dancee_app/features/auth/pages/login/sections.dart';
 import 'package:dancee_app/i18n/translations.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -104,6 +106,99 @@ void main() {
       // After navigation, the register destination is shown
       expect(find.text('Register'), findsWidgets);
       expect(find.byType(LoginPage), findsNothing);
+    },
+  );
+
+  // =========================================================================
+  // Task 19: LoginFormSection: password visibility toggle changes obscureText
+  // =========================================================================
+
+  // =========================================================================
+  // Task 21: LoginButtonSection renders Google and Apple buttons and OrDivider
+  // =========================================================================
+
+  testWidgets(
+    'TC-T21: LoginButtonSection renders Google button, Apple button, and OrDivider',
+    (tester) async {
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: const MaterialApp(home: Scaffold(body: LoginButtonSection())),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Continue with Google'), findsOneWidget);
+      expect(find.text('Continue with Apple'), findsOneWidget);
+      expect(find.byType(OrDivider), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // Task 19: LoginFormSection: password visibility toggle changes obscureText
+  // =========================================================================
+
+  testWidgets(
+    'TC-T19: LoginFormSection password toggle: obscure→visible→obscure on taps',
+    (tester) async {
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: const MaterialApp(home: Scaffold(body: LoginFormSection())),
+        ),
+      );
+      await tester.pump();
+
+      // Initially obscured: eye icon is visible (visibility)
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+
+      // First tap: password becomes visible
+      await tester.tap(find.byIcon(Icons.visibility));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+      expect(find.byIcon(Icons.visibility), findsNothing);
+
+      // Second tap: password becomes obscured again
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+    },
+  );
+
+  // =========================================================================
+  // Task 20: LoginHeaderSection: tapping back button fires onBackPressed
+  // =========================================================================
+
+  testWidgets(
+    'TC-T20: LoginHeaderSection tapping back button fires onBackPressed',
+    (tester) async {
+      var callCount = 0;
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: MaterialApp(
+            home: Scaffold(
+              body: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFFEC4899)],
+                  ),
+                ),
+                child: LoginHeaderSection(
+                  onBackPressed: () => callCount++,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pump();
+
+      expect(callCount, 1);
     },
   );
 }

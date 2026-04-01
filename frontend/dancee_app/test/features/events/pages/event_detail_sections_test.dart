@@ -1,4 +1,5 @@
 import 'package:dancee_app/features/events/data/entities.dart';
+import 'package:dancee_app/features/events/pages/event_detail/components.dart';
 import 'package:dancee_app/features/events/pages/event_detail/sections.dart';
 import 'package:dancee_app/i18n/translations.g.dart';
 import 'package:flutter/material.dart';
@@ -296,14 +297,235 @@ void main() {
     (tester) async {
       var callCount = 0;
       await tester.pumpWidget(
-        _wrap(EventVenueSection(
-          venue: _testVenue,
-          onNavigatePressed: () => callCount++,
-        )),
+        TranslationProvider(
+          child: MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EventVenueSection(
+                  venue: _testVenue,
+                  onNavigatePressed: () => callCount++,
+                ),
+              ),
+            ),
+          ),
+        ),
       );
       await tester.pump();
 
       await tester.tap(find.byIcon(Icons.directions));
+      await tester.pump();
+
+      expect(callCount, 1);
+    },
+  );
+
+  // =========================================================================
+  // Task 11: EventVenueSection: hides description text when venue.description is empty
+  // =========================================================================
+
+  testWidgets(
+    'TC-T11: EventVenueSection hides description when venue.description is empty',
+    (tester) async {
+      const venue = Venue(
+        name: 'Empty Desc Venue',
+        address: _testAddress,
+        description: '',
+        latitude: 50.0,
+        longitude: 14.0,
+      );
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EventVenueSection(
+                  venue: venue,
+                  onNavigatePressed: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // The venue name is present but description is empty — no description text rendered
+      expect(find.text('Empty Desc Venue'), findsOneWidget);
+      expect(find.text(''), findsNothing);
+    },
+  );
+
+  // =========================================================================
+  // Task 12: EventOrganizerSection: renders organizer name
+  // =========================================================================
+
+  testWidgets(
+    'TC-T12: EventOrganizerSection renders organizer name',
+    (tester) async {
+      await tester.pumpWidget(
+        _wrap(const EventOrganizerSection(organizer: 'Dance Club Prague')),
+      );
+      await tester.pump();
+
+      expect(find.text('Dance Club Prague'), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // Task 13: EventDescriptionSection: renders text; nothing when empty
+  // =========================================================================
+
+  testWidgets(
+    'TC-T13a: EventDescriptionSection renders description text when non-empty',
+    (tester) async {
+      await tester.pumpWidget(
+        _wrap(const EventDescriptionSection(
+          description: 'A great dance event.',
+        )),
+      );
+      await tester.pump();
+
+      expect(find.text('A great dance event.'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'TC-T13b: EventDescriptionSection renders SizedBox.shrink when empty',
+    (tester) async {
+      await tester.pumpWidget(
+        _wrap(const EventDescriptionSection(description: '')),
+      );
+      await tester.pump();
+
+      expect(find.text('A great dance event.'), findsNothing);
+      expect(find.byType(SizedBox), findsWidgets);
+    },
+  );
+
+  // =========================================================================
+  // Task 14: EventInfoSection: renders one card per EventInfo item
+  // =========================================================================
+
+  testWidgets(
+    'TC-T14: EventInfoSection renders one EventInfoCard per EventInfo item',
+    (tester) async {
+      const infoList = [
+        EventInfo(type: EventInfoType.text, key: 'Info 1', value: 'Value 1'),
+        EventInfo(type: EventInfoType.url, key: 'Website', value: 'https://example.com'),
+      ];
+      await tester.pumpWidget(
+        _wrap(const EventInfoSection(info: infoList)),
+      );
+      await tester.pump();
+
+      expect(find.byType(EventInfoCard), findsNWidgets(2));
+    },
+  );
+
+  // =========================================================================
+  // Task 15: EventInfoSection: URL-type card fires onUrlTapped; text-type does not
+  // =========================================================================
+
+  testWidgets(
+    'TC-T15: EventInfoSection URL card fires onUrlTapped; text card does not',
+    (tester) async {
+      const String testUrl = 'https://example.com';
+      final List<String> tappedUrls = [];
+
+      const infoList = [
+        EventInfo(type: EventInfoType.text, key: 'Text Info', value: 'Some text'),
+        EventInfo(type: EventInfoType.url, key: 'Website', value: testUrl),
+      ];
+      await tester.pumpWidget(
+        _wrap(EventInfoSection(
+          info: infoList,
+          onUrlTapped: (url) => tappedUrls.add(url),
+        )),
+      );
+      await tester.pump();
+
+      // Tap the text card (no onTap attached)
+      await tester.tap(find.text('Text Info'));
+      await tester.pump();
+      expect(tappedUrls, isEmpty);
+
+      // Tap the URL card
+      await tester.tap(find.text('Website'));
+      await tester.pump();
+      expect(tappedUrls, [testUrl]);
+    },
+  );
+
+  // =========================================================================
+  // Task 16: EventPartsSection: renders one EventPartCard per event part
+  // =========================================================================
+
+  testWidgets(
+    'TC-T16: EventPartsSection renders one EventPartCard per event part',
+    (tester) async {
+      final parts = [
+        EventPart(
+          name: 'Workshop Part',
+          type: EventPartType.workshop,
+          startTime: DateTime(2026, 6, 1, 18, 0),
+        ),
+        EventPart(
+          name: 'Party Part',
+          type: EventPartType.party,
+          startTime: DateTime(2026, 6, 1, 21, 0),
+        ),
+      ];
+      await tester.pumpWidget(
+        _wrap(EventPartsSection(parts: parts)),
+      );
+      await tester.pump();
+
+      expect(find.byType(EventPartCard), findsNWidgets(2));
+      expect(find.text('Workshop Part'), findsOneWidget);
+      expect(find.text('Party Part'), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // Task 17: EventSourceSection: renders URL text and fires onTap when tapped
+  // =========================================================================
+
+  testWidgets(
+    'TC-T17: EventSourceSection renders sourceUrl and fires onTap',
+    (tester) async {
+      var callCount = 0;
+      const sourceUrl = 'https://fb.com/event';
+      await tester.pumpWidget(
+        _wrap(EventSourceSection(
+          sourceUrl: sourceUrl,
+          onTap: () => callCount++,
+        )),
+      );
+      await tester.pump();
+
+      expect(find.text(sourceUrl), findsOneWidget);
+
+      await tester.tap(find.text(sourceUrl));
+      await tester.pump();
+
+      expect(callCount, 1);
+    },
+  );
+
+  // =========================================================================
+  // Task 18: EventNotFoundSection: tapping "Back to Events" fires onBackPressed
+  // =========================================================================
+
+  testWidgets(
+    'TC-T18: EventNotFoundSection tapping Back to Events fires onBackPressed',
+    (tester) async {
+      var callCount = 0;
+      await tester.pumpWidget(
+        _wrap(EventNotFoundSection(onBackPressed: () => callCount++)),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Back to Events'));
       await tester.pump();
 
       expect(callCount, 1);

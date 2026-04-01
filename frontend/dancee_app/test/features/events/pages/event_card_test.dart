@@ -212,4 +212,30 @@ void main() {
 
     expect(find.byType(Dismissible), findsNothing);
   });
+
+  // =========================================================================
+  // Task 27: EventCard tapping card body fires onTap (which navigates in router)
+  // =========================================================================
+
+  testWidgets(
+    'TC-T27: tapping EventCard body fires onTap callback',
+    (tester) async {
+      var callCount = 0;
+      final event = _makeEvent(id: 'abc123');
+
+      await tester.pumpWidget(_wrap(
+        EventCard(
+          event: event,
+          onTap: () => callCount++,
+          onFavoriteToggle: () {},
+        ),
+      ));
+      await tester.pump();
+
+      await tester.tap(find.byType(InkWell).first);
+      await tester.pump();
+
+      expect(callCount, 1);
+    },
+  );
 }
