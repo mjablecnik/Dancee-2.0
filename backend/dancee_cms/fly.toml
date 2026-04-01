@@ -1,4 +1,4 @@
-app = 'dancee-directus'
+app = 'dancee-cms'
 primary_region = 'fra'
 
 [build]

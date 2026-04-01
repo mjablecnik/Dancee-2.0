@@ -1,13 +1,12 @@
 #!/bin/sh
 
-# Sets up Fly.io app and secrets from .env file.
-# Creates the app if it doesn't exist, then sets secrets.
-# Keys already defined in fly.toml [env] are skipped automatically.
+# Sets Fly.io secrets from .env file.
+# Only sets secrets — does not create the app or skip any keys.
 #
 # Usage:
 #   cd backend/dancee_workflow
-#   chmod +x fly-setup.sh
-#   ./fly-setup.sh
+#   chmod +x fly-secrets.sh
+#   ./fly-secrets.sh
 
 set -e
 
@@ -19,7 +18,7 @@ if [ ! -f "$TOML_FILE" ]; then
   exit 1
 fi
 
-APP_NAME=$(grep '^app\s*=' "$TOML_FILE" | sed 's/^app\s*=\s*"\(.*\)"/\1/' | tr -d '\r')
+APP_NAME=$(grep '^app\s*=' "$TOML_FILE" | sed "s/^app[[:space:]]*=[[:space:]]*['\"]//;s/['\"].*$//" | tr -d '\r')
 
 if [ -z "$APP_NAME" ]; then
   echo "Error: Could not parse app name from $TOML_FILE"
@@ -36,17 +35,6 @@ if ! command -v fly > /dev/null 2>&1; then
   exit 1
 fi
 
-# Create app on Fly.io if it doesn't exist yet
-if ! fly apps list --json 2>/dev/null | grep -q "\"$APP_NAME\""; then
-  echo "Creating app $APP_NAME on Fly.io..."
-  fly launch --no-deploy --copy-config --name "$APP_NAME" --yes
-else
-  echo "App $APP_NAME already exists, skipping creation."
-fi
-
-# Keys managed in fly.toml [env] — not secrets
-SKIP_KEYS="APP_PORT NOMINATIM_BASE_URL CORS_ORIGINS DIRECTUS_TIMEOUT_MS NOMINATIM_TIMEOUT_MS LLM_TEMPERATURE"
-
 secrets=""
 
 while IFS= read -r line || [ -n "$line" ]; do
@@ -57,20 +45,6 @@ while IFS= read -r line || [ -n "$line" ]; do
 
   key="${line%%=*}"
   value="${line#*=}"
-
-  # Skip keys managed in fly.toml
-  skip=false
-  for sk in $SKIP_KEYS; do
-    if [ "$key" = "$sk" ]; then
-      skip=true
-      break
-    fi
-  done
-
-  if [ "$skip" = true ]; then
-    echo "Skipping $key (managed in fly.toml)"
-    continue
-  fi
 
   # Skip empty values
   if [ -z "$value" ]; then
@@ -88,4 +62,4 @@ fi
 
 echo "Setting secrets on $APP_NAME..."
 eval fly secrets set $secrets --app "$APP_NAME"
-echo "Done. Run 'fly deploy' to deploy."
+echo "Done."
