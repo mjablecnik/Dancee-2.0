@@ -10,10 +10,13 @@ class DirectusClient {
   final Dio _dio;
 
   /// Creates a DirectusClient configured for the Directus CMS API.
+  ///
+  /// An optional [dio] instance can be injected for testing purposes.
   DirectusClient({
     required String baseUrl,
     required String accessToken,
-  }) : _dio = Dio() {
+    Dio? dio,
+  }) : _dio = dio ?? Dio() {
     _dio.options.baseUrl = baseUrl;
     _dio.options.connectTimeout =
         Duration(milliseconds: AppConfig.connectTimeout);

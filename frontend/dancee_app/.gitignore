@@ -52,3 +52,5 @@ lib/l10n/
 
 # Environment-specific sensitive configuration
 lib/config.dart
+
+.flutter-plugins
