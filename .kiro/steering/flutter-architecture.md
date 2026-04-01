@@ -254,7 +254,7 @@ class EventRepository {
 ```dart
 Future<User> getUser(String id) async {
   try {
-    final json = await _apiClient.get('/users/$id');
+    final json = await _apiClient.get('/api/users/$id');
     return User.fromJson(json as Map<String, dynamic>);
   } catch (e) {
     throw ApiException(message: 'Failed to fetch user', originalError: e);
@@ -571,7 +571,7 @@ class EventRepository {
   EventRepository(this._apiClient);
   
   Future<List<Event>> getEvents() async {
-    final response = await _apiClient.get('/events');
+    final response = await _apiClient.get('/api/events');
     return (response as List)
         .map((json) => Event.fromJson(json as Map<String, dynamic>))
         .toList();

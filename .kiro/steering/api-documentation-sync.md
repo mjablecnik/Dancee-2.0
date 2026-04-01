@@ -23,10 +23,10 @@ The `backend/dancee_api` service acts as an API Gateway and maintains the **sing
 
 All backend services must sync their API changes to `dancee_api`:
 
-1. **dancee_events** (Go) → Update `backend/dancee_api/specs/events.openapi.yaml`
-2. **dancee_scraper** (TypeScript) → Update `backend/dancee_api/specs/scraper.openapi.yaml`
-3. **dancee_server** (NestJS) → Update appropriate spec file in `backend/dancee_api/specs/`
-4. **dancee_event_service** (Dart) → Update appropriate spec file in `backend/dancee_api/specs/`
+1. **dancee_workflow** (TypeScript/Restate) → Update `backend/dancee_api/specs/workflow.openapi.yaml`
+2. **dancee_cms** (Directus) → Update `backend/dancee_api/specs/cms.openapi.yaml`
+
+The combined spec is maintained at `backend/dancee_api/specs/combined.openapi.yaml`.
 
 ## What to Update
 
@@ -128,7 +128,7 @@ components:
 ❌ Wrong: `/events/list`, `/events/favorites`, `/events/{id}`
 
 This applies to:
-- Route definitions in all backend services (Go, TypeScript, NestJS, Dart)
+- Route definitions in all backend services
 - OpenAPI spec paths in `dancee_api/specs/`
 - Frontend API client calls
 
@@ -157,45 +157,39 @@ task validate-specs
 # Upload to https://editor.swagger.io/
 ```
 
-## Example: Adding a New Event Endpoint
+## Example: Adding a New Workflow Endpoint
 
-**Step 1: Implement in `dancee_events` service (Go)**
-```go
-func GetEventByID(c *gin.Context) {
-    id := c.Param("id")
-    // Implementation...
-}
+**Step 1: Implement in `dancee_workflow` service**
+```typescript
+// backend/dancee_workflow/src/services/api.ts
+router.get('/api/workflow/status', async (req, res) => {
+  // Implementation...
+});
 ```
 
-**Step 2: Update `backend/dancee_api/specs/events.openapi.yaml`**
+**Step 2: Update `backend/dancee_api/specs/workflow.openapi.yaml`**
 ```yaml
 paths:
-  /api/events/{id}:
+  /api/workflow/status:
     get:
-      summary: Get event by ID
-      operationId: getEventById
+      summary: Get workflow status
+      operationId: getWorkflowStatus
       tags:
-        - Events
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - Workflow
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/WorkflowStatus'
 ```
 
 **Step 3: Commit both changes together**
 ```bash
-git add backend/dancee_events/internal/handlers/event_handler.go
-git add backend/dancee_api/specs/events.openapi.yaml
-git commit -m "feat: add GET /api/events/:id endpoint"
+git add backend/dancee_workflow/src/services/api.ts
+git add backend/dancee_api/specs/workflow.openapi.yaml
+git commit -m "feat: add GET /api/workflow/status endpoint"
 ```
 
 ## Remember

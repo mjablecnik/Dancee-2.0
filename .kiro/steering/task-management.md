@@ -4,7 +4,7 @@ inclusion: always
 
 # Task Management
 
-This project uses **Taskfile** for automation. Always use tasks instead of direct Flutter commands when suggesting or running commands.
+This project uses **Taskfile** for automation. Always use tasks instead of direct commands when suggesting or running commands.
 
 ## Frontend Tasks (Flutter)
 
@@ -31,27 +31,42 @@ This project uses **Taskfile** for automation. Always use tasks instead of direc
 - `task slang-watch` - Watch and auto-regenerate translations
 - `task slang-analyze` - Analyze translations for missing keys
 
+### Testing Tasks
+- `task test` - Run all Flutter tests
+- `task test-coverage` - Run tests with coverage report
+
 ## Backend Tasks
 
-### dancee_server (NestJS)
+### dancee_api (TypeScript/Express)
 ```bash
-task install      # Install dependencies
-task dev          # Start development server with hot reload
-task start        # Start production server
-task build        # Build the application
-task lint         # Run linter
-task format       # Format code with prettier
-task test         # Run tests
-task test-watch   # Run tests in watch mode
-task test-e2e     # Run end-to-end tests
-task clean        # Clean build artifacts
+task install        # Install dependencies (npm)
+task dev            # Start development server with hot reload
+task build          # Build TypeScript to JavaScript
+task start          # Start production server
+task test           # Run all tests
+task test-watch     # Run tests in watch mode
+task test-coverage  # Run tests with coverage report
+task lint           # Run ESLint
+task lint-fix       # Run ESLint and fix issues
+task format         # Format code with Prettier
+task format-check   # Check code formatting
+task clean          # Clean build artifacts
+task clean-build    # Clean and rebuild
 ```
 
-### dancee_event_service (Dart)
+### dancee_workflow (TypeScript/Restate)
 ```bash
-task get-deps     # Install dependencies
-task run          # Start the service
-task test         # Run tests
+task install          # Install dependencies (bun)
+task dev              # Start development server with hot reload
+task build            # Build TypeScript to JavaScript
+task start            # Start production server
+task test             # Run all tests
+task setup-directus   # Create Directus collections and seed languages
+task docker-build     # Build Docker image
+task docker-up        # Start service with Docker Compose
+task docker-down      # Stop Docker Compose service
+task clean            # Clean build artifacts
+task clean-build      # Clean and rebuild
 ```
 
 ## Quick Commands Reference
@@ -70,17 +85,21 @@ task slang              # Generate translations
 task slang-watch        # Auto-regenerate translations
 task slang-analyze      # Check for missing keys
 
+# Testing
+task test
+task test-coverage
+
 # Build for production
 task build-web
 task build-android
 task build-ios
 ```
 
-**Backend - dancee_server (NestJS):**
+**Backend - dancee_api (Express):**
 ```bash
 # Start development
 task install
-task dev                # Development with hot reload
+task dev
 
 # Code quality
 task lint
@@ -89,19 +108,31 @@ task format
 # Testing
 task test
 task test-watch
-task test-e2e
+task test-coverage
 
 # Build for production
 task build
 task start
 ```
 
-**Backend - dancee_event_service (Dart):**
+**Backend - dancee_workflow (Restate):**
 ```bash
 # Start development
-task get-deps
-task run
+task install
+task dev
 
 # Testing
 task test
+
+# Docker
+task docker-build
+task docker-up
+task docker-down
+
+# Directus setup
+task setup-directus
+
+# Build for production
+task build
+task start
 ```

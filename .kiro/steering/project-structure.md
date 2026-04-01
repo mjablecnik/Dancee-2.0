@@ -38,7 +38,7 @@ Dancee App is a Flutter-based mobile and web application for dance enthusiasts. 
 - **Technology**: Node.js with Express framework (TypeScript)
 - **Purpose**: API Gateway — centralized routing, OpenAPI spec aggregation, and single source of truth for all API documentation
 - **Location**: `backend/dancee_api/`
-- **Deployment**: Fly.io
+- **Deployment**: Not yet deployed (local development service)
 - **Key Features**:
   - OpenAPI spec aggregation and validation
   - Swagger UI for API documentation
@@ -56,8 +56,8 @@ backend/dancee_api/
 │   ├── index.ts           # Entry point
 │   └── server.ts          # Express server setup
 ├── specs/                 # OpenAPI specs for all services
+│   ├── cms.openapi.yaml
 │   ├── combined.openapi.yaml
-│   ├── events.openapi.yaml
 │   └── workflow.openapi.yaml
 ├── docs/                  # Documentation
 ├── taskfile.yaml
@@ -113,6 +113,7 @@ backend/dancee_workflow/
 ├── taskfile.yaml
 ├── Dockerfile
 ├── docker-compose.yml
+├── fly-secrets.sh         # Push secrets to Fly.io
 └── fly.toml
 ```
 

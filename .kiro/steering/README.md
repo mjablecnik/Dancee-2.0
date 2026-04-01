@@ -11,7 +11,7 @@ This directory contains steering files that guide AI development for the Dancee 
 ### 📁 project-structure.md
 - Project overview and architecture
 - Directory structure
-- Backend services description
+- Backend services description (dancee_api, dancee_workflow, dancee_cms)
 - Platform support information
 
 ### 📚 documentation-standards.md
@@ -26,15 +26,14 @@ This directory contains steering files that guide AI development for the Dancee 
 - Common mistakes to avoid
 
 ### 🔐 configuration-management.md
-- Sensitive configuration handling
-- app_config.dart usage
-- Environment-specific settings
+- Flutter: `config.dart` / `core/config.dart` pattern
+- Backend: `.env` / `.env.example` pattern
 - Security best practices
 
 ### 🛠️ task-management.md
 - Taskfile commands reference
 - Frontend tasks (Flutter)
-- Backend tasks (NestJS, Dart)
+- Backend tasks (dancee_api, dancee_workflow)
 - Quick command reference
 
 ### 🔧 development-workflow.md

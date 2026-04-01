@@ -2,17 +2,21 @@
 inclusion: always
 ---
 
-# Sensitive Configuration Management
+# Configuration Management
+
+This project uses two different configuration patterns depending on the platform.
+
+## Flutter Frontend (`dancee_app`)
 
 **CRITICAL**: Sensitive configuration values MUST be stored in `config.dart`, which is excluded from version control.
 
-## Configuration Files
+### Configuration Files
 
 - **`lib/config.dart`** - Contains ONLY sensitive values (in .gitignore, NOT committed)
 - **`lib/config.example.dart`** - Template file (committed to git)
 - **`lib/core/config.dart`** - Public configuration that imports from Config
 
-## What Goes in `config.dart` (Sensitive - Gitignored)
+### What Goes in `config.dart` (Sensitive - Gitignored)
 
 - **API URLs** (baseUrl for different environments)
 - **API Keys** and tokens
@@ -22,7 +26,7 @@ inclusion: always
 - **Sentry DSN** and monitoring keys
 - Any environment-specific sensitive data
 
-## What Goes in `core/config.dart` (Public - Committed)
+### What Goes in `core/config.dart` (Public - Committed)
 
 - **Timeout values** (connectTimeout, receiveTimeout, sendTimeout)
 - **Default user IDs** for development
@@ -30,7 +34,7 @@ inclusion: always
 - **Feature flags** and non-sensitive settings
 - **Imports from sensitive config** (re-exports sensitive values for use in app)
 
-## Usage Pattern
+### Usage Pattern
 
 **lib/config.dart** (gitignored - ONLY sensitive data):
 ```dart
@@ -69,19 +73,40 @@ class AppConfig {
 }
 ```
 
-## Setup for New Developers
+### Setup for New Developers (Flutter)
 
 ```bash
-# Copy the example file
 cp lib/config.example.dart lib/config.dart
 # Edit lib/config.dart with actual values
 ```
 
+## Backend Services (`dancee_api`, `dancee_workflow`, `dancee_cms`)
+
+Backend services use the standard `.env` pattern as defined in the global `env_configuration_standard` steering.
+
+### Configuration Files
+
+- **`.env`** - Contains actual secrets and configuration values (gitignored, NEVER committed)
+- **`.env.example`** - Template with all keys and placeholder values (committed)
+
+### Rules
+
+1. **NEVER commit `.env`** — it's in .gitignore
+2. **Always update `.env.example`** when adding or removing environment variables
+3. **Keep `.env` and `.env.example` in sync** — same keys, same structure
+4. Non-sensitive config can go in `fly.toml [env]` section for Fly.io deployments
+
+### Setup for New Developers (Backend)
+
+```bash
+cp .env.example .env
+# Edit .env with actual values
+```
+
 ## Important Rules
 
-1. **NEVER commit `lib/config.dart`** - it's in .gitignore
-2. **Always update `lib/config.example.dart`** when adding new sensitive fields
-3. **Use placeholder values** in example file (e.g., 'YOUR_API_KEY_HERE')
-4. **Document all fields** with comments explaining their purpose
-5. **Keep sensitive data separate** - ONLY in `lib/config.dart`, all other config in `lib/core/config.dart`
-6. **Import pattern**: `lib/core/config.dart` imports from `lib/config.dart` and re-exports for app use
+1. **Flutter**: `lib/config.dart` (sensitive, gitignored) + `lib/core/config.dart` (public)
+2. **Backend**: `.env` (sensitive, gitignored) + `.env.example` (template, committed)
+3. **Never hardcode secrets** in source code
+4. **Always provide templates** so new developers know which variables to set
+5. **Import pattern (Flutter)**: `lib/core/config.dart` imports from `lib/config.dart` and re-exports for app use

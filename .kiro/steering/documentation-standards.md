@@ -8,7 +8,7 @@ inclusion: always
 
 **CRITICAL**: All documentation files MUST follow strict organizational rules.
 
-**For ALL backend services (`dancee_server`, `dancee_event_service`, `dancee_api`, `dancee_events`, `dancee_scraper`):**
+**For ALL backend services (`dancee_api`, `dancee_workflow`, `dancee_cms`):**
 - ✅ **All documentation files** MUST be placed in the `docs/` folder
 - ✅ **Exception**: Only `README.md` can be in the root directory
 - ❌ **Never** place documentation files (`.md`) in the root except `README.md`
@@ -17,15 +17,15 @@ inclusion: always
 
 ```
 ✅ CORRECT:
-backend/dancee_server/README.md              # Root README only
-backend/dancee_server/docs/SWAGGER.md        # Documentation in docs/
-backend/dancee_server/docs/EXAMPLES.md       # Documentation in docs/
-backend/dancee_server/docs/QUICK_START.md    # Documentation in docs/
+backend/dancee_api/README.md                 # Root README only
+backend/dancee_api/docs/SWAGGER.md           # Documentation in docs/
+backend/dancee_api/docs/SETUP.md             # Documentation in docs/
+backend/dancee_workflow/README.md             # Root README only
+backend/dancee_workflow/docs/SCRIPTS.md       # Documentation in docs/
 
 ❌ WRONG:
-backend/dancee_server/SWAGGER.md             # Should be in docs/
-backend/dancee_server/API_GUIDE.md           # Should be in docs/
-backend/dancee_server/SETUP.md               # Should be in docs/
+backend/dancee_api/SWAGGER.md                # Should be in docs/
+backend/dancee_workflow/API_GUIDE.md          # Should be in docs/
 ```
 
 ## Documentation Standards
