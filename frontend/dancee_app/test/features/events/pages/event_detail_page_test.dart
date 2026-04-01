@@ -28,12 +28,17 @@ Widget _wrap(Widget child) {
   );
 }
 
-Event _makeEvent({required String id, String title = 'Test Event'}) {
+Event _makeEvent({
+  required String id,
+  String title = 'Test Event',
+  String organizer = 'Test Organizer',
+  List<String> dances = const [],
+}) {
   return Event(
     id: id,
     title: title,
     description: 'Test description',
-    organizer: 'Test Organizer',
+    organizer: organizer,
     venue: const Venue(
       name: 'Test Venue',
       address: Address(
@@ -47,7 +52,7 @@ Event _makeEvent({required String id, String title = 'Test Event'}) {
       longitude: 14.43,
     ),
     startTime: DateTime.now().add(const Duration(hours: 2)),
-    dances: const [],
+    dances: dances,
     isFavorite: false,
   );
 }
@@ -115,6 +120,121 @@ void main() {
       await tester.pump();
 
       expect(find.byType(EventNotFoundSection), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // TC-191: EventDetailPage shows map icon when venue has non-null coordinates
+  // =========================================================================
+
+  testWidgets(
+    'TC-191: renders map icon button when event venue has non-null coordinates',
+    (tester) async {
+      const eventId = 'evt-map';
+      final event = _makeEvent(id: eventId, title: 'Map Test Event');
+      // _makeEvent already sets latitude: 50.08 and longitude: 14.43
+
+      listCubit.seed(EventListState.loaded(
+        allEvents: [event],
+        todayEvents: [],
+        tomorrowEvents: [],
+        upcomingEvents: [event],
+      ));
+
+      await tester.pumpWidget(_wrap(const EventDetailPage(eventId: eventId)));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.map), findsAtLeastNWidgets(1),
+          reason: 'Map icon should be visible when venue has coordinates');
+    },
+  );
+
+  // =========================================================================
+  // TC-M12: EventDetailPage — tapping the favorite button triggers toggleFavorite
+  // =========================================================================
+
+  testWidgets(
+    'TC-M12: tapping the favorite button calls EventListCubit.toggleFavorite',
+    (tester) async {
+      const eventId = 'evt-fav';
+      final event = _makeEvent(id: eventId, title: 'Fav Test Event');
+
+      listCubit.seed(EventListState.loaded(
+        allEvents: [event],
+        todayEvents: [],
+        tomorrowEvents: [],
+        upcomingEvents: [event],
+      ));
+
+      when(() => mockRepo.toggleFavorite(any(), any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(_wrap(const EventDetailPage(eventId: eventId)));
+      await tester.pump();
+
+      final favoriteButton = find.byIcon(Icons.favorite_border);
+      expect(favoriteButton, findsOneWidget);
+      await tester.tap(favoriteButton);
+      await tester.pump();
+
+      verify(() => mockRepo.toggleFavorite(eventId, false)).called(1);
+    },
+  );
+
+  // =========================================================================
+  // TC-M13: EventDetailPage — renders dance-style chips for each dance
+  // =========================================================================
+
+  testWidgets(
+    'TC-M13: renders dance-style chips for each dance in the event',
+    (tester) async {
+      const eventId = 'evt-dance';
+      final event = _makeEvent(
+        id: eventId,
+        title: 'Dance Event',
+        dances: ['Salsa', 'Bachata'],
+      );
+
+      listCubit.seed(EventListState.loaded(
+        allEvents: [event],
+        todayEvents: [],
+        tomorrowEvents: [],
+        upcomingEvents: [event],
+      ));
+
+      await tester.pumpWidget(_wrap(const EventDetailPage(eventId: eventId)));
+      await tester.pump();
+
+      expect(find.text('Salsa'), findsOneWidget);
+      expect(find.text('Bachata'), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // TC-L06: EventDetailPage — renders the organizer name from the event
+  // =========================================================================
+
+  testWidgets(
+    'TC-L06: renders the organizer name from the event',
+    (tester) async {
+      const eventId = 'evt-org';
+      final event = _makeEvent(
+        id: eventId,
+        title: 'Organizer Test',
+        organizer: 'Dance Academy',
+      );
+
+      listCubit.seed(EventListState.loaded(
+        allEvents: [event],
+        todayEvents: [],
+        tomorrowEvents: [],
+        upcomingEvents: [event],
+      ));
+
+      await tester.pumpWidget(_wrap(const EventDetailPage(eventId: eventId)));
+      await tester.pump();
+
+      expect(find.text('Dance Academy'), findsOneWidget);
     },
   );
 }

@@ -24,6 +24,35 @@ class _SeedableEventListCubit extends EventListCubit {
   Future<void> loadEvents() async {}
 }
 
+/// A cubit that supports seeding state and re-emits all stored events when
+/// loadEvents() is called — used to test the "clear search → restore list"
+/// flow where clearing the search field calls loadEvents().
+class _RestoringEventListCubit extends EventListCubit {
+  List<Event> _storedAllEvents = const [];
+
+  _RestoringEventListCubit(super.repo);
+
+  void seed(EventListState state) {
+    if (state is EventListLoaded) {
+      _storedAllEvents = state.allEvents;
+    }
+    emit(state);
+  }
+
+  @override
+  Future<void> loadEvents() async {
+    // Skip during construction (before seed() has been called).
+    if (_storedAllEvents.isEmpty) return;
+    // Re-emit stored events so that clearing the search restores the full list.
+    emit(EventListState.loaded(
+      allEvents: _storedAllEvents,
+      todayEvents: const [],
+      tomorrowEvents: const [],
+      upcomingEvents: _storedAllEvents,
+    ));
+  }
+}
+
 Widget _wrap(Widget child) {
   return TranslationProvider(
     child: MaterialApp(
@@ -193,6 +222,57 @@ void main() {
       expect(find.byType(EventCard), findsOneWidget);
       expect(find.text('Salsa Night'), findsOneWidget);
       expect(find.text('Tango Evening'), findsNothing);
+    },
+  );
+
+  // =========================================================================
+  // TC-M17: Clearing the search field restores the full event list
+  // =========================================================================
+
+  testWidgets(
+    'TC-M17: clearing the search field after filtering restores all event cards',
+    (tester) async {
+      final event1 = _makeUpcomingEvent(id: '1', title: 'Salsa Night');
+      final event2 = _makeUpcomingEvent(id: '2', title: 'Tango Evening');
+      final event3 = _makeUpcomingEvent(id: '3', title: 'Bachata Fest');
+
+      // Use a restoring cubit that re-emits all events when loadEvents() is
+      // called (which is what the search bar does when the field is cleared).
+      final restoringCubit = _RestoringEventListCubit(mockRepo);
+      getIt.allowReassignment = true;
+      getIt.registerSingleton<EventListCubit>(restoringCubit);
+      addTearDown(() async {
+        await restoringCubit.close();
+        if (getIt.isRegistered<EventListCubit>()) {
+          getIt.unregister<EventListCubit>();
+        }
+      });
+
+      restoringCubit.seed(EventListState.loaded(
+        allEvents: [event1, event2, event3],
+        todayEvents: const [],
+        tomorrowEvents: const [],
+        upcomingEvents: [event1, event2, event3],
+      ));
+
+      await tester.pumpWidget(_wrap(const EventListPage()));
+      await tester.pump();
+
+      // All 3 events visible initially
+      expect(find.byType(EventCard), findsNWidgets(3));
+
+      // Type "Salsa" to filter — only 1 event should show
+      final searchField = find.byType(TextField);
+      await tester.enterText(searchField, 'Salsa');
+      await tester.pumpAndSettle();
+      expect(find.byType(EventCard), findsOneWidget);
+
+      // Clear the search field — page calls loadEvents() which re-emits all events
+      await tester.enterText(searchField, '');
+      await tester.pumpAndSettle();
+
+      // All 3 event cards should be visible again
+      expect(find.byType(EventCard), findsNWidgets(3));
     },
   );
 }

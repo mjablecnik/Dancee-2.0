@@ -361,6 +361,158 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // TC-M19: checkHealth() returns false when server responds with non-200
+    // -----------------------------------------------------------------------
+    test(
+        'TC-M19: checkHealth() returns false when server responds with 500',
+        () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter((_) async => _jsonResponse(
+            {'errors': [{'message': 'Internal Server Error'}]},
+            statusCode: 500,
+          ));
+
+      final client = DirectusClient(
+        baseUrl: 'https://example.com',
+        accessToken: 'token',
+        dio: dio,
+      );
+
+      expect(await client.checkHealth(), isFalse);
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-M20: get() returns list when Directus data envelope contains an array
+    // -----------------------------------------------------------------------
+    test('TC-M20: get() returns list when data field contains an array',
+        () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter((_) async => _jsonResponse({
+            'data': [
+              {'id': 1},
+              {'id': 2}
+            ]
+          }));
+
+      final client = DirectusClient(
+        baseUrl: 'https://example.com',
+        accessToken: 'token',
+        dio: dio,
+      );
+
+      final result = await client.get('/items/events');
+      expect(result, isA<List>());
+      expect(result, equals([
+        {'id': 1},
+        {'id': 2}
+      ]));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-H02: post() throws ApiException with statusCode 422 on 422 response
+    // -----------------------------------------------------------------------
+    test('TC-H02: post() throws ApiException with statusCode 422 on 422 response',
+        () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter((_) async => _jsonResponse(
+            {'errors': [{'message': 'Unprocessable Entity'}]},
+            statusCode: 422,
+          ));
+
+      final client = DirectusClient(
+        baseUrl: 'https://example.com',
+        accessToken: 'token',
+        dio: dio,
+      );
+
+      await expectLater(
+        client.post('/items/foo', data: {'name': 'test'}),
+        throwsA(isA<ApiException>().having(
+          (e) => e.statusCode,
+          'statusCode',
+          422,
+        )),
+      );
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-H03: patch() throws ApiException with statusCode 404 on 404 response
+    // -----------------------------------------------------------------------
+    test('TC-H03: patch() throws ApiException with statusCode 404 on 404 response',
+        () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter((_) async => _jsonResponse(
+            {'errors': [{'message': 'Not Found'}]},
+            statusCode: 404,
+          ));
+
+      final client = DirectusClient(
+        baseUrl: 'https://example.com',
+        accessToken: 'token',
+        dio: dio,
+      );
+
+      await expectLater(
+        client.patch('/items/foo/1', data: {'name': 'updated'}),
+        throwsA(isA<ApiException>().having(
+          (e) => e.statusCode,
+          'statusCode',
+          404,
+        )),
+      );
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-H04: delete() throws ApiException with statusCode 403 on 403 response
+    // -----------------------------------------------------------------------
+    test('TC-H04: delete() throws ApiException with statusCode 403 on 403 response',
+        () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter((_) async => _jsonResponse(
+            {'errors': [{'message': 'Forbidden'}]},
+            statusCode: 403,
+          ));
+
+      final client = DirectusClient(
+        baseUrl: 'https://example.com',
+        accessToken: 'token',
+        dio: dio,
+      );
+
+      await expectLater(
+        client.delete('/items/foo/1'),
+        throwsA(isA<ApiException>().having(
+          (e) => e.statusCode,
+          'statusCode',
+          403,
+        )),
+      );
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-M03: delete() forwards queryParameters to Dio
+    // -----------------------------------------------------------------------
+    test('TC-M03: delete() forwards queryParameters to Dio', () async {
+      Map<String, dynamic>? capturedParams;
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter((options) async {
+        capturedParams = options.queryParameters;
+        return _jsonResponse({'data': null}, statusCode: 204);
+      });
+
+      final client = DirectusClient(
+        baseUrl: 'https://example.com',
+        accessToken: 'token',
+        dio: dio,
+      );
+
+      final queryParameters = {'filter[id][_in]': '1,2,3'};
+      await client.delete('/items/foo', queryParameters: queryParameters);
+
+      expect(capturedParams, equals(queryParameters));
+    });
+
+    // -----------------------------------------------------------------------
     // TC-108: get() passes queryParameters to Dio
     // -----------------------------------------------------------------------
     test('TC-108: get() forwards queryParameters to Dio', () async {

@@ -94,6 +94,28 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // TC-L07: Venue.toJson() round-trip preserves all fields
+    // -----------------------------------------------------------------------
+    test('TC-L07: toJson() round-trip preserves all fields', () {
+      final venue = _testVenue();
+      final json = venue.toJson();
+      final addressJson = json['address'] as Map<String, dynamic>;
+      final restored = Venue(
+        name: json['name'] as String,
+        address: Address(
+          street: addressJson['street'] as String,
+          city: addressJson['city'] as String,
+          postalCode: addressJson['postalCode'] as String,
+          country: addressJson['country'] as String,
+        ),
+        description: json['description'] as String,
+        latitude: json['latitude'] as double,
+        longitude: json['longitude'] as double,
+      );
+      expect(restored, equals(venue));
+    });
+
+    // -----------------------------------------------------------------------
     // TC-113: Venue.copyWith() updates only specified fields
     // -----------------------------------------------------------------------
     test('TC-113: copyWith(name) updates name and preserves other fields', () {
@@ -139,6 +161,63 @@ void main() {
       expect(full, contains('Prague'));
       expect(full, contains('110 00'));
       expect(full, contains('CZ'));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-152: fullAddress with partial empty fields is non-empty and
+    //          contains the non-empty components
+    // -----------------------------------------------------------------------
+    test(
+        'TC-152: fullAddress with partial empty fields is non-empty and '
+        'contains city and country', () {
+      const address = Address(
+        street: '',
+        city: 'Prague',
+        postalCode: '',
+        country: 'CZ',
+      );
+      final full = address.fullAddress;
+      expect(full, isNotEmpty);
+      expect(full, contains('Prague'));
+      expect(full, contains('CZ'));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-L08: Address.toJson() round-trip preserves all fields
+    // -----------------------------------------------------------------------
+    test('TC-L08: toJson() round-trip preserves all fields', () {
+      const address = Address(
+        street: '123 Main St',
+        city: 'Brno',
+        postalCode: '602 00',
+        country: 'CZ',
+      );
+      final json = address.toJson();
+      final restored = Address(
+        street: json['street'] as String,
+        city: json['city'] as String,
+        postalCode: json['postalCode'] as String,
+        country: json['country'] as String,
+      );
+      expect(restored, equals(address));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-M04: copyWith(city:) updates only city and preserves all other fields
+    // -----------------------------------------------------------------------
+    test('TC-M04: copyWith(city: Brno) updates only city', () {
+      const original = Address(
+        street: 'Main St 1',
+        city: 'Prague',
+        postalCode: '110 00',
+        country: 'CZ',
+      );
+      final updated = original.copyWith(city: 'Brno');
+
+      expect(updated.city, equals('Brno'));
+      expect(updated.street, equals('Main St 1'));
+      expect(updated.postalCode, equals('110 00'));
+      expect(updated.country, equals('CZ'));
     });
 
     // -----------------------------------------------------------------------
@@ -289,6 +368,36 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // TC-153: copyWith(isFavorite) preserves all other fields
+    // -----------------------------------------------------------------------
+    test(
+        'TC-153: copyWith(isFavorite: true) changes only isFavorite and '
+        'preserves all other fields', () {
+      final original = Event.fromDirectus(_fullDirectusEvent(), language: 'cs');
+      final updated = original.copyWith(isFavorite: true);
+
+      expect(updated.isFavorite, isTrue,
+          reason: 'isFavorite should be updated');
+      expect(original.isFavorite, isFalse,
+          reason: 'original should not be mutated');
+      expect(updated.id, equals(original.id));
+      expect(updated.title, equals(original.title));
+      expect(updated.description, equals(original.description));
+      expect(updated.organizer, equals(original.organizer));
+      expect(updated.venue, equals(original.venue));
+      expect(updated.startTime, equals(original.startTime));
+      expect(updated.endTime, equals(original.endTime));
+      expect(updated.duration, equals(original.duration));
+      expect(updated.dances, equals(original.dances));
+      expect(updated.info, equals(original.info));
+      expect(updated.parts, equals(original.parts));
+      expect(updated.isPast, equals(original.isPast));
+      expect(updated.badge, equals(original.badge));
+      expect(updated.sourceUrl, equals(original.sourceUrl));
+      expect(updated.timezone, equals(original.timezone));
+    });
+
+    // -----------------------------------------------------------------------
     // TC-021: copyWith() returns new instance with updated fields
     // -----------------------------------------------------------------------
     test('TC-021: copyWith(isFavorite: true) updates only isFavorite', () {
@@ -328,6 +437,51 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // TC-H09: fromDirectus() falls back to root-level title when requested
+    //         language is absent from translations
+    // -----------------------------------------------------------------------
+    test(
+        'TC-H09: fromDirectus() uses root-level title when requested language '
+        'is absent from translations', () {
+      final json = {
+        'id': '1',
+        'start_time': '2099-12-31T20:00:00.000Z',
+        'end_time': '2099-12-31T23:00:00.000Z',
+        'organizer': 'Dance Club',
+        'dances': <String>[],
+        'venue': {
+          'name': 'Club X',
+          'street': 'Main St',
+          'number': '1',
+          'town': 'Prague',
+          'postal_code': '110 00',
+          'country': 'CZ',
+          'latitude': 50.08,
+          'longitude': 14.43,
+        },
+        'title': 'Root Title',
+        'translations': [
+          {
+            'languages_code': 'cs',
+            'title': 'Salsa Night CZ',
+            'description': 'Popis akce',
+          },
+          {
+            'languages_code': 'en',
+            'title': 'Salsa Night EN',
+            'description': 'Event description',
+          },
+        ],
+        'info': <dynamic>[],
+        'parts': <dynamic>[],
+      };
+
+      final event = Event.fromDirectus(json, language: 'de');
+      expect(event.title, equals('Root Title'),
+          reason: 'Should fall back to root-level title when language is absent');
+    });
+
+    // -----------------------------------------------------------------------
     // TC-093: fromDirectus() with all optional fields null/missing
     // -----------------------------------------------------------------------
     test('TC-093: fromDirectus() with minimal JSON does not throw', () {
@@ -361,6 +515,63 @@ void main() {
         expect(roundTrip, equals(info));
       });
     }
+
+    // -----------------------------------------------------------------------
+    // TC-154: fromJson() parses "url" type with specific values
+    // -----------------------------------------------------------------------
+    test('TC-154: EventInfo.fromJson parses url type with correct fields', () {
+      final json = {
+        'type': 'url',
+        'key': 'website',
+        'value': 'https://example.com',
+      };
+      final info = EventInfo.fromJson(json);
+      expect(info.type, equals(EventInfoType.url));
+      expect(info.key, equals('website'));
+      expect(info.value, equals('https://example.com'));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-155: fromJson() parses "price" type with specific values
+    // -----------------------------------------------------------------------
+    test('TC-155: EventInfo.fromJson parses price type with correct fields',
+        () {
+      final json = {
+        'type': 'price',
+        'key': 'ticket',
+        'value': '200 CZK',
+      };
+      final info = EventInfo.fromJson(json);
+      expect(info.type, equals(EventInfoType.price));
+      expect(info.key, equals('ticket'));
+      expect(info.value, equals('200 CZK'));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-M05: fromJson() with unknown type string defaults to EventInfoType.text
+    // -----------------------------------------------------------------------
+    test('TC-M05: fromJson() with unknown type defaults to EventInfoType.text',
+        () {
+      final json = {'type': 'foobar', 'key': 'Foo', 'value': 'Bar'};
+      final info = EventInfo.fromJson(json);
+      expect(info.type, equals(EventInfoType.text));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-M06: copyWith(value:) updates only value, preserves type and key
+    // -----------------------------------------------------------------------
+    test('TC-M06: copyWith(value: new) updates only value', () {
+      const original = EventInfo(
+        type: EventInfoType.url,
+        key: 'Website',
+        value: 'old',
+      );
+      final updated = original.copyWith(value: 'new');
+
+      expect(updated.value, equals('new'));
+      expect(updated.type, equals(EventInfoType.url));
+      expect(updated.key, equals('Website'));
+    });
   });
 
   // =========================================================================
@@ -388,6 +599,51 @@ void main() {
       expect(part.name, equals('Workshop'));
       expect(part.type, equals(EventPartType.workshop));
       expect(part.lectors, contains('Alice'));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-156: fromDirectus() with null date_time_range sets endTime to null
+    // -----------------------------------------------------------------------
+    test(
+        'TC-156: fromDirectus() with null date_time_range does not throw and '
+        'sets endTime to null', () {
+      final json = {
+        'name': 'Party',
+        'type': 'party',
+        'date_time_range': null,
+      };
+
+      expect(() => EventPart.fromDirectus(json), returnsNormally);
+
+      final part = EventPart.fromDirectus(json);
+      expect(part.endTime, isNull,
+          reason: 'endTime should be null when date_time_range is absent');
+      expect(part.startTime, isA<DateTime>(),
+          reason: 'startTime defaults to DateTime.now() when absent');
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-M07: copyWith(name:) updates only name and preserves all other fields
+    // -----------------------------------------------------------------------
+    test('TC-M07: copyWith(name: Updated) updates only name', () {
+      final startTime = DateTime(2099, 12, 31, 18, 0, 0);
+      final endTime = DateTime(2099, 12, 31, 20, 0, 0);
+      final original = EventPart(
+        name: 'Original',
+        type: EventPartType.workshop,
+        startTime: startTime,
+        endTime: endTime,
+        lectors: const ['Alice'],
+        djs: const ['DJ Bob'],
+      );
+      final updated = original.copyWith(name: 'Updated');
+
+      expect(updated.name, equals('Updated'));
+      expect(updated.type, equals(EventPartType.workshop));
+      expect(updated.startTime, equals(startTime));
+      expect(updated.endTime, equals(endTime));
+      expect(updated.lectors, equals(const ['Alice']));
+      expect(updated.djs, equals(const ['DJ Bob']));
     });
   });
 }

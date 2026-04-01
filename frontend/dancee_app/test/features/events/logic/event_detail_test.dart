@@ -74,6 +74,22 @@ void main() {
   });
 
   // =========================================================================
+  // TC-H10: EventDetailCubit emits null when EventListCubit is in loading state
+  // =========================================================================
+
+  test('TC-H10: EventDetailCubit state is null when EventListCubit is loading', () {
+    listCubit.seed(const EventListState.loading());
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '5',
+    );
+
+    expect(detailCubit.state, isNull);
+    detailCubit.close();
+  });
+
+  // =========================================================================
   // TC-046: EventDetailCubit emits correct event from EventListCubit state
   // =========================================================================
 
@@ -291,6 +307,135 @@ void main() {
       await detailCubit.close();
     },
   );
+  // =========================================================================
+  // TC-130: openMap() constructs correct Google Maps URL with venue coordinates
+  // =========================================================================
+
+  test('TC-130: openMap launches exact Google Maps destination URL', () async {
+    final fakePlatform = _FakeUrlLauncherPlatform();
+    UrlLauncherPlatform.instance = fakePlatform;
+
+    final event = _makeEvent(id: '1');
+    listCubit.seed(EventListState.loaded(
+      allEvents: [event],
+      todayEvents: [],
+      tomorrowEvents: [],
+      upcomingEvents: [event],
+    ));
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '1',
+    );
+
+    const venue = Venue(
+      name: 'Studio Tango',
+      address: Address(
+          street: 'Wenceslas 42', city: 'Prague', postalCode: '11000', country: 'CZ'),
+      description: '',
+      latitude: 50.0755,
+      longitude: 14.4378,
+    );
+
+    await detailCubit.openMap(venue);
+
+    expect(fakePlatform.launchedUrls, isNotEmpty);
+    expect(
+      fakePlatform.launchedUrls.first,
+      equals('https://www.google.com/maps/dir/?api=1&destination=50.0755,14.4378'),
+    );
+
+    await detailCubit.close();
+  });
+
+  // =========================================================================
+  // TC-131: openMap() does not throw when venue has zero/missing coordinates
+  // =========================================================================
+
+  test('TC-131: openMap does not throw when venue has zero coordinates', () async {
+    final fakePlatform = _FakeUrlLauncherPlatform();
+    UrlLauncherPlatform.instance = fakePlatform;
+
+    final event = _makeEvent(id: '1');
+    listCubit.seed(EventListState.loaded(
+      allEvents: [event],
+      todayEvents: [],
+      tomorrowEvents: [],
+      upcomingEvents: [event],
+    ));
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '1',
+    );
+
+    // Venue with 0.0 coordinates (fallback for missing lat/lon in JSON)
+    const venue = Venue(
+      name: 'Unknown Venue',
+      address: Address(street: '', city: '', postalCode: '', country: ''),
+      description: '',
+      latitude: 0.0,
+      longitude: 0.0,
+    );
+
+    // Should complete without throwing
+    await expectLater(detailCubit.openMap(venue), completes);
+
+    await detailCubit.close();
+  });
+
+  // =========================================================================
+  // TC-L11: openUrl() with an empty string does not throw
+  // =========================================================================
+
+  test('TC-L11: openUrl with empty string does not throw', () async {
+    final fakePlatform = _FakeUrlLauncherPlatform();
+    UrlLauncherPlatform.instance = fakePlatform;
+
+    final event = _makeEvent(id: '1');
+    listCubit.seed(EventListState.loaded(
+      allEvents: [event],
+      todayEvents: [],
+      tomorrowEvents: [],
+      upcomingEvents: [event],
+    ));
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '1',
+    );
+
+    await expectLater(detailCubit.openUrl(''), completes);
+
+    await detailCubit.close();
+  });
+
+  // =========================================================================
+  // TC-L11b: openUrl() with a malformed URL does not throw
+  // =========================================================================
+
+  test('TC-L11b: openUrl with malformed URL does not throw', () async {
+    final fakePlatform = _FakeUrlLauncherPlatform();
+    UrlLauncherPlatform.instance = fakePlatform;
+
+    final event = _makeEvent(id: '1');
+    listCubit.seed(EventListState.loaded(
+      allEvents: [event],
+      todayEvents: [],
+      tomorrowEvents: [],
+      upcomingEvents: [event],
+    ));
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '1',
+    );
+
+    await expectLater(detailCubit.openUrl('not a url'), completes);
+
+    await detailCubit.close();
+  });
+
   // =========================================================================
   // TC-129: close() cancels the EventListCubit stream subscription
   // =========================================================================

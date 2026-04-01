@@ -55,6 +55,25 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // TC-M18: authRedirect() — authenticated user visiting /login receives null
+    // Documents that authRedirect does not redirect away from /login for
+    // authenticated users (no /events redirect is emitted by authRedirect alone).
+    // -----------------------------------------------------------------------
+    test(
+      'TC-M18: authRedirect() returns null for authenticated user on /login '
+      '(no automatic redirect to /events)',
+      () {
+        final result = authRedirect(
+          matchedLocation: '/login',
+          isAuthenticated: true,
+        );
+        // authRedirect only blocks unauthenticated users; an authenticated user
+        // visiting /login is not redirected by this function.
+        expect(result, isNull);
+      },
+    );
+
+    // -----------------------------------------------------------------------
     // TC-109: authRedirect() returns null for unauthenticated user on public routes
     // -----------------------------------------------------------------------
     test(
@@ -85,6 +104,20 @@ void main() {
             reason: 'Expected /login redirect for protected route: $route',
           );
         }
+      },
+    );
+
+    // -----------------------------------------------------------------------
+    // Task 67: unauthenticated user on sub-path of public route is not redirected
+    // -----------------------------------------------------------------------
+    test(
+      'TC-T67: unauthenticated user accessing /events/abc123 returns null (no redirect)',
+      () {
+        final result = authRedirect(
+          matchedLocation: '/events/abc123',
+          isAuthenticated: false,
+        );
+        expect(result, isNull);
       },
     );
   });

@@ -40,5 +40,25 @@ void main() {
       final roundTripped = User.fromJson(user.toJson());
       expect(roundTripped, equals(user));
     });
+
+    // =========================================================================
+    // TC-120: copyWith() updates only specified fields
+    // =========================================================================
+
+    test('TC-120: copyWith updates only specified fields, preserves others', () {
+      const original = User(
+        id: '1',
+        email: 'a@b.com',
+        displayName: 'Old',
+        photoUrl: null,
+      );
+
+      final updated = original.copyWith(displayName: 'New Name');
+
+      expect(updated.displayName, equals('New Name'));
+      expect(updated.id, equals('1'));
+      expect(updated.email, equals('a@b.com'));
+      expect(updated.photoUrl, isNull);
+    });
   });
 }

@@ -30,5 +30,16 @@ void main() {
       expect(exception.statusCode, isNull);
       expect(exception.message, equals('timeout'));
     });
+
+    // =========================================================================
+    // Task 68: ApiException with empty message stores it correctly
+    // =========================================================================
+
+    test('TC-T68: ApiException with empty message stores it without error', () {
+      final exception = ApiException(message: '');
+
+      expect(exception.message, equals(''));
+      expect(exception.statusCode, isNull);
+    });
   });
 }

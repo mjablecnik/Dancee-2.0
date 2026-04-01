@@ -273,6 +273,50 @@ void main() {
   );
 
   // =========================================================================
+  // TC-134: filterUnfavoritedEvents() does nothing when state is not FavoritesLoaded
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-134: filterUnfavoritedEvents does nothing when state is not FavoritesLoaded',
+    build: () => FavoritesCubit(mockRepo),
+    // Cubit starts in FavoritesInitial by default
+    act: (cubit) {
+      cubit.filterUnfavoritedEvents();
+    },
+    expect: () => <FavoritesState>[],
+  );
+
+  // =========================================================================
+  // TC-135: removePastEvent() calls repository and notifies EventListCubit
+  // =========================================================================
+
+  test('TC-135: removePastEvent calls repository and notifies EventListCubit',
+      () async {
+    final cubit = FavoritesCubit(mockRepo);
+
+    // Load the cubit into FavoritesLoaded state with one past event
+    when(() => mockRepo.getFavoriteEvents()).thenAnswer((_) async => [
+          _makeEvent(id: 'evt-past', isFavorite: true, isPast: true),
+        ]);
+    await cubit.loadFavorites();
+    expect(cubit.state, isA<FavoritesLoaded>());
+
+    // Stub repository toggleFavorite (removePastEvent calls it with current isFavorite)
+    when(() => mockRepo.toggleFavorite(any(), any()))
+        .thenAnswer((_) async {});
+
+    await cubit.removePastEvent('evt-past');
+
+    // Verify repository was called
+    verify(() => mockRepo.toggleFavorite('evt-past', true)).called(1);
+
+    // Verify EventListCubit.loadEvents() was called
+    verify(() => mockListCubit.loadEvents()).called(1);
+
+    await cubit.close();
+  });
+
+  // =========================================================================
   // TC-056: toggleFavorite() calls EventListCubit.loadEvents() once
   // =========================================================================
 
@@ -385,5 +429,129 @@ void main() {
       await listCubit.close();
       await favoritesCubit.close();
     },
+  );
+
+  // =========================================================================
+  // TC-L10: toggleFavorite() for a past event updates pastEvents, not upcomingEvents
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-L10: toggleFavorite for a past event updates pastEvents and leaves upcomingEvents unchanged',
+    build: () => FavoritesCubit(mockRepo),
+    seed: () => FavoritesState.loaded(
+      upcomingEvents: [_makeEvent(id: 'up1', isFavorite: true, isPast: false)],
+      pastEvents: [_makeEvent(id: 'past1', isFavorite: true, isPast: true)],
+    ),
+    act: (cubit) async {
+      when(() => mockRepo.toggleFavorite(any(), any()))
+          .thenAnswer((_) async {});
+      await cubit.toggleFavorite('past1');
+    },
+    expect: () => [
+      isA<FavoritesLoaded>()
+          .having(
+            (s) => s.pastEvents.first.isFavorite,
+            'past event isFavorite after toggle',
+            isFalse,
+          )
+          .having(
+            (s) => s.upcomingEvents.first.id,
+            'upcoming event unchanged',
+            'up1',
+          )
+          .having(
+            (s) => s.upcomingEvents.first.isFavorite,
+            'upcoming isFavorite unchanged',
+            isTrue,
+          ),
+    ],
+  );
+
+  // =========================================================================
+  // TC-H05: toggleFavorite() emits FavoritesError when event ID not in loaded state
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-H05: toggleFavorite emits FavoritesError when eventId not found in loaded state',
+    build: () => FavoritesCubit(mockRepo),
+    seed: () => FavoritesState.loaded(
+      upcomingEvents: [_makeEvent(id: 'id-1', isFavorite: true, isPast: false)],
+      pastEvents: const [],
+    ),
+    act: (cubit) async {
+      await cubit.toggleFavorite('does-not-exist');
+    },
+    expect: () => [
+      isA<FavoritesError>(),
+    ],
+  );
+
+  // =========================================================================
+  // TC-H06: removePastEvent() emits nothing when state is not FavoritesLoaded
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-H06: removePastEvent emits nothing when cubit is in initial state',
+    build: () => FavoritesCubit(mockRepo),
+    // Default initial state (not loaded)
+    act: (cubit) async {
+      await cubit.removePastEvent('any-id');
+    },
+    expect: () => <FavoritesState>[],
+  );
+
+  // =========================================================================
+  // TC-H07: removePastEvent() emits FavoritesError when event ID not in pastEvents
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-H07: removePastEvent emits FavoritesError when eventId not found in pastEvents',
+    build: () => FavoritesCubit(mockRepo),
+    seed: () => const FavoritesState.loaded(
+      upcomingEvents: [],
+      pastEvents: [],
+    ),
+    act: (cubit) async {
+      await cubit.removePastEvent('missing-id');
+    },
+    expect: () => [
+      isA<FavoritesError>(),
+    ],
+  );
+
+  // =========================================================================
+  // TC-151: loadFavorites() emits loading → error when ApiException('Network error') thrown
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-151: loadFavorites emits loading → error when ApiException with null statusCode thrown',
+    build: () => FavoritesCubit(mockRepo),
+    act: (cubit) async {
+      when(() => mockRepo.getFavoriteEvents())
+          .thenThrow(ApiException(message: 'Network error'));
+      await cubit.loadFavorites();
+    },
+    expect: () => [
+      isA<FavoritesLoading>(),
+      isA<FavoritesError>(),
+    ],
+  );
+
+  // =========================================================================
+  // TC-L09: loadFavorites() emits FavoritesError on a non-ApiException
+  // =========================================================================
+
+  blocTest<FavoritesCubit, FavoritesState>(
+    'TC-L09: loadFavorites emits loading → error on a generic (non-ApiException) exception',
+    build: () => FavoritesCubit(mockRepo),
+    act: (cubit) async {
+      when(() => mockRepo.getFavoriteEvents())
+          .thenThrow(StateError('unexpected state'));
+      await cubit.loadFavorites();
+    },
+    expect: () => [
+      isA<FavoritesLoading>(),
+      isA<FavoritesError>(),
+    ],
   );
 }

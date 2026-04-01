@@ -241,6 +241,119 @@ void main() {
   );
 
   // =========================================================================
+  // TC-127: searchEvents() matches against venue name (case-insensitive)
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-127: searchEvents matches venue name case-insensitively',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      final now = DateTime.now();
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(
+              id: '1',
+              startTime: now.add(const Duration(hours: 1)),
+              title: 'Tango Night',
+            ).copyWith(
+              venue: const Venue(
+                name: 'Studio Prague',
+                address: Address(
+                  street: 'Street 1',
+                  city: 'Prague',
+                  postalCode: '100 00',
+                  country: 'CZ',
+                ),
+                description: '',
+                latitude: 0,
+                longitude: 0,
+              ),
+            ),
+            _makeEvent(
+              id: '2',
+              startTime: now.add(const Duration(hours: 2)),
+              title: 'Salsa Night',
+            ),
+          ]);
+      await cubit.loadEvents();
+      await cubit.searchEvents('prague');
+    },
+    skip: 2,
+    expect: () => [
+      isA<EventListLoaded>().having(
+        (s) => s.allEvents.length,
+        'filtered length',
+        1,
+      ),
+    ],
+    verify: (cubit) {
+      expect(
+        (cubit.state as EventListLoaded).allEvents.first.id,
+        equals('1'),
+        reason: 'Event with venue name matching query should be returned',
+      );
+    },
+  );
+
+  // =========================================================================
+  // TC-128: searchEvents() matches against event description
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-128: searchEvents matches event description',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      final now = DateTime.now();
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            Event(
+              id: '1',
+              title: 'Dance Night',
+              description: 'Beginners welcome',
+              organizer: '',
+              venue: const Venue(
+                name: 'Venue',
+                address: Address(
+                  street: 'Street 1',
+                  city: 'City',
+                  postalCode: '100 00',
+                  country: 'CZ',
+                ),
+                description: '',
+                latitude: 0,
+                longitude: 0,
+              ),
+              startTime: now.add(const Duration(hours: 1)),
+              dances: const [],
+              isFavorite: false,
+            ),
+            _makeEvent(
+              id: '2',
+              startTime: now.add(const Duration(hours: 2)),
+              title: 'Pro Workshop',
+            ),
+          ]);
+      await cubit.loadEvents();
+      await cubit.searchEvents('beginners');
+    },
+    skip: 2,
+    expect: () => [
+      isA<EventListLoaded>().having(
+        (s) => s.allEvents.length,
+        'filtered length',
+        1,
+      ),
+    ],
+    verify: (cubit) {
+      expect(
+        (cubit.state as EventListLoaded).allEvents.first.id,
+        equals('1'),
+        reason: 'Event with matching description should be returned',
+      );
+    },
+  );
+
+  // =========================================================================
   // TC-044: searchEvents() does nothing when state is not loaded
   // =========================================================================
 
@@ -369,6 +482,157 @@ void main() {
       final errorState = cubit.state as EventListError;
       expect(errorState.message, isNotEmpty);
     },
+  );
+
+  // =========================================================================
+  // TC-149: searchEvents('') with 3 loaded events returns all 3 in allEvents
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-149: searchEvents with empty string returns all events in allEvents',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      final now = DateTime.now();
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(
+                id: '1',
+                startTime: now.add(const Duration(hours: 1)),
+                title: 'Salsa Night'),
+            _makeEvent(
+                id: '2',
+                startTime: now.add(const Duration(hours: 2)),
+                title: 'Tango Evening'),
+            _makeEvent(
+                id: '3',
+                startTime: now.add(const Duration(hours: 3)),
+                title: 'Bachata Workshop'),
+          ]);
+      await cubit.loadEvents(); // bring to loaded state
+      await cubit.searchEvents(''); // empty → full reload
+    },
+    skip: 2, // skip [loading, loaded] from initial loadEvents()
+    expect: () => [
+      isA<EventListLoading>(),
+      isA<EventListLoaded>().having(
+        (s) => s.allEvents.length,
+        'all events count after clearing search',
+        3,
+      ),
+    ],
+  );
+
+  // =========================================================================
+  // TC-150: searchEvents('tango') with no matching events → all date groups empty
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-150: searchEvents with no matches produces empty date groups',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      final now = DateTime.now();
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(
+              id: '1',
+              startTime: now.add(const Duration(hours: 1)),
+              title: 'Salsa Night',
+            ),
+            _makeEvent(
+              id: '2',
+              startTime: now.add(const Duration(hours: 2)),
+              title: 'Salsa Party',
+            ),
+          ]);
+      await cubit.loadEvents();
+      await cubit.searchEvents('tango');
+    },
+    skip: 2, // skip [loading, loaded] from loadEvents()
+    expect: () => [
+      isA<EventListLoaded>(),
+    ],
+    verify: (cubit) {
+      final s = cubit.state as EventListLoaded;
+      expect(s.todayEvents, isEmpty,
+          reason: 'todayEvents should be empty when no matches');
+      expect(s.tomorrowEvents, isEmpty,
+          reason: 'tomorrowEvents should be empty when no matches');
+      expect(s.upcomingEvents, isEmpty,
+          reason: 'upcomingEvents should be empty when no matches');
+    },
+  );
+
+  // =========================================================================
+  // TC-151: toggleFavorite() with non-existent ID does not crash
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-151: toggleFavorite with non-existent ID emits error state without crashing',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      final now = DateTime.now();
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(id: '1', startTime: now.add(const Duration(hours: 1))),
+          ]);
+      await cubit.loadEvents(); // bring cubit to loaded state with event '1'
+      await cubit.toggleFavorite('999'); // ID '999' does not exist
+    },
+    skip: 2, // skip [loading, loaded] emitted by loadEvents()
+    expect: () => [
+      // The cubit catches the ApiException internally and emits an error state.
+      // No unhandled exception escapes — "no crash" is satisfied.
+      isA<EventListError>(),
+    ],
+  );
+
+  // =========================================================================
+  // TC-L09: searchEvents() with regex-special characters does not throw
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-L09: searchEvents with regex-special characters does not throw',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      final now = DateTime.now();
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(
+              id: '1',
+              startTime: now.add(const Duration(hours: 1)),
+              title: 'Salsa Night',
+            ),
+          ]);
+      await cubit.loadEvents();
+      await cubit.searchEvents('(salsa)');
+    },
+    skip: 2,
+    expect: () => [
+      isA<EventListLoaded>(),
+    ],
+    verify: (cubit) {
+      expect(cubit.state, isA<EventListLoaded>(),
+          reason: 'Special characters in query must not cause a crash');
+    },
+  );
+
+  // =========================================================================
+  // TC-H08: loadEvents() emits EventListError on a non-ApiException (generic catch)
+  // =========================================================================
+
+  blocTest<EventListCubit, EventListState>(
+    'TC-H08: loadEvents emits EventListError when repository throws a generic exception',
+    build: () => EventListCubit(mockRepo),
+    seed: () => const EventListState.initial(),
+    act: (cubit) async {
+      when(() => mockRepo.getAllEvents())
+          .thenThrow(Exception('unexpected'));
+      await cubit.loadEvents();
+    },
+    expect: () => [
+      isA<EventListLoading>(),
+      isA<EventListError>(),
+    ],
   );
 
   // =========================================================================

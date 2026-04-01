@@ -171,4 +171,45 @@ void main() {
     expect(find.text('Salsa'), findsOneWidget);
     expect(find.text('Bachata'), findsOneWidget);
   });
+
+  // =========================================================================
+  // TC-L03b: EventCard with empty dances list renders no dance chips
+  // =========================================================================
+
+  testWidgets('TC-L03b: EventCard with empty dances list renders no dance chips',
+      (tester) async {
+    final event = _makeEvent(dances: []);
+
+    await tester.pumpWidget(_wrap(
+      EventCard(
+        event: event,
+        onTap: () {},
+        onFavoriteToggle: () {},
+      ),
+    ));
+
+    expect(find.text('Salsa'), findsNothing);
+    expect(find.text('Bachata'), findsNothing);
+  });
+
+  // =========================================================================
+  // TC-L04: EventCard with enableDismiss=false does not wrap card in Dismissible
+  // =========================================================================
+
+  testWidgets(
+      'TC-L04: EventCard with enableDismiss=false does not wrap card in Dismissible',
+      (tester) async {
+    final event = _makeEvent();
+
+    await tester.pumpWidget(_wrap(
+      EventCard(
+        event: event,
+        onTap: () {},
+        onFavoriteToggle: () {},
+        // enableDismiss defaults to false
+      ),
+    ));
+
+    expect(find.byType(Dismissible), findsNothing);
+  });
 }

@@ -192,4 +192,93 @@ void main() {
       expect(find.text('Old Tango Night'), findsOneWidget);
     },
   );
+
+  // =========================================================================
+  // TC-M14: FavoritesPage header renders the total saved-event count
+  // =========================================================================
+
+  testWidgets(
+    'TC-M14: header renders total saved-event count (2 upcoming + 1 past = 3)',
+    (tester) async {
+      favoritesCubit.seed(FavoritesState.loaded(
+        upcomingEvents: [
+          _makeEvent(id: '1', title: 'Event A', isPast: false),
+          _makeEvent(id: '2', title: 'Event B', isPast: false),
+        ],
+        pastEvents: [
+          _makeEvent(id: '3', title: 'Event C', isPast: true),
+        ],
+      ));
+
+      await tester.pumpWidget(_wrap(const FavoritesPage()));
+      await tester.pump();
+
+      expect(find.text('3 saved events'), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // TC-M15: FavoritesPage filter section renders at least the "All" filter chip
+  // =========================================================================
+
+  testWidgets(
+    'TC-M15: filter section renders the "All" filter chip',
+    (tester) async {
+      favoritesCubit.seed(FavoritesState.loaded(
+        upcomingEvents: [_makeEvent(id: '1', title: 'Event A')],
+        pastEvents: const [],
+      ));
+
+      await tester.pumpWidget(_wrap(const FavoritesPage()));
+      await tester.pump();
+
+      expect(find.text('All'), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // TC-L07: FavoritesPage empty state renders a BrowseEventsButton
+  // =========================================================================
+
+  testWidgets(
+    'TC-L07: empty state renders BrowseEventsButton',
+    (tester) async {
+      favoritesCubit.seed(const FavoritesState.loaded(
+        upcomingEvents: [],
+        pastEvents: [],
+      ));
+
+      await tester.pumpWidget(_wrap(const FavoritesPage()));
+      await tester.pump();
+
+      expect(find.byType(BrowseEventsButton), findsOneWidget);
+    },
+  );
+
+  // =========================================================================
+  // TC-L08: FavoritesFilterChip — selected shows check icon; unselected does not
+  // =========================================================================
+
+  testWidgets(
+    'TC-L08: selected FavoritesFilterChip shows check icon; unselected does not',
+    (tester) async {
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: MaterialApp(
+            home: Scaffold(
+              body: Row(
+                children: const [
+                  FavoritesFilterChip(label: 'All', isSelected: true),
+                  FavoritesFilterChip(label: 'Today', isSelected: false),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.check), findsOneWidget,
+          reason: 'Only the selected chip should show a check icon');
+    },
+  );
 }

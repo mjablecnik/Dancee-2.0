@@ -72,4 +72,32 @@ void main() {
     );
     await cubit.close();
   });
+
+  // =========================================================================
+  // TC-184: checkAuthStatus() emits loading → unauthenticated (stub behavior)
+  // =========================================================================
+
+  blocTest<AuthCubit, AuthState>(
+    'TC-184: checkAuthStatus emits loading → unauthenticated (placeholder)',
+    build: () => AuthCubit(mockRepo),
+    act: (cubit) => cubit.checkAuthStatus(),
+    expect: () => [
+      isA<AuthLoading>(),
+      isA<AuthUnauthenticated>(),
+    ],
+  );
+
+  // =========================================================================
+  // TC-H01: register() emits loading → unauthenticated (placeholder contract)
+  // =========================================================================
+
+  blocTest<AuthCubit, AuthState>(
+    'TC-H01: register emits loading → unauthenticated (placeholder)',
+    build: () => AuthCubit(mockRepo),
+    act: (cubit) => cubit.register('user@example.com', 'password123', 'Alice'),
+    expect: () => [
+      isA<AuthLoading>(),
+      isA<AuthUnauthenticated>(),
+    ],
+  );
 }

@@ -87,6 +87,24 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // TC-152: Rethrows ApiException with null statusCode
+    // -----------------------------------------------------------------------
+    test('TC-152: rethrows ApiException with null statusCode from client',
+        () async {
+      when(() => mockClient.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenThrow(ApiException(message: 'timeout', statusCode: null));
+
+      await expectLater(
+        () => repository.getAllEvents(),
+        throwsA(isA<ApiException>()
+            .having((e) => e.message, 'message', 'timeout')
+            .having((e) => e.statusCode, 'statusCode', isNull)),
+      );
+    });
+
+    // -----------------------------------------------------------------------
     // TC-036: Handles empty data array from API
     // -----------------------------------------------------------------------
     test('TC-036: returns empty list when API returns empty array', () async {
@@ -140,6 +158,47 @@ void main() {
             queryParameters: any(named: 'queryParameters'),
           ));
     });
+
+    // -----------------------------------------------------------------------
+    // TC-L12: Returns empty list when no favorites stored (no API call made)
+    // -----------------------------------------------------------------------
+    test('TC-L12: getFavoriteEvents returns empty list when no favorites stored',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final result = await repository.getFavoriteEvents();
+
+      expect(result, isEmpty,
+          reason: 'Should return empty list with no stored favorites');
+      verifyNever(() => mockClient.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-124: Returns only the subset of events the API returns for given IDs
+    // -----------------------------------------------------------------------
+    test(
+        'TC-124: getFavoriteEvents returns only events the API returns for saved IDs',
+        () async {
+      SharedPreferences.setMockInitialValues({
+        'favorite_event_ids': ['evt-1', 'evt-2'],
+      });
+
+      // API returns only evt-1 (evt-2 may have been deleted)
+      when(() => mockClient.get(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenAnswer(
+        (_) async => [_eventJson('evt-1')],
+      );
+
+      final favorites = await repository.getFavoriteEvents();
+
+      expect(favorites.length, equals(1));
+      expect(favorites.first.id, equals('evt-1'));
+    });
   });
 
   // =========================================================================
@@ -173,6 +232,43 @@ void main() {
       final saved = prefs.getStringList('favorite_event_ids') ?? [];
       expect(saved, isNot(contains('42')));
       expect(saved, contains('99'));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-173: addFavorite() idempotency — adding same ID twice stores one entry
+    // -----------------------------------------------------------------------
+    test('TC-173: addFavorite is idempotent — duplicate ID not stored twice',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+
+      await repository.addFavorite('1');
+      await repository.addFavorite('1');
+
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getStringList('favorite_event_ids') ?? [];
+      expect(
+        saved.where((id) => id == '1').length,
+        equals(1),
+        reason: 'ID "1" should appear exactly once after two addFavorite calls',
+      );
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-174: removeFavorite() for non-existent ID leaves stored list unchanged
+    // -----------------------------------------------------------------------
+    test(
+        'TC-174: removeFavorite for non-existent ID leaves stored list unchanged',
+        () async {
+      SharedPreferences.setMockInitialValues({
+        'favorite_event_ids': ['1', '2'],
+      });
+
+      await repository.removeFavorite('999');
+
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getStringList('favorite_event_ids') ?? [];
+      expect(saved, containsAll(['1', '2']));
+      expect(saved, isNot(contains('999')));
     });
   });
 
