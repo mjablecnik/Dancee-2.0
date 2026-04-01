@@ -1,9 +1,5 @@
 import { appConfig } from './app.config';
 
-/**
- * Service definition interface
- * Defines metadata for a backend service
- */
 export interface ServiceDefinition {
   id: string;
   name: string;
@@ -14,10 +10,6 @@ export interface ServiceDefinition {
   enabled: boolean;
 }
 
-/**
- * UI configuration interface
- * Defines Swagger UI display settings
- */
 export interface UIConfig {
   title: string;
   description: string;
@@ -25,129 +17,75 @@ export interface UIConfig {
   theme: 'light' | 'dark' | 'auto';
 }
 
-/**
- * Service configuration interface
- * Contains all service definitions and UI settings
- */
 export interface ServiceConfig {
   services: ServiceDefinition[];
   ui: UIConfig;
 }
 
-/**
- * Service configuration
- * Defines all backend services and UI settings
- */
 export const serviceConfig: ServiceConfig = {
   services: [
     {
-      id: 'dancee-combined',
-      name: 'Dancee API - Complete',
+      id: 'dancee-workflow',
+      name: 'Dancee Workflow API',
       version: '1.0.0',
-      description: 'Complete API documentation for all Dancee services (Events + Scraper)',
-      baseUrl: appConfig.eventsServiceUrl,
-      specFile: 'combined.openapi.yaml',
+      description: 'Facebook event processing pipeline — scraping, AI parsing, translation, geocoding',
+      baseUrl: appConfig.workflowServiceUrl,
+      specFile: 'workflow.openapi.yaml',
       enabled: true,
     },
     {
-      id: 'dancee-events',
-      name: 'Dancee Events API',
+      id: 'dancee-cms',
+      name: 'Dancee CMS API',
       version: '1.0.0',
-      description: 'Event management and favorites API',
-      baseUrl: appConfig.eventsServiceUrl,
-      specFile: 'events.openapi.yaml',
-      enabled: true, 
-    },
-    {
-      id: 'test-api',
-      name: 'Test API',
-      version: '1.0.0',
-      description: 'Test API for health check validation',
-      baseUrl: 'http://localhost:8080',
-      specFile: 'test.openapi.yaml',
-      enabled: true, 
+      description: 'Directus headless CMS — event data, venues, groups',
+      baseUrl: appConfig.cmsServiceUrl,
+      specFile: 'cms.openapi.yaml',
+      enabled: true,
     },
   ],
   ui: {
     title: 'Dancee API Documentation',
     description: 'Centralized API documentation for all Dancee backend services',
-    defaultService: 'dancee-combined',
+    defaultService: 'dancee-workflow',
     theme: 'auto',
   },
 };
 
-/**
- * Get all enabled services
- */
 export function getEnabledServices(): ServiceDefinition[] {
   return serviceConfig.services.filter(service => service.enabled);
 }
 
-/**
- * Get service by ID
- */
 export function getServiceById(serviceId: string): ServiceDefinition | undefined {
   return serviceConfig.services.find(service => service.id === serviceId);
 }
 
-/**
- * Validate service configuration
- * Throws error if configuration is invalid
- */
 export function validateServiceConfig(): void {
   const errors: string[] = [];
 
-  // Check for duplicate service IDs
   const serviceIds = serviceConfig.services.map(s => s.id);
   const duplicates = serviceIds.filter((id, index) => serviceIds.indexOf(id) !== index);
   if (duplicates.length > 0) {
     errors.push(`Duplicate service IDs found: ${duplicates.join(', ')}`);
   }
 
-  // Validate each service
   serviceConfig.services.forEach(service => {
-    // Validate service ID format (kebab-case)
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(service.id)) {
       errors.push(`Invalid service ID format: ${service.id}. Must be kebab-case.`);
     }
-
-    // Validate required fields
-    if (!service.name || service.name.trim() === '') {
-      errors.push(`Service ${service.id} is missing name`);
-    }
-
-    if (!service.version || service.version.trim() === '') {
-      errors.push(`Service ${service.id} is missing version`);
-    }
-
-    if (!service.description || service.description.trim() === '') {
-      errors.push(`Service ${service.id} is missing description`);
-    }
-
-    if (!service.baseUrl || service.baseUrl.trim() === '') {
-      errors.push(`Service ${service.id} is missing baseUrl`);
-    }
-
-    if (!service.specFile || service.specFile.trim() === '') {
-      errors.push(`Service ${service.id} is missing specFile`);
-    }
+    if (!service.name?.trim()) errors.push(`Service ${service.id} is missing name`);
+    if (!service.version?.trim()) errors.push(`Service ${service.id} is missing version`);
+    if (!service.description?.trim()) errors.push(`Service ${service.id} is missing description`);
+    if (!service.baseUrl?.trim()) errors.push(`Service ${service.id} is missing baseUrl`);
+    if (!service.specFile?.trim()) errors.push(`Service ${service.id} is missing specFile`);
   });
 
-  // Validate at least one service is enabled
   if (getEnabledServices().length === 0) {
     errors.push('At least one service must be enabled');
   }
 
-  // Validate UI configuration
-  if (!serviceConfig.ui.title || serviceConfig.ui.title.trim() === '') {
-    errors.push('UI title cannot be empty');
-  }
+  if (!serviceConfig.ui.title?.trim()) errors.push('UI title cannot be empty');
+  if (!serviceConfig.ui.defaultService?.trim()) errors.push('UI defaultService cannot be empty');
 
-  if (!serviceConfig.ui.defaultService || serviceConfig.ui.defaultService.trim() === '') {
-    errors.push('UI defaultService cannot be empty');
-  }
-
-  // Validate default service exists
   const defaultService = getServiceById(serviceConfig.ui.defaultService);
   if (!defaultService) {
     errors.push(`Default service ${serviceConfig.ui.defaultService} not found in services list`);
@@ -158,5 +96,4 @@ export function validateServiceConfig(): void {
   }
 }
 
-// Validate configuration on module load
 validateServiceConfig();

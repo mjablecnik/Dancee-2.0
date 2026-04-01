@@ -5,20 +5,19 @@ info:
   description: |
     REST API for the dancee_workflow service.
 
-    This service processes Facebook dance events through an AI-powered workflow:
-    it scrapes event data, classifies the event type, extracts parts and info,
-    resolves the venue via reverse geocoding, stores the result in Directus CMS,
-    and generates multilingual translations (CS, EN, ES).
+    Processes Facebook dance events through an AI-powered pipeline:
+    scraping, event classification, LLM-based parts/info extraction,
+    venue geocoding via Nominatim, multilingual translation (CS, EN, ES),
+    and storage in Directus CMS.
 
-    All endpoints are exposed via the `/api` prefix. The HTTP server internally
-    rewrites `/api/*` paths to Restate's service-call URL pattern
-    (`/ApiService/<handler>`) before forwarding to the Restate handler.
+    All endpoints use the `/api` prefix. The HTTP server internally rewrites
+    `/api/*` paths to Restate service handlers before forwarding.
 
 servers:
+  - url: https://dancee-workflow.fly.dev
+    description: Production (Restate ingress)
   - url: http://localhost:8080
-    description: Application HTTP server (development)
-  - url: https://workflow.dancee.app
-    description: Application HTTP server (production)
+    description: Development (Restate ingress)
 
 tags:
   - name: Events
@@ -33,26 +32,19 @@ paths:
         - Events
       summary: Process a single Facebook event
       description: |
-        Submits a single Facebook event URL for AI-powered processing.
+        Submits a Facebook event URL for AI-powered processing.
 
         The workflow:
-        1. Scrapes the event from the dancee_scraper API
-        2. Checks for duplicate events (early, right after scraping)
-        3. Classifies the event type (party, workshop, festival, holiday — unsupported types are skipped)
-        4. Extracts event parts (structured sections with dates, lectors, DJs)
-        5. Extracts event info (prices, URLs)
-        6. Resolves the venue via Nominatim reverse geocoding
-        7. Translates event content to English and Spanish
-        8. Stores the event in Directus CMS
+        1. Scrapes the event
+        2. Checks for duplicates
+        3. Classifies event type (party, workshop, festival, holiday — unsupported types are skipped)
+        4. Extracts structured parts and info via LLM
+        5. Resolves venue via Nominatim geocoding
+        6. Translates content to CS, EN, ES
+        7. Stores in Directus CMS
 
         The workflow key is deterministic (derived from the normalised URL), so
-        calling this endpoint multiple times with the same URL will return the
-        existing result instead of creating a new workflow. If the workflow is
-        still running, Restate waits for completion. If it previously failed,
-        Restate resumes from the last successful step.
-
-        Internally the HTTP server rewrites `/api/event` → `/ApiService/processEvent`
-        before forwarding to the Restate handler.
+        repeated calls with the same URL return the existing result.
       operationId: processEvent
       requestBody:
         required: true
@@ -64,70 +56,20 @@ paths:
               url: "https://www.facebook.com/events/1234567890"
       responses:
         '200':
-          description: Event processed successfully (or skipped if unsupported type or duplicate)
+          description: Event processed (or skipped if unsupported type / duplicate)
           content:
             application/json:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/DirectusEvent'
+                  - $ref: '#/components/schemas/AlreadyProcessingResponse'
                   - type: 'null'
-              example:
-                id: 42
-                original_url: "https://www.facebook.com/events/1234567890"
-                organizer: "Prague Salsa Club"
-                start_time: "2024-02-15T20:00:00.000Z"
-                end_time: "2024-02-16T02:00:00.000Z"
-                timezone: "UTC"
-                status: "published"
-                translation_status: "complete"
-                dances: ["Salsa", "Bachata"]
         '400':
           description: Missing or invalid request body
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                message: "Missing required field: 'url'"
-                code: 400
-
-  /api/events/process:
-    get:
-      tags:
-        - Events
-      summary: Trigger batch processing of all groups
-      description: |
-        Kicks off the batch processing workflow, which iterates over all groups
-        stored in Directus (ordered by `updated_at` ascending) and processes
-        any new Facebook events found for each group.
-
-        The batch workflow:
-        1. Fetches all groups from Directus ordered by `updated_at`
-        2. For each group, scrapes the event list from the dancee_scraper API
-        3. For each event not already in Directus, submits it to the EventWorkflow
-        4. Updates the group's `updated_at` timestamp after processing
-        5. Logs errors to Directus (deduplicating by URL) and Sentry
-
-        This endpoint returns immediately with an acknowledgement. Processing
-        continues asynchronously in the background via Restate.
-
-        Internally the HTTP server rewrites `/api/events/process` → `/ApiService/processBatch`.
-      operationId: processBatch
-      responses:
-        '200':
-          description: Batch processing acknowledged and started
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BatchAcknowledgement'
-              example:
-                acknowledged: true
-                message: "Batch processing started"
-
-  /api/events/list:
-    get:
-      tags:
-        - Listing
 
   /api/event/reprocess:
     post:
@@ -136,19 +78,15 @@ paths:
       summary: Reprocess parts of an existing event
       description: |
         Re-runs selected processing steps on an existing event in Directus.
-        Useful for fixing bad translations, re-extracting parts/info after
-        prompt changes, or recomputing dances.
-
-        By default all steps are re-run. Use the `steps` array to select
-        specific steps.
 
         Available steps:
-        - `parts` — re-extract event parts and title from original_description via LLM
-        - `info` — re-extract event info (prices, URLs) from original_description via LLM
-        - `translations` — re-translate to EN and ES (uses current parts/info)
-        - `dances` — recompute the dances array from current parts
+        - `parts` — re-extract event parts and title via LLM
+        - `info` — re-extract event info (prices, URLs) via LLM
+        - `translations` — re-translate to CS, EN, ES (or a single language via `lang`)
+        - `dances` — recompute dances array from current parts
 
-        Note: `parts` automatically triggers `dances` recomputation as well.
+        Note: `parts` automatically triggers `dances` recomputation.
+        Either `id` or `translationId` must be provided.
       operationId: reprocessEvent
       requestBody:
         required: true
@@ -160,16 +98,27 @@ paths:
               allSteps:
                 summary: Reprocess everything
                 value:
-                  id: "019710af-52bf-7e9a-baeb-666322a932a9"
+                  id: 42
               translationsOnly:
                 summary: Only redo translations
                 value:
-                  id: "019710af-52bf-7e9a-baeb-666322a932a9"
+                  id: 42
+                  steps: ["translations"]
+              singleLanguage:
+                summary: Retranslate to English only
+                value:
+                  id: 42
+                  steps: ["translations"]
+                  lang: "en"
+              fromTranslation:
+                summary: Reprocess via translation record ID
+                value:
+                  translationId: 15
                   steps: ["translations"]
               partsAndDances:
                 summary: Re-extract parts and recompute dances
                 value:
-                  id: "019710af-52bf-7e9a-baeb-666322a932a9"
+                  id: 42
                   steps: ["parts", "dances"]
       responses:
         '200':
@@ -191,41 +140,83 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/events/process:
+    get:
+      tags:
+        - Events
+      summary: Trigger batch processing of all groups
+      description: |
+        Kicks off batch processing for all groups stored in Directus (ordered by `updated_at`).
+        Returns immediately with an acknowledgement; processing continues asynchronously via Restate.
+      operationId: processBatch
+      responses:
+        '200':
+          description: Batch processing acknowledged and started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAcknowledgement'
+              example:
+                acknowledged: true
+                message: "Batch processing started"
+
+  /api/events/group:
+    post:
+      tags:
+        - Events
+      summary: Trigger processing of a single Facebook group
+      description: |
+        Kicks off asynchronous processing for a single Facebook group URL.
+        Returns immediately with an acknowledgement.
+      operationId: processGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessGroupRequest'
+            example:
+              url: "https://www.facebook.com/PragueSalsaClub/events"
+      responses:
+        '200':
+          description: Group processing acknowledged and started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAcknowledgement'
+        '400':
+          description: Missing or invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/events/list:
     get:
       tags:
         - Listing
       summary: List published events
       description: |
-        Returns all published events from Directus CMS with expanded translations and venue.
-
-        By default only events with `status = "published"` are returned.
-        The `original_description` field is omitted by default to reduce payload size.
+        Returns all published events from Directus with expanded translations and venue.
 
         Use request headers to control the response:
-        - `x-dancee-filter`: JSON-encoded Directus filter (only allowed fields: dances, start_time, end_time, venue, organizer, translation_status)
-        - `x-dancee-lang`: Language code (cs, en, es) — flattens the matching translation onto each event and removes the translations array
+        - `x-dancee-filter`: JSON-encoded Directus filter (allowed fields: dances, start_time, end_time, venue, organizer, translation_status)
+        - `x-dancee-lang`: Language code (cs, en, es) — flattens the matching translation onto each event
         - `x-dancee-include: original_description` — includes the original Facebook description
-
-        Internally the HTTP server rewrites `/api/events/list` → `/ApiService/listEvents`.
       operationId: listEvents
       parameters:
         - name: x-dancee-filter
           in: header
           required: false
           description: |
-            JSON-encoded Directus filter object. Only allowed fields:
-            dances, start_time, end_time, venue, organizer, translation_status.
+            JSON-encoded Directus filter. Allowed fields: dances, start_time, end_time, venue, organizer, translation_status.
           schema:
             type: string
           example: '{"dances":{"_contains":"Salsa"}}'
         - name: x-dancee-lang
           in: header
           required: false
-          description: |
-            Language code (cs, en, es). When provided, the matching translation
-            is flattened onto each event (title, description, parts_translations,
-            info_translations) and the translations array is removed.
+          description: Language code. Flattens matching translation onto each event and removes the translations array.
           schema:
             type: string
             enum: [cs, en, es]
@@ -233,16 +224,13 @@ paths:
         - name: x-dancee-include
           in: header
           required: false
-          description: |
-            Set to `original_description` to include the original Facebook
-            description in the response (omitted by default).
+          description: Set to `original_description` to include the original Facebook description.
           schema:
             type: string
             enum: [original_description]
-          example: original_description
       responses:
         '200':
-          description: List of events
+          description: List of published events
           content:
             application/json:
               schema:
@@ -262,6 +250,44 @@ components:
           description: Facebook event URL to process
           example: "https://www.facebook.com/events/1234567890"
 
+    ProcessGroupRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Facebook page or group URL to scrape events from
+          example: "https://www.facebook.com/PragueSalsaClub/events"
+
+    ReprocessEventRequest:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Directus event ID. Either `id` or `translationId` is required.
+          example: 42
+        translationId:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Directus translation record ID. Alternative to `id` — parent event and language are resolved automatically.
+          example: 15
+        steps:
+          type: array
+          description: Steps to re-run. If omitted, all steps are executed.
+          items:
+            type: string
+            enum: [parts, info, translations, dances]
+          example: ["translations"]
+        lang:
+          type: string
+          description: Language code — when provided, only that language is (re-)translated.
+          enum: [cs, en, es]
+          example: "en"
+
     BatchAcknowledgement:
       type: object
       required:
@@ -270,12 +296,37 @@ components:
       properties:
         acknowledged:
           type: boolean
-          description: Whether the batch request was accepted
           example: true
         message:
           type: string
-          description: Human-readable status message
           example: "Batch processing started"
+
+    AlreadyProcessingResponse:
+      type: object
+      description: Returned when a workflow was already invoked for this URL but the event is not yet in Directus
+      required:
+        - status
+        - url
+      properties:
+        status:
+          type: string
+          enum: [already_processing]
+          example: "already_processing"
+        url:
+          type: string
+          example: "https://www.facebook.com/events/1234567890"
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Missing required field: 'url'"
+        code:
+          type: integer
+          example: 400
 
     DirectusEvent:
       type: object
@@ -284,98 +335,73 @@ components:
           oneOf:
             - type: integer
             - type: string
-          description: Directus record ID
           example: 42
         title:
           type: string
-          description: Event title (Czech, from LLM extraction)
           example: "Pražská Salsa Noc"
         original_description:
           type: string
-          description: Original Facebook event description (omitted by default, use x-dancee-include header)
+          description: Original Facebook event description (omitted by default)
         organizer:
           type: string
-          description: Event organizer name (first host or event title)
           example: "Prague Salsa Club"
         venue:
           oneOf:
             - type: integer
-              description: Venue ID (when not expanded)
             - type: string
-              description: Venue UUID (when not expanded)
             - $ref: '#/components/schemas/DirectusVenue'
             - type: 'null'
-          description: Venue — expanded object in list responses, ID in other contexts
         start_time:
           type: string
           format: date-time
           nullable: true
-          description: Event start time in ISO 8601 format
           example: "2024-02-15T20:00:00.000Z"
         end_time:
           type: string
           format: date-time
           nullable: true
-          description: Event end time in ISO 8601 format
           example: "2024-02-16T02:00:00.000Z"
         timezone:
           type: string
-          description: IANA timezone string
           example: "Europe/Prague"
         original_url:
           type: string
-          description: Original Facebook event URL
           example: "https://www.facebook.com/events/1234567890"
         parts:
           type: array
-          description: Structured event parts (workshops, parties, open lessons)
           items:
             $ref: '#/components/schemas/EventPart'
         info:
           type: array
-          description: Extracted event info items (prices, URLs)
           items:
             $ref: '#/components/schemas/EventInfo'
         dances:
           type: array
-          description: Computed list of unique dance styles across all parts
           items:
             type: string
           example: ["Salsa", "Bachata"]
         status:
           type: string
           enum: [published, draft, archived]
-          description: Directus publishing status
           example: "published"
         translation_status:
           type: string
           enum: [complete, partial, missing]
-          description: Translation completeness across CS/EN/ES
           example: "complete"
         translations:
           type: array
-          description: Multilingual translations for this event
           items:
             $ref: '#/components/schemas/DirectusEventTranslation'
 
     EventPart:
       type: object
-      required:
-        - name
-        - description
-        - type
-        - dances
-        - date_time_range
-        - lectors
-        - djs
+      required: [name, description, type, dances, date_time_range, lectors, djs]
       properties:
         name:
           type: string
-          description: Part name
           example: "Social Dancing"
         description:
           type: string
-          description: Part description
         type:
           type: string
           enum: [party, workshop, openLesson]
@@ -407,10 +433,7 @@ components:
 
     EventInfo:
       type: object
-      required:
-        - type
-        - key
-        - value
+      required: [type, key, value]
       properties:
         type:
           type: string
@@ -425,32 +448,22 @@ components:
 
     DirectusEventTranslation:
       type: object
-      required:
-        - languages_code
-        - title
-        - description
-        - parts_translations
-        - info_translations
+      required: [languages_code, title, description, parts_translations, info_translations]
       properties:
         id:
           type: integer
-          description: Translation record ID
         events_id:
           oneOf:
             - type: integer
             - type: string
-          description: Parent event ID
         languages_code:
           type: string
-          description: BCP-47 language code
           example: "cs"
         title:
           type: string
-          description: Translated event title
           example: "Pražská Salsa Noc"
         description:
           type: string
-          description: Translated event description
         parts_translations:
           type: array
           items:
@@ -470,41 +483,6 @@ components:
               key:
                 type: string
 
-    ReprocessEventRequest:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          oneOf:
-            - type: string
-            - type: integer
-          description: Directus event ID to reprocess
-          example: "019710af-52bf-7e9a-baeb-666322a932a9"
-        steps:
-          type: array
-          description: |
-            Which steps to re-run. If omitted, all steps are executed.
-            Valid values: parts, info, translations, dances.
-          items:
-            type: string
-            enum: [parts, info, translations, dances]
-          example: ["translations"]
-
-    ErrorResponse:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
-          description: Error message
-          example: "Missing required field: 'url'"
-        code:
-          type: integer
-          description: HTTP error code
-          example: 400
-
     DirectusVenue:
       type: object
       properties:
@@ -512,7 +490,6 @@ components:
           oneOf:
             - type: integer
             - type: string
-          description: Venue record ID
         name:
           type: string
           example: "Lucerna Music Bar"

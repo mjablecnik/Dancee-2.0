@@ -1,0 +1,628 @@
+openapi: 3.0.0
+info:
+  title: Dancee CMS API
+  version: 1.0.0
+  description: |
+    Directus headless CMS REST API for dancee_cms.
+
+    Manages event data, venues, groups, and related content.
+    All endpoints require a Bearer token (`Authorization: Bearer <token>`).
+
+    Authentication: use `./get-token.sh` to obtain an access token from the running Directus instance.
+
+servers:
+  - url: https://dancee-cms.fly.dev
+    description: CMS service (production)
+  - url: http://localhost:8055
+    description: CMS service (development)
+
+tags:
+  - name: Health
+    description: CMS health check
+  - name: Events
+    description: Event CRUD
+  - name: Venues
+    description: Venue CRUD
+  - name: Groups
+    description: Facebook group sources
+  - name: Errors
+    description: Processing error log
+  - name: Skipped Events
+    description: Skipped event log
+
+paths:
+  /server/health:
+    get:
+      tags:
+        - Health
+      summary: CMS health check
+      operationId: cmsHealthCheck
+      responses:
+        '200':
+          description: CMS is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    example: ok
+
+  /items/events:
+    get:
+      tags:
+        - Events
+      summary: List events
+      description: Supports standard Directus query parameters — `filter`, `sort`, `limit`, `offset`, `fields`.
+      operationId: cmsListEvents
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusOffset'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusEvent'
+    post:
+      tags:
+        - Events
+      summary: Create event
+      operationId: cmsCreateEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusEvent'
+      responses:
+        '200':
+          description: Created event
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusEvent'
+
+  /items/events/{id}:
+    get:
+      tags:
+        - Events
+      summary: Get event by ID
+      operationId: cmsGetEvent
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: Event record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusEvent'
+        '404':
+          description: Not found
+    patch:
+      tags:
+        - Events
+      summary: Update event
+      operationId: cmsUpdateEvent
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusEvent'
+      responses:
+        '200':
+          description: Updated event
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusEvent'
+    delete:
+      tags:
+        - Events
+      summary: Delete event
+      operationId: cmsDeleteEvent
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      responses:
+        '204':
+          description: Deleted
+
+  /items/venues:
+    get:
+      tags:
+        - Venues
+      summary: List venues
+      operationId: cmsListVenues
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of venues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusVenue'
+    post:
+      tags:
+        - Venues
+      summary: Create venue
+      operationId: cmsCreateVenue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusVenue'
+      responses:
+        '200':
+          description: Created venue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusVenue'
+
+  /items/venues/{id}:
+    patch:
+      tags:
+        - Venues
+      summary: Update venue
+      operationId: cmsUpdateVenue
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusVenue'
+      responses:
+        '200':
+          description: Updated venue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusVenue'
+
+  /items/groups:
+    get:
+      tags:
+        - Groups
+      summary: List groups
+      description: Facebook page/group URLs used as event sources. Managed via Directus admin UI.
+      operationId: cmsListGroups
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusSort'
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusGroup'
+
+  /items/groups/{id}:
+    patch:
+      tags:
+        - Groups
+      summary: Update group
+      operationId: cmsUpdateGroup
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusGroup'
+      responses:
+        '200':
+          description: Updated group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusGroup'
+
+  /items/errors:
+    get:
+      tags:
+        - Errors
+      summary: List processing errors
+      operationId: cmsListErrors
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusSort'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusError'
+
+  /items/skipped_events:
+    get:
+      tags:
+        - Skipped Events
+      summary: List skipped events
+      operationId: cmsListSkippedEvents
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusSort'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of skipped events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusSkippedEvent'
+
+components:
+  parameters:
+    DirectusId:
+      name: id
+      in: path
+      required: true
+      schema:
+        oneOf:
+          - type: integer
+          - type: string
+      example: 42
+
+    DirectusFilter:
+      name: filter
+      in: query
+      required: false
+      description: JSON-encoded Directus filter object
+      schema:
+        type: string
+      example: '{"status":{"_eq":"published"}}'
+
+    DirectusFields:
+      name: fields
+      in: query
+      required: false
+      description: Comma-separated fields to include (supports dot notation for relations)
+      schema:
+        type: string
+      example: "*,translations.*,venue.*"
+
+    DirectusLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+      example: 50
+
+    DirectusOffset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+
+    DirectusSort:
+      name: sort
+      in: query
+      required: false
+      description: Comma-separated sort fields (prefix with `-` for descending)
+      schema:
+        type: string
+      example: "-start_time"
+
+  schemas:
+    DirectusEvent:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 42
+        title:
+          type: string
+          example: "Pražská Salsa Noc"
+        original_description:
+          type: string
+        organizer:
+          type: string
+          example: "Prague Salsa Club"
+        venue:
+          oneOf:
+            - type: integer
+            - type: string
+            - $ref: '#/components/schemas/DirectusVenue'
+            - type: 'null'
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-02-15T20:00:00.000Z"
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-02-16T02:00:00.000Z"
+        timezone:
+          type: string
+          example: "Europe/Prague"
+        original_url:
+          type: string
+          example: "https://www.facebook.com/events/1234567890"
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventPart'
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventInfo'
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["Salsa", "Bachata"]
+        status:
+          type: string
+          enum: [published, draft, archived]
+          example: "published"
+        translation_status:
+          type: string
+          enum: [complete, partial, missing]
+          example: "complete"
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusEventTranslation'
+
+    EventPart:
+      type: object
+      required: [name, description, type, dances, date_time_range, lectors, djs]
+      properties:
+        name:
+          type: string
+          example: "Social Dancing"
+        description:
+          type: string
+        type:
+          type: string
+          enum: [party, workshop, openLesson]
+          example: "party"
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["Salsa"]
+        date_time_range:
+          type: object
+          required: [start, end]
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        lectors:
+          type: array
+          items:
+            type: string
+        djs:
+          type: array
+          items:
+            type: string
+          example: ["DJ Carlos"]
+
+    EventInfo:
+      type: object
+      required: [type, key, value]
+      properties:
+        type:
+          type: string
+          enum: [url, price]
+          example: "price"
+        key:
+          type: string
+          example: "Entry Fee"
+        value:
+          type: string
+          example: "200 Kč"
+
+    DirectusEventTranslation:
+      type: object
+      required: [languages_code, title, description, parts_translations, info_translations]
+      properties:
+        id:
+          type: integer
+        events_id:
+          oneOf:
+            - type: integer
+            - type: string
+        languages_code:
+          type: string
+          example: "cs"
+        title:
+          type: string
+          example: "Pražská Salsa Noc"
+        description:
+          type: string
+        parts_translations:
+          type: array
+          items:
+            type: object
+            required: [name, description]
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+        info_translations:
+          type: array
+          items:
+            type: object
+            required: [key]
+            properties:
+              key:
+                type: string
+
+    DirectusVenue:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+        name:
+          type: string
+          example: "Lucerna Music Bar"
+        street:
+          type: string
+          example: "Vodičkova"
+        number:
+          type: string
+          example: "36"
+        town:
+          type: string
+          example: "Prague"
+        country:
+          type: string
+          example: "CZ"
+        postal_code:
+          type: string
+          example: "110 00"
+        region:
+          type: string
+          example: "Hlavní město Praha"
+        latitude:
+          type: number
+          nullable: true
+          example: 50.0813
+        longitude:
+          type: number
+          nullable: true
+          example: 14.4258
+
+    DirectusGroup:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+        url:
+          type: string
+          example: "https://www.facebook.com/PragueSalsaClub/events"
+        type:
+          type: string
+          nullable: true
+          example: "page"
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    DirectusError:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+        url:
+          type: string
+          example: "https://www.facebook.com/events/1234567890"
+        message:
+          type: string
+          example: "Failed to scrape event"
+        type:
+          type: string
+          enum: [scrape_failed, parse_failed, llm_parse_failed, workflow_failed, schedule_failed, unknown]
+          example: "scrape_failed"
+        datetime:
+          type: string
+          format: date-time
+
+    DirectusSkippedEvent:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+        original_url:
+          type: string
+          example: "https://www.facebook.com/events/1234567890"
+        reason:
+          type: string
+          nullable: true
+          example: "unsupported_type"
+        event_type:
+          type: string
+          nullable: true
+          example: "holiday"
+        datetime:
+          type: string
+          format: date-time

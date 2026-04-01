@@ -4,41 +4,265 @@ info:
   version: 1.0.0
   description: |
     Complete API documentation for all Dancee backend services.
-    
-    This unified documentation includes:
-    - **Events API**: Event management and user favorites
-    
-    Facebook event scraping is handled internally by the dancee_workflow service
-    and is not exposed as a public API.
-  contact:
-    name: Dancee API Support
-    email: support@dancee.app
+
+    - **Workflow API** (`dancee_workflow`): Facebook event processing pipeline — scraping, AI parsing, translation, geocoding, batch processing
+    - **CMS API** (`dancee_cms`): Directus headless CMS — event data storage, admin interface
 
 servers:
-  - url: https://dancee-events.fly.dev
-    description: Events API - Production
   - url: http://localhost:8080
-    description: Events API - Development
+    description: Workflow service (development, Restate ingress)
+  - url: https://dancee-workflow.fly.dev
+    description: Workflow service (production)
+  - url: http://localhost:8055
+    description: CMS service (development)
+  - url: https://dancee-cms.fly.dev
+    description: CMS service (production)
 
 tags:
-  - name: Events - Health
-    description: Events service health check
-  - name: Events - Event Management
-    description: Event listing and retrieval
-  - name: Events - Favorites
-    description: User favorite event management
+  - name: Workflow - Events
+    description: Single-event and batch event processing (dancee_workflow)
+  - name: Workflow - Listing
+    description: Querying stored events (dancee_workflow)
+  - name: CMS - Events
+    description: Event CRUD via Directus REST API (dancee_cms)
+  - name: CMS - Venues
+    description: Venue CRUD via Directus REST API (dancee_cms)
+  - name: CMS - Groups
+    description: Facebook group sources (dancee_cms)
+  - name: CMS - Health
+    description: CMS health check (dancee_cms)
+
+# =============================================================================
+# WORKFLOW API (dancee_workflow — port 8080 via Restate ingress)
+# =============================================================================
 
 paths:
-  /health:
-    get:
+  /api/event:
+    post:
       tags:
-        - Events - Health
-      summary: Health check (Events API)
-      description: Check if the Events API server is running and healthy
-      operationId: eventsHealthCheck
+        - Workflow - Events
+      summary: Process a single Facebook event
+      description: |
+        Submits a Facebook event URL for AI-powered processing.
+
+        The workflow:
+        1. Scrapes the event
+        2. Checks for duplicates
+        3. Classifies event type (party, workshop, festival, holiday — unsupported types are skipped)
+        4. Extracts structured parts and info via LLM
+        5. Resolves venue via Nominatim geocoding
+        6. Translates content to CS, EN, ES
+        7. Stores in Directus CMS
+
+        The workflow key is deterministic (derived from the normalised URL), so
+        repeated calls with the same URL return the existing result.
+      operationId: processEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessEventRequest'
+            example:
+              url: "https://www.facebook.com/events/1234567890"
       responses:
         '200':
-          description: Server is healthy
+          description: Event processed (or skipped if unsupported type / duplicate)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DirectusEvent'
+                  - $ref: '#/components/schemas/AlreadyProcessingResponse'
+                  - type: 'null'
+        '400':
+          description: Missing or invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
+
+  /api/event/reprocess:
+    post:
+      tags:
+        - Workflow - Events
+      summary: Reprocess parts of an existing event
+      description: |
+        Re-runs selected processing steps on an existing event in Directus.
+
+        Available steps:
+        - `parts` — re-extract event parts and title via LLM
+        - `info` — re-extract event info (prices, URLs) via LLM
+        - `translations` — re-translate to CS, EN, ES (or a single language via `lang`)
+        - `dances` — recompute dances array from current parts
+
+        Note: `parts` automatically triggers `dances` recomputation.
+        Either `id` or `translationId` must be provided.
+      operationId: reprocessEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReprocessEventRequest'
+            examples:
+              allSteps:
+                summary: Reprocess everything
+                value:
+                  id: 42
+              translationsOnly:
+                summary: Only redo translations
+                value:
+                  id: 42
+                  steps: ["translations"]
+              singleLanguage:
+                summary: Retranslate to English only
+                value:
+                  id: 42
+                  steps: ["translations"]
+                  lang: "en"
+              fromTranslation:
+                summary: Reprocess via translation record ID
+                value:
+                  translationId: 15
+                  steps: ["translations"]
+              partsAndDances:
+                summary: Re-extract parts and recompute dances
+                value:
+                  id: 42
+                  steps: ["parts", "dances"]
+      responses:
+        '200':
+          description: Event reprocessed and updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusEvent'
+        '400':
+          description: Missing ID or invalid steps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
+
+  /api/events/process:
+    get:
+      tags:
+        - Workflow - Events
+      summary: Trigger batch processing of all groups
+      description: |
+        Kicks off batch processing for all groups stored in Directus (ordered by `updated_at`).
+        Returns immediately with an acknowledgement; processing continues asynchronously via Restate.
+      operationId: processBatch
+      responses:
+        '200':
+          description: Batch processing acknowledged and started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAcknowledgement'
+              example:
+                acknowledged: true
+                message: "Batch processing started"
+
+  /api/events/group:
+    post:
+      tags:
+        - Workflow - Events
+      summary: Trigger processing of a single Facebook group
+      description: |
+        Kicks off asynchronous processing for a single Facebook group URL.
+        Returns immediately with an acknowledgement.
+      operationId: processGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessGroupRequest'
+            example:
+              url: "https://www.facebook.com/PragueSalsaClub/events"
+      responses:
+        '200':
+          description: Group processing acknowledged and started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAcknowledgement'
+        '400':
+          description: Missing or invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
+
+  /api/events/list:
+    get:
+      tags:
+        - Workflow - Listing
+      summary: List published events
+      description: |
+        Returns all published events from Directus with expanded translations and venue.
+
+        Use request headers to control the response:
+        - `x-dancee-filter`: JSON-encoded Directus filter (allowed fields: dances, start_time, end_time, venue, organizer, translation_status)
+        - `x-dancee-lang`: Language code (cs, en, es) — flattens the matching translation onto each event
+        - `x-dancee-include: original_description` — includes the original Facebook description
+      operationId: listEvents
+      parameters:
+        - name: x-dancee-filter
+          in: header
+          required: false
+          description: |
+            JSON-encoded Directus filter. Allowed fields: dances, start_time, end_time, venue, organizer, translation_status.
+          schema:
+            type: string
+          example: '{"dances":{"_contains":"Salsa"}}'
+        - name: x-dancee-lang
+          in: header
+          required: false
+          description: Language code. Flattens matching translation onto each event and removes the translations array.
+          schema:
+            type: string
+            enum: [cs, en, es]
+          example: cs
+        - name: x-dancee-include
+          in: header
+          required: false
+          description: Set to `original_description` to include the original Facebook description.
+          schema:
+            type: string
+            enum: [original_description]
+      responses:
+        '200':
+          description: List of published events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusEvent'
+
+# =============================================================================
+# CMS API (dancee_cms — Directus on port 8055)
+# =============================================================================
+
+  /server/health:
+    get:
+      tags:
+        - CMS - Health
+      summary: CMS health check
+      description: Returns the health status of the Directus CMS instance.
+      operationId: cmsHealthCheck
+      responses:
+        '200':
+          description: CMS is healthy
           content:
             application/json:
               schema:
@@ -46,259 +270,586 @@ paths:
                 properties:
                   status:
                     type: string
+                    enum: [ok]
                     example: ok
 
-  /api/events/list:
+  /items/events:
     get:
       tags:
-        - Events - Event Management
-      summary: List all events
+        - CMS - Events
+      summary: List events
       description: |
-        Retrieve all dance events. Optionally mark favorite events for a specific user.
-      operationId: listEvents
+        Retrieve events from Directus. Supports standard Directus query parameters:
+        `filter`, `sort`, `limit`, `offset`, `fields`.
+      operationId: cmsListEvents
       parameters:
-        - name: userId
-          in: query
-          description: User identifier to mark favorite events
-          required: false
-          schema:
-            type: string
-          example: user123
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusOffset'
+        - $ref: '#/components/parameters/DirectusSort'
       responses:
         '200':
-          description: List of events retrieved successfully
+          description: List of events
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Event'
-
-  /api/events/favorites:
-    get:
-      tags:
-        - Events - Favorites
-      summary: List favorite events
-      description: Retrieve all favorite events for a specific user
-      operationId: listFavorites
-      parameters:
-        - name: userId
-          in: query
-          description: User identifier
-          required: true
-          schema:
-            type: string
-          example: user123
-      responses:
-        '200':
-          description: List of favorite events retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Event'
-        '400':
-          description: Missing required userId parameter
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
+                $ref: '#/components/schemas/DirectusListResponse'
     post:
       tags:
-        - Events - Favorites
-      summary: Add favorite event
-      description: Add an event to a user's favorites
-      operationId: addFavorite
+        - CMS - Events
+      summary: Create event
+      operationId: cmsCreateEvent
       requestBody:
-        description: User and event identifiers
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddFavoriteRequest'
-            example:
-              userId: user123
-              eventId: event-001
+              $ref: '#/components/schemas/DirectusEvent'
       responses:
-        '201':
-          description: Favorite added successfully
+        '200':
+          description: Created event
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddFavoriteResponse'
-        '400':
-          description: Missing required fields
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/DirectusSingleResponse'
 
-  /api/events/favorites/{eventId}:
+  /items/events/{id}:
+    get:
+      tags:
+        - CMS - Events
+      summary: Get event by ID
+      operationId: cmsGetEvent
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: Event record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+        '404':
+          description: Not found
+    patch:
+      tags:
+        - CMS - Events
+      summary: Update event
+      operationId: cmsUpdateEvent
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusEvent'
+      responses:
+        '200':
+          description: Updated event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
     delete:
       tags:
-        - Events - Favorites
-      summary: Remove favorite event
-      description: Remove an event from a user's favorites
-      operationId: removeFavorite
+        - CMS - Events
+      summary: Delete event
+      operationId: cmsDeleteEvent
       parameters:
-        - name: eventId
-          in: path
-          description: Event identifier to remove
-          required: true
-          schema:
-            type: string
-          example: event-001
-        - name: userId
-          in: query
-          description: User identifier
-          required: true
-          schema:
-            type: string
-          example: user123
+        - $ref: '#/components/parameters/DirectusId'
       responses:
         '204':
-          description: Favorite removed successfully
-        '400':
-          description: Missing required userId parameter
+          description: Deleted
+
+  /items/venues:
+    get:
+      tags:
+        - CMS - Venues
+      summary: List venues
+      operationId: cmsListVenues
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of venues
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/DirectusListResponse'
+    post:
+      tags:
+        - CMS - Venues
+      summary: Create venue
+      operationId: cmsCreateVenue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusVenue'
+      responses:
+        '200':
+          description: Created venue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+
+  /items/venues/{id}:
+    patch:
+      tags:
+        - CMS - Venues
+      summary: Update venue
+      operationId: cmsUpdateVenue
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusVenue'
+      responses:
+        '200':
+          description: Updated venue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+
+  /items/groups:
+    get:
+      tags:
+        - CMS - Groups
+      summary: List groups
+      description: Facebook page/group URLs used as event sources. Managed via Directus admin UI.
+      operationId: cmsListGroups
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusListResponse'
+
+  /items/groups/{id}:
+    patch:
+      tags:
+        - CMS - Groups
+      summary: Update group (e.g. updated_at timestamp)
+      operationId: cmsUpdateGroup
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusGroup'
+      responses:
+        '200':
+          description: Updated group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
 
 components:
+  parameters:
+    DirectusId:
+      name: id
+      in: path
+      required: true
+      schema:
+        oneOf:
+          - type: integer
+          - type: string
+      example: 42
+
+    DirectusFilter:
+      name: filter
+      in: query
+      required: false
+      description: JSON-encoded Directus filter object
+      schema:
+        type: string
+      example: '{"status":{"_eq":"published"}}'
+
+    DirectusFields:
+      name: fields
+      in: query
+      required: false
+      description: Comma-separated list of fields to include (supports dot notation for relations)
+      schema:
+        type: string
+      example: "*,translations.*,venue.*"
+
+    DirectusLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+      example: 50
+
+    DirectusOffset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+
+    DirectusSort:
+      name: sort
+      in: query
+      required: false
+      description: Comma-separated sort fields (prefix with `-` for descending)
+      schema:
+        type: string
+      example: "-start_time"
+
   schemas:
-    Event:
+    # ---- Workflow request/response schemas ----
+
+    ProcessEventRequest:
       type: object
       required:
-        - id
-        - title
-        - organizer
-        - venue
-        - startTime
-        - dances
+        - url
+      properties:
+        url:
+          type: string
+          description: Facebook event URL to process
+          example: "https://www.facebook.com/events/1234567890"
+
+    ProcessGroupRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Facebook page or group URL to scrape events from
+          example: "https://www.facebook.com/PragueSalsaClub/events"
+
+    ReprocessEventRequest:
+      type: object
       properties:
         id:
-          type: string
-          description: Unique event identifier
-          example: event-001
-        title:
-          type: string
-          description: Event title
-          example: Prague Salsa Night
-        description:
-          type: string
-          description: Event description
-          example: Join us for an amazing night of Salsa dancing!
-        organizer:
-          type: string
-          description: Event organizer name
-          example: Prague Salsa Club
-        venue:
-          $ref: '#/components/schemas/Venue'
-        startTime:
-          type: string
-          format: date-time
-          description: Event start time in ISO 8601 format
-          example: "2024-02-15T20:00:00Z"
-        endTime:
-          type: string
-          format: date-time
-          description: Event end time in ISO 8601 format
-          example: "2024-02-16T02:00:00Z"
-        dances:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Directus event ID. Either `id` or `translationId` is required.
+          example: 42
+        translationId:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Directus translation record ID. Alternative to `id` — parent event and language are resolved automatically.
+          example: 15
+        steps:
           type: array
-          description: List of dance styles
+          description: Steps to re-run. If omitted, all steps are executed.
           items:
             type: string
-          example:
-            - Salsa
-            - Bachata
-        isFavorite:
+            enum: [parts, info, translations, dances]
+          example: ["translations"]
+        lang:
+          type: string
+          description: Language code — when provided, only that language is (re-)translated.
+          enum: [cs, en, es]
+          example: "en"
+
+    BatchAcknowledgement:
+      type: object
+      required:
+        - acknowledged
+        - message
+      properties:
+        acknowledged:
           type: boolean
-          description: Whether the event is marked as favorite
-          example: false
+          example: true
+        message:
+          type: string
+          example: "Batch processing started"
 
-    Venue:
+    AlreadyProcessingResponse:
       type: object
+      description: Returned when a workflow was already invoked for this URL but the event is not yet in Directus
       required:
-        - name
-        - address
+        - status
+        - url
       properties:
-        name:
+        status:
           type: string
-          description: Venue name
-          example: Lucerna Music Bar
-        address:
-          $ref: '#/components/schemas/Address'
-        latitude:
-          type: number
-          format: double
-          description: Venue latitude coordinate
-          example: 50.0813
-        longitude:
-          type: number
-          format: double
-          description: Venue longitude coordinate
-          example: 14.4258
+          enum: [already_processing]
+          example: "already_processing"
+        url:
+          type: string
+          example: "https://www.facebook.com/events/1234567890"
 
-    Address:
-      type: object
-      required:
-        - street
-        - city
-        - postalCode
-        - country
-      properties:
-        street:
-          type: string
-          example: Vodičkova 36
-        city:
-          type: string
-          example: Prague
-        postalCode:
-          type: string
-          example: "110 00"
-        country:
-          type: string
-          example: Czech Republic
-
-    AddFavoriteRequest:
-      type: object
-      required:
-        - userId
-        - eventId
-      properties:
-        userId:
-          type: string
-          example: user123
-        eventId:
-          type: string
-          example: event-001
-
-    AddFavoriteResponse:
+    WorkflowErrorResponse:
       type: object
       required:
         - message
-        - userId
-        - eventId
       properties:
         message:
           type: string
-          example: Favorite added successfully
-        userId:
-          type: string
-          example: user123
-        eventId:
-          type: string
-          example: event-001
+          example: "Missing required field: 'url'"
+        code:
+          type: integer
+          example: 400
 
-    ErrorResponse:
+    # ---- Shared Directus data schemas ----
+
+    DirectusEvent:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 42
+        title:
+          type: string
+          description: Event title (Czech, from LLM extraction)
+          example: "Pražská Salsa Noc"
+        original_description:
+          type: string
+          description: Original Facebook event description (omitted by default in workflow list endpoint)
+        organizer:
+          type: string
+          example: "Prague Salsa Club"
+        venue:
+          oneOf:
+            - type: integer
+            - type: string
+            - $ref: '#/components/schemas/DirectusVenue'
+            - type: 'null'
+          description: Venue ID or expanded venue object
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-02-15T20:00:00.000Z"
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-02-16T02:00:00.000Z"
+        timezone:
+          type: string
+          example: "Europe/Prague"
+        original_url:
+          type: string
+          example: "https://www.facebook.com/events/1234567890"
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventPart'
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventInfo'
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["Salsa", "Bachata"]
+        status:
+          type: string
+          enum: [published, draft, archived]
+          example: "published"
+        translation_status:
+          type: string
+          enum: [complete, partial, missing]
+          example: "complete"
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusEventTranslation'
+
+    EventPart:
       type: object
       required:
-        - error
+        - name
+        - description
+        - type
+        - dances
+        - date_time_range
+        - lectors
+        - djs
       properties:
-        error:
+        name:
           type: string
-          example: userId query parameter is required
+          example: "Social Dancing"
+        description:
+          type: string
+        type:
+          type: string
+          enum: [party, workshop, openLesson]
+          example: "party"
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["Salsa"]
+        date_time_range:
+          type: object
+          required: [start, end]
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        lectors:
+          type: array
+          items:
+            type: string
+        djs:
+          type: array
+          items:
+            type: string
+          example: ["DJ Carlos"]
+
+    EventInfo:
+      type: object
+      required:
+        - type
+        - key
+        - value
+      properties:
+        type:
+          type: string
+          enum: [url, price]
+          example: "price"
+        key:
+          type: string
+          example: "Entry Fee"
+        value:
+          type: string
+          example: "200 Kč"
+
+    DirectusEventTranslation:
+      type: object
+      required:
+        - languages_code
+        - title
+        - description
+        - parts_translations
+        - info_translations
+      properties:
+        id:
+          type: integer
+        events_id:
+          oneOf:
+            - type: integer
+            - type: string
+        languages_code:
+          type: string
+          example: "cs"
+        title:
+          type: string
+          example: "Pražská Salsa Noc"
+        description:
+          type: string
+        parts_translations:
+          type: array
+          items:
+            type: object
+            required: [name, description]
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+        info_translations:
+          type: array
+          items:
+            type: object
+            required: [key]
+            properties:
+              key:
+                type: string
+
+    DirectusVenue:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+        name:
+          type: string
+          example: "Lucerna Music Bar"
+        street:
+          type: string
+          example: "Vodičkova"
+        number:
+          type: string
+          example: "36"
+        town:
+          type: string
+          example: "Prague"
+        country:
+          type: string
+          example: "CZ"
+        postal_code:
+          type: string
+          example: "110 00"
+        region:
+          type: string
+          example: "Hlavní město Praha"
+        latitude:
+          type: number
+          nullable: true
+          example: 50.0813
+        longitude:
+          type: number
+          nullable: true
+          example: 14.4258
+
+    DirectusGroup:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+        url:
+          type: string
+          description: Facebook page/group URL used as event source
+          example: "https://www.facebook.com/PragueSalsaClub/events"
+        type:
+          type: string
+          nullable: true
+          example: "page"
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp of last batch processing run for this group
+
+    DirectusListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+
+    DirectusSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
