@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../data/entities.dart';
+import '../data/filter_persistence_service.dart';
 import 'event_list.dart';
 
 part 'event_filter.freezed.dart';
@@ -51,7 +52,7 @@ class EventFilterState with _$EventFilterState {
 /// Applies [filters] to [events] using AND logic.
 ///
 /// Empty/unset filter criteria impose no restriction.
-List<Event> applyFilters(List<Event> events, FilterState filters) {
+List<Event> filterEvents(List<Event> events, FilterState filters) {
   return events.where((event) {
     // Text search — case-insensitive title match
     if (filters.searchQuery.isNotEmpty) {
@@ -125,7 +126,7 @@ int countEventsForDanceType(
   FilterState filters,
 ) {
   final filtersWithoutDanceType = filters.copyWith(selectedDanceTypes: {danceType});
-  return applyFilters(events, filtersWithoutDanceType).length;
+  return filterEvents(events, filtersWithoutDanceType).length;
 }
 
 /// Returns the count of events matching all active filters except region
@@ -136,7 +137,7 @@ int countEventsForRegion(
   FilterState filters,
 ) {
   final filtersWithoutRegion = filters.copyWith(selectedRegions: {region});
-  return applyFilters(events, filtersWithoutRegion).length;
+  return filterEvents(events, filtersWithoutRegion).length;
 }
 
 /// Returns the number of active filter categories.
@@ -200,17 +201,18 @@ int getActiveFilterCount(FilterState filters) {
 /// Cubit that applies filter logic to the event list from [EventListCubit].
 class EventFilterCubit extends Cubit<EventFilterState> {
   final EventListCubit _eventListCubit;
+  final FilterPersistenceService _persistenceService;
   StreamSubscription<EventListState>? _eventListSubscription;
   Timer? _debounceTimer;
 
-  EventFilterCubit(this._eventListCubit)
+  EventFilterCubit(this._eventListCubit, this._persistenceService)
       : super(
-          EventFilterState(
-            filters: const FilterState(),
-            filteredEvents: const [],
-            todayEvents: const [],
-            tomorrowEvents: const [],
-            upcomingEvents: const [],
+          const EventFilterState(
+            filters: FilterState(),
+            filteredEvents: [],
+            todayEvents: [],
+            tomorrowEvents: [],
+            upcomingEvents: [],
           ),
         ) {
     _eventListSubscription = _eventListCubit.stream.listen(_onEventListState);
@@ -231,7 +233,7 @@ class EventFilterCubit extends Cubit<EventFilterState> {
   }
 
   void _recompute(List<Event> allEvents, FilterState filters) {
-    final filtered = applyFilters(allEvents, filters);
+    final filtered = filterEvents(allEvents, filters);
     emit(EventFilterState(
       filters: filters,
       filteredEvents: filtered,
@@ -273,9 +275,26 @@ class EventFilterCubit extends Cubit<EventFilterState> {
     _recompute(_allEvents(), filters);
   }
 
-  /// Resets all filters to default empty state.
+  /// Resets all filters to default empty state and clears saved filters.
   void resetFilters() {
+    _persistenceService.clearFilters();
     _recompute(_allEvents(), const FilterState());
+  }
+
+  /// Persists the current [FilterState] via [FilterPersistenceService].
+  Future<void> saveFilters() async {
+    await _persistenceService.saveFilters(state.filters);
+  }
+
+  /// Loads and restores a previously saved [FilterState] from persistence.
+  ///
+  /// Falls back to the default empty state if no filters are saved or if
+  /// loading fails.
+  Future<void> restoreFilters() async {
+    final saved = await _persistenceService.loadFilters();
+    if (saved != null) {
+      _recompute(_allEvents(), saved);
+    }
   }
 
   /// Updates the search query with a 300ms debounce.
