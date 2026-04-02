@@ -23,8 +23,8 @@ final goRouter = GoRouter(
   routes: [
     $initialRoute,
     $appLayoutRoute,
-    $eventDetailRoute,
     $eventFiltersRoute,
+    $eventDetailRoute,
     $loginRoute,
     $registerRoute,
     $settingsRoute,
