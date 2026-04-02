@@ -65,7 +65,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Group filtered events into today/tomorrow/upcoming (reuse grouping logic)
     - _Requirements: 1.2, 1.3, 6.1, 6.2, 6.5, 7.1, 7.2, 7.3, 7.5, 7.6, 9.1, 9.2_
 
-  - [ ]* 3.3 Write property test for combined AND filter correctness (Property 1)
+  - [x]* 3.3 Write property test for combined AND filter correctness (Property 1)
     - **Property 1: Combined AND filter correctness**
     - **Validates: Requirements 1.2, 1.3, 3.3, 3.4, 4.3, 4.4, 5.2, 5.3, 5.4, 5.5, 6.1, 9.1, 9.2**
 
