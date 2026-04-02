@@ -323,6 +323,7 @@ class Event extends Equatable {
     Map<String, dynamic> json, {
     String language = 'cs',
     Set<String> favoriteIds = const {},
+    DateTime? now,
   }) {
     final id = json['id'].toString();
 
@@ -368,10 +369,12 @@ class Event extends Equatable {
       duration = endTime.difference(startTime);
     }
 
-    // Compute isPast
+    // Compute isPast relative to the provided [now] (defaults to DateTime.now()).
+    // Accepting [now] as a parameter enables deterministic unit testing.
+    final effectiveNow = now ?? DateTime.now();
     final isPast = endTime != null
-        ? endTime.isBefore(DateTime.now())
-        : startTime.isBefore(DateTime.now());
+        ? endTime.isBefore(effectiveNow)
+        : startTime.isBefore(effectiveNow);
 
     // Parse dances
     final dances = (json['dances'] as List<dynamic>?)?.cast<String>() ?? [];

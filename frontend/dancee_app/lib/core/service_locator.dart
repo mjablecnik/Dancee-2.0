@@ -47,7 +47,7 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<FavoritesCubit>(
-    () => FavoritesCubit(getIt<EventRepository>()),
+    () => FavoritesCubit(getIt<EventRepository>(), getIt<EventListCubit>()),
   );
 
   getIt.registerFactory<AuthCubit>(

@@ -18,7 +18,7 @@ class MockEventListCubit extends Mock implements EventListCubit {}
 /// Seedable FavoritesCubit: overrides loadFavorites() so initState() doesn't
 /// change state during widget tests. Exposes seed() to force any state.
 class _SeedableFavoritesCubit extends FavoritesCubit {
-  _SeedableFavoritesCubit(super.repo);
+  _SeedableFavoritesCubit(super.repo, super.eventListCubit);
 
   void seed(FavoritesState state) => emit(state);
 
@@ -85,8 +85,8 @@ void main() {
 
   setUp(() {
     mockRepo = MockEventRepository();
-    favoritesCubit = _SeedableFavoritesCubit(mockRepo);
     mockListCubit = MockEventListCubit();
+    favoritesCubit = _SeedableFavoritesCubit(mockRepo, mockListCubit);
 
     when(() => mockListCubit.state)
         .thenReturn(const EventListState.initial());

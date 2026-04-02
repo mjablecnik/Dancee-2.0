@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'config.dart';
 import 'exceptions.dart';
 
@@ -29,12 +32,14 @@ class DirectusClient {
       'Authorization': 'Bearer $accessToken',
     };
 
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      error: true,
-      logPrint: (obj) => print('[Directus] $obj'),
-    ));
+    if (kDebugMode) {
+      _dio.interceptors.add(LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        error: true,
+        logPrint: (obj) => developer.log('$obj', name: 'DirectusClient'),
+      ));
+    }
   }
 
   /// Extracts the `data` field from a Directus response envelope.

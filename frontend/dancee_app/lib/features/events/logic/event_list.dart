@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,6 +49,13 @@ class EventListState with _$EventListState {
 /// Events are automatically grouped by date (today, tomorrow, upcoming).
 class EventListCubit extends Cubit<EventListState> {
   final EventRepository _repository;
+  final _errorController = StreamController<String>.broadcast();
+
+  /// Stream of non-fatal error messages (e.g. from [toggleFavorite] failures).
+  ///
+  /// The UI layer should listen to this stream and show appropriate feedback
+  /// (e.g. a snackbar) without destroying the loaded event list.
+  Stream<String> get errorStream => _errorController.stream;
 
   EventListCubit(this._repository) : super(const EventListState.initial()) {
     loadEvents();
@@ -110,10 +118,18 @@ class EventListCubit extends Cubit<EventListState> {
         upcomingEvents: updateList(currentState.upcomingEvents),
       ));
     } on ApiException {
-      emit(EventListState.error(t.errors.toggleFavoriteError));
+      // Keep the current loaded state — a failed favorite toggle is non-fatal.
+      // Communicate the error via errorStream so the UI can show a snackbar.
+      _errorController.add(t.errors.toggleFavoriteError);
     } catch (_) {
-      emit(EventListState.error(t.errors.genericError));
+      _errorController.add(t.errors.genericError);
     }
+  }
+
+  @override
+  Future<void> close() {
+    _errorController.close();
+    return super.close();
   }
 
   /// Groups events by date and emits a [EventListLoaded] state.

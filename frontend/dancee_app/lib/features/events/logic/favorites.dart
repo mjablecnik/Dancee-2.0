@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../core/exceptions.dart';
-import '../../../core/service_locator.dart';
 import '../../../i18n/translations.g.dart';
 import '../data/entities.dart';
 import '../data/event_repository.dart';
@@ -45,8 +44,10 @@ class FavoritesState with _$FavoritesState {
 /// Events are automatically separated into upcoming and past for UI convenience.
 class FavoritesCubit extends Cubit<FavoritesState> {
   final EventRepository _repository;
+  final EventListCubit _eventListCubit;
 
-  FavoritesCubit(this._repository) : super(const FavoritesState.initial());
+  FavoritesCubit(this._repository, this._eventListCubit)
+      : super(const FavoritesState.initial());
 
   /// Loads favorite events and separates them into upcoming and past.
   ///
@@ -125,7 +126,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       ));
 
       // Notify EventListCubit to reload its data
-      getIt<EventListCubit>().loadEvents();
+      _eventListCubit.loadEvents();
     } on ApiException {
       emit(FavoritesState.error(t.errors.toggleFavoriteError));
     } catch (_) {
@@ -184,7 +185,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       ));
 
       // Notify EventListCubit to reload its data
-      getIt<EventListCubit>().loadEvents();
+      _eventListCubit.loadEvents();
     } on ApiException {
       emit(FavoritesState.error(t.errors.toggleFavoriteError));
     } catch (_) {

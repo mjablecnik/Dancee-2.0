@@ -1,7 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dancee_app/core/clients.dart';
 import 'package:dancee_app/core/exceptions.dart';
-import 'package:dancee_app/core/service_locator.dart';
 import 'package:dancee_app/features/events/data/entities.dart';
 import 'package:dancee_app/features/events/data/event_repository.dart';
 import 'package:dancee_app/features/events/logic/event_list.dart';
@@ -77,23 +76,7 @@ void main() {
     mockRepo = MockEventRepository();
     mockListCubit = MockEventListCubit();
 
-    // Stub the mock EventListCubit so getIt injections work correctly
-    when(() => mockListCubit.state)
-        .thenReturn(const EventListState.initial());
-    when(() => mockListCubit.stream)
-        .thenAnswer((_) => const Stream.empty());
     when(() => mockListCubit.loadEvents()).thenAnswer((_) async {});
-    when(() => mockListCubit.isClosed).thenReturn(false);
-
-    // Register the mock EventListCubit in getIt so FavoritesCubit can resolve it
-    getIt.allowReassignment = true;
-    getIt.registerSingleton<EventListCubit>(mockListCubit);
-  });
-
-  tearDown(() async {
-    if (getIt.isRegistered<EventListCubit>()) {
-      getIt.unregister<EventListCubit>();
-    }
   });
 
   // =========================================================================
@@ -102,7 +85,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-053: loadFavorites emits loading → loaded with past and upcoming split',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     act: (cubit) async {
       when(() => mockRepo.getFavoriteEvents()).thenAnswer((_) async => [
             _makeEvent(id: '1', isPast: false),
@@ -131,7 +114,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-054: loadFavorites emits loading → error when repository throws',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     act: (cubit) async {
       when(() => mockRepo.getFavoriteEvents())
           .thenThrow(ApiException(message: 'Server error', statusCode: 500));
@@ -149,7 +132,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-055: toggleFavorite updates isFavorite on the event in loaded state',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => FavoritesState.loaded(
       upcomingEvents: [_makeEvent(id: '3', isFavorite: true, isPast: false)],
       pastEvents: const [],
@@ -174,7 +157,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-057: filterUnfavoritedEvents removes events where isFavorite is false',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => FavoritesState.loaded(
       upcomingEvents: [
         _makeEvent(id: '1', isFavorite: true, isPast: false),
@@ -208,7 +191,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-058: removePastEvent removes the past event and leaves upcoming unchanged',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => FavoritesState.loaded(
       upcomingEvents: [_makeEvent(id: 'up1', isFavorite: true, isPast: false)],
       pastEvents: [
@@ -242,7 +225,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-132: loadFavorites emits loaded with empty lists when repository returns empty list',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     act: (cubit) async {
       when(() => mockRepo.getFavoriteEvents()).thenAnswer((_) async => []);
       await cubit.loadFavorites();
@@ -261,7 +244,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-133: toggleFavorite emits nothing when cubit is not in FavoritesLoaded state',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => const FavoritesState.loading(),
     act: (cubit) async {
       await cubit.toggleFavorite('evt-1');
@@ -278,7 +261,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-134: filterUnfavoritedEvents does nothing when state is not FavoritesLoaded',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     // Cubit starts in FavoritesInitial by default
     act: (cubit) {
       cubit.filterUnfavoritedEvents();
@@ -292,7 +275,7 @@ void main() {
 
   test('TC-135: removePastEvent calls repository and notifies EventListCubit',
       () async {
-    final cubit = FavoritesCubit(mockRepo);
+    final cubit = FavoritesCubit(mockRepo, mockListCubit);
 
     // Load the cubit into FavoritesLoaded state with one past event
     when(() => mockRepo.getFavoriteEvents()).thenAnswer((_) async => [
@@ -321,7 +304,7 @@ void main() {
   // =========================================================================
 
   test('TC-056: toggleFavorite triggers EventListCubit.loadEvents()', () async {
-    final cubit = FavoritesCubit(mockRepo);
+    final cubit = FavoritesCubit(mockRepo, mockListCubit);
 
     // Seed the cubit to loaded state
     // We need to emit the state directly - use blocTest approach
@@ -401,11 +384,7 @@ void main() {
         upcomingEvents: [event],
       ));
 
-      // Register listCubit for FavoritesCubit's getIt dependency
-      getIt.allowReassignment = true;
-      getIt.registerSingleton<EventListCubit>(listCubit);
-
-      final favoritesCubit = FavoritesCubit(realRepo);
+      final favoritesCubit = FavoritesCubit(realRepo, listCubit);
 
       // Toggle favorite via EventListCubit — writes 'evt-1' to SharedPreferences
       await listCubit.toggleFavorite('evt-1');
@@ -437,7 +416,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-L10: toggleFavorite for a past event updates pastEvents and leaves upcomingEvents unchanged',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => FavoritesState.loaded(
       upcomingEvents: [_makeEvent(id: 'up1', isFavorite: true, isPast: false)],
       pastEvents: [_makeEvent(id: 'past1', isFavorite: true, isPast: true)],
@@ -473,7 +452,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-H05: toggleFavorite emits FavoritesError when eventId not found in loaded state',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => FavoritesState.loaded(
       upcomingEvents: [_makeEvent(id: 'id-1', isFavorite: true, isPast: false)],
       pastEvents: const [],
@@ -492,7 +471,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-H06: removePastEvent emits nothing when cubit is in initial state',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     // Default initial state (not loaded)
     act: (cubit) async {
       await cubit.removePastEvent('any-id');
@@ -506,7 +485,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-H07: removePastEvent emits FavoritesError when eventId not found in pastEvents',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     seed: () => const FavoritesState.loaded(
       upcomingEvents: [],
       pastEvents: [],
@@ -525,7 +504,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-151: loadFavorites emits loading → error when ApiException with null statusCode thrown',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     act: (cubit) async {
       when(() => mockRepo.getFavoriteEvents())
           .thenThrow(ApiException(message: 'Network error'));
@@ -543,7 +522,7 @@ void main() {
 
   blocTest<FavoritesCubit, FavoritesState>(
     'TC-L09: loadFavorites emits loading → error on a generic (non-ApiException) exception',
-    build: () => FavoritesCubit(mockRepo),
+    build: () => FavoritesCubit(mockRepo, mockListCubit),
     act: (cubit) async {
       when(() => mockRepo.getFavoriteEvents())
           .thenThrow(StateError('unexpected state'));

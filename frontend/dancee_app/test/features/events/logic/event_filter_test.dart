@@ -160,12 +160,11 @@ void main() {
         const FilterState(searchQuery: '   '),
       );
 
-      // The filter function treats non-empty whitespace as a real query.
-      // Whitespace-only should match nothing by title; verify behavior:
-      // "   " is non-empty so it runs the title contains check.
-      // Neither 'Alpha' nor 'Beta' contains "   ", so result is empty.
-      // This is the documented behavior.
-      expect(filterCubit.state.filteredEvents, isEmpty);
+      // filterEvents() trims the searchQuery before comparison: "   ".trim() → "".
+      // An empty query imposes no restriction, so all events are returned.
+      // Both applyFilters and updateSearchQuery now share the same behavior:
+      // trimming happens only inside filterEvents(), not in updateSearchQuery.
+      expect(filterCubit.state.filteredEvents, hasLength(2));
 
       filterCubit.close();
       listCubit.close();
@@ -338,6 +337,74 @@ void main() {
       expect(filterCubit.state.filteredEvents.length, equals(2));
 
       filterCubit.close();
+      listCubit.close();
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-EFC-11: close() cancels the EventListCubit stream subscription
+    // -----------------------------------------------------------------------
+    test(
+        'TC-EFC-11: close() cancels EventListCubit subscription — no error after close',
+        () async {
+      final (listCubit, filterCubit) = _buildPair();
+      final events = [
+        _makeEvent(id: '1', startTime: _futureDate(), title: 'Alpha'),
+      ];
+      listCubit.seed(_loaded(events));
+      await Future<void>.delayed(Duration.zero);
+
+      // Close the filter cubit
+      await filterCubit.close();
+
+      // Seeding the list cubit after the filter cubit is closed should not
+      // cause an "emit after close" exception or any other error.
+      expect(
+        () {
+          listCubit.seed(_loaded([
+            ...events,
+            _makeEvent(id: '2', startTime: _futureDate(), title: 'Beta'),
+          ]));
+        },
+        returnsNormally,
+        reason: 'No error should occur when listCubit emits after filterCubit is closed',
+      );
+
+      listCubit.close();
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-EFC-12: close() cancels the debounce timer — no emission after close
+    // -----------------------------------------------------------------------
+    test(
+        'TC-EFC-12: close() cancels pending debounce timer — no state emitted after debounce period',
+        () async {
+      final (listCubit, filterCubit) = _buildPair();
+      final events = [
+        _makeEvent(id: '1', startTime: _futureDate(), title: 'Salsa Night'),
+        _makeEvent(id: '2', startTime: _futureDate(), title: 'Tango Evening'),
+      ];
+      listCubit.seed(_loaded(events));
+      await Future<void>.delayed(Duration.zero);
+
+      final emittedStates = <EventFilterState>[];
+      final sub = filterCubit.stream.listen(emittedStates.add);
+
+      // Start a debounced search that would filter to Salsa events only
+      filterCubit.updateSearchQuery('Salsa');
+
+      // Close immediately before the debounce (300 ms) fires
+      await filterCubit.close();
+      await sub.cancel();
+
+      // Wait past the debounce period — timer must have been cancelled
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+
+      expect(
+        emittedStates,
+        isEmpty,
+        reason: 'No state should be emitted after close() cancels the debounce timer',
+      );
+
       listCubit.close();
     });
 

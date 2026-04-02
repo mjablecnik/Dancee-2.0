@@ -320,7 +320,7 @@ class EventFilterCubit extends Cubit<EventFilterState> {
   void updateSearchQuery(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-      final newFilters = state.filters.copyWith(searchQuery: query.trim());
+      final newFilters = state.filters.copyWith(searchQuery: query);
       _recompute(_allEvents(), newFilters);
     });
   }

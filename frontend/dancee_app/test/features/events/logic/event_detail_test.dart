@@ -437,6 +437,86 @@ void main() {
   });
 
   // =========================================================================
+  // TC-H11: openUrl() emits to errorStream when URL launch throws
+  // =========================================================================
+
+  test('TC-H11: openUrl emits error message to errorStream when launch fails',
+      () async {
+    final throwingPlatform = _ThrowingUrlLauncherPlatform();
+    UrlLauncherPlatform.instance = throwingPlatform;
+
+    final event = _makeEvent(id: '1');
+    listCubit.seed(EventListState.loaded(
+      allEvents: [event],
+      todayEvents: [],
+      tomorrowEvents: [],
+      upcomingEvents: [event],
+    ));
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '1',
+    );
+
+    final errors = <String>[];
+    final sub = detailCubit.errorStream.listen(errors.add);
+
+    await detailCubit.openUrl('https://example.com/event');
+    // Yield to the event loop so the broadcast stream delivers the event.
+    await Future<void>.delayed(Duration.zero);
+
+    expect(errors, isNotEmpty,
+        reason: 'errorStream should emit when URL launch fails');
+
+    await sub.cancel();
+    await detailCubit.close();
+  });
+
+  // =========================================================================
+  // TC-H12: openMap() emits to errorStream when map launch throws
+  // =========================================================================
+
+  test('TC-H12: openMap emits error message to errorStream when launch fails',
+      () async {
+    final throwingPlatform = _ThrowingUrlLauncherPlatform();
+    UrlLauncherPlatform.instance = throwingPlatform;
+
+    final event = _makeEvent(id: '1');
+    listCubit.seed(EventListState.loaded(
+      allEvents: [event],
+      todayEvents: [],
+      tomorrowEvents: [],
+      upcomingEvents: [event],
+    ));
+
+    final detailCubit = EventDetailCubit(
+      eventListCubit: listCubit,
+      eventId: '1',
+    );
+
+    const venue = Venue(
+      name: 'Test Venue',
+      address: Address(street: 'St', city: 'Prague', postalCode: '100', country: 'CZ'),
+      description: '',
+      latitude: 50.08,
+      longitude: 14.43,
+    );
+
+    final errors = <String>[];
+    final sub = detailCubit.errorStream.listen(errors.add);
+
+    await detailCubit.openMap(venue);
+    // Yield to the event loop so the broadcast stream delivers the event.
+    await Future<void>.delayed(Duration.zero);
+
+    expect(errors, isNotEmpty,
+        reason: 'errorStream should emit when map launch fails');
+
+    await sub.cancel();
+    await detailCubit.close();
+  });
+
+  // =========================================================================
   // TC-129: close() cancels the EventListCubit stream subscription
   // =========================================================================
 
@@ -504,6 +584,31 @@ class _FakeUrlLauncherPlatform extends Fake
   @override
   Future<bool> canLaunch(String url) async => true;
 
+  @override
+  Future<bool> supportsMode(PreferredLaunchMode mode) async => true;
+
+  @override
+  Future<bool> supportsCloseForMode(PreferredLaunchMode mode) async => false;
+}
+
+// ---------------------------------------------------------------------------
+// Throwing UrlLauncherPlatform for TC-H11, TC-H12 (error path tests)
+// ---------------------------------------------------------------------------
+class _ThrowingUrlLauncherPlatform extends Fake
+    with MockPlatformInterfaceMixin
+    implements UrlLauncherPlatform {
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> launchUrl(String url, LaunchOptions options) async {
+    throw Exception('URL launch failed in test');
+  }
+
+  @override
+  Future<bool> canLaunch(String url) async => true;
+
+  /// Return true so url_launcher proceeds to call launchUrl (which throws).
   @override
   Future<bool> supportsMode(PreferredLaunchMode mode) async => true;
 

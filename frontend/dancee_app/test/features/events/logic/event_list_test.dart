@@ -286,27 +286,40 @@ void main() {
   );
 
   // =========================================================================
-  // TC-151: toggleFavorite() with non-existent ID does not crash
+  // TC-151: toggleFavorite() with non-existent ID preserves loaded state
   // =========================================================================
 
-  blocTest<EventListCubit, EventListState>(
-    'TC-151: toggleFavorite with non-existent ID emits error state without crashing',
-    build: () => EventListCubit(mockRepo),
-    seed: () => const EventListState.initial(),
-    act: (cubit) async {
+  test(
+    'TC-151: toggleFavorite with non-existent ID preserves loaded state and emits to errorStream',
+    () async {
+      final cubit = EventListCubit(mockRepo);
       final now = DateTime.now();
       when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
             _makeEvent(id: '1', startTime: now.add(const Duration(hours: 1))),
           ]);
-      await cubit.loadEvents(); // bring cubit to loaded state with event '1'
-      await cubit.toggleFavorite('999'); // ID '999' does not exist
+
+      await cubit.loadEvents();
+      expect(cubit.state, isA<EventListLoaded>(),
+          reason: 'Cubit should be in loaded state after loadEvents');
+
+      final errors = <String>[];
+      final sub = cubit.errorStream.listen(errors.add);
+
+      // Toggle a non-existent ID — should NOT replace loaded state with error
+      await cubit.toggleFavorite('999');
+
+      expect(cubit.state, isA<EventListLoaded>(),
+          reason: 'Loaded state must be preserved on toggleFavorite failure');
+      expect(errors, isNotEmpty,
+          reason: 'errorStream should receive a message on toggleFavorite failure');
+
+      await sub.cancel();
+      // Complete the constructor's blocked autoLoad before closing to avoid
+      // "emit after close" errors from the pending future.
+      if (!autoLoadBlocker.isCompleted) autoLoadBlocker.complete([]);
+      await Future<void>.delayed(Duration.zero);
+      await cubit.close();
     },
-    skip: 2, // skip [loading, loaded] emitted by loadEvents()
-    expect: () => [
-      // The cubit catches the ApiException internally and emits an error state.
-      // No unhandled exception escapes — "no crash" is satisfied.
-      isA<EventListError>(),
-    ],
   );
 
   // =========================================================================

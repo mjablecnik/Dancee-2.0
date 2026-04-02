@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../i18n/translations.g.dart';
 import '../data/entities.dart';
 import 'event_list.dart';
 
@@ -18,6 +19,13 @@ class EventDetailCubit extends Cubit<Event?> {
   final EventListCubit _eventListCubit;
   final String eventId;
   StreamSubscription<EventListState>? _subscription;
+  final _errorController = StreamController<String>.broadcast();
+
+  /// Stream of error messages for URL-launch failures.
+  ///
+  /// The UI layer should listen to this stream and show appropriate feedback
+  /// (e.g. a snackbar) when a URL fails to open.
+  Stream<String> get errorStream => _errorController.stream;
 
   EventDetailCubit({
     required EventListCubit eventListCubit,
@@ -70,6 +78,7 @@ class EventDetailCubit extends Cubit<Event?> {
         name: 'EventDetailCubit',
         level: 900,
       );
+      _errorController.add(t.errors.genericError);
     }
   }
 
@@ -84,12 +93,14 @@ class EventDetailCubit extends Cubit<Event?> {
         name: 'EventDetailCubit',
         level: 900,
       );
+      _errorController.add(t.errors.genericError);
     }
   }
 
   @override
   Future<void> close() {
     _subscription?.cancel();
+    _errorController.close();
     return super.close();
   }
 }
