@@ -55,8 +55,9 @@ class EventFilterState with _$EventFilterState {
 List<Event> filterEvents(List<Event> events, FilterState filters) {
   return events.where((event) {
     // Text search — case-insensitive title match
-    if (filters.searchQuery.isNotEmpty) {
-      if (!event.title.toLowerCase().contains(filters.searchQuery.toLowerCase())) {
+    final query = filters.searchQuery.trim();
+    if (query.isNotEmpty) {
+      if (!event.title.toLowerCase().contains(query.toLowerCase())) {
         return false;
       }
     }
@@ -143,7 +144,7 @@ int countEventsForRegion(
 /// Returns the number of active filter categories.
 int getActiveFilterCount(FilterState filters) {
   var count = 0;
-  if (filters.searchQuery.isNotEmpty) count++;
+  if (filters.searchQuery.trim().isNotEmpty) count++;
   if (filters.selectedDanceTypes.isNotEmpty) count++;
   if (filters.selectedRegions.isNotEmpty) count++;
   if (filters.dateFrom != null || filters.dateTo != null) count++;
@@ -319,7 +320,7 @@ class EventFilterCubit extends Cubit<EventFilterState> {
   void updateSearchQuery(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-      final newFilters = state.filters.copyWith(searchQuery: query);
+      final newFilters = state.filters.copyWith(searchQuery: query.trim());
       _recompute(_allEvents(), newFilters);
     });
   }
