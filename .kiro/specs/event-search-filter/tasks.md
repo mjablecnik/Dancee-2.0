@@ -85,7 +85,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - **Property 5: Active filter category count**
     - **Validates: Requirements 6.3, 8.1**
 
-  - [ ]* 3.8 Write property test for quick date preset computation (Property 6)
+  - [x]* 3.8 Write property test for quick date preset computation (Property 6)
     - **Property 6: Quick date preset computation**
     - **Validates: Requirements 5.7**
 
