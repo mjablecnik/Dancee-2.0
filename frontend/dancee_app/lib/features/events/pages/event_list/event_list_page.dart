@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
+import '../../logic/event_filter.dart';
 import '../../logic/event_list.dart';
 import 'sections.dart';
 
@@ -41,26 +42,53 @@ class EventListPage extends StatelessWidget {
       body: SafeArea(
         child: BlocBuilder<EventListCubit, EventListState>(
           bloc: getIt<EventListCubit>(),
-          builder: (context, state) {
-            return state.when(
+          builder: (context, listState) {
+            return listState.when(
               initial: () => const SizedBox.shrink(),
               loading: () => const LoadingSection(),
-              loaded: (allEvents, todayEvents, tomorrowEvents, upcomingEvents) {
-                return CustomScrollView(
-                  slivers: [
-                    const EventListHeaderSection(),
-                    const SliverToBoxAdapter(
-                      child: SearchAndFiltersSection(),
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
-                      sliver: EventsByDateSection(
-                        todayEvents: todayEvents,
-                        tomorrowEvents: tomorrowEvents,
-                        upcomingEvents: upcomingEvents,
-                      ),
-                    ),
-                  ],
+              loaded: (allEvents, _, __, ___) {
+                return BlocBuilder<EventFilterCubit, EventFilterState>(
+                  bloc: getIt<EventFilterCubit>(),
+                  builder: (context, filterState) {
+                    final filters = filterState.filters;
+                    final activeFilterCount = getActiveFilterCount(filters);
+                    final hasActiveFilters = activeFilterCount > 0;
+                    final isEmpty = filterState.filteredEvents.isEmpty;
+
+                    return CustomScrollView(
+                      slivers: [
+                        const EventListHeaderSection(),
+                        const SliverToBoxAdapter(
+                          child: SearchAndFiltersSection(),
+                        ),
+                        if (hasActiveFilters && isEmpty)
+                          SliverFillRemaining(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(32),
+                                child: Text(
+                                  t.eventFilters.noEventsMatch,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
+                            sliver: EventsByDateSection(
+                              todayEvents: filterState.todayEvents,
+                              tomorrowEvents: filterState.tomorrowEvents,
+                              upcomingEvents: filterState.upcomingEvents,
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 );
               },
               error: (message) => ErrorSection(message: message),

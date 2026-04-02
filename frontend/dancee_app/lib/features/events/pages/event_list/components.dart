@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
+import '../../logic/event_filter.dart';
+import '../event_filters_page.dart';
 
 // ============================================================================
 // EventCard
@@ -519,32 +523,57 @@ class SearchBar extends StatelessWidget {
 // ============================================================================
 
 /// Horizontally scrollable row of [FilterChip] components.
+///
+/// Reads active filter state from [EventFilterCubit] to display badges
+/// and highlight active chips. Navigates to [EventFiltersRoute] on tap.
 class FilterChipsRow extends StatelessWidget {
   const FilterChipsRow({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          FilterChip(
-            label: t.filters,
-            hasNotification: true,
-            notificationCount: 2,
+    return BlocBuilder<EventFilterCubit, EventFilterState>(
+      bloc: getIt<EventFilterCubit>(),
+      builder: (context, filterState) {
+        final filters = filterState.filters;
+        final activeCount = getActiveFilterCount(filters);
+        final hasDateFilter = filters.dateFrom != null || filters.dateTo != null;
+        final hasLocationFilter = filters.selectedRegions.isNotEmpty;
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => const EventFiltersRoute().push(context),
+                child: FilterChip(
+                  label: t.filters,
+                  hasNotification: activeCount > 0,
+                  notificationCount: activeCount,
+                  isActive: activeCount > 0,
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => const EventFiltersRoute(scrollTo: 'date').push(context),
+                child: FilterChip(
+                  label: t.today,
+                  icon: Icons.calendar_today,
+                  isActive: hasDateFilter,
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => const EventFiltersRoute(scrollTo: 'location').push(context),
+                child: FilterChip(
+                  label: t.prague,
+                  icon: Icons.location_on,
+                  isActive: hasLocationFilter,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          FilterChip(
-            label: t.today,
-            icon: Icons.calendar_today,
-          ),
-          const SizedBox(width: 8),
-          FilterChip(
-            label: t.prague,
-            icon: Icons.location_on,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -559,6 +588,7 @@ class FilterChip extends StatelessWidget {
   final IconData? icon;
   final bool hasNotification;
   final int notificationCount;
+  final bool isActive;
 
   const FilterChip({
     super.key,
@@ -566,6 +596,7 @@ class FilterChip extends StatelessWidget {
     this.icon,
     this.hasNotification = false,
     this.notificationCount = 0,
+    this.isActive = false,
   });
 
   @override
@@ -574,8 +605,13 @@ class FilterChip extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: isActive
+            ? Colors.white.withValues(alpha: 0.35)
+            : Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
+        border: isActive
+            ? Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.5)
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

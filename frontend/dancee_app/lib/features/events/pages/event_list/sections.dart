@@ -5,6 +5,7 @@ import '../../../../design/widgets.dart';
 import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
+import '../../logic/event_filter.dart';
 import '../../logic/event_list.dart';
 import '../event_detail/event_detail_page.dart';
 import 'components.dart' as components;
@@ -179,11 +180,7 @@ class _SearchAndFiltersSectionState extends State<SearchAndFiltersSection> {
       _showClearButton = _searchController.text.isNotEmpty;
     });
 
-    if (_searchController.text.isEmpty) {
-      getIt<EventListCubit>().loadEvents();
-    } else {
-      getIt<EventListCubit>().searchEvents(_searchController.text);
-    }
+    getIt<EventFilterCubit>().updateSearchQuery(_searchController.text);
   }
 
   @override
