@@ -20,7 +20,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Run `task build-runner` to generate freezed/json code
     - _Requirements: 7.2, 7.3_
 
-  - [ ]* 1.3 Write property test for Venue region parsing (Property 8)
+  - [x]* 1.3 Write property test for Venue region parsing (Property 8)
     - **Property 8: Venue region parsing from Directus JSON**
     - **Validates: Requirements 4.7**
 
