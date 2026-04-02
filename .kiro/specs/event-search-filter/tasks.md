@@ -196,7 +196,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Test Venue with valid region string parses correctly
     - _Requirements: 4.7_
 
-- [ ] 11. Final checkpoint - Ensure all tests pass
+- [x] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
