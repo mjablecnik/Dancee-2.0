@@ -37,7 +37,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Use key `saved_event_filters`
     - _Requirements: 7.2, 7.3, 7.4, 7.5_
 
-  - [ ]* 2.2 Write unit tests for FilterPersistenceService
+  - [x]* 2.2 Write unit tests for FilterPersistenceService
     - Test save and load round trip
     - Test corrupt JSON returns null
     - Test clearFilters removes from storage
