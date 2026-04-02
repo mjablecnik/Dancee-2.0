@@ -7,7 +7,7 @@ import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
 import '../../data/entities.dart';
 import '../../logic/event_filter.dart';
-import '../event_filters_page.dart';
+import '../event_filters/event_filters_page.dart';
 
 // ============================================================================
 // EventCard

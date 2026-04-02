@@ -6,7 +6,7 @@ import '../features/app/layouts.dart';
 import '../features/app/pages/initial_page.dart';
 import '../features/app/pages/not_found_page.dart';
 import '../features/events/pages/event_detail/event_detail_page.dart';
-import '../features/events/pages/event_filters_page.dart';
+import '../features/events/pages/event_filters/event_filters_page.dart';
 
 import '../features/auth/pages/login/login_page.dart';
 import '../features/auth/pages/register/register_page.dart';
