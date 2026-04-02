@@ -81,7 +81,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - **Property 4: Per-option cross-filter event count accuracy**
     - **Validates: Requirements 3.5, 4.5**
 
-  - [ ]* 3.7 Write property test for active filter category count (Property 5)
+  - [x]* 3.7 Write property test for active filter category count (Property 5)
     - **Property 5: Active filter category count**
     - **Validates: Requirements 6.3, 8.1**
 
