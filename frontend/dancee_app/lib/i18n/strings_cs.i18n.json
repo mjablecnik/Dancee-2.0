@@ -77,6 +77,7 @@
     "saveFilterButton": "Uložit filtr",
     "datePlaceholder": "dd.mm.yyyy",
     "clearAll": "Vymazat vše",
+    "noEvents": "Žádné akce nebyly nalezeny",
     "noEventsMatch": "Žádné akce neodpovídají vašim filtrům",
     "showEvents": "Zobrazit {count} akcí",
     "activeFilterCount": "{count} aktivní",

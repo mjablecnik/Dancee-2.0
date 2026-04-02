@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 414 (138 per locale)
+/// Strings: 417 (139 per locale)
 ///
-/// Built on 2026-04-02 at 06:25 UTC
+/// Built on 2026-04-02 at 06:44 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -26,8 +26,8 @@ const AppLocale _baseLocale = AppLocale.en;
 /// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
 enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	en(languageCode: 'en', build: Translations.build),
-	cs(languageCode: 'cs', build: _StringsCs.build),
-	es(languageCode: 'es', build: _StringsEs.build);
+	cs(languageCode: 'cs', build: _TranslationsCs.build),
+	es(languageCode: 'es', build: _TranslationsEs.build);
 
 	const AppLocale({required this.languageCode, this.scriptCode, this.countryCode, required this.build}); // ignore: unused_element
 
@@ -48,7 +48,6 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 ///
 /// Usage:
 /// String a = t.someKey.anotherKey;
-/// String b = t['someKey.anotherKey']; // Only for edge cases!
 Translations get t => LocaleSettings.instance.currentTranslations;
 
 /// Method B: Advanced
@@ -65,7 +64,6 @@ Translations get t => LocaleSettings.instance.currentTranslations;
 /// Step 2:
 /// final t = Translations.of(context); // Get t variable.
 /// String a = t.someKey.anotherKey; // Use t variable.
-/// String b = t['someKey.anotherKey']; // Only for edge cases!
 class TranslationProvider extends BaseTranslationProvider<AppLocale, Translations> {
 	TranslationProvider({required super.child}) : super(settings: LocaleSettings.instance);
 
@@ -136,15 +134,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
-	}
+		  );
 
 	/// Metadata for the translations of <en>.
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
-
-	/// Access flat map
-	dynamic operator[](String key) => $meta.getTranslation(key);
 
 	late final Translations _root = this; // ignore: unused_field
 
@@ -160,13 +153,13 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get thisWeek => 'This week';
 	String get thisMonth => 'This month';
 	String get prague => 'Prague';
-	String get eventsCount => '{count} events';
+	String eventsCount({required Object count}) => '${count} events';
 	String get detail => 'Detail';
-	String get hours => '{count} hours';
+	String hours({required Object count}) => '${count} hours';
 	String get errorLoadingEvents => 'Error Loading Events';
 	String get retry => 'Retry';
 	String get favoriteEvents => 'Favorite Events';
-	String get savedEvents => '{count} saved events';
+	String savedEvents({required Object count}) => '${count} saved events';
 	String get all => 'All';
 	String get upcomingEvents => 'Upcoming Events';
 	String get pastEvents => 'Past Events';
@@ -175,24 +168,24 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get browseEvents => 'Browse Events';
 	String get errorLoadingFavorites => 'Error Loading Favorites';
 	String get dancee => 'Dancee';
-	String get tuesdayDate => '(Tuesday {date})';
-	String get wednesdayDate => '(Wednesday {date})';
+	String tuesdayDate({required Object date}) => '(Tuesday ${date})';
+	String wednesdayDate({required Object date}) => '(Wednesday ${date})';
 	String get apiErrorNetwork => 'Connection error. Please check your internet connection.';
 	String get apiErrorTimeout => 'Request timeout. Please try again.';
 	String get apiErrorServer => 'Server error occurred. Please try again later.';
 	String get apiErrorParsing => 'Failed to process server response.';
 	String get apiErrorGeneric => 'An unexpected error occurred. Please try again.';
-	late final _StringsEventDetailEn eventDetail = _StringsEventDetailEn._(_root);
-	late final _StringsEventFiltersEn eventFilters = _StringsEventFiltersEn._(_root);
-	late final _StringsAuthEn auth = _StringsAuthEn._(_root);
-	late final _StringsSettingsPageEn settingsPage = _StringsSettingsPageEn._(_root);
+	late final _TranslationsEventDetailEn eventDetail = _TranslationsEventDetailEn._(_root);
+	late final _TranslationsEventFiltersEn eventFilters = _TranslationsEventFiltersEn._(_root);
+	late final _TranslationsAuthEn auth = _TranslationsAuthEn._(_root);
+	late final _TranslationsSettingsPageEn settingsPage = _TranslationsSettingsPageEn._(_root);
 	String get goHome => 'Go to Home';
-	late final _StringsErrorsEn errors = _StringsErrorsEn._(_root);
+	late final _TranslationsErrorsEn errors = _TranslationsErrorsEn._(_root);
 }
 
 // Path: eventDetail
-class _StringsEventDetailEn {
-	_StringsEventDetailEn._(this._root);
+class _TranslationsEventDetailEn {
+	_TranslationsEventDetailEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -223,8 +216,8 @@ class _StringsEventDetailEn {
 }
 
 // Path: eventFilters
-class _StringsEventFiltersEn {
-	_StringsEventFiltersEn._(this._root);
+class _TranslationsEventFiltersEn {
+	_TranslationsEventFiltersEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -232,7 +225,7 @@ class _StringsEventFiltersEn {
 	String get title => 'Filter & Sort';
 	String get subtitle => 'Customize your event view';
 	String get activeFilters => 'Active filters';
-	String get eventsShown => '{count} events shown based on your criteria';
+	String eventsShown({required Object count}) => '${count} events shown based on your criteria';
 	String get danceType => 'Dance type';
 	String get clear => 'Clear';
 	String get location => 'Location';
@@ -248,17 +241,18 @@ class _StringsEventFiltersEn {
 	String get saveFilterButton => 'Save filter';
 	String get datePlaceholder => 'dd.mm.yyyy';
 	String get clearAll => 'Clear all';
+	String get noEvents => 'No events found';
 	String get noEventsMatch => 'No events match your filters';
-	String get showEvents => 'Show {count} events';
-	String get activeFilterCount => '{count} active';
+	String showEvents({required Object count}) => 'Show ${count} events';
+	String activeFilterCount({required Object count}) => '${count} active';
 	String get noResults => 'No results';
 	String get showMoreDances => 'Show more dances';
 	String get showLessDances => 'Show less';
 }
 
 // Path: auth
-class _StringsAuthEn {
-	_StringsAuthEn._(this._root);
+class _TranslationsAuthEn {
+	_TranslationsAuthEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -287,8 +281,8 @@ class _StringsAuthEn {
 }
 
 // Path: settingsPage
-class _StringsSettingsPageEn {
-	_StringsSettingsPageEn._(this._root);
+class _TranslationsSettingsPageEn {
+	_TranslationsSettingsPageEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -320,8 +314,8 @@ class _StringsSettingsPageEn {
 }
 
 // Path: errors
-class _StringsErrorsEn {
-	_StringsErrorsEn._(this._root);
+class _TranslationsErrorsEn {
+	_TranslationsErrorsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -340,27 +334,23 @@ class _StringsErrorsEn {
 }
 
 // Path: <root>
-class _StringsCs implements Translations {
+class _TranslationsCs extends Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
-	_StringsCs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
+	_TranslationsCs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
 		  $meta = TranslationMetadata(
 		    locale: AppLocale.cs,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
-	}
+		  ),
+		  super.build(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver);
 
 	/// Metadata for the translations of <cs>.
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
-	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
-
-	@override late final _StringsCs _root = this; // ignore: unused_field
+	@override late final _TranslationsCs _root = this; // ignore: unused_field
 
 	// Translations
 	@override String get appTitle => 'Dancee Aplikace';
@@ -374,13 +364,13 @@ class _StringsCs implements Translations {
 	@override String get thisWeek => 'Tento týden';
 	@override String get thisMonth => 'Tento měsíc';
 	@override String get prague => 'Praha';
-	@override String get eventsCount => '{count} událostí';
+	@override String eventsCount({required Object count}) => '${count} událostí';
 	@override String get detail => 'Detail';
-	@override String get hours => '{count} hodin';
+	@override String hours({required Object count}) => '${count} hodin';
 	@override String get errorLoadingEvents => 'Chyba při načítání událostí';
 	@override String get retry => 'Zkusit znovu';
 	@override String get favoriteEvents => 'Oblíbené události';
-	@override String get savedEvents => '{count} uložených událostí';
+	@override String savedEvents({required Object count}) => '${count} uložených událostí';
 	@override String get all => 'Vše';
 	@override String get upcomingEvents => 'Nadcházející události';
 	@override String get pastEvents => 'Minulé události';
@@ -389,26 +379,26 @@ class _StringsCs implements Translations {
 	@override String get browseEvents => 'Procházet události';
 	@override String get errorLoadingFavorites => 'Chyba při načítání oblíbených';
 	@override String get dancee => 'Dancee';
-	@override String get tuesdayDate => '(Úterý {date})';
-	@override String get wednesdayDate => '(Středa {date})';
+	@override String tuesdayDate({required Object date}) => '(Úterý ${date})';
+	@override String wednesdayDate({required Object date}) => '(Středa ${date})';
 	@override String get apiErrorNetwork => 'Chyba připojení. Zkontrolujte prosím své internetové připojení.';
 	@override String get apiErrorTimeout => 'Vypršel časový limit požadavku. Zkuste to prosím znovu.';
 	@override String get apiErrorServer => 'Došlo k chybě serveru. Zkuste to prosím později.';
 	@override String get apiErrorParsing => 'Nepodařilo se zpracovat odpověď serveru.';
 	@override String get apiErrorGeneric => 'Došlo k neočekávané chybě. Zkuste to prosím znovu.';
-	@override late final _StringsEventDetailCs eventDetail = _StringsEventDetailCs._(_root);
-	@override late final _StringsEventFiltersCs eventFilters = _StringsEventFiltersCs._(_root);
-	@override late final _StringsAuthCs auth = _StringsAuthCs._(_root);
-	@override late final _StringsSettingsPageCs settingsPage = _StringsSettingsPageCs._(_root);
+	@override late final _TranslationsEventDetailCs eventDetail = _TranslationsEventDetailCs._(_root);
+	@override late final _TranslationsEventFiltersCs eventFilters = _TranslationsEventFiltersCs._(_root);
+	@override late final _TranslationsAuthCs auth = _TranslationsAuthCs._(_root);
+	@override late final _TranslationsSettingsPageCs settingsPage = _TranslationsSettingsPageCs._(_root);
 	@override String get goHome => 'Přejít na hlavní stránku';
-	@override late final _StringsErrorsCs errors = _StringsErrorsCs._(_root);
+	@override late final _TranslationsErrorsCs errors = _TranslationsErrorsCs._(_root);
 }
 
 // Path: eventDetail
-class _StringsEventDetailCs implements _StringsEventDetailEn {
-	_StringsEventDetailCs._(this._root);
+class _TranslationsEventDetailCs extends _TranslationsEventDetailEn {
+	_TranslationsEventDetailCs._(_TranslationsCs root) : this._root = root, super._(root);
 
-	@override final _StringsCs _root; // ignore: unused_field
+	@override final _TranslationsCs _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'Detail akce';
@@ -437,16 +427,16 @@ class _StringsEventDetailCs implements _StringsEventDetailEn {
 }
 
 // Path: eventFilters
-class _StringsEventFiltersCs implements _StringsEventFiltersEn {
-	_StringsEventFiltersCs._(this._root);
+class _TranslationsEventFiltersCs extends _TranslationsEventFiltersEn {
+	_TranslationsEventFiltersCs._(_TranslationsCs root) : this._root = root, super._(root);
 
-	@override final _StringsCs _root; // ignore: unused_field
+	@override final _TranslationsCs _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'Filtrování & Řazení';
 	@override String get subtitle => 'Přizpůsobte si zobrazení akcí';
 	@override String get activeFilters => 'Aktivní filtry';
-	@override String get eventsShown => '{count} akcí podle vašich kritérií';
+	@override String eventsShown({required Object count}) => '${count} akcí podle vašich kritérií';
 	@override String get danceType => 'Typ tance';
 	@override String get clear => 'Zrušit';
 	@override String get location => 'Místo konání';
@@ -462,19 +452,20 @@ class _StringsEventFiltersCs implements _StringsEventFiltersEn {
 	@override String get saveFilterButton => 'Uložit filtr';
 	@override String get datePlaceholder => 'dd.mm.yyyy';
 	@override String get clearAll => 'Vymazat vše';
+	@override String get noEvents => 'Žádné akce nebyly nalezeny';
 	@override String get noEventsMatch => 'Žádné akce neodpovídají vašim filtrům';
-	@override String get showEvents => 'Zobrazit {count} akcí';
-	@override String get activeFilterCount => '{count} aktivní';
+	@override String showEvents({required Object count}) => 'Zobrazit ${count} akcí';
+	@override String activeFilterCount({required Object count}) => '${count} aktivní';
 	@override String get noResults => 'Žádné výsledky';
 	@override String get showMoreDances => 'Zobrazit další tance';
 	@override String get showLessDances => 'Zobrazit méně';
 }
 
 // Path: auth
-class _StringsAuthCs implements _StringsAuthEn {
-	_StringsAuthCs._(this._root);
+class _TranslationsAuthCs extends _TranslationsAuthEn {
+	_TranslationsAuthCs._(_TranslationsCs root) : this._root = root, super._(root);
 
-	@override final _StringsCs _root; // ignore: unused_field
+	@override final _TranslationsCs _root; // ignore: unused_field
 
 	// Translations
 	@override String get login => 'Přihlášení';
@@ -501,10 +492,10 @@ class _StringsAuthCs implements _StringsAuthEn {
 }
 
 // Path: settingsPage
-class _StringsSettingsPageCs implements _StringsSettingsPageEn {
-	_StringsSettingsPageCs._(this._root);
+class _TranslationsSettingsPageCs extends _TranslationsSettingsPageEn {
+	_TranslationsSettingsPageCs._(_TranslationsCs root) : this._root = root, super._(root);
 
-	@override final _StringsCs _root; // ignore: unused_field
+	@override final _TranslationsCs _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'Nastavení';
@@ -534,10 +525,10 @@ class _StringsSettingsPageCs implements _StringsSettingsPageEn {
 }
 
 // Path: errors
-class _StringsErrorsCs implements _StringsErrorsEn {
-	_StringsErrorsCs._(this._root);
+class _TranslationsErrorsCs extends _TranslationsErrorsEn {
+	_TranslationsErrorsCs._(_TranslationsCs root) : this._root = root, super._(root);
 
-	@override final _StringsCs _root; // ignore: unused_field
+	@override final _TranslationsCs _root; // ignore: unused_field
 
 	// Translations
 	@override String get pageNotFound => 'Stránka nenalezena';
@@ -554,27 +545,23 @@ class _StringsErrorsCs implements _StringsErrorsEn {
 }
 
 // Path: <root>
-class _StringsEs implements Translations {
+class _TranslationsEs extends Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
-	_StringsEs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
+	_TranslationsEs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
 		  $meta = TranslationMetadata(
 		    locale: AppLocale.es,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
-	}
+		  ),
+		  super.build(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver);
 
 	/// Metadata for the translations of <es>.
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
-	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
-
-	@override late final _StringsEs _root = this; // ignore: unused_field
+	@override late final _TranslationsEs _root = this; // ignore: unused_field
 
 	// Translations
 	@override String get appTitle => 'Aplicación Dancee';
@@ -588,13 +575,13 @@ class _StringsEs implements Translations {
 	@override String get thisWeek => 'Esta semana';
 	@override String get thisMonth => 'Este mes';
 	@override String get prague => 'Praga';
-	@override String get eventsCount => '{count} eventos';
+	@override String eventsCount({required Object count}) => '${count} eventos';
 	@override String get detail => 'Detalle';
-	@override String get hours => '{count} horas';
+	@override String hours({required Object count}) => '${count} horas';
 	@override String get errorLoadingEvents => 'Error al cargar eventos';
 	@override String get retry => 'Reintentar';
 	@override String get favoriteEvents => 'Eventos favoritos';
-	@override String get savedEvents => '{count} eventos guardados';
+	@override String savedEvents({required Object count}) => '${count} eventos guardados';
 	@override String get all => 'Todos';
 	@override String get upcomingEvents => 'Próximos eventos';
 	@override String get pastEvents => 'Eventos pasados';
@@ -603,26 +590,26 @@ class _StringsEs implements Translations {
 	@override String get browseEvents => 'Explorar eventos';
 	@override String get errorLoadingFavorites => 'Error al cargar favoritos';
 	@override String get dancee => 'Dancee';
-	@override String get tuesdayDate => '(Martes {date})';
-	@override String get wednesdayDate => '(Miércoles {date})';
+	@override String tuesdayDate({required Object date}) => '(Martes ${date})';
+	@override String wednesdayDate({required Object date}) => '(Miércoles ${date})';
 	@override String get apiErrorNetwork => 'Error de conexión. Por favor, verifica tu conexión a internet.';
 	@override String get apiErrorTimeout => 'Tiempo de espera agotado. Por favor, inténtalo de nuevo.';
 	@override String get apiErrorServer => 'Error del servidor. Por favor, inténtalo más tarde.';
 	@override String get apiErrorParsing => 'Error al procesar la respuesta del servidor.';
 	@override String get apiErrorGeneric => 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.';
-	@override late final _StringsEventDetailEs eventDetail = _StringsEventDetailEs._(_root);
-	@override late final _StringsEventFiltersEs eventFilters = _StringsEventFiltersEs._(_root);
-	@override late final _StringsAuthEs auth = _StringsAuthEs._(_root);
-	@override late final _StringsSettingsPageEs settingsPage = _StringsSettingsPageEs._(_root);
+	@override late final _TranslationsEventDetailEs eventDetail = _TranslationsEventDetailEs._(_root);
+	@override late final _TranslationsEventFiltersEs eventFilters = _TranslationsEventFiltersEs._(_root);
+	@override late final _TranslationsAuthEs auth = _TranslationsAuthEs._(_root);
+	@override late final _TranslationsSettingsPageEs settingsPage = _TranslationsSettingsPageEs._(_root);
 	@override String get goHome => 'Ir al inicio';
-	@override late final _StringsErrorsEs errors = _StringsErrorsEs._(_root);
+	@override late final _TranslationsErrorsEs errors = _TranslationsErrorsEs._(_root);
 }
 
 // Path: eventDetail
-class _StringsEventDetailEs implements _StringsEventDetailEn {
-	_StringsEventDetailEs._(this._root);
+class _TranslationsEventDetailEs extends _TranslationsEventDetailEn {
+	_TranslationsEventDetailEs._(_TranslationsEs root) : this._root = root, super._(root);
 
-	@override final _StringsEs _root; // ignore: unused_field
+	@override final _TranslationsEs _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'Detalle del Evento';
@@ -651,16 +638,16 @@ class _StringsEventDetailEs implements _StringsEventDetailEn {
 }
 
 // Path: eventFilters
-class _StringsEventFiltersEs implements _StringsEventFiltersEn {
-	_StringsEventFiltersEs._(this._root);
+class _TranslationsEventFiltersEs extends _TranslationsEventFiltersEn {
+	_TranslationsEventFiltersEs._(_TranslationsEs root) : this._root = root, super._(root);
 
-	@override final _StringsEs _root; // ignore: unused_field
+	@override final _TranslationsEs _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'Filtrar y Ordenar';
 	@override String get subtitle => 'Personaliza tu vista de eventos';
 	@override String get activeFilters => 'Filtros activos';
-	@override String get eventsShown => '{count} eventos según tus criterios';
+	@override String eventsShown({required Object count}) => '${count} eventos según tus criterios';
 	@override String get danceType => 'Tipo de baile';
 	@override String get clear => 'Limpiar';
 	@override String get location => 'Ubicación';
@@ -676,19 +663,20 @@ class _StringsEventFiltersEs implements _StringsEventFiltersEn {
 	@override String get saveFilterButton => 'Guardar filtro';
 	@override String get datePlaceholder => 'dd.mm.yyyy';
 	@override String get clearAll => 'Limpiar todo';
+	@override String get noEvents => 'No se encontraron eventos';
 	@override String get noEventsMatch => 'Ningún evento coincide con tus filtros';
-	@override String get showEvents => 'Mostrar {count} eventos';
-	@override String get activeFilterCount => '{count} activo';
+	@override String showEvents({required Object count}) => 'Mostrar ${count} eventos';
+	@override String activeFilterCount({required Object count}) => '${count} activo';
 	@override String get noResults => 'Sin resultados';
 	@override String get showMoreDances => 'Mostrar más bailes';
 	@override String get showLessDances => 'Mostrar menos';
 }
 
 // Path: auth
-class _StringsAuthEs implements _StringsAuthEn {
-	_StringsAuthEs._(this._root);
+class _TranslationsAuthEs extends _TranslationsAuthEn {
+	_TranslationsAuthEs._(_TranslationsEs root) : this._root = root, super._(root);
 
-	@override final _StringsEs _root; // ignore: unused_field
+	@override final _TranslationsEs _root; // ignore: unused_field
 
 	// Translations
 	@override String get login => 'Iniciar sesión';
@@ -715,10 +703,10 @@ class _StringsAuthEs implements _StringsAuthEn {
 }
 
 // Path: settingsPage
-class _StringsSettingsPageEs implements _StringsSettingsPageEn {
-	_StringsSettingsPageEs._(this._root);
+class _TranslationsSettingsPageEs extends _TranslationsSettingsPageEn {
+	_TranslationsSettingsPageEs._(_TranslationsEs root) : this._root = root, super._(root);
 
-	@override final _StringsEs _root; // ignore: unused_field
+	@override final _TranslationsEs _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'Configuración';
@@ -748,10 +736,10 @@ class _StringsSettingsPageEs implements _StringsSettingsPageEn {
 }
 
 // Path: errors
-class _StringsErrorsEs implements _StringsErrorsEn {
-	_StringsErrorsEs._(this._root);
+class _TranslationsErrorsEs extends _TranslationsErrorsEn {
+	_TranslationsErrorsEs._(_TranslationsEs root) : this._root = root, super._(root);
 
-	@override final _StringsEs _root; // ignore: unused_field
+	@override final _TranslationsEs _root; // ignore: unused_field
 
 	// Translations
 	@override String get pageNotFound => 'Página no encontrada';
@@ -765,445 +753,4 @@ class _StringsErrorsEs implements _StringsErrorsEn {
 	@override String get loadEventsError => 'Error al cargar eventos.';
 	@override String get loadFavoritesError => 'Error al cargar favoritos.';
 	@override String get toggleFavoriteError => 'Error al actualizar favorito.';
-}
-
-/// Flat map(s) containing all translations.
-/// Only for edge cases! For simple maps, use the map function of this library.
-
-extension on Translations {
-	dynamic _flatMapFunction(String path) {
-		switch (path) {
-			case 'appTitle': return 'Dancee App';
-			case 'events': return 'Events';
-			case 'favorites': return 'Favorites';
-			case 'settings': return 'Settings';
-			case 'searchEvents': return 'Search events...';
-			case 'filters': return 'Filters';
-			case 'today': return 'Today';
-			case 'tomorrow': return 'Tomorrow';
-			case 'thisWeek': return 'This week';
-			case 'thisMonth': return 'This month';
-			case 'prague': return 'Prague';
-			case 'eventsCount': return '{count} events';
-			case 'detail': return 'Detail';
-			case 'hours': return '{count} hours';
-			case 'errorLoadingEvents': return 'Error Loading Events';
-			case 'retry': return 'Retry';
-			case 'favoriteEvents': return 'Favorite Events';
-			case 'savedEvents': return '{count} saved events';
-			case 'all': return 'All';
-			case 'upcomingEvents': return 'Upcoming Events';
-			case 'pastEvents': return 'Past Events';
-			case 'noFavoriteEvents': return 'No Favorite Events';
-			case 'noFavoriteEventsDescription': return 'You haven\'t saved any favorite events yet. Start exploring dance events and save the ones that interest you.';
-			case 'browseEvents': return 'Browse Events';
-			case 'errorLoadingFavorites': return 'Error Loading Favorites';
-			case 'dancee': return 'Dancee';
-			case 'tuesdayDate': return '(Tuesday {date})';
-			case 'wednesdayDate': return '(Wednesday {date})';
-			case 'apiErrorNetwork': return 'Connection error. Please check your internet connection.';
-			case 'apiErrorTimeout': return 'Request timeout. Please try again.';
-			case 'apiErrorServer': return 'Server error occurred. Please try again later.';
-			case 'apiErrorParsing': return 'Failed to process server response.';
-			case 'apiErrorGeneric': return 'An unexpected error occurred. Please try again.';
-			case 'eventDetail.title': return 'Event Detail';
-			case 'eventDetail.favorite': return 'Favorite';
-			case 'eventDetail.map': return 'Map';
-			case 'eventDetail.dancesAtEvent': return 'Dances at Event';
-			case 'eventDetail.venue': return 'Venue';
-			case 'eventDetail.address': return 'Address';
-			case 'eventDetail.navigateToVenue': return 'Navigate to Venue';
-			case 'eventDetail.organizer': return 'Organizer';
-			case 'eventDetail.description': return 'Description';
-			case 'eventDetail.additionalInfo': return 'Additional Info';
-			case 'eventDetail.eventParts': return 'Event Parts';
-			case 'eventDetail.workshop': return 'Workshop';
-			case 'eventDetail.party': return 'Party';
-			case 'eventDetail.openLesson': return 'Open Lesson';
-			case 'eventDetail.eventNotFound': return 'Event not found';
-			case 'eventDetail.eventNotFoundDescription': return 'The event you are looking for could not be found.';
-			case 'eventDetail.backToEvents': return 'Back to Events';
-			case 'eventDetail.addedToFavorites': return 'Added to favorites';
-			case 'eventDetail.removedFromFavorites': return 'Removed from favorites';
-			case 'eventDetail.favoriteError': return 'Failed to update favorite';
-			case 'eventDetail.remove': return 'Remove';
-			case 'eventDetail.originalSource': return 'Original Source';
-			case 'eventDetail.viewOriginal': return 'View original event';
-			case 'eventFilters.title': return 'Filter & Sort';
-			case 'eventFilters.subtitle': return 'Customize your event view';
-			case 'eventFilters.activeFilters': return 'Active filters';
-			case 'eventFilters.eventsShown': return '{count} events shown based on your criteria';
-			case 'eventFilters.danceType': return 'Dance type';
-			case 'eventFilters.clear': return 'Clear';
-			case 'eventFilters.location': return 'Location';
-			case 'eventFilters.date': return 'Date';
-			case 'eventFilters.dateFrom': return 'From:';
-			case 'eventFilters.dateTo': return 'To:';
-			case 'eventFilters.dateToday': return 'Today';
-			case 'eventFilters.dateTomorrow': return 'Tomorrow';
-			case 'eventFilters.dateThisWeek': return 'This week';
-			case 'eventFilters.dateWeekend': return 'Weekend';
-			case 'eventFilters.saveFilter': return 'Save this filter';
-			case 'eventFilters.saveFilterDescription': return 'For quick access next time';
-			case 'eventFilters.saveFilterButton': return 'Save filter';
-			case 'eventFilters.datePlaceholder': return 'dd.mm.yyyy';
-			case 'eventFilters.clearAll': return 'Clear all';
-			case 'eventFilters.noEventsMatch': return 'No events match your filters';
-			case 'eventFilters.showEvents': return 'Show {count} events';
-			case 'eventFilters.activeFilterCount': return '{count} active';
-			case 'eventFilters.noResults': return 'No results';
-			case 'eventFilters.showMoreDances': return 'Show more dances';
-			case 'eventFilters.showLessDances': return 'Show less';
-			case 'auth.login': return 'Login';
-			case 'auth.loginTitle': return 'Sign In';
-			case 'auth.loginSubtitle': return 'Welcome back to Dancee';
-			case 'auth.email': return 'Email';
-			case 'auth.emailPlaceholder': return 'your@email.com';
-			case 'auth.password': return 'Password';
-			case 'auth.passwordPlaceholder': return '••••••••';
-			case 'auth.forgotPassword': return 'Forgot your password?';
-			case 'auth.loginButton': return 'Sign In';
-			case 'auth.orDivider': return 'OR';
-			case 'auth.continueWithGoogle': return 'Continue with Google';
-			case 'auth.continueWithApple': return 'Continue with Apple';
-			case 'auth.noAccount': return 'Don\'t have an account?';
-			case 'auth.register': return 'Register';
-			case 'auth.registerTitle': return 'Create Account';
-			case 'auth.registerSubtitle': return 'Join the Dancee community';
-			case 'auth.name': return 'Name';
-			case 'auth.namePlaceholder': return 'Your name';
-			case 'auth.registerButton': return 'Register';
-			case 'auth.alreadyHaveAccount': return 'Already have an account?';
-			case 'auth.loginLink': return 'Sign In';
-			case 'settingsPage.title': return 'Settings';
-			case 'settingsPage.subtitle': return 'Manage your account';
-			case 'settingsPage.profile': return 'Profile';
-			case 'settingsPage.profileName': return 'Jan Novák';
-			case 'settingsPage.profileEmail': return 'jan.novak@email.cz';
-			case 'settingsPage.editProfile': return 'Edit Profile';
-			case 'settingsPage.preferences': return 'Preferences';
-			case 'settingsPage.language': return 'Language';
-			case 'settingsPage.languageValue': return 'English';
-			case 'settingsPage.theme': return 'Theme';
-			case 'settingsPage.themeValue': return 'System';
-			case 'settingsPage.notifications': return 'Notifications';
-			case 'settingsPage.notificationsEnabled': return 'Enabled';
-			case 'settingsPage.account': return 'Account';
-			case 'settingsPage.changePassword': return 'Change Password';
-			case 'settingsPage.privacySettings': return 'Privacy Settings';
-			case 'settingsPage.deleteAccount': return 'Delete Account';
-			case 'settingsPage.deleteAccountWarning': return 'This action is irreversible';
-			case 'settingsPage.appInfo': return 'App Info';
-			case 'settingsPage.version': return 'Version';
-			case 'settingsPage.about': return 'About Dancee';
-			case 'settingsPage.termsOfService': return 'Terms of Service';
-			case 'settingsPage.privacyPolicy': return 'Privacy Policy';
-			case 'settingsPage.contactSupport': return 'Contact Support';
-			case 'goHome': return 'Go to Home';
-			case 'errors.pageNotFound': return 'Page not found';
-			case 'errors.pageNotFoundDescription': return 'The page you are looking for does not exist.';
-			case 'errors.somethingWentWrong': return 'Something went wrong';
-			case 'errors.networkError': return 'Connection error. Please check your internet connection.';
-			case 'errors.timeoutError': return 'Request timeout. Please try again.';
-			case 'errors.serverError': return 'Server error occurred. Please try again later.';
-			case 'errors.parsingError': return 'Failed to process server response.';
-			case 'errors.genericError': return 'An unexpected error occurred.';
-			case 'errors.loadEventsError': return 'Failed to load events.';
-			case 'errors.loadFavoritesError': return 'Failed to load favorites.';
-			case 'errors.toggleFavoriteError': return 'Failed to update favorite.';
-			default: return null;
-		}
-	}
-}
-
-extension on _StringsCs {
-	dynamic _flatMapFunction(String path) {
-		switch (path) {
-			case 'appTitle': return 'Dancee Aplikace';
-			case 'events': return 'Události';
-			case 'favorites': return 'Oblíbené';
-			case 'settings': return 'Nastavení';
-			case 'searchEvents': return 'Hledat události...';
-			case 'filters': return 'Filtry';
-			case 'today': return 'Dnes';
-			case 'tomorrow': return 'Zítra';
-			case 'thisWeek': return 'Tento týden';
-			case 'thisMonth': return 'Tento měsíc';
-			case 'prague': return 'Praha';
-			case 'eventsCount': return '{count} událostí';
-			case 'detail': return 'Detail';
-			case 'hours': return '{count} hodin';
-			case 'errorLoadingEvents': return 'Chyba při načítání událostí';
-			case 'retry': return 'Zkusit znovu';
-			case 'favoriteEvents': return 'Oblíbené události';
-			case 'savedEvents': return '{count} uložených událostí';
-			case 'all': return 'Vše';
-			case 'upcomingEvents': return 'Nadcházející události';
-			case 'pastEvents': return 'Minulé události';
-			case 'noFavoriteEvents': return 'Žádné oblíbené události';
-			case 'noFavoriteEventsDescription': return 'Zatím jste neuložili žádné oblíbené události. Začněte prozkoumávat taneční události a uložte si ty, které vás zajímají.';
-			case 'browseEvents': return 'Procházet události';
-			case 'errorLoadingFavorites': return 'Chyba při načítání oblíbených';
-			case 'dancee': return 'Dancee';
-			case 'tuesdayDate': return '(Úterý {date})';
-			case 'wednesdayDate': return '(Středa {date})';
-			case 'apiErrorNetwork': return 'Chyba připojení. Zkontrolujte prosím své internetové připojení.';
-			case 'apiErrorTimeout': return 'Vypršel časový limit požadavku. Zkuste to prosím znovu.';
-			case 'apiErrorServer': return 'Došlo k chybě serveru. Zkuste to prosím později.';
-			case 'apiErrorParsing': return 'Nepodařilo se zpracovat odpověď serveru.';
-			case 'apiErrorGeneric': return 'Došlo k neočekávané chybě. Zkuste to prosím znovu.';
-			case 'eventDetail.title': return 'Detail akce';
-			case 'eventDetail.favorite': return 'Oblíbené';
-			case 'eventDetail.map': return 'Mapa';
-			case 'eventDetail.dancesAtEvent': return 'Tance na akci';
-			case 'eventDetail.venue': return 'Místo konání';
-			case 'eventDetail.address': return 'Adresa';
-			case 'eventDetail.navigateToVenue': return 'Navigovat k místu';
-			case 'eventDetail.organizer': return 'Pořadatel';
-			case 'eventDetail.description': return 'Popis akce';
-			case 'eventDetail.additionalInfo': return 'Dodatečné informace';
-			case 'eventDetail.eventParts': return 'Program akce';
-			case 'eventDetail.workshop': return 'Workshop';
-			case 'eventDetail.party': return 'Párty';
-			case 'eventDetail.openLesson': return 'Otevřená lekce';
-			case 'eventDetail.eventNotFound': return 'Akce nenalezena';
-			case 'eventDetail.eventNotFoundDescription': return 'Akce, kterou hledáte, nebyla nalezena.';
-			case 'eventDetail.backToEvents': return 'Zpět na události';
-			case 'eventDetail.addedToFavorites': return 'Přidáno do oblíbených';
-			case 'eventDetail.removedFromFavorites': return 'Odebráno z oblíbených';
-			case 'eventDetail.favoriteError': return 'Nepodařilo se aktualizovat oblíbené';
-			case 'eventDetail.remove': return 'Odebrat';
-			case 'eventDetail.originalSource': return 'Původní zdroj';
-			case 'eventDetail.viewOriginal': return 'Zobrazit původní událost';
-			case 'eventFilters.title': return 'Filtrování & Řazení';
-			case 'eventFilters.subtitle': return 'Přizpůsobte si zobrazení akcí';
-			case 'eventFilters.activeFilters': return 'Aktivní filtry';
-			case 'eventFilters.eventsShown': return '{count} akcí podle vašich kritérií';
-			case 'eventFilters.danceType': return 'Typ tance';
-			case 'eventFilters.clear': return 'Zrušit';
-			case 'eventFilters.location': return 'Místo konání';
-			case 'eventFilters.date': return 'Datum';
-			case 'eventFilters.dateFrom': return 'Od:';
-			case 'eventFilters.dateTo': return 'Do:';
-			case 'eventFilters.dateToday': return 'Dnes';
-			case 'eventFilters.dateTomorrow': return 'Zítra';
-			case 'eventFilters.dateThisWeek': return 'Tento týden';
-			case 'eventFilters.dateWeekend': return 'Víkend';
-			case 'eventFilters.saveFilter': return 'Uložit toto filtrování';
-			case 'eventFilters.saveFilterDescription': return 'Pro rychlý přístup příště';
-			case 'eventFilters.saveFilterButton': return 'Uložit filtr';
-			case 'eventFilters.datePlaceholder': return 'dd.mm.yyyy';
-			case 'eventFilters.clearAll': return 'Vymazat vše';
-			case 'eventFilters.noEventsMatch': return 'Žádné akce neodpovídají vašim filtrům';
-			case 'eventFilters.showEvents': return 'Zobrazit {count} akcí';
-			case 'eventFilters.activeFilterCount': return '{count} aktivní';
-			case 'eventFilters.noResults': return 'Žádné výsledky';
-			case 'eventFilters.showMoreDances': return 'Zobrazit další tance';
-			case 'eventFilters.showLessDances': return 'Zobrazit méně';
-			case 'auth.login': return 'Přihlášení';
-			case 'auth.loginTitle': return 'Přihlášení';
-			case 'auth.loginSubtitle': return 'Vítejte zpět v Dancee';
-			case 'auth.email': return 'E-mail';
-			case 'auth.emailPlaceholder': return 'vas@email.cz';
-			case 'auth.password': return 'Heslo';
-			case 'auth.passwordPlaceholder': return '••••••••';
-			case 'auth.forgotPassword': return 'Zapomněli jste heslo?';
-			case 'auth.loginButton': return 'Přihlásit se';
-			case 'auth.orDivider': return 'NEBO';
-			case 'auth.continueWithGoogle': return 'Pokračovat s Google';
-			case 'auth.continueWithApple': return 'Pokračovat s Apple';
-			case 'auth.noAccount': return 'Nemáte účet?';
-			case 'auth.register': return 'Zaregistrujte se';
-			case 'auth.registerTitle': return 'Vytvořit účet';
-			case 'auth.registerSubtitle': return 'Připojte se ke komunitě Dancee';
-			case 'auth.name': return 'Jméno';
-			case 'auth.namePlaceholder': return 'Vaše jméno';
-			case 'auth.registerButton': return 'Zaregistrovat se';
-			case 'auth.alreadyHaveAccount': return 'Již máte účet?';
-			case 'auth.loginLink': return 'Přihlásit se';
-			case 'settingsPage.title': return 'Nastavení';
-			case 'settingsPage.subtitle': return 'Správa vašeho účtu';
-			case 'settingsPage.profile': return 'Profil';
-			case 'settingsPage.profileName': return 'Jan Novák';
-			case 'settingsPage.profileEmail': return 'jan.novak@email.cz';
-			case 'settingsPage.editProfile': return 'Upravit profil';
-			case 'settingsPage.preferences': return 'Předvolby';
-			case 'settingsPage.language': return 'Jazyk';
-			case 'settingsPage.languageValue': return 'Čeština';
-			case 'settingsPage.theme': return 'Motiv';
-			case 'settingsPage.themeValue': return 'Systémový';
-			case 'settingsPage.notifications': return 'Oznámení';
-			case 'settingsPage.notificationsEnabled': return 'Zapnuto';
-			case 'settingsPage.account': return 'Účet';
-			case 'settingsPage.changePassword': return 'Změnit heslo';
-			case 'settingsPage.privacySettings': return 'Nastavení soukromí';
-			case 'settingsPage.deleteAccount': return 'Smazat účet';
-			case 'settingsPage.deleteAccountWarning': return 'Tato akce je nevratná';
-			case 'settingsPage.appInfo': return 'O aplikaci';
-			case 'settingsPage.version': return 'Verze';
-			case 'settingsPage.about': return 'O Dancee';
-			case 'settingsPage.termsOfService': return 'Podmínky služby';
-			case 'settingsPage.privacyPolicy': return 'Zásady ochrany osobních údajů';
-			case 'settingsPage.contactSupport': return 'Kontaktovat podporu';
-			case 'goHome': return 'Přejít na hlavní stránku';
-			case 'errors.pageNotFound': return 'Stránka nenalezena';
-			case 'errors.pageNotFoundDescription': return 'Stránka, kterou hledáte, neexistuje.';
-			case 'errors.somethingWentWrong': return 'Něco se pokazilo';
-			case 'errors.networkError': return 'Chyba připojení. Zkontrolujte prosím své internetové připojení.';
-			case 'errors.timeoutError': return 'Vypršel časový limit požadavku. Zkuste to prosím znovu.';
-			case 'errors.serverError': return 'Došlo k chybě serveru. Zkuste to prosím později.';
-			case 'errors.parsingError': return 'Nepodařilo se zpracovat odpověď serveru.';
-			case 'errors.genericError': return 'Došlo k neočekávané chybě.';
-			case 'errors.loadEventsError': return 'Nepodařilo se načíst události.';
-			case 'errors.loadFavoritesError': return 'Nepodařilo se načíst oblíbené.';
-			case 'errors.toggleFavoriteError': return 'Nepodařilo se aktualizovat oblíbené.';
-			default: return null;
-		}
-	}
-}
-
-extension on _StringsEs {
-	dynamic _flatMapFunction(String path) {
-		switch (path) {
-			case 'appTitle': return 'Aplicación Dancee';
-			case 'events': return 'Eventos';
-			case 'favorites': return 'Favoritos';
-			case 'settings': return 'Configuración';
-			case 'searchEvents': return 'Buscar eventos...';
-			case 'filters': return 'Filtros';
-			case 'today': return 'Hoy';
-			case 'tomorrow': return 'Mañana';
-			case 'thisWeek': return 'Esta semana';
-			case 'thisMonth': return 'Este mes';
-			case 'prague': return 'Praga';
-			case 'eventsCount': return '{count} eventos';
-			case 'detail': return 'Detalle';
-			case 'hours': return '{count} horas';
-			case 'errorLoadingEvents': return 'Error al cargar eventos';
-			case 'retry': return 'Reintentar';
-			case 'favoriteEvents': return 'Eventos favoritos';
-			case 'savedEvents': return '{count} eventos guardados';
-			case 'all': return 'Todos';
-			case 'upcomingEvents': return 'Próximos eventos';
-			case 'pastEvents': return 'Eventos pasados';
-			case 'noFavoriteEvents': return 'Sin eventos favoritos';
-			case 'noFavoriteEventsDescription': return 'Aún no has guardado ningún evento favorito. Comienza a explorar eventos de baile y guarda los que te interesen.';
-			case 'browseEvents': return 'Explorar eventos';
-			case 'errorLoadingFavorites': return 'Error al cargar favoritos';
-			case 'dancee': return 'Dancee';
-			case 'tuesdayDate': return '(Martes {date})';
-			case 'wednesdayDate': return '(Miércoles {date})';
-			case 'apiErrorNetwork': return 'Error de conexión. Por favor, verifica tu conexión a internet.';
-			case 'apiErrorTimeout': return 'Tiempo de espera agotado. Por favor, inténtalo de nuevo.';
-			case 'apiErrorServer': return 'Error del servidor. Por favor, inténtalo más tarde.';
-			case 'apiErrorParsing': return 'Error al procesar la respuesta del servidor.';
-			case 'apiErrorGeneric': return 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.';
-			case 'eventDetail.title': return 'Detalle del Evento';
-			case 'eventDetail.favorite': return 'Favorito';
-			case 'eventDetail.map': return 'Mapa';
-			case 'eventDetail.dancesAtEvent': return 'Bailes en el Evento';
-			case 'eventDetail.venue': return 'Lugar';
-			case 'eventDetail.address': return 'Dirección';
-			case 'eventDetail.navigateToVenue': return 'Navegar al Lugar';
-			case 'eventDetail.organizer': return 'Organizador';
-			case 'eventDetail.description': return 'Descripción';
-			case 'eventDetail.additionalInfo': return 'Información Adicional';
-			case 'eventDetail.eventParts': return 'Programa del Evento';
-			case 'eventDetail.workshop': return 'Taller';
-			case 'eventDetail.party': return 'Fiesta';
-			case 'eventDetail.openLesson': return 'Clase Abierta';
-			case 'eventDetail.eventNotFound': return 'Evento no encontrado';
-			case 'eventDetail.eventNotFoundDescription': return 'El evento que buscas no se pudo encontrar.';
-			case 'eventDetail.backToEvents': return 'Volver a Eventos';
-			case 'eventDetail.addedToFavorites': return 'Añadido a favoritos';
-			case 'eventDetail.removedFromFavorites': return 'Eliminado de favoritos';
-			case 'eventDetail.favoriteError': return 'Error al actualizar favorito';
-			case 'eventDetail.remove': return 'Eliminar';
-			case 'eventDetail.originalSource': return 'Fuente Original';
-			case 'eventDetail.viewOriginal': return 'Ver evento original';
-			case 'eventFilters.title': return 'Filtrar y Ordenar';
-			case 'eventFilters.subtitle': return 'Personaliza tu vista de eventos';
-			case 'eventFilters.activeFilters': return 'Filtros activos';
-			case 'eventFilters.eventsShown': return '{count} eventos según tus criterios';
-			case 'eventFilters.danceType': return 'Tipo de baile';
-			case 'eventFilters.clear': return 'Limpiar';
-			case 'eventFilters.location': return 'Ubicación';
-			case 'eventFilters.date': return 'Fecha';
-			case 'eventFilters.dateFrom': return 'Desde:';
-			case 'eventFilters.dateTo': return 'Hasta:';
-			case 'eventFilters.dateToday': return 'Hoy';
-			case 'eventFilters.dateTomorrow': return 'Mañana';
-			case 'eventFilters.dateThisWeek': return 'Esta semana';
-			case 'eventFilters.dateWeekend': return 'Fin de semana';
-			case 'eventFilters.saveFilter': return 'Guardar este filtro';
-			case 'eventFilters.saveFilterDescription': return 'Para acceso rápido la próxima vez';
-			case 'eventFilters.saveFilterButton': return 'Guardar filtro';
-			case 'eventFilters.datePlaceholder': return 'dd.mm.yyyy';
-			case 'eventFilters.clearAll': return 'Limpiar todo';
-			case 'eventFilters.noEventsMatch': return 'Ningún evento coincide con tus filtros';
-			case 'eventFilters.showEvents': return 'Mostrar {count} eventos';
-			case 'eventFilters.activeFilterCount': return '{count} activo';
-			case 'eventFilters.noResults': return 'Sin resultados';
-			case 'eventFilters.showMoreDances': return 'Mostrar más bailes';
-			case 'eventFilters.showLessDances': return 'Mostrar menos';
-			case 'auth.login': return 'Iniciar sesión';
-			case 'auth.loginTitle': return 'Iniciar sesión';
-			case 'auth.loginSubtitle': return 'Bienvenido de vuelta a Dancee';
-			case 'auth.email': return 'Correo electrónico';
-			case 'auth.emailPlaceholder': return 'tu@email.com';
-			case 'auth.password': return 'Contraseña';
-			case 'auth.passwordPlaceholder': return '••••••••';
-			case 'auth.forgotPassword': return '¿Olvidaste tu contraseña?';
-			case 'auth.loginButton': return 'Iniciar sesión';
-			case 'auth.orDivider': return 'O';
-			case 'auth.continueWithGoogle': return 'Continuar con Google';
-			case 'auth.continueWithApple': return 'Continuar con Apple';
-			case 'auth.noAccount': return '¿No tienes cuenta?';
-			case 'auth.register': return 'Regístrate';
-			case 'auth.registerTitle': return 'Crear cuenta';
-			case 'auth.registerSubtitle': return 'Únete a la comunidad Dancee';
-			case 'auth.name': return 'Nombre';
-			case 'auth.namePlaceholder': return 'Tu nombre';
-			case 'auth.registerButton': return 'Registrarse';
-			case 'auth.alreadyHaveAccount': return '¿Ya tienes cuenta?';
-			case 'auth.loginLink': return 'Iniciar sesión';
-			case 'settingsPage.title': return 'Configuración';
-			case 'settingsPage.subtitle': return 'Administra tu cuenta';
-			case 'settingsPage.profile': return 'Perfil';
-			case 'settingsPage.profileName': return 'Jan Novák';
-			case 'settingsPage.profileEmail': return 'jan.novak@email.cz';
-			case 'settingsPage.editProfile': return 'Editar perfil';
-			case 'settingsPage.preferences': return 'Preferencias';
-			case 'settingsPage.language': return 'Idioma';
-			case 'settingsPage.languageValue': return 'Español';
-			case 'settingsPage.theme': return 'Tema';
-			case 'settingsPage.themeValue': return 'Sistema';
-			case 'settingsPage.notifications': return 'Notificaciones';
-			case 'settingsPage.notificationsEnabled': return 'Activadas';
-			case 'settingsPage.account': return 'Cuenta';
-			case 'settingsPage.changePassword': return 'Cambiar contraseña';
-			case 'settingsPage.privacySettings': return 'Configuración de privacidad';
-			case 'settingsPage.deleteAccount': return 'Eliminar cuenta';
-			case 'settingsPage.deleteAccountWarning': return 'Esta acción es irreversible';
-			case 'settingsPage.appInfo': return 'Información de la app';
-			case 'settingsPage.version': return 'Versión';
-			case 'settingsPage.about': return 'Acerca de Dancee';
-			case 'settingsPage.termsOfService': return 'Términos de servicio';
-			case 'settingsPage.privacyPolicy': return 'Política de privacidad';
-			case 'settingsPage.contactSupport': return 'Contactar soporte';
-			case 'goHome': return 'Ir al inicio';
-			case 'errors.pageNotFound': return 'Página no encontrada';
-			case 'errors.pageNotFoundDescription': return 'La página que buscas no existe.';
-			case 'errors.somethingWentWrong': return 'Algo salió mal';
-			case 'errors.networkError': return 'Error de conexión. Por favor, verifica tu conexión a internet.';
-			case 'errors.timeoutError': return 'Tiempo de espera agotado. Por favor, inténtalo de nuevo.';
-			case 'errors.serverError': return 'Error del servidor. Por favor, inténtalo más tarde.';
-			case 'errors.parsingError': return 'Error al procesar la respuesta del servidor.';
-			case 'errors.genericError': return 'Ocurrió un error inesperado.';
-			case 'errors.loadEventsError': return 'Error al cargar eventos.';
-			case 'errors.loadFavoritesError': return 'Error al cargar favoritos.';
-			case 'errors.toggleFavoriteError': return 'Error al actualizar favorito.';
-			default: return null;
-		}
-	}
 }

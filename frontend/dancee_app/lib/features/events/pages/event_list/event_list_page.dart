@@ -55,19 +55,23 @@ class EventListPage extends StatelessWidget {
                     final hasActiveFilters = activeFilterCount > 0;
                     final isEmpty = filterState.filteredEvents.isEmpty;
 
+                    final emptyMessage = hasActiveFilters
+                        ? t.eventFilters.noEventsMatch
+                        : t.eventFilters.noEvents;
+
                     return CustomScrollView(
                       slivers: [
                         const EventListHeaderSection(),
                         const SliverToBoxAdapter(
                           child: SearchAndFiltersSection(),
                         ),
-                        if (hasActiveFilters && isEmpty)
+                        if (isEmpty)
                           SliverFillRemaining(
                             child: Center(
                               child: Padding(
                                 padding: const EdgeInsets.all(32),
                                 child: Text(
-                                  t.eventFilters.noEventsMatch,
+                                  emptyMessage,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 16,

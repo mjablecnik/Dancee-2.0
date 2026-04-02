@@ -151,6 +151,37 @@ int getActiveFilterCount(FilterState filters) {
 }
 
 // ============================================================================
+// Date grouping helpers (shared with EventListCubit)
+// ============================================================================
+
+/// Groups [events] that fall on today's date and are not past.
+List<Event> groupToday(List<Event> events, DateTime now) {
+  final today = DateTime(now.year, now.month, now.day);
+  return events.where((e) {
+    final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
+    return d.isAtSameMomentAs(today) && !e.isPast;
+  }).toList();
+}
+
+/// Groups [events] that fall on tomorrow's date and are not past.
+List<Event> groupTomorrow(List<Event> events, DateTime now) {
+  final tomorrow = DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
+  return events.where((e) {
+    final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
+    return d.isAtSameMomentAs(tomorrow) && !e.isPast;
+  }).toList();
+}
+
+/// Groups [events] that fall after tomorrow and are not past.
+List<Event> groupUpcoming(List<Event> events, DateTime now) {
+  final tomorrow = DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
+  return events.where((e) {
+    final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
+    return d.isAfter(tomorrow) && !e.isPast;
+  }).toList();
+}
+
+// ============================================================================
 // Quick date preset helpers
 // ============================================================================
 
@@ -181,13 +212,17 @@ int getActiveFilterCount(FilterState filters) {
 
 /// Computes dateFrom/dateTo for the "Weekend" preset (Saturday through Sunday).
 (DateTime, DateTime) weekendPreset(DateTime now) {
-  // If today is Saturday (6), use today. Otherwise look forward to next Saturday.
-  // On Sunday (7) we skip ahead 6 days to the coming Saturday (forward-looking).
-  final daysUntilSaturday = now.weekday == 6
-      ? 0
-      : now.weekday == 7
-          ? 6
-          : 6 - now.weekday;
+  // If today is Saturday (6), use today as start through tomorrow (Sunday).
+  // If today is Sunday (7), show the current weekend: yesterday (Saturday) to today.
+  // Otherwise look forward to the next Saturday.
+  if (now.weekday == 7) {
+    // Sunday — show the whole current weekend: yesterday (Saturday) to today (Sunday)
+    final saturday = now.subtract(const Duration(days: 1));
+    final start = DateTime(saturday.year, saturday.month, saturday.day);
+    final end = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    return (start, end);
+  }
+  final daysUntilSaturday = now.weekday == 6 ? 0 : 6 - now.weekday;
   final saturday = now.add(Duration(days: daysUntilSaturday));
   final sunday = saturday.add(const Duration(days: 1));
   final start = DateTime(saturday.year, saturday.month, saturday.day);
@@ -235,40 +270,14 @@ class EventFilterCubit extends Cubit<EventFilterState> {
 
   void _recompute(List<Event> allEvents, FilterState filters) {
     final filtered = filterEvents(allEvents, filters);
+    final now = DateTime.now();
     emit(EventFilterState(
       filters: filters,
       filteredEvents: filtered,
-      todayEvents: _groupToday(filtered),
-      tomorrowEvents: _groupTomorrow(filtered),
-      upcomingEvents: _groupUpcoming(filtered),
+      todayEvents: groupToday(filtered, now),
+      tomorrowEvents: groupTomorrow(filtered, now),
+      upcomingEvents: groupUpcoming(filtered, now),
     ));
-  }
-
-  List<Event> _groupToday(List<Event> events) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return events.where((e) {
-      final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
-      return d.isAtSameMomentAs(today) && !e.isPast;
-    }).toList();
-  }
-
-  List<Event> _groupTomorrow(List<Event> events) {
-    final now = DateTime.now();
-    final tomorrow = DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
-    return events.where((e) {
-      final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
-      return d.isAtSameMomentAs(tomorrow) && !e.isPast;
-    }).toList();
-  }
-
-  List<Event> _groupUpcoming(List<Event> events) {
-    final now = DateTime.now();
-    final tomorrow = DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
-    return events.where((e) {
-      final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
-      return d.isAfter(tomorrow) && !e.isPast;
-    }).toList();
   }
 
   /// Sets new filters and recomputes the filtered event list.

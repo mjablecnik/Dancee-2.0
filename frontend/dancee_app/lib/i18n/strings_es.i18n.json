@@ -77,6 +77,7 @@
     "saveFilterButton": "Guardar filtro",
     "datePlaceholder": "dd.mm.yyyy",
     "clearAll": "Limpiar todo",
+    "noEvents": "No se encontraron eventos",
     "noEventsMatch": "Ningún evento coincide con tus filtros",
     "showEvents": "Mostrar {count} eventos",
     "activeFilterCount": "{count} activo",

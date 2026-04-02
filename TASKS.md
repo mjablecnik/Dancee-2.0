@@ -1,15 +1,18 @@
-# Tasks: Event Search & Filter — Code Review Fixes
+# Tasks: Event Search & Filter Feature
 
-- [x] 1. [CRITICAL] Fix `weekendPreset` returning past Saturday when called on Sunday — use forward-looking logic (`event_filter.dart`)
-- [x] 2. [HIGH] Initialize search bar `TextEditingController` with current search query from `EventFilterCubit` state (`sections.dart`)
-- [x] 3. [HIGH] Replace hardcoded "Prague" label on location filter chip with dynamic label reflecting selected regions (`components.dart`)
-- [x] 4. [HIGH] Replace hardcoded "Today" label on date filter chip with dynamic label reflecting active date filter (`components.dart`)
-- [x] 5. [MEDIUM] Implement collapsible "Show more dances" button for long dance type lists per design mockup (`event_filters/sections.dart`)
-- [x] 6. [MEDIUM] Implement custom location text input field below region checkboxes per design mockup, or document as intentionally deferred (`event_filters/sections.dart`)
-- [x] 7. [MEDIUM] Document that location filter uses multi-select checkboxes (per spec) instead of radio buttons (per design mockup) as intentional deviation
-- [x] 8. [MEDIUM] Make `setupDependencies` async and await `restoreFilters()` to prevent flash of unfiltered content on startup (`service_locator.dart`, `main.dart`)
-- [x] 9. [MEDIUM] Change `EventFilterCubit` registration from `registerLazySingleton` to `registerSingleton` since it's accessed immediately (`service_locator.dart`)
-- [ ] 10. [LOW] Remove duplicate live count from apply button — use a dedicated "Apply filters" label and keep count only in footer info text (`sections.dart`)
-- [ ] 11. [LOW] Rename custom `FilterChip` class to `EventFilterChip` to avoid conflict with Flutter's built-in `FilterChip` (`components.dart`)
-- [ ] 12. [LOW] Document the `isAfter(tomorrow)` edge case in `_groupUpcoming` as a known minor inconsistency (`event_filter.dart`)
-- [ ] 13. [LOW] Add `eventFilters.applyFilters` i18n key to all three language files and use it for the apply button label
+Derived from [CODE_REVIEW.md](./CODE_REVIEW.md).
+
+- [x] 1. [CRITICAL] Fix `weekendPreset` to return current weekend (today) when called on Sunday instead of skipping 6 days ahead
+- [x] 2. [HIGH] Add empty state message for when no events exist at all (not just filtered out) on the event list page
+- [x] 3. [HIGH] Extract date grouping logic (`_groupToday`, `_groupTomorrow`, `_groupUpcoming`) into a shared pure function used by both `EventFilterCubit` and `EventListCubit`
+- [x] 4. [HIGH] Restyle "Show more dances" / "Show less" toggle to match design mockup (full-width button with gray background, border, rounded corners)
+- [ ] 5. [MEDIUM] Document location section checkbox vs radio button design deviation (spec requires multi-select, design shows single-select)
+- [ ] 6. [MEDIUM] Track custom location search input from design as a future enhancement (not in current spec)
+- [ ] 7. [MEDIUM] Replace hardcoded 120px bottom padding in filter page ListView with dynamic footer height measurement
+- [ ] 8. [MEDIUM] Add `BlocListener` to `SearchAndFiltersSection` to sync search bar text when filter state changes externally (e.g., after reset or restore)
+- [ ] 9. [MEDIUM] Change apply button text to dedicated "Apply filters" key and keep event count only in the footer info line, matching the design
+- [ ] 10. [MEDIUM] Add `eventFilters.applyFilters` translation key to all three language files (en, cs, es)
+- [ ] 11. [LOW] Update `weekendPreset` comment after fixing the Sunday behavior
+- [ ] 12. [LOW] No action — `_kDanceTypeInitialCount = 5` is a reasonable UX choice
+- [ ] 13. [LOW] No action — eager singleton registration for `EventFilterCubit` is correctly documented
+- [ ] 14. [LOW] Rename "This week" section header to "Upcoming" or limit the group to current week events only

@@ -7,6 +7,7 @@ import '../../../core/exceptions.dart';
 import '../../../i18n/translations.g.dart';
 import '../data/entities.dart';
 import '../data/event_repository.dart';
+import 'event_filter.dart';
 
 part 'event_list.freezed.dart';
 
@@ -118,29 +119,11 @@ class EventListCubit extends Cubit<EventListState> {
   /// Groups events by date and emits a [EventListLoaded] state.
   void _emitGrouped(List<Event> events) {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final tomorrow = today.add(const Duration(days: 1));
-
-    final todayEvents = events.where((e) {
-      final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
-      return d.isAtSameMomentAs(today) && !e.isPast;
-    }).toList();
-
-    final tomorrowEvents = events.where((e) {
-      final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
-      return d.isAtSameMomentAs(tomorrow) && !e.isPast;
-    }).toList();
-
-    final upcomingEvents = events.where((e) {
-      final d = DateTime(e.startTime.year, e.startTime.month, e.startTime.day);
-      return d.isAfter(tomorrow) && !e.isPast;
-    }).toList();
-
     emit(EventListState.loaded(
       allEvents: events,
-      todayEvents: todayEvents,
-      tomorrowEvents: tomorrowEvents,
-      upcomingEvents: upcomingEvents,
+      todayEvents: groupToday(events, now),
+      tomorrowEvents: groupTomorrow(events, now),
+      upcomingEvents: groupUpcoming(events, now),
     ));
   }
 }

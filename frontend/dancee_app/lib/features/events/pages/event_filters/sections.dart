@@ -235,28 +235,39 @@ class _DanceTypeFilterSectionState extends State<DanceTypeFilterSection> {
               padding: const EdgeInsets.only(top: 4),
               child: GestureDetector(
                 onTap: () => setState(() => _showAll = !_showAll),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _showAll
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      size: 18,
-                      color: const Color(0xFF6366F1),
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.grey.shade200,
+                      width: 2,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _showAll
-                          ? t.eventFilters.showLessDances
-                          : t.eventFilters.showMoreDances,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _showAll
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        size: 18,
                         color: const Color(0xFF6366F1),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        _showAll
+                            ? t.eventFilters.showLessDances
+                            : t.eventFilters.showMoreDances,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF6366F1),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
