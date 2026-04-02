@@ -276,8 +276,8 @@ class EventFilterCubit extends Cubit<EventFilterState> {
   }
 
   /// Resets all filters to default empty state and clears saved filters.
-  void resetFilters() {
-    _persistenceService.clearFilters();
+  Future<void> resetFilters() async {
+    await _persistenceService.clearFilters();
     _recompute(_allEvents(), const FilterState());
   }
 

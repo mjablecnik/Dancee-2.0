@@ -316,7 +316,7 @@ void main() {
     // -----------------------------------------------------------------------
     // TC-EFC-09: resetFilters clears all filters
     // -----------------------------------------------------------------------
-    test('TC-EFC-09: resetFilters clears active filters', () {
+    test('TC-EFC-09: resetFilters clears active filters', () async {
       final (listCubit, filterCubit) = _buildPair();
       final events = [
         _makeEvent(
@@ -332,7 +332,7 @@ void main() {
       );
       expect(filterCubit.state.filteredEvents.length, equals(1));
 
-      filterCubit.resetFilters();
+      await filterCubit.resetFilters();
 
       expect(filterCubit.state.filters, equals(const FilterState()));
       expect(filterCubit.state.filteredEvents.length, equals(2));
