@@ -144,6 +144,49 @@ void main() {
       expect(venue.longitude, equals(0.0));
       expect(venue.description, equals(''));
     });
+
+    // -----------------------------------------------------------------------
+    // TC-VR-01: Venue with missing region field defaults to empty string
+    // -----------------------------------------------------------------------
+    test('TC-VR-01: fromDirectus() defaults region to empty string when absent',
+        () {
+      final json = {
+        'name': 'Club A',
+        'latitude': 50.0,
+        'longitude': 14.0,
+      };
+      final venue = Venue.fromDirectus(json);
+      expect(venue.region, equals(''));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-VR-02: Venue with null region defaults to empty string
+    // -----------------------------------------------------------------------
+    test('TC-VR-02: fromDirectus() defaults region to empty string when null',
+        () {
+      final json = {
+        'name': 'Club B',
+        'region': null,
+        'latitude': 50.0,
+        'longitude': 14.0,
+      };
+      final venue = Venue.fromDirectus(json);
+      expect(venue.region, equals(''));
+    });
+
+    // -----------------------------------------------------------------------
+    // TC-VR-03: Venue with valid region string parses correctly
+    // -----------------------------------------------------------------------
+    test('TC-VR-03: fromDirectus() parses valid region string correctly', () {
+      final json = {
+        'name': 'Club C',
+        'region': 'South Moravia',
+        'latitude': 49.2,
+        'longitude': 16.6,
+      };
+      final venue = Venue.fromDirectus(json);
+      expect(venue.region, equals('South Moravia'));
+    });
   });
 
   // =========================================================================

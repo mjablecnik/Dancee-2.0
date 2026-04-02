@@ -180,8 +180,8 @@ Implement local search and filtering for the Dancee App event list. This adds a 
 - [x] 9. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Integration testing
-  - [ ]* 10.1 Write unit tests for EventFilterCubit
+- [x] 10. Integration testing
+  - [x]* 10.1 Write unit tests for EventFilterCubit
     - Test empty event list returns empty filtered list
     - Test search with whitespace-only query
     - Test filter with dance types not present in any event returns empty
@@ -190,7 +190,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Test quick date presets on edge days (Sunday for "This Week", Saturday for "Weekend")
     - _Requirements: 1.2, 1.3, 1.5, 3.3, 3.4, 5.2, 6.1_
 
-  - [ ]* 10.2 Write unit tests for Venue region parsing edge cases
+  - [x]* 10.2 Write unit tests for Venue region parsing edge cases
     - Test Venue with missing region field defaults to empty string
     - Test Venue with null region defaults to empty string
     - Test Venue with valid region string parses correctly
