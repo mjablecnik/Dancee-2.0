@@ -1,60 +1,231 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
+import '../../../core/service_locator.dart';
 import '../../../i18n/translations.g.dart';
+import '../data/entities.dart';
+import '../logic/event_filter.dart';
+import '../logic/event_list.dart';
 
 part 'event_filters_page.g.dart';
 
 /// Route definition for the event filters page.
 ///
-/// Simple page (no folder) with [NoTransitionPage] to disable animations.
+/// Accepts an optional [scrollTo] query parameter to auto-scroll to a section
+/// ('date' or 'location') on open.
 @TypedGoRoute<EventFiltersRoute>(path: '/events/filters')
 class EventFiltersRoute extends GoRouteData {
-  const EventFiltersRoute();
+  final String? scrollTo;
+
+  const EventFiltersRoute({this.scrollTo});
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return const NoTransitionPage(child: EventFiltersPage());
+    return NoTransitionPage(child: EventFiltersPage(scrollTo: scrollTo));
   }
 }
 
 /// Page for filtering and sorting dance events.
 ///
-/// Placeholder implementation based on `.design/event-filters.html`.
-/// Contains filter sections for dance type, location, and date range.
-class EventFiltersPage extends StatelessWidget {
-  const EventFiltersPage({super.key});
+/// Maintains a local draft [FilterState] for live preview. Filters are only
+/// pushed to [EventFilterCubit] when the user taps "Apply filters".
+class EventFiltersPage extends StatefulWidget {
+  final String? scrollTo;
+
+  const EventFiltersPage({super.key, this.scrollTo});
+
+  @override
+  State<EventFiltersPage> createState() => _EventFiltersPageState();
+}
+
+class _EventFiltersPageState extends State<EventFiltersPage> {
+  late FilterState _draft;
+  final _scrollController = ScrollController();
+  final _locationSectionKey = GlobalKey();
+  final _dateSectionKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _draft = getIt<EventFilterCubit>().state.filters;
+    if (widget.scrollTo != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSection(widget.scrollTo!);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  List<Event> get _allEvents {
+    final s = getIt<EventListCubit>().state;
+    if (s is EventListLoaded) return s.allEvents;
+    return const [];
+  }
+
+  void _scrollToSection(String section) {
+    GlobalKey? key;
+    if (section == 'date') key = _dateSectionKey;
+    if (section == 'location') key = _locationSectionKey;
+    if (key?.currentContext != null) {
+      Scrollable.ensureVisible(
+        key!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _updateDraft(FilterState newDraft) {
+    setState(() => _draft = newDraft);
+  }
+
+  Future<void> _pickDateFrom() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _draft.dateFrom ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (date != null) {
+      _updateDraft(_draft.copyWith(dateFrom: date));
+    }
+  }
+
+  Future<void> _pickDateTo() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _draft.dateTo ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (date != null) {
+      _updateDraft(_draft.copyWith(dateTo: date));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final allEvents = _allEvents;
+    final danceTypes = extractDanceTypes(allEvents);
+    final regions = extractRegions(allEvents);
+    final matchingCount = filterEvents(allEvents, _draft).length;
+    final activeCount = getActiveFilterCount(_draft);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
           EventFiltersHeaderSection(
             onBackPressed: () => context.pop(),
-            onResetPressed: () {},
+            onResetPressed: () => _updateDraft(const FilterState()),
           ),
           Expanded(
             child: ListView(
+              controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
-              children: const [
-                ActiveFiltersSummary(),
-                SizedBox(height: 24),
-                DanceTypeFilterSection(),
-                SizedBox(height: 24),
-                LocationFilterSection(),
-                SizedBox(height: 24),
-                DateRangeFilterSection(),
-                SizedBox(height: 24),
-                SaveFilterSection(),
+              children: [
+                ActiveFiltersSummary(
+                  activeCount: activeCount,
+                  matchingCount: matchingCount,
+                ),
+                const SizedBox(height: 24),
+                DanceTypeFilterSection(
+                  danceTypes: danceTypes,
+                  selectedTypes: _draft.selectedDanceTypes,
+                  allEvents: allEvents,
+                  filters: _draft,
+                  onToggle: (type) {
+                    final newSet = Set<String>.from(_draft.selectedDanceTypes);
+                    if (newSet.contains(type)) {
+                      newSet.remove(type);
+                    } else {
+                      newSet.add(type);
+                    }
+                    _updateDraft(_draft.copyWith(selectedDanceTypes: newSet));
+                  },
+                  onClear: () =>
+                      _updateDraft(_draft.copyWith(selectedDanceTypes: const {})),
+                ),
+                const SizedBox(height: 24),
+                LocationFilterSection(
+                  key: _locationSectionKey,
+                  regions: regions,
+                  selectedRegions: _draft.selectedRegions,
+                  allEvents: allEvents,
+                  filters: _draft,
+                  onToggle: (region) {
+                    final newSet = Set<String>.from(_draft.selectedRegions);
+                    if (newSet.contains(region)) {
+                      newSet.remove(region);
+                    } else {
+                      newSet.add(region);
+                    }
+                    _updateDraft(_draft.copyWith(selectedRegions: newSet));
+                  },
+                  onClear: () =>
+                      _updateDraft(_draft.copyWith(selectedRegions: const {})),
+                ),
+                const SizedBox(height: 24),
+                DateRangeFilterSection(
+                  key: _dateSectionKey,
+                  dateFrom: _draft.dateFrom,
+                  dateTo: _draft.dateTo,
+                  onDateFromTap: _pickDateFrom,
+                  onDateToTap: _pickDateTo,
+                  onTodayPreset: () {
+                    final (from, to) = todayPreset(DateTime.now());
+                    _updateDraft(_draft.copyWith(dateFrom: from, dateTo: to));
+                  },
+                  onTomorrowPreset: () {
+                    final (from, to) = tomorrowPreset(DateTime.now());
+                    _updateDraft(_draft.copyWith(dateFrom: from, dateTo: to));
+                  },
+                  onThisWeekPreset: () {
+                    final (from, to) = thisWeekPreset(DateTime.now());
+                    _updateDraft(_draft.copyWith(dateFrom: from, dateTo: to));
+                  },
+                  onWeekendPreset: () {
+                    final (from, to) = weekendPreset(DateTime.now());
+                    _updateDraft(_draft.copyWith(dateFrom: from, dateTo: to));
+                  },
+                  onClear: () => _updateDraft(
+                      _draft.copyWith(dateFrom: null, dateTo: null)),
+                ),
+                const SizedBox(height: 24),
+                SaveFilterSection(
+                  onSave: () async {
+                    getIt<EventFilterCubit>().applyFilters(_draft);
+                    await getIt<EventFilterCubit>().saveFilters();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(t.eventFilters.saveFilter),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           ),
         ],
       ),
-      bottomSheet: const FilterFooterActions(),
+      bottomSheet: FilterFooterActions(
+        matchingCount: matchingCount,
+        onClearAll: () => _updateDraft(const FilterState()),
+        onApply: () {
+          getIt<EventFilterCubit>().applyFilters(_draft);
+          context.pop();
+        },
+      ),
     );
   }
 }
@@ -164,7 +335,14 @@ class HeaderIconButton extends StatelessWidget {
 
 /// Summary card showing the number of active filters and matching events.
 class ActiveFiltersSummary extends StatelessWidget {
-  const ActiveFiltersSummary({super.key});
+  final int activeCount;
+  final int matchingCount;
+
+  const ActiveFiltersSummary({
+    super.key,
+    required this.activeCount,
+    required this.matchingCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +380,7 @@ class ActiveFiltersSummary extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  t.eventFilters.eventsShown(count: 24),
+                  t.eventFilters.eventsShown(count: matchingCount),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -214,11 +392,13 @@ class ActiveFiltersSummary extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF6366F1),
+              color: activeCount > 0
+                  ? const Color(0xFF6366F1)
+                  : Colors.grey.shade400,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              '2',
+              '$activeCount',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -238,7 +418,22 @@ class ActiveFiltersSummary extends StatelessWidget {
 
 /// Section with checkboxes for filtering by dance style.
 class DanceTypeFilterSection extends StatelessWidget {
-  const DanceTypeFilterSection({super.key});
+  final List<String> danceTypes;
+  final Set<String> selectedTypes;
+  final List<Event> allEvents;
+  final FilterState filters;
+  final void Function(String) onToggle;
+  final VoidCallback onClear;
+
+  const DanceTypeFilterSection({
+    super.key,
+    required this.danceTypes,
+    required this.selectedTypes,
+    required this.allEvents,
+    required this.filters,
+    required this.onToggle,
+    required this.onClear,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -248,32 +443,27 @@ class DanceTypeFilterSection extends StatelessWidget {
         FilterSectionHeader(
           icon: Icons.music_note,
           title: t.eventFilters.danceType,
-          onClear: () {},
+          onClear: onClear,
         ),
         const SizedBox(height: 12),
-        DanceTypeOption(label: t.eventFilters.salsa, icon: Icons.local_fire_department, iconColor: Colors.red),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.bachata, icon: Icons.favorite, iconColor: Colors.pink),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.kizomba, icon: Icons.nightlight_round, iconColor: Colors.purple),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.zouk, icon: Icons.water, iconColor: Colors.teal),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.tango, icon: Icons.local_florist, iconColor: Colors.blueGrey),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.swing, icon: Icons.face, iconColor: Colors.orange),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.forro, icon: Icons.album, iconColor: Colors.green),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.merengue, icon: Icons.wb_sunny, iconColor: Colors.amber),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.reggaeton, icon: Icons.bolt, iconColor: Colors.lime),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.urbanKiz, icon: Icons.location_city, iconColor: Colors.deepPurple),
-        const SizedBox(height: 8),
-        DanceTypeOption(label: t.eventFilters.lindyHop, icon: Icons.album, iconColor: Colors.yellow.shade800),
-        const SizedBox(height: 12),
-        ShowMoreDancesButton(onPressed: () {}),
+        if (danceTypes.isEmpty)
+          _EmptyOptionMessage(message: t.eventFilters.noResults)
+        else
+          ...danceTypes.map((type) {
+            final isSelected = selectedTypes.contains(type);
+            final count = countEventsForDanceType(allEvents, type, filters);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: DanceTypeOption(
+                label: type,
+                icon: _danceTypeIcon(type),
+                iconColor: _danceTypeColor(type),
+                isSelected: isSelected,
+                count: count,
+                onTap: () => onToggle(type),
+              ),
+            );
+          }),
       ],
     );
   }
@@ -284,81 +474,77 @@ class DanceTypeOption extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color iconColor;
+  final bool isSelected;
+  final int count;
+  final VoidCallback onTap;
 
   const DanceTypeOption({
     super.key,
     required this.label,
     required this.icon,
     required this.iconColor,
+    required this.isSelected,
+    required this.count,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 2),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: iconColor, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF0F172A),
-              ),
-            ),
-          ),
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.grey.shade300, width: 2),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Button to show more dance type options.
-class ShowMoreDancesButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  const ShowMoreDancesButton({super.key, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: onTap,
       child: Container(
-        height: 40,
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: isSelected
+              ? const Color(0xFFEEF2FF)
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200, width: 2),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF6366F1)
+                : Colors.grey.shade200,
+            width: 2,
+          ),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              t.eventFilters.showMoreDances,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF0F172A),
+            Icon(icon, color: iconColor, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF0F172A),
+                ),
               ),
             ),
-            const SizedBox(width: 6),
-            const Icon(Icons.keyboard_arrow_down, size: 16),
+            Text(
+              '$count',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: Colors.grey.shade500,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF6366F1) : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF6366F1)
+                      : Colors.grey.shade300,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
+            ),
           ],
         ),
       ),
@@ -370,9 +556,24 @@ class ShowMoreDancesButton extends StatelessWidget {
 // Location Filter Section
 // ---------------------------------------------------------------------------
 
-/// Section with radio-style options for filtering by location.
+/// Section with checkboxes for filtering by Czech region.
 class LocationFilterSection extends StatelessWidget {
-  const LocationFilterSection({super.key});
+  final List<String> regions;
+  final Set<String> selectedRegions;
+  final List<Event> allEvents;
+  final FilterState filters;
+  final void Function(String) onToggle;
+  final VoidCallback onClear;
+
+  const LocationFilterSection({
+    super.key,
+    required this.regions,
+    required this.selectedRegions,
+    required this.allEvents,
+    required this.filters,
+    required this.onToggle,
+    required this.onClear,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -382,137 +583,106 @@ class LocationFilterSection extends StatelessWidget {
         FilterSectionHeader(
           icon: Icons.location_on,
           title: t.eventFilters.location,
-          onClear: () {},
+          onClear: onClear,
         ),
         const SizedBox(height: 12),
-        LocationOption(label: t.prague, icon: Icons.apartment, iconColor: const Color(0xFF6366F1)),
-        const SizedBox(height: 8),
-        LocationOption(label: t.eventFilters.brno, icon: Icons.account_balance, iconColor: Colors.blue.shade700),
-        const SizedBox(height: 8),
-        LocationOption(label: t.eventFilters.ostrava, icon: Icons.factory, iconColor: Colors.blueGrey),
-        const SizedBox(height: 8),
-        LocationOption(label: t.eventFilters.plzen, icon: Icons.sports_bar, iconColor: Colors.amber.shade700),
-        const SizedBox(height: 8),
-        LocationOption(label: t.eventFilters.liberec, icon: Icons.terrain, iconColor: Colors.green.shade700),
-        const SizedBox(height: 8),
-        LocationOption(label: t.eventFilters.olomouc, icon: Icons.church, iconColor: Colors.indigo),
-        const SizedBox(height: 16),
-        CustomLocationInput(),
+        if (regions.isEmpty)
+          _EmptyOptionMessage(message: t.eventFilters.noResults)
+        else
+          ...regions.map((region) {
+            final isSelected = selectedRegions.contains(region);
+            final count = countEventsForRegion(allEvents, region, filters);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: LocationOption(
+                label: region,
+                isSelected: isSelected,
+                count: count,
+                onTap: () => onToggle(region),
+              ),
+            );
+          }),
       ],
     );
   }
 }
 
-/// A single location radio-style option row.
+/// A single location checkbox-style option row.
 class LocationOption extends StatelessWidget {
   final String label;
-  final IconData icon;
-  final Color iconColor;
+  final bool isSelected;
+  final int count;
+  final VoidCallback onTap;
 
   const LocationOption({
     super.key,
     required this.label,
-    required this.icon,
-    required this.iconColor,
+    required this.isSelected,
+    required this.count,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 2),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: iconColor, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF0F172A),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF6366F1) : Colors.grey.shade200,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.location_on,
+              color: isSelected
+                  ? const Color(0xFF6366F1)
+                  : Colors.grey.shade500,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF0F172A),
+                ),
               ),
             ),
-          ),
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300, width: 2),
+            Text(
+              '$count',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: Colors.grey.shade500,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Text input for entering a custom location.
-class CustomLocationInput extends StatelessWidget {
-  const CustomLocationInput({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFF9FAFB), Color(0xFFF8FAFC)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+            const SizedBox(width: 12),
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF6366F1) : Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF6366F1)
+                      : Colors.grey.shade300,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  : null,
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            t.eventFilters.customLocationLabel,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200, width: 2),
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12),
-                  child: Icon(Icons.search, color: Colors.grey.shade400, size: 20),
-                ),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: t.eventFilters.customLocationHint,
-                      hintStyle: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                    style: GoogleFonts.inter(fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -524,7 +694,28 @@ class CustomLocationInput extends StatelessWidget {
 
 /// Section with date pickers and quick-select date buttons.
 class DateRangeFilterSection extends StatelessWidget {
-  const DateRangeFilterSection({super.key});
+  final DateTime? dateFrom;
+  final DateTime? dateTo;
+  final VoidCallback onDateFromTap;
+  final VoidCallback onDateToTap;
+  final VoidCallback onTodayPreset;
+  final VoidCallback onTomorrowPreset;
+  final VoidCallback onThisWeekPreset;
+  final VoidCallback onWeekendPreset;
+  final VoidCallback onClear;
+
+  const DateRangeFilterSection({
+    super.key,
+    required this.dateFrom,
+    required this.dateTo,
+    required this.onDateFromTap,
+    required this.onDateToTap,
+    required this.onTodayPreset,
+    required this.onTomorrowPreset,
+    required this.onThisWeekPreset,
+    required this.onWeekendPreset,
+    required this.onClear,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -534,12 +725,20 @@ class DateRangeFilterSection extends StatelessWidget {
         FilterSectionHeader(
           icon: Icons.calendar_month,
           title: t.eventFilters.date,
-          onClear: () {},
+          onClear: onClear,
         ),
         const SizedBox(height: 12),
-        DateInputField(label: t.eventFilters.dateFrom),
+        DateInputField(
+          label: t.eventFilters.dateFrom,
+          value: dateFrom,
+          onTap: onDateFromTap,
+        ),
         const SizedBox(height: 12),
-        DateInputField(label: t.eventFilters.dateTo),
+        DateInputField(
+          label: t.eventFilters.dateTo,
+          value: dateTo,
+          onTap: onDateToTap,
+        ),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -550,7 +749,7 @@ class DateRangeFilterSection extends StatelessWidget {
                 iconColor: const Color(0xFF6366F1),
                 gradientColors: const [Color(0xFFEFF6FF), Color(0xFFEEF2FF)],
                 borderColor: const Color(0xFFBFDBFE),
-                onPressed: () {},
+                onPressed: onTodayPreset,
               ),
             ),
             const SizedBox(width: 8),
@@ -561,7 +760,7 @@ class DateRangeFilterSection extends StatelessWidget {
                 iconColor: const Color(0xFF8B5CF6),
                 gradientColors: const [Color(0xFFF5F3FF), Color(0xFFFDF2F8)],
                 borderColor: const Color(0xFFD8B4FE),
-                onPressed: () {},
+                onPressed: onTomorrowPreset,
               ),
             ),
           ],
@@ -576,7 +775,7 @@ class DateRangeFilterSection extends StatelessWidget {
                 iconColor: const Color(0xFFEC4899),
                 gradientColors: const [Color(0xFFFDF2F8), Color(0xFFFFF1F2)],
                 borderColor: const Color(0xFFFBCFE8),
-                onPressed: () {},
+                onPressed: onThisWeekPreset,
               ),
             ),
             const SizedBox(width: 8),
@@ -584,10 +783,10 @@ class DateRangeFilterSection extends StatelessWidget {
               child: DateQuickSelectButton(
                 icon: Icons.event_available,
                 label: t.eventFilters.dateWeekend,
-                iconColor: Colors.green.shade600,
+                iconColor: Colors.green,
                 gradientColors: const [Color(0xFFF0FDF4), Color(0xFFECFDF5)],
                 borderColor: const Color(0xFFBBF7D0),
-                onPressed: () {},
+                onPressed: onWeekendPreset,
               ),
             ),
           ],
@@ -597,14 +796,25 @@ class DateRangeFilterSection extends StatelessWidget {
   }
 }
 
-/// A labeled date input field with calendar icon.
+/// A labeled date input field with calendar icon and optional selected date.
 class DateInputField extends StatelessWidget {
   final String label;
+  final DateTime? value;
+  final VoidCallback onTap;
 
-  const DateInputField({super.key, required this.label});
+  const DateInputField({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final formatted = value != null
+        ? DateFormat('dd.MM.yyyy').format(value!)
+        : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -617,37 +827,44 @@ class DateInputField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200, width: 2),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Icon(Icons.calendar_today,
-                    color: Colors.grey.shade400, size: 18),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: value != null
+                    ? const Color(0xFF6366F1)
+                    : Colors.grey.shade200,
+                width: 2,
               ),
-              Expanded(
-                child: TextField(
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    hintText: 'dd.mm.yyyy',
-                    hintStyle: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.grey.shade400,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Icon(
+                    Icons.calendar_today,
+                    color: value != null
+                        ? const Color(0xFF6366F1)
+                        : Colors.grey.shade400,
+                    size: 18,
                   ),
-                  style: GoogleFonts.inter(fontSize: 14),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Text(
+                  formatted ?? 'dd.mm.yyyy',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: value != null
+                        ? const Color(0xFF0F172A)
+                        : Colors.grey.shade400,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -714,7 +931,9 @@ class DateQuickSelectButton extends StatelessWidget {
 
 /// Card prompting the user to save the current filter configuration.
 class SaveFilterSection extends StatelessWidget {
-  const SaveFilterSection({super.key});
+  final Future<void> Function() onSave;
+
+  const SaveFilterSection({super.key, required this.onSave});
 
   @override
   Widget build(BuildContext context) {
@@ -761,7 +980,7 @@ class SaveFilterSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           GestureDetector(
-            onTap: () {},
+            onTap: onSave,
             child: Container(
               height: 40,
               decoration: BoxDecoration(
@@ -798,7 +1017,16 @@ class SaveFilterSection extends StatelessWidget {
 
 /// Fixed bottom bar with "Clear all" and "Apply filters" buttons.
 class FilterFooterActions extends StatelessWidget {
-  const FilterFooterActions({super.key});
+  final int matchingCount;
+  final VoidCallback onClearAll;
+  final VoidCallback onApply;
+
+  const FilterFooterActions({
+    super.key,
+    required this.matchingCount,
+    required this.onClearAll,
+    required this.onApply,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -825,11 +1053,14 @@ class FilterFooterActions extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: ClearAllButton(onPressed: () {}),
+                  child: ClearAllButton(onPressed: onClearAll),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ApplyFiltersButton(onPressed: () {}),
+                  child: ApplyFiltersButton(
+                    matchingCount: matchingCount,
+                    onPressed: onApply,
+                  ),
                 ),
               ],
             ),
@@ -841,7 +1072,7 @@ class FilterFooterActions extends StatelessWidget {
                     size: 14, color: Colors.grey.shade500),
                 const SizedBox(width: 6),
                 Text(
-                  t.eventFilters.eventsShown(count: 24),
+                  t.eventFilters.showEvents(count: matchingCount),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: Colors.grey.shade500,
@@ -895,9 +1126,14 @@ class ClearAllButton extends StatelessWidget {
 
 /// "Apply filters" gradient button in the footer.
 class ApplyFiltersButton extends StatelessWidget {
+  final int matchingCount;
   final VoidCallback onPressed;
 
-  const ApplyFiltersButton({super.key, required this.onPressed});
+  const ApplyFiltersButton({
+    super.key,
+    required this.matchingCount,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -917,7 +1153,7 @@ class ApplyFiltersButton extends StatelessWidget {
             const Icon(Icons.check, size: 16, color: Colors.white),
             const SizedBox(width: 6),
             Text(
-              t.eventFilters.applyFilters,
+              t.eventFilters.showEvents(count: matchingCount),
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -980,5 +1216,90 @@ class FilterSectionHeader extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Small message shown when there are no options to display.
+class _EmptyOptionMessage extends StatelessWidget {
+  final String message;
+
+  const _EmptyOptionMessage({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        message,
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          color: Colors.grey.shade500,
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dance type icon/color helpers
+// ---------------------------------------------------------------------------
+
+IconData _danceTypeIcon(String danceType) {
+  switch (danceType.toLowerCase()) {
+    case 'salsa':
+      return Icons.local_fire_department;
+    case 'bachata':
+      return Icons.favorite;
+    case 'kizomba':
+      return Icons.nightlight_round;
+    case 'zouk':
+      return Icons.water;
+    case 'tango':
+      return Icons.local_florist;
+    case 'swing':
+      return Icons.face;
+    case 'forró':
+    case 'forro':
+      return Icons.album;
+    case 'merengue':
+      return Icons.wb_sunny;
+    case 'reggaeton':
+      return Icons.bolt;
+    case 'urban kiz':
+      return Icons.location_city;
+    case 'lindy hop':
+      return Icons.album;
+    default:
+      return Icons.music_note;
+  }
+}
+
+Color _danceTypeColor(String danceType) {
+  switch (danceType.toLowerCase()) {
+    case 'salsa':
+      return Colors.red;
+    case 'bachata':
+      return Colors.pink;
+    case 'kizomba':
+      return Colors.purple;
+    case 'zouk':
+      return Colors.teal;
+    case 'tango':
+      return Colors.blueGrey;
+    case 'swing':
+      return Colors.orange;
+    case 'forró':
+    case 'forro':
+      return Colors.green;
+    case 'merengue':
+      return Colors.amber;
+    case 'reggaeton':
+      return Colors.lime;
+    case 'urban kiz':
+      return Colors.deepPurple;
+    case 'lindy hop':
+      return Colors.yellow;
+    default:
+      return const Color(0xFF6366F1);
   }
 }

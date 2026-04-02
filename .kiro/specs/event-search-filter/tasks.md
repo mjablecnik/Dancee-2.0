@@ -106,15 +106,15 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Call `restoreFilters()` on EventFilterCubit after registration
     - _Requirements: 7.3_
 
-- [ ] 7. Upgrade EventFiltersPage to interactive filter page
-  - [ ] 7.1 Refactor EventFiltersPage to StatefulWidget with draft FilterState
+- [x] 7. Upgrade EventFiltersPage to interactive filter page
+  - [x] 7.1 Refactor EventFiltersPage to StatefulWidget with draft FilterState
     - Convert `EventFiltersPage` to accept optional `scrollTo` parameter for auto-scrolling to a section
     - Update `EventFiltersRoute` to pass `scrollTo` query parameter
     - Maintain local draft `FilterState` in the StatefulWidget
     - Initialize draft from current `EventFilterCubit` filters on page open
     - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6_
 
-  - [ ] 7.2 Wire DanceTypeFilterSection to draft state
+  - [x] 7.2 Wire DanceTypeFilterSection to draft state
     - Populate dance type list dynamically from `extractDanceTypes(allEvents)`
     - Show checkboxes reflecting draft `selectedDanceTypes`
     - Toggle dance types in draft state on tap
@@ -122,7 +122,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Wire "Clear" button to deselect all dance types in draft
     - _Requirements: 3.1, 3.2, 3.3, 3.5, 3.6_
 
-  - [ ] 7.3 Wire LocationFilterSection to draft state
+  - [x] 7.3 Wire LocationFilterSection to draft state
     - Populate region list dynamically from `extractRegions(allEvents)`
     - Show checkboxes reflecting draft `selectedRegions`
     - Toggle regions in draft state on tap
@@ -130,14 +130,14 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Wire "Clear" button to deselect all regions in draft
     - _Requirements: 4.1, 4.2, 4.3, 4.5, 4.6_
 
-  - [ ] 7.4 Wire DateRangeFilterSection to draft state
+  - [x] 7.4 Wire DateRangeFilterSection to draft state
     - Wire "From" and "To" date input fields to draft `dateFrom`/`dateTo`
     - Open date picker on tap
     - Wire quick date preset buttons (Today, Tomorrow, This Week, Weekend) to populate draft dates
     - Wire "Clear" button to clear both date fields in draft
     - _Requirements: 5.1, 5.2, 5.6, 5.7, 5.8_
 
-  - [ ] 7.5 Wire footer actions and live preview count
+  - [x] 7.5 Wire footer actions and live preview count
     - Compute live matching count from draft FilterState against all events using `applyFilters` pure function
     - Display count in footer (e.g., "Show 42 events")
     - "Apply filters" button pushes draft to `EventFilterCubit.applyFilters()` and pops back
@@ -145,12 +145,12 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Update `ActiveFiltersSummary` to show real active filter count and matching event count
     - _Requirements: 6.3, 6.4, 6.5, 9.1, 9.2, 9.3, 9.4_
 
-  - [ ] 7.6 Wire SaveFilterSection
+  - [x] 7.6 Wire SaveFilterSection
     - "Save filters" button calls `EventFilterCubit.saveFilters()` with current draft
     - Show feedback (snackbar) on save success/failure
     - _Requirements: 7.2, 7.6_
 
-  - [ ] 7.7 Wire reset button in header
+  - [x] 7.7 Wire reset button in header
     - Reset button clears all draft filter selections on the Filter_Page
     - _Requirements: 2.4_
 
