@@ -35,7 +35,7 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardContent = _EventCardContent(
+    final cardContent = EventCardContent(
       event: event,
       onTap: onTap,
       onFavoriteToggle: onFavoriteToggle,
@@ -65,12 +65,12 @@ class EventCard extends StatelessWidget {
 }
 
 /// Internal card content layout for [EventCard].
-class _EventCardContent extends StatelessWidget {
+class EventCardContent extends StatelessWidget {
   final Event event;
   final VoidCallback onTap;
   final VoidCallback onFavoriteToggle;
 
-  const _EventCardContent({
+  const EventCardContent({
     required this.event,
     required this.onTap,
     required this.onFavoriteToggle,
@@ -115,26 +115,26 @@ class _EventCardContent extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _EventIconBadge(
+                      EventIconBadge(
                         dances: event.dances,
                         gradientColors: gradientColors,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _EventDetails(
+                        child: EventDetails(
                           event: event,
                           dateFormat: dateFormat,
                           timeFormat: timeFormat,
                         ),
                       ),
-                      _EventActions(
+                      EventActions(
                         event: event,
                         onFavoriteToggle: onFavoriteToggle,
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _EventFooter(event: event),
+                  EventFooter(event: event),
                 ],
               ),
             ),
@@ -146,11 +146,11 @@ class _EventCardContent extends StatelessWidget {
 }
 
 /// Gradient icon badge showing a dance-style-specific icon.
-class _EventIconBadge extends StatelessWidget {
+class EventIconBadge extends StatelessWidget {
   final List<String> dances;
   final List<Color> gradientColors;
 
-  const _EventIconBadge({
+  const EventIconBadge({
     required this.dances,
     required this.gradientColors,
   });
@@ -178,12 +178,12 @@ class _EventIconBadge extends StatelessWidget {
 }
 
 /// Title, venue, date, and time details for an event card.
-class _EventDetails extends StatelessWidget {
+class EventDetails extends StatelessWidget {
   final Event event;
   final String dateFormat;
   final String timeFormat;
 
-  const _EventDetails({
+  const EventDetails({
     required this.event,
     required this.dateFormat,
     required this.timeFormat,
@@ -270,11 +270,11 @@ class _EventDetails extends StatelessWidget {
 }
 
 /// Badge and favorite toggle button column.
-class _EventActions extends StatelessWidget {
+class EventActions extends StatelessWidget {
   final Event event;
   final VoidCallback onFavoriteToggle;
 
-  const _EventActions({
+  const EventActions({
     required this.event,
     required this.onFavoriteToggle,
   });
@@ -341,10 +341,10 @@ class _EventActions extends StatelessWidget {
 }
 
 /// Footer row with dance style tags and detail link.
-class _EventFooter extends StatelessWidget {
+class EventFooter extends StatelessWidget {
   final Event event;
 
-  const _EventFooter({required this.event});
+  const EventFooter({required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -356,7 +356,7 @@ class _EventFooter extends StatelessWidget {
             spacing: 6,
             runSpacing: 6,
             children: event.dances
-                .map((dance) => _DanceTag(tag: dance, isPast: event.isPast))
+                .map((dance) => DanceTag(tag: dance, isPast: event.isPast))
                 .toList(),
           ),
         ),
@@ -382,11 +382,11 @@ class _EventFooter extends StatelessWidget {
 }
 
 /// A small colored tag chip for a dance style.
-class _DanceTag extends StatelessWidget {
+class DanceTag extends StatelessWidget {
   final String tag;
   final bool isPast;
 
-  const _DanceTag({required this.tag, required this.isPast});
+  const DanceTag({required this.tag, required this.isPast});
 
   @override
   Widget build(BuildContext context) {
@@ -631,7 +631,7 @@ class FilterChip extends StatelessWidget {
           ),
           if (hasNotification) ...[
             const SizedBox(width: 8),
-            _NotificationBadge(count: notificationCount),
+            NotificationBadge(count: notificationCount),
           ],
         ],
       ),
@@ -640,10 +640,10 @@ class FilterChip extends StatelessWidget {
 }
 
 /// Small red circle badge showing a count number.
-class _NotificationBadge extends StatelessWidget {
+class NotificationBadge extends StatelessWidget {
   final int count;
 
-  const _NotificationBadge({required this.count});
+  const NotificationBadge({required this.count});
 
   @override
   Widget build(BuildContext context) {

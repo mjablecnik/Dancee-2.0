@@ -43,13 +43,13 @@ class EventListHeaderSection extends StatelessWidget {
           final double borderRadius = 12.0 - (4.0 * progress);
           final double titleFontSize = 32.0 - (16.0 * progress);
 
-          return _HeaderBackground(
+          return HeaderBackground(
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    _LogoIcon(
+                    LogoIcon(
                       size: iconSize,
                       innerSize: iconInnerSize,
                       borderRadius: borderRadius,
@@ -84,10 +84,10 @@ class EventListHeaderSection extends StatelessWidget {
 }
 
 /// Gradient background container used by the header section.
-class _HeaderBackground extends StatelessWidget {
+class HeaderBackground extends StatelessWidget {
   final Widget child;
 
-  const _HeaderBackground({required this.child});
+  const HeaderBackground({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -105,13 +105,13 @@ class _HeaderBackground extends StatelessWidget {
 }
 
 /// Animated logo icon with white background and music note.
-class _LogoIcon extends StatelessWidget {
+class LogoIcon extends StatelessWidget {
   final double size;
   final double innerSize;
   final double borderRadius;
   final double animationProgress;
 
-  const _LogoIcon({
+  const LogoIcon({
     required this.size,
     required this.innerSize,
     required this.borderRadius,

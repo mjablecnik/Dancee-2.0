@@ -64,7 +64,7 @@ class EventDetailPage extends StatelessWidget {
                 onBackPressed: () => context.pop(),
               );
             }
-            return _EventDetailContent(event: event);
+            return EventDetailContent(event: event);
           },
         ),
       ),
@@ -76,10 +76,10 @@ class EventDetailPage extends StatelessWidget {
 ///
 /// Separated into its own widget so callbacks can access the
 /// [EventDetailCubit] from the [BlocProvider] above.
-class _EventDetailContent extends StatelessWidget {
+class EventDetailContent extends StatelessWidget {
   final Event event;
 
-  const _EventDetailContent({required this.event});
+  const EventDetailContent({required this.event});
 
   @override
   Widget build(BuildContext context) {

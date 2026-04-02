@@ -325,8 +325,8 @@ class EventInfoCard extends StatelessWidget {
         ),
       ),
       child: info.type == EventInfoType.url
-          ? _UrlInfoCardContent(info: info, iconColor: iconColor)
-          : _DefaultInfoCardContent(info: info, iconColor: iconColor),
+          ? UrlInfoCardContent(info: info, iconColor: iconColor)
+          : DefaultInfoCardContent(info: info, iconColor: iconColor),
     );
 
     if (onTap != null) {
@@ -338,11 +338,11 @@ class EventInfoCard extends StatelessWidget {
 }
 
 /// Default layout for price/text info cards — key left, value right.
-class _DefaultInfoCardContent extends StatelessWidget {
+class DefaultInfoCardContent extends StatelessWidget {
   final EventInfo info;
   final Color iconColor;
 
-  const _DefaultInfoCardContent({
+  const DefaultInfoCardContent({
     required this.info,
     required this.iconColor,
   });
@@ -377,11 +377,11 @@ class _DefaultInfoCardContent extends StatelessWidget {
 }
 
 /// Vertical layout for URL info cards — label on top, truncated URL below.
-class _UrlInfoCardContent extends StatelessWidget {
+class UrlInfoCardContent extends StatelessWidget {
   final EventInfo info;
   final Color iconColor;
 
-  const _UrlInfoCardContent({
+  const UrlInfoCardContent({
     required this.info,
     required this.iconColor,
   });
