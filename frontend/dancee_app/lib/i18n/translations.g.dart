@@ -248,6 +248,7 @@ class _TranslationsEventFiltersEn {
 	String get noResults => 'No results';
 	String get showMoreDances => 'Show more dances';
 	String get showLessDances => 'Show less';
+	String get applyFilters => 'Apply filters';
 }
 
 // Path: auth
@@ -459,6 +460,7 @@ class _TranslationsEventFiltersCs extends _TranslationsEventFiltersEn {
 	@override String get noResults => 'Žádné výsledky';
 	@override String get showMoreDances => 'Zobrazit další tance';
 	@override String get showLessDances => 'Zobrazit méně';
+	@override String get applyFilters => 'Použít filtry';
 }
 
 // Path: auth
@@ -670,6 +672,7 @@ class _TranslationsEventFiltersEs extends _TranslationsEventFiltersEn {
 	@override String get noResults => 'Sin resultados';
 	@override String get showMoreDances => 'Mostrar más bailes';
 	@override String get showLessDances => 'Mostrar menos';
+	@override String get applyFilters => 'Aplicar filtros';
 }
 
 // Path: auth

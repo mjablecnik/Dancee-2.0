@@ -583,7 +583,6 @@ class FilterFooterActions extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ApplyFiltersButton(
-                    matchingCount: matchingCount,
                     onPressed: onApply,
                   ),
                 ),

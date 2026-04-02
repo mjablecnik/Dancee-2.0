@@ -128,7 +128,7 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
           Expanded(
             child: ListView(
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
               children: [
                 ActiveFiltersSummary(
                   activeCount: activeCount,
@@ -215,15 +215,15 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
               ],
             ),
           ),
+          FilterFooterActions(
+            matchingCount: matchingCount,
+            onClearAll: () => _updateDraft(const FilterState()),
+            onApply: () {
+              getIt<EventFilterCubit>().applyFilters(_draft);
+              context.pop();
+            },
+          ),
         ],
-      ),
-      bottomSheet: FilterFooterActions(
-        matchingCount: matchingCount,
-        onClearAll: () => _updateDraft(const FilterState()),
-        onApply: () {
-          getIt<EventFilterCubit>().applyFilters(_draft);
-          context.pop();
-        },
       ),
     );
   }

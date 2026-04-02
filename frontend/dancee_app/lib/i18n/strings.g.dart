@@ -254,6 +254,7 @@ class _StringsEventFiltersEn {
 	String get noResults => 'No results';
 	String get showMoreDances => 'Show more dances';
 	String get showLessDances => 'Show less';
+	String get applyFilters => 'Apply filters';
 }
 
 // Path: auth
@@ -468,6 +469,7 @@ class _StringsEventFiltersCs implements _StringsEventFiltersEn {
 	@override String get noResults => 'Žádné výsledky';
 	@override String get showMoreDances => 'Zobrazit další tance';
 	@override String get showLessDances => 'Zobrazit méně';
+	@override String get applyFilters => 'Použít filtry';
 }
 
 // Path: auth
@@ -682,6 +684,7 @@ class _StringsEventFiltersEs implements _StringsEventFiltersEn {
 	@override String get noResults => 'Sin resultados';
 	@override String get showMoreDances => 'Mostrar más bailes';
 	@override String get showLessDances => 'Mostrar menos';
+	@override String get applyFilters => 'Aplicar filtros';
 }
 
 // Path: auth
@@ -854,6 +857,7 @@ extension on Translations {
 			case 'eventFilters.noResults': return 'No results';
 			case 'eventFilters.showMoreDances': return 'Show more dances';
 			case 'eventFilters.showLessDances': return 'Show less';
+			case 'eventFilters.applyFilters': return 'Apply filters';
 			case 'auth.login': return 'Login';
 			case 'auth.loginTitle': return 'Sign In';
 			case 'auth.loginSubtitle': return 'Welcome back to Dancee';
@@ -1000,6 +1004,7 @@ extension on _StringsCs {
 			case 'eventFilters.noResults': return 'Žádné výsledky';
 			case 'eventFilters.showMoreDances': return 'Zobrazit další tance';
 			case 'eventFilters.showLessDances': return 'Zobrazit méně';
+			case 'eventFilters.applyFilters': return 'Použít filtry';
 			case 'auth.login': return 'Přihlášení';
 			case 'auth.loginTitle': return 'Přihlášení';
 			case 'auth.loginSubtitle': return 'Vítejte zpět v Dancee';
@@ -1146,6 +1151,7 @@ extension on _StringsEs {
 			case 'eventFilters.noResults': return 'Sin resultados';
 			case 'eventFilters.showMoreDances': return 'Mostrar más bailes';
 			case 'eventFilters.showLessDances': return 'Mostrar menos';
+			case 'eventFilters.applyFilters': return 'Aplicar filtros';
 			case 'auth.login': return 'Iniciar sesión';
 			case 'auth.loginTitle': return 'Iniciar sesión';
 			case 'auth.loginSubtitle': return 'Bienvenido de vuelta a Dancee';

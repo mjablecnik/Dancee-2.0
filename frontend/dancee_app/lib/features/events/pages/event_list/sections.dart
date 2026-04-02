@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -189,25 +190,39 @@ class _SearchAndFiltersSectionState extends State<SearchAndFiltersSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: Column(
-        children: [
-          components.SearchBar(
-            controller: _searchController,
-            showClearButton: _showClearButton,
+    return BlocListener<EventFilterCubit, EventFilterState>(
+      bloc: getIt<EventFilterCubit>(),
+      listenWhen: (previous, current) =>
+          previous.filters.searchQuery != current.filters.searchQuery,
+      listener: (context, state) {
+        final newQuery = state.filters.searchQuery;
+        if (_searchController.text != newQuery) {
+          _searchController.text = newQuery;
+          setState(() {
+            _showClearButton = newQuery.isNotEmpty;
+          });
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
-          const SizedBox(height: 16),
-          const components.FilterChipsRow(),
-        ],
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+        child: Column(
+          children: [
+            components.SearchBar(
+              controller: _searchController,
+              showClearButton: _showClearButton,
+            ),
+            const SizedBox(height: 16),
+            const components.FilterChipsRow(),
+          ],
+        ),
       ),
     );
   }

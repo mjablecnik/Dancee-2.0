@@ -83,7 +83,8 @@
     "activeFilterCount": "{count} aktivní",
     "noResults": "Žádné výsledky",
     "showMoreDances": "Zobrazit další tance",
-    "showLessDances": "Zobrazit méně"
+    "showLessDances": "Zobrazit méně",
+    "applyFilters": "Použít filtry"
   },
   "auth": {
     "login": "Přihlášení",

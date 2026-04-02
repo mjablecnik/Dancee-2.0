@@ -392,12 +392,10 @@ class ClearAllButton extends StatelessWidget {
 
 /// "Apply filters" gradient button in the footer.
 class ApplyFiltersButton extends StatelessWidget {
-  final int matchingCount;
   final VoidCallback onPressed;
 
   const ApplyFiltersButton({
     super.key,
-    required this.matchingCount,
     required this.onPressed,
   });
 
@@ -419,7 +417,7 @@ class ApplyFiltersButton extends StatelessWidget {
             const Icon(Icons.check, size: 16, color: Colors.white),
             const SizedBox(width: 6),
             Text(
-              t.eventFilters.showEvents(count: matchingCount),
+              t.eventFilters.applyFilters,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,

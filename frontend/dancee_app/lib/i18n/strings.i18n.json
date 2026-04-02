@@ -83,7 +83,8 @@
     "activeFilterCount": "{count} active",
     "noResults": "No results",
     "showMoreDances": "Show more dances",
-    "showLessDances": "Show less"
+    "showLessDances": "Show less",
+    "applyFilters": "Apply filters"
   },
   "auth": {
     "login": "Login",
