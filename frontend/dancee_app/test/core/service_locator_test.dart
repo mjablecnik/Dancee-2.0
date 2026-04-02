@@ -8,6 +8,8 @@ import 'package:dancee_app/features/events/logic/event_list.dart';
 import 'package:dancee_app/features/events/logic/favorites.dart';
 import 'package:dancee_app/features/settings/data/settings_repository.dart';
 import 'package:dancee_app/features/settings/logic/settings.dart';
+import 'package:dancee_app/features/events/data/filter_persistence_service.dart';
+import 'package:dancee_app/features/events/logic/event_filter.dart';
 import 'package:dancee_app/i18n/translations.g.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -46,6 +48,10 @@ void main() {
 
       // Factory with param
       expect(getIt<EventDetailCubit>(param1: 'test-event-id'), isNotNull);
+
+      // New filter dependencies
+      expect(getIt<FilterPersistenceService>(), isNotNull);
+      expect(getIt<EventFilterCubit>(), isNotNull);
     },
   );
 }

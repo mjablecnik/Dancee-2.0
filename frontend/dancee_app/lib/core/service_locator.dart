@@ -14,6 +14,8 @@ import '../features/events/logic/favorites.dart';
 import '../features/auth/logic/auth.dart';
 import '../features/settings/logic/settings.dart';
 import '../features/events/logic/event_detail.dart';
+import '../features/events/data/filter_persistence_service.dart';
+import '../features/events/logic/event_filter.dart';
 
 final getIt = GetIt.instance;
 
@@ -62,4 +64,18 @@ void setupDependencies() {
       eventId: eventId,
     ),
   );
+
+  getIt.registerLazySingleton<FilterPersistenceService>(
+    () => FilterPersistenceService(),
+  );
+
+  getIt.registerLazySingleton<EventFilterCubit>(
+    () => EventFilterCubit(
+      getIt<EventListCubit>(),
+      getIt<FilterPersistenceService>(),
+    ),
+  );
+
+  // Restore saved filters on startup
+  getIt<EventFilterCubit>().restoreFilters();
 }

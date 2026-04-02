@@ -99,8 +99,8 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Run `task slang` to regenerate translations
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 6. Register dependencies in service locator
-  - [ ] 6.1 Register FilterPersistenceService and EventFilterCubit in DI
+- [x] 6. Register dependencies in service locator
+  - [x] 6.1 Register FilterPersistenceService and EventFilterCubit in DI
     - Register `FilterPersistenceService` as lazy singleton
     - Register `EventFilterCubit` as lazy singleton, injecting `EventListCubit` and `FilterPersistenceService`
     - Call `restoreFilters()` on EventFilterCubit after registration
