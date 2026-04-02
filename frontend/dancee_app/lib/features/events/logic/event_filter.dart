@@ -97,25 +97,29 @@ List<Event> filterEvents(List<Event> events, FilterState filters) {
   }).toList();
 }
 
-/// Returns sorted unique dance types from all events.
+/// Returns unique dance types from all events, sorted by event count descending.
 List<String> extractDanceTypes(List<Event> events) {
-  final types = <String>{};
+  final counts = <String, int>{};
   for (final event in events) {
-    types.addAll(event.dances);
+    for (final dance in event.dances) {
+      counts[dance] = (counts[dance] ?? 0) + 1;
+    }
   }
-  final sorted = types.toList()..sort();
+  final sorted = counts.keys.toList()
+    ..sort((a, b) => counts[b]!.compareTo(counts[a]!));
   return sorted;
 }
 
-/// Returns sorted unique non-empty regions from all events.
+/// Returns unique non-empty regions from all events, sorted by event count descending.
 List<String> extractRegions(List<Event> events) {
-  final regions = <String>{};
+  final counts = <String, int>{};
   for (final event in events) {
     if (event.venue.region.isNotEmpty) {
-      regions.add(event.venue.region);
+      counts[event.venue.region] = (counts[event.venue.region] ?? 0) + 1;
     }
   }
-  final sorted = regions.toList()..sort();
+  final sorted = counts.keys.toList()
+    ..sort((a, b) => counts[b]!.compareTo(counts[a]!));
   return sorted;
 }
 
