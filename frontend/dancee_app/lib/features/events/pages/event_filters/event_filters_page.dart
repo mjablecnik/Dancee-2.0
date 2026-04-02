@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -212,14 +214,30 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
                 const SizedBox(height: 24),
                 SaveFilterSection(
                   onSave: () async {
-                    await getIt<EventFilterCubit>().persistFilters(_draft);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(t.eventFilters.saveFilter),
-                          duration: const Duration(seconds: 2),
-                        ),
+                    try {
+                      await getIt<EventFilterCubit>().persistFilters(_draft);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(t.eventFilters.filtersSaved),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    } catch (e, st) {
+                      developer.log(
+                        'Failed to save filters',
+                        error: e,
+                        stackTrace: st,
                       );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(t.eventFilters.filtersSaveError),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     }
                   },
                 ),

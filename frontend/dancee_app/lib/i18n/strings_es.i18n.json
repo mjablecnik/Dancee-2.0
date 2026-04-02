@@ -84,7 +84,9 @@
     "noResults": "Sin resultados",
     "showMoreDances": "Mostrar más bailes",
     "showLessDances": "Mostrar menos",
-    "applyFilters": "Aplicar filtros"
+    "applyFilters": "Aplicar filtros",
+    "filtersSaved": "Filtros guardados",
+    "filtersSaveError": "Error al guardar los filtros"
   },
   "auth": {
     "login": "Iniciar sesión",

@@ -84,7 +84,9 @@
     "noResults": "No results",
     "showMoreDances": "Show more dances",
     "showLessDances": "Show less",
-    "applyFilters": "Apply filters"
+    "applyFilters": "Apply filters",
+    "filtersSaved": "Filters saved",
+    "filtersSaveError": "Failed to save filters"
   },
   "auth": {
     "login": "Login",

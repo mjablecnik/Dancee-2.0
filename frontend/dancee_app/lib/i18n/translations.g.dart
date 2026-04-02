@@ -249,6 +249,8 @@ class _TranslationsEventFiltersEn {
 	String get showMoreDances => 'Show more dances';
 	String get showLessDances => 'Show less';
 	String get applyFilters => 'Apply filters';
+	String get filtersSaved => 'Filters saved';
+	String get filtersSaveError => 'Failed to save filters';
 }
 
 // Path: auth
@@ -461,6 +463,8 @@ class _TranslationsEventFiltersCs extends _TranslationsEventFiltersEn {
 	@override String get showMoreDances => 'Zobrazit další tance';
 	@override String get showLessDances => 'Zobrazit méně';
 	@override String get applyFilters => 'Použít filtry';
+	@override String get filtersSaved => 'Filtry uloženy';
+	@override String get filtersSaveError => 'Nepodařilo se uložit filtry';
 }
 
 // Path: auth
@@ -673,6 +677,8 @@ class _TranslationsEventFiltersEs extends _TranslationsEventFiltersEn {
 	@override String get showMoreDances => 'Mostrar más bailes';
 	@override String get showLessDances => 'Mostrar menos';
 	@override String get applyFilters => 'Aplicar filtros';
+	@override String get filtersSaved => 'Filtros guardados';
+	@override String get filtersSaveError => 'Error al guardar los filtros';
 }
 
 // Path: auth

@@ -84,7 +84,9 @@
     "noResults": "Žádné výsledky",
     "showMoreDances": "Zobrazit další tance",
     "showLessDances": "Zobrazit méně",
-    "applyFilters": "Použít filtry"
+    "applyFilters": "Použít filtry",
+    "filtersSaved": "Filtry uloženy",
+    "filtersSaveError": "Nepodařilo se uložit filtry"
   },
   "auth": {
     "login": "Přihlášení",
