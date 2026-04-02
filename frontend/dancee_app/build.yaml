@@ -1,5 +1,5 @@
 # Build configuration for code generation
-# Used by build_runner for go_router_builder, freezed, and json_serializable
+# Used by build_runner for go_router_builder, freezed, json_serializable, and slang
 targets:
   $default:
     builders:
@@ -14,3 +14,6 @@ targets:
         enabled: true
         options:
           explicit_to_json: true
+      # slang translation generation
+      slang_build_runner:
+        enabled: true

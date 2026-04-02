@@ -2,6 +2,23 @@ import 'package:dancee_app/features/events/data/filter_persistence_service.dart'
 import 'package:dancee_app/features/events/logic/event_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
+
+/// A SharedPreferences store that throws on any write operation.
+/// Used to simulate storage failures (e.g. storage full).
+class _ThrowingSharedPreferencesStore extends InMemorySharedPreferencesStore {
+  _ThrowingSharedPreferencesStore() : super.empty();
+
+  @override
+  Future<bool> setValue(String valueType, String key, Object value) async {
+    throw Exception('Simulated write failure: storage full');
+  }
+
+  @override
+  Future<bool> remove(String key) async {
+    throw Exception('Simulated remove failure: storage full');
+  }
+}
 
 void main() {
   group('FilterPersistenceService', () {
@@ -65,6 +82,30 @@ void main() {
 
       final loaded = await service.loadFilters();
       expect(loaded!.searchQuery, equals('second'));
+    });
+
+    test('saveFilters propagates exception when SharedPreferences write fails',
+        () async {
+      SharedPreferencesStorePlatform.instance =
+          _ThrowingSharedPreferencesStore();
+
+      final service = FilterPersistenceService();
+      expect(
+        () => service.saveFilters(const FilterState(searchQuery: 'tango')),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('clearFilters propagates exception when SharedPreferences remove fails',
+        () async {
+      SharedPreferencesStorePlatform.instance =
+          _ThrowingSharedPreferencesStore();
+
+      final service = FilterPersistenceService();
+      expect(
+        () => service.clearFilters(),
+        throwsA(isA<Exception>()),
+      );
     });
   });
 }

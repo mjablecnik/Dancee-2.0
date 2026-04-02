@@ -342,6 +342,55 @@ void main() {
   );
 
   // =========================================================================
+  // TC-MEDIUM-14: Error recovery — loadEvents() succeeds after toggleFavorite failure
+  // =========================================================================
+
+  test(
+    'TC-MEDIUM-14: loadEvents recovers to EventListLoaded after toggleFavorite failure',
+    () async {
+      final cubit = EventListCubit(mockRepo);
+      final now = DateTime.now();
+
+      // Step 1: Load events successfully
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(id: '1', startTime: now.add(const Duration(hours: 1))),
+          ]);
+      await cubit.loadEvents();
+      expect(cubit.state, isA<EventListLoaded>(),
+          reason: 'Cubit should be loaded after initial loadEvents');
+
+      // Step 2: Trigger toggleFavorite failure (non-existent ID)
+      final errors = <String>[];
+      final sub = cubit.errorStream.listen(errors.add);
+
+      await cubit.toggleFavorite('non-existent-id');
+
+      // Step 3: Verify loaded state is preserved (not replaced by error state)
+      expect(cubit.state, isA<EventListLoaded>(),
+          reason: 'Loaded state must be preserved after toggleFavorite failure');
+      expect(errors, isNotEmpty,
+          reason: 'errorStream should emit a message on failure');
+
+      // Step 4: Call loadEvents again — cubit must recover to loaded state
+      when(() => mockRepo.getAllEvents()).thenAnswer((_) async => [
+            _makeEvent(id: '1', startTime: now.add(const Duration(hours: 1))),
+            _makeEvent(id: '2', startTime: now.add(const Duration(hours: 2))),
+          ]);
+      await cubit.loadEvents();
+      expect(cubit.state, isA<EventListLoaded>(),
+          reason: 'Cubit should recover to EventListLoaded after loadEvents');
+      final loaded = cubit.state as EventListLoaded;
+      expect(loaded.allEvents.length, equals(2),
+          reason: 'Recovered state should contain the newly loaded events');
+
+      await sub.cancel();
+      if (!autoLoadBlocker.isCompleted) autoLoadBlocker.complete([]);
+      await Future<void>.delayed(Duration.zero);
+      await cubit.close();
+    },
+  );
+
+  // =========================================================================
   // TC-094: Midnight boundary — event at 00:00:00 tomorrow goes to tomorrowEvents
   // =========================================================================
 

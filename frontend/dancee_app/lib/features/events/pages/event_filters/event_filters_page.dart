@@ -84,7 +84,18 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
   }
 
   void _updateDraft(FilterState newDraft) {
-    setState(() => _draft = newDraft);
+    // Auto-swap if both dates are set and dateFrom > dateTo to prevent
+    // invalid ranges that would silently return zero results.
+    FilterState validated = newDraft;
+    if (newDraft.dateFrom != null &&
+        newDraft.dateTo != null &&
+        newDraft.dateFrom!.isAfter(newDraft.dateTo!)) {
+      validated = newDraft.copyWith(
+        dateFrom: newDraft.dateTo,
+        dateTo: newDraft.dateFrom,
+      );
+    }
+    setState(() => _draft = validated);
   }
 
   Future<void> _pickDateFrom() async {

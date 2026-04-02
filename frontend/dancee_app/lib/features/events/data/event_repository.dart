@@ -83,25 +83,60 @@ class EventRepository {
     }
   }
 
+  /// Maximum number of favorite IDs that can safely be passed as a URL query
+  /// parameter before the URL length limit may be exceeded.
+  static const _maxIdsInQuery = 50;
+
   /// Returns only favorite events.
   ///
-  /// Fetches all published events and filters to those whose IDs
-  /// are in the local favorites set.
+  /// When the number of favorites is small (≤ [_maxIdsInQuery]) the IDs are
+  /// passed as a `filter[id][_in]` query parameter for an efficient targeted
+  /// fetch. When the favorites list is large the method fetches all published
+  /// events instead and filters client-side, avoiding URL length limit issues.
   Future<List<Event>> getFavoriteEvents() async {
     try {
       final favoriteIds = await _loadFavoriteIds();
       if (favoriteIds.isEmpty) return [];
 
-      final response = await _client.get(
-        '/items/events',
-        queryParameters: {
-          'fields': '*,venue.*,translations.*',
-          'filter[status][_eq]': 'published',
-          'filter[id][_in]': favoriteIds.join(','),
-          'sort': 'start_time',
-          'limit': '-1',
-        },
-      );
+      final List<dynamic> response;
+
+      if (favoriteIds.length <= _maxIdsInQuery) {
+        response = await _client.get(
+          '/items/events',
+          queryParameters: {
+            'fields': '*,venue.*,translations.*',
+            'filter[status][_eq]': 'published',
+            'filter[id][_in]': favoriteIds.join(','),
+            'sort': 'start_time',
+            'limit': '-1',
+          },
+        ) as List;
+      } else {
+        developer.log(
+          'getFavoriteEvents: ${favoriteIds.length} favorites exceed the '
+          '$_maxIdsInQuery-ID query limit; fetching all events and filtering '
+          'client-side',
+          name: 'EventRepository',
+        );
+        final all = await _client.get(
+          '/items/events',
+          queryParameters: {
+            'fields': '*,venue.*,translations.*',
+            'filter[status][_eq]': 'published',
+            'sort': 'start_time',
+            'limit': '-1',
+          },
+        );
+        if (all is! List) {
+          throw ApiException(message: 'Invalid response format');
+        }
+        response = (all).where((item) {
+          if (item is Map<String, dynamic>) {
+            return favoriteIds.contains(item['id']?.toString());
+          }
+          return false;
+        }).toList();
+      }
 
       if (response is! List) {
         throw ApiException(message: 'Invalid response format');

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:equatable/equatable.dart';
 
 // ============================================================================
@@ -29,6 +31,16 @@ class Address extends Equatable {
       street: fullStreet,
       city: json['town'] as String? ?? '',
       postalCode: json['postal_code'] as String? ?? '',
+      country: json['country'] as String? ?? '',
+    );
+  }
+
+  /// Creates an Address from the format produced by [toJson].
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      street: json['street'] as String? ?? '',
+      city: json['city'] as String? ?? '',
+      postalCode: json['postalCode'] as String? ?? '',
       country: json['country'] as String? ?? '',
     );
   }
@@ -88,6 +100,18 @@ class Venue extends Equatable {
       name: json['name'] as String? ?? '',
       address: Address.fromDirectusVenue(json),
       description: '',
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      region: json['region'] as String? ?? '',
+    );
+  }
+
+  /// Creates a Venue from the format produced by [toJson].
+  factory Venue.fromJson(Map<String, dynamic> json) {
+    return Venue(
+      name: json['name'] as String? ?? '',
+      address: Address.fromJson(json['address'] as Map<String, dynamic>? ?? {}),
+      description: json['description'] as String? ?? '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
       region: json['region'] as String? ?? '',
@@ -207,6 +231,15 @@ class EventPart extends Equatable {
     final startStr = dateRange?['start'] as String?;
     final endStr = dateRange?['end'] as String?;
 
+    if (startStr == null) {
+      developer.log(
+        'EventPart.fromDirectus: missing start time in date_time_range for part '
+        '"${json['name']}"; falling back to DateTime.now()',
+        name: 'EventPart',
+        level: 900,
+      );
+    }
+
     return EventPart(
       name: json['name'] as String? ?? '',
       description: json['description'] as String?,
@@ -215,6 +248,23 @@ class EventPart extends Equatable {
           ? DateTime.parse(startStr)
           : DateTime.now(),
       endTime: endStr != null ? DateTime.parse(endStr) : null,
+      lectors: (json['lectors'] as List<dynamic>?)?.cast<String>(),
+      djs: (json['djs'] as List<dynamic>?)?.cast<String>(),
+    );
+  }
+
+  /// Creates an EventPart from the format produced by [toJson].
+  factory EventPart.fromJson(Map<String, dynamic> json) {
+    final startTimeStr = json['startTime'] as String?;
+    final endTimeStr = json['endTime'] as String?;
+    return EventPart(
+      name: json['name'] as String? ?? '',
+      description: json['description'] as String?,
+      type: _parsePartType(json['type'] as String?),
+      startTime: startTimeStr != null
+          ? DateTime.parse(startTimeStr)
+          : DateTime.now(),
+      endTime: endTimeStr != null ? DateTime.parse(endTimeStr) : null,
       lectors: (json['lectors'] as List<dynamic>?)?.cast<String>(),
       djs: (json['djs'] as List<dynamic>?)?.cast<String>(),
     );
@@ -406,6 +456,49 @@ class Event extends Equatable {
       isFavorite: favoriteIds.contains(id),
       isPast: isPast,
       sourceUrl: json['original_url'] as String?,
+      timezone: json['timezone'] as String?,
+    );
+  }
+
+  /// Creates an Event from the format produced by [toJson].
+  ///
+  /// Note: this factory reads the camelCase keys produced by [toJson] (e.g.
+  /// `startTime`, `venue` as a nested object). It is NOT interchangeable with
+  /// [Event.fromDirectus], which reads Directus-specific snake_case keys.
+  factory Event.fromJson(Map<String, dynamic> json) {
+    final startTimeStr = json['startTime'] as String?;
+    final endTimeStr = json['endTime'] as String?;
+    final durationSeconds = json['duration'] as int?;
+
+    final startTime = startTimeStr != null
+        ? DateTime.parse(startTimeStr)
+        : DateTime.now();
+    final endTime = endTimeStr != null ? DateTime.parse(endTimeStr) : null;
+
+    return Event(
+      id: json['id']?.toString() ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      organizer: json['organizer'] as String? ?? '',
+      venue: Venue.fromJson(json['venue'] as Map<String, dynamic>? ?? {}),
+      startTime: startTime,
+      endTime: endTime,
+      duration: durationSeconds != null
+          ? Duration(seconds: durationSeconds)
+          : null,
+      dances: (json['dances'] as List<dynamic>?)?.cast<String>() ?? [],
+      info: (json['info'] as List<dynamic>?)
+              ?.map((i) => EventInfo.fromJson(i as Map<String, dynamic>))
+              .toList() ??
+          [],
+      parts: (json['parts'] as List<dynamic>?)
+              ?.map((p) => EventPart.fromJson(p as Map<String, dynamic>))
+              .toList() ??
+          [],
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      isPast: json['isPast'] as bool? ?? false,
+      badge: json['badge'] as String?,
+      sourceUrl: json['sourceUrl'] as String?,
       timezone: json['timezone'] as String?,
     );
   }
