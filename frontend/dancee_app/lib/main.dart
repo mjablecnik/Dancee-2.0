@@ -5,10 +5,10 @@ import 'design/theme.dart';
 import 'core/service_locator.dart';
 import 'i18n/translations.g.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale(); // Initialize slang with device locale
-  setupDependencies();
+  await setupDependencies();
   runApp(TranslationProvider(child: const MyApp()));
 }
 

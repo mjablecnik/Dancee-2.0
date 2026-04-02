@@ -164,8 +164,13 @@ class ActiveFiltersSummary extends StatelessWidget {
 // DanceTypeFilterSection
 // ============================================================================
 
+/// Number of dance type items shown before the "Show more" button appears.
+const int _kDanceTypeInitialCount = 5;
+
 /// Section with checkboxes for filtering by dance style.
-class DanceTypeFilterSection extends StatelessWidget {
+/// Shows the first [_kDanceTypeInitialCount] items with a "Show more" toggle
+/// button when the list is longer, matching the design mockup.
+class DanceTypeFilterSection extends StatefulWidget {
   final List<String> danceTypes;
   final Set<String> selectedTypes;
   final List<Event> allEvents;
@@ -184,22 +189,35 @@ class DanceTypeFilterSection extends StatelessWidget {
   });
 
   @override
+  State<DanceTypeFilterSection> createState() => _DanceTypeFilterSectionState();
+}
+
+class _DanceTypeFilterSectionState extends State<DanceTypeFilterSection> {
+  bool _showAll = false;
+
+  @override
   Widget build(BuildContext context) {
+    final hasMore = widget.danceTypes.length > _kDanceTypeInitialCount;
+    final visibleTypes = _showAll || !hasMore
+        ? widget.danceTypes
+        : widget.danceTypes.take(_kDanceTypeInitialCount).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         FilterSectionHeader(
           icon: Icons.music_note,
           title: t.eventFilters.danceType,
-          onClear: onClear,
+          onClear: widget.onClear,
         ),
         const SizedBox(height: 12),
-        if (danceTypes.isEmpty)
+        if (widget.danceTypes.isEmpty)
           EmptyOptionMessage(message: t.eventFilters.noResults)
-        else
-          ...danceTypes.map((type) {
-            final isSelected = selectedTypes.contains(type);
-            final count = countEventsForDanceType(allEvents, type, filters);
+        else ...[
+          ...visibleTypes.map((type) {
+            final isSelected = widget.selectedTypes.contains(type);
+            final count =
+                countEventsForDanceType(widget.allEvents, type, widget.filters);
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: DanceTypeOption(
@@ -208,10 +226,41 @@ class DanceTypeFilterSection extends StatelessWidget {
                 iconColor: danceTypeColor(type),
                 isSelected: isSelected,
                 count: count,
-                onTap: () => onToggle(type),
+                onTap: () => widget.onToggle(type),
               ),
             );
           }),
+          if (hasMore)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: GestureDetector(
+                onTap: () => setState(() => _showAll = !_showAll),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _showAll
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      size: 18,
+                      color: const Color(0xFF6366F1),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _showAll
+                          ? t.eventFilters.showLessDances
+                          : t.eventFilters.showMoreDances,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF6366F1),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -222,6 +271,16 @@ class DanceTypeFilterSection extends StatelessWidget {
 // ============================================================================
 
 /// Section with checkboxes for filtering by Czech region.
+///
+/// Design deviation (intentional): The design mockup uses radio buttons
+/// (single-select), but the requirements spec (Req 4.2) explicitly requires
+/// multi-select checkboxes. The implementation follows the spec.
+///
+/// Known gap (intentionally deferred): The design mockup includes a free-text
+/// location search input ("Nebo zadejte vlastní lokalitu") below the region
+/// list. This is not implemented because the requirements spec does not require
+/// it — only region-based filtering is specified (Req 4.1–4.6). This can be
+/// added as a future enhancement.
 class LocationFilterSection extends StatelessWidget {
   final List<String> regions;
   final Set<String> selectedRegions;

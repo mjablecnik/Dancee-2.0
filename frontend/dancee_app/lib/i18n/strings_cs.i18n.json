@@ -80,7 +80,9 @@
     "noEventsMatch": "Žádné akce neodpovídají vašim filtrům",
     "showEvents": "Zobrazit {count} akcí",
     "activeFilterCount": "{count} aktivní",
-    "noResults": "Žádné výsledky"
+    "noResults": "Žádné výsledky",
+    "showMoreDances": "Zobrazit další tance",
+    "showLessDances": "Zobrazit méně"
   },
   "auth": {
     "login": "Přihlášení",

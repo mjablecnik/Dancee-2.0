@@ -80,7 +80,9 @@
     "noEventsMatch": "Ningún evento coincide con tus filtros",
     "showEvents": "Mostrar {count} eventos",
     "activeFilterCount": "{count} activo",
-    "noResults": "Sin resultados"
+    "noResults": "Sin resultados",
+    "showMoreDances": "Mostrar más bailes",
+    "showLessDances": "Mostrar menos"
   },
   "auth": {
     "login": "Iniciar sesión",

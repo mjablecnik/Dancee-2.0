@@ -80,7 +80,9 @@
     "noEventsMatch": "No events match your filters",
     "showEvents": "Show {count} events",
     "activeFilterCount": "{count} active",
-    "noResults": "No results"
+    "noResults": "No results",
+    "showMoreDances": "Show more dances",
+    "showLessDances": "Show less"
   },
   "auth": {
     "login": "Login",

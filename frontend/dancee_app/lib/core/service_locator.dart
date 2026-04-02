@@ -19,7 +19,7 @@ import '../features/events/logic/event_filter.dart';
 
 final getIt = GetIt.instance;
 
-void setupDependencies() {
+Future<void> setupDependencies() async {
   // Register DirectusClient as lazy singleton
   getIt.registerLazySingleton<DirectusClient>(
     () => DirectusClient(
@@ -69,13 +69,15 @@ void setupDependencies() {
     () => FilterPersistenceService(),
   );
 
-  getIt.registerLazySingleton<EventFilterCubit>(
-    () => EventFilterCubit(
+  // Use registerSingleton (eager) since the cubit is accessed immediately for
+  // restoreFilters() — using lazySingleton here would be misleading.
+  getIt.registerSingleton<EventFilterCubit>(
+    EventFilterCubit(
       getIt<EventListCubit>(),
       getIt<FilterPersistenceService>(),
     ),
   );
 
-  // Restore saved filters on startup
-  getIt<EventFilterCubit>().restoreFilters();
+  // Await restoreFilters so saved filters are in place before the UI renders.
+  await getIt<EventFilterCubit>().restoreFilters();
 }
