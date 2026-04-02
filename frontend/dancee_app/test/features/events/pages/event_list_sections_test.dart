@@ -1,6 +1,8 @@
 import 'package:dancee_app/core/service_locator.dart';
 import 'package:dancee_app/features/events/data/entities.dart';
 import 'package:dancee_app/features/events/data/event_repository.dart';
+import 'package:dancee_app/features/events/data/filter_persistence_service.dart';
+import 'package:dancee_app/features/events/logic/event_filter.dart';
 import 'package:dancee_app/features/events/logic/event_list.dart';
 import 'package:dancee_app/features/events/pages/event_list/sections.dart';
 import 'package:dancee_app/i18n/translations.g.dart';
@@ -11,26 +13,37 @@ import 'package:mocktail/mocktail.dart';
 class MockEventRepository extends Mock implements EventRepository {}
 
 class _SeedableEventListCubit extends EventListCubit {
-  final List<String> searchedTerms = [];
-
   _SeedableEventListCubit(super.repo);
 
   void seed(EventListState state) => emit(state);
 
   @override
   Future<void> loadEvents() async {}
+}
+
+/// Tracks calls to [updateSearchQuery] for assertions in TC-T24.
+class _TrackingEventFilterCubit extends EventFilterCubit {
+  final List<String> queriedTerms = [];
+
+  _TrackingEventFilterCubit(super.eventListCubit, super.persistenceService);
 
   @override
-  Future<void> searchEvents(String query) async {
-    searchedTerms.add(query);
-    // Emit empty results for simplicity
-    emit(const EventListState.loaded(
-      allEvents: [],
-      todayEvents: [],
-      tomorrowEvents: [],
-      upcomingEvents: [],
-    ));
+  void updateSearchQuery(String query) {
+    queriedTerms.add(query);
+    super.updateSearchQuery(query);
   }
+}
+
+/// A no-op [FilterPersistenceService] for use in tests.
+class _NoOpFilterPersistenceService extends FilterPersistenceService {
+  @override
+  Future<FilterState?> loadFilters() async => null;
+
+  @override
+  Future<void> saveFilters(FilterState filters) async {}
+
+  @override
+  Future<void> clearFilters() async {}
 }
 
 Widget _wrapSliver(Widget sliver) {
@@ -69,18 +82,25 @@ Event _makeEvent({required String id, String title = 'Test Event'}) {
 void main() {
   late MockEventRepository mockRepo;
   late _SeedableEventListCubit cubit;
+  late _TrackingEventFilterCubit filterCubit;
 
   setUpAll(() => LocaleSettings.setLocale(AppLocale.en));
 
   setUp(() {
     mockRepo = MockEventRepository();
     cubit = _SeedableEventListCubit(mockRepo);
+    filterCubit = _TrackingEventFilterCubit(cubit, _NoOpFilterPersistenceService());
     getIt.allowReassignment = true;
     getIt.registerSingleton<EventListCubit>(cubit);
+    getIt.registerSingleton<EventFilterCubit>(filterCubit);
   });
 
   tearDown(() async {
+    await filterCubit.close();
     await cubit.close();
+    if (getIt.isRegistered<EventFilterCubit>()) {
+      getIt.unregister<EventFilterCubit>();
+    }
     if (getIt.isRegistered<EventListCubit>()) {
       getIt.unregister<EventListCubit>();
     }
@@ -162,8 +182,11 @@ void main() {
       final searchField = find.byType(TextField).first;
       await tester.enterText(searchField, 'salsa');
       await tester.pump();
+      // Advance past the 300ms debounce timer to prevent a pending-timer error.
+      await tester.pump(const Duration(milliseconds: 350));
 
-      expect(cubit.searchedTerms, contains('salsa'));
+      // Search now routes through EventFilterCubit.updateSearchQuery
+      expect(filterCubit.queriedTerms, contains('salsa'));
     },
   );
 

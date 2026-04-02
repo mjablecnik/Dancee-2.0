@@ -2,6 +2,8 @@ import 'package:dancee_app/core/service_locator.dart';
 import 'package:dancee_app/design/widgets.dart';
 import 'package:dancee_app/features/events/data/entities.dart';
 import 'package:dancee_app/features/events/data/event_repository.dart';
+import 'package:dancee_app/features/events/data/filter_persistence_service.dart';
+import 'package:dancee_app/features/events/logic/event_filter.dart';
 import 'package:dancee_app/features/events/logic/event_list.dart';
 import 'package:dancee_app/features/events/pages/event_list/components.dart';
 import 'package:dancee_app/features/events/pages/event_list/event_list_page.dart';
@@ -11,6 +13,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockEventRepository extends Mock implements EventRepository {}
+
+/// A no-op [FilterPersistenceService] that always returns null on load.
+class _NoOpFilterPersistenceService extends FilterPersistenceService {
+  @override
+  Future<FilterState?> loadFilters() async => null;
+
+  @override
+  Future<void> saveFilters(FilterState filters) async {}
+
+  @override
+  Future<void> clearFilters() async {}
+}
 
 /// Extends EventListCubit to expose emit() for seeding state in tests.
 /// Overrides loadEvents() as a no-op so the constructor doesn't kick off
@@ -94,19 +108,26 @@ Event _makeUpcomingEvent({
 void main() {
   late MockEventRepository mockRepo;
   late _SeedableEventListCubit cubit;
+  late EventFilterCubit filterCubit;
 
   setUpAll(() => LocaleSettings.setLocale(AppLocale.en));
 
   setUp(() {
     mockRepo = MockEventRepository();
     cubit = _SeedableEventListCubit(mockRepo);
+    filterCubit = EventFilterCubit(cubit, _NoOpFilterPersistenceService());
 
     getIt.allowReassignment = true;
     getIt.registerSingleton<EventListCubit>(cubit);
+    getIt.registerSingleton<EventFilterCubit>(filterCubit);
   });
 
   tearDown(() async {
+    await filterCubit.close();
     await cubit.close();
+    if (getIt.isRegistered<EventFilterCubit>()) {
+      getIt.unregister<EventFilterCubit>();
+    }
     if (getIt.isRegistered<EventListCubit>()) {
       getIt.unregister<EventListCubit>();
     }
@@ -216,7 +237,8 @@ void main() {
       final searchField = find.byType(TextField);
       expect(searchField, findsOneWidget);
       await tester.enterText(searchField, 'Salsa');
-      await tester.pumpAndSettle();
+      // Advance past the 300ms debounce in EventFilterCubit.updateSearchQuery
+      await tester.pump(const Duration(milliseconds: 350));
 
       // Only the Salsa event card should be visible
       expect(find.byType(EventCard), findsOneWidget);
@@ -236,19 +258,9 @@ void main() {
       final event2 = _makeUpcomingEvent(id: '2', title: 'Tango Evening');
       final event3 = _makeUpcomingEvent(id: '3', title: 'Bachata Fest');
 
-      // Use a restoring cubit that re-emits all events when loadEvents() is
-      // called (which is what the search bar does when the field is cleared).
-      final restoringCubit = _RestoringEventListCubit(mockRepo);
-      getIt.allowReassignment = true;
-      getIt.registerSingleton<EventListCubit>(restoringCubit);
-      addTearDown(() async {
-        await restoringCubit.close();
-        if (getIt.isRegistered<EventListCubit>()) {
-          getIt.unregister<EventListCubit>();
-        }
-      });
-
-      restoringCubit.seed(EventListState.loaded(
+      // Seed events via EventListCubit — EventFilterCubit will react via its
+      // stream subscription and make all 3 events available for display.
+      cubit.seed(EventListState.loaded(
         allEvents: [event1, event2, event3],
         todayEvents: const [],
         tomorrowEvents: const [],
@@ -261,15 +273,15 @@ void main() {
       // All 3 events visible initially
       expect(find.byType(EventCard), findsNWidgets(3));
 
-      // Type "Salsa" to filter — only 1 event should show
+      // Type "Salsa" to filter — advance past 300ms debounce
       final searchField = find.byType(TextField);
       await tester.enterText(searchField, 'Salsa');
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 350));
       expect(find.byType(EventCard), findsOneWidget);
 
-      // Clear the search field — page calls loadEvents() which re-emits all events
+      // Clear the search field — EventFilterCubit removes the query filter
       await tester.enterText(searchField, '');
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 350));
 
       // All 3 event cards should be visible again
       expect(find.byType(EventCard), findsNWidgets(3));

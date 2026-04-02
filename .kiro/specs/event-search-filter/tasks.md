@@ -154,14 +154,14 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Reset button clears all draft filter selections on the Filter_Page
     - _Requirements: 2.4_
 
-- [ ] 8. Update Event List Page to use EventFilterCubit
-  - [ ] 8.1 Wire SearchAndFiltersSection to EventFilterCubit
+- [x] 8. Update Event List Page to use EventFilterCubit
+  - [x] 8.1 Wire SearchAndFiltersSection to EventFilterCubit
     - Replace `EventListCubit.searchEvents()` calls with `EventFilterCubit.updateSearchQuery()`
     - Add 300ms debounce in the search text field change handler
     - Show clear button only when text is present
     - _Requirements: 1.1, 1.2, 1.4_
 
-  - [ ] 8.2 Wire FilterChipsRow to EventFilterCubit state
+  - [x] 8.2 Wire FilterChipsRow to EventFilterCubit state
     - "Filters" chip shows active filter category count as badge from `EventFilterCubit`
     - "Filters" chip navigates to `EventFiltersRoute()` on tap
     - Date chip navigates to `EventFiltersRoute(scrollTo: 'date')` on tap
@@ -169,7 +169,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Visually distinguish active vs inactive chips based on filter state
     - _Requirements: 2.1, 2.5, 2.6, 8.1, 8.2, 8.3, 8.4_
 
-  - [ ] 8.3 Wire EventListPage to read filtered events from EventFilterCubit
+  - [x] 8.3 Wire EventListPage to read filtered events from EventFilterCubit
     - Replace `BlocBuilder<EventListCubit>` with `BlocBuilder<EventFilterCubit>` for the event list display
     - Read `todayEvents`, `tomorrowEvents`, `upcomingEvents` from `EventFilterState`
     - Show empty state message when filtered results are empty and filters are active
@@ -177,7 +177,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - Favorites page remains unaffected — always shows all favorited events
     - _Requirements: 1.5, 6.1, 6.2_
 
-- [ ] 9. Checkpoint - Ensure all tests pass
+- [x] 9. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Integration testing
