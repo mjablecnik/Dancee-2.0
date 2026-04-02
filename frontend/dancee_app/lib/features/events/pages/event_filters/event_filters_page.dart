@@ -259,6 +259,7 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
             matchingCount: matchingCount,
             onClearAll: () {
               _updateDraft(const FilterState());
+              getIt<EventFilterCubit>().applyFilters(const FilterState());
             },
             onApply: () {
               getIt<EventFilterCubit>().applyFilters(_draft);
