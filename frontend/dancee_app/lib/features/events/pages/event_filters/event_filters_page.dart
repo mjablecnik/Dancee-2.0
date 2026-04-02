@@ -134,7 +134,6 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
           EventFiltersHeaderSection(
             onBackPressed: () => context.pop(),
             onResetPressed: () {
-              getIt<EventFilterCubit>().resetFilters();
               _updateDraft(const FilterState());
             },
           ),
@@ -230,7 +229,6 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
           FilterFooterActions(
             matchingCount: matchingCount,
             onClearAll: () {
-              getIt<EventFilterCubit>().resetFilters();
               _updateDraft(const FilterState());
             },
             onApply: () {
