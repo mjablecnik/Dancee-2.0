@@ -24,7 +24,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - **Property 8: Venue region parsing from Directus JSON**
     - **Validates: Requirements 4.7**
 
-  - [ ]* 1.4 Write property test for FilterState serialization round trip (Property 7)
+  - [x]* 1.4 Write property test for FilterState serialization round trip (Property 7)
     - **Property 7: FilterState serialization round trip**
     - **Validates: Requirements 7.2, 7.3**
 
