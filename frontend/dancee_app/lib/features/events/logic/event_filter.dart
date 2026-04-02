@@ -296,6 +296,14 @@ class EventFilterCubit extends Cubit<EventFilterState> {
     await _persistenceService.saveFilters(state.filters);
   }
 
+  /// Persists an arbitrary [FilterState] without applying it to the cubit state.
+  ///
+  /// Use this to save a draft filter for next app launch without changing the
+  /// currently applied filters.
+  Future<void> persistFilters(FilterState filters) async {
+    await _persistenceService.saveFilters(filters);
+  }
+
   /// Loads and restores a previously saved [FilterState] from persistence.
   ///
   /// Falls back to the default empty state if no filters are saved or if

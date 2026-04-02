@@ -93,7 +93,12 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
       lastDate: DateTime(2030),
     );
     if (date != null) {
-      _updateDraft(_draft.copyWith(dateFrom: date));
+      var newDraft = _draft.copyWith(dateFrom: date);
+      // Auto-swap if dateFrom > dateTo
+      if (newDraft.dateTo != null && date.isAfter(newDraft.dateTo!)) {
+        newDraft = newDraft.copyWith(dateFrom: newDraft.dateTo, dateTo: date);
+      }
+      _updateDraft(newDraft);
     }
   }
 
@@ -105,7 +110,12 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
       lastDate: DateTime(2030),
     );
     if (date != null) {
-      _updateDraft(_draft.copyWith(dateTo: date));
+      var newDraft = _draft.copyWith(dateTo: date);
+      // Auto-swap if dateTo < dateFrom
+      if (newDraft.dateFrom != null && date.isBefore(newDraft.dateFrom!)) {
+        newDraft = newDraft.copyWith(dateTo: newDraft.dateFrom, dateFrom: date);
+      }
+      _updateDraft(newDraft);
     }
   }
 
@@ -123,7 +133,10 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
         children: [
           EventFiltersHeaderSection(
             onBackPressed: () => context.pop(),
-            onResetPressed: () => _updateDraft(const FilterState()),
+            onResetPressed: () {
+              getIt<EventFilterCubit>().resetFilters();
+              _updateDraft(const FilterState());
+            },
           ),
           Expanded(
             child: ListView(
@@ -200,8 +213,7 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
                 const SizedBox(height: 24),
                 SaveFilterSection(
                   onSave: () async {
-                    getIt<EventFilterCubit>().applyFilters(_draft);
-                    await getIt<EventFilterCubit>().saveFilters();
+                    await getIt<EventFilterCubit>().persistFilters(_draft);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -217,7 +229,10 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
           ),
           FilterFooterActions(
             matchingCount: matchingCount,
-            onClearAll: () => _updateDraft(const FilterState()),
+            onClearAll: () {
+              getIt<EventFilterCubit>().resetFilters();
+              _updateDraft(const FilterState());
+            },
             onApply: () {
               getIt<EventFilterCubit>().applyFilters(_draft);
               context.pop();
