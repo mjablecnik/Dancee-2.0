@@ -69,7 +69,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - **Property 1: Combined AND filter correctness**
     - **Validates: Requirements 1.2, 1.3, 3.3, 3.4, 4.3, 4.4, 5.2, 5.3, 5.4, 5.5, 6.1, 9.1, 9.2**
 
-  - [ ]* 3.4 Write property test for dance type extraction (Property 2)
+  - [x]* 3.4 Write property test for dance type extraction (Property 2)
     - **Property 2: Dance type extraction returns all unique dances**
     - **Validates: Requirements 3.1**
 
