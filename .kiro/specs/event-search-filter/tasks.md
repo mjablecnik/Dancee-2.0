@@ -77,7 +77,7 @@ Implement local search and filtering for the Dancee App event list. This adds a 
     - **Property 3: Region extraction returns all unique regions**
     - **Validates: Requirements 4.1**
 
-  - [ ]* 3.6 Write property test for cross-filter count accuracy (Property 4)
+  - [x]* 3.6 Write property test for cross-filter count accuracy (Property 4)
     - **Property 4: Per-option cross-filter event count accuracy**
     - **Validates: Requirements 3.5, 4.5**
 
