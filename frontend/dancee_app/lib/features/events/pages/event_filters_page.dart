@@ -855,7 +855,7 @@ class DateInputField extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  formatted ?? 'dd.mm.yyyy',
+                  formatted ?? t.eventFilters.datePlaceholder,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: value != null

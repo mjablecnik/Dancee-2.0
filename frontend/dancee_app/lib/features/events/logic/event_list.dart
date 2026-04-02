@@ -75,30 +75,6 @@ class EventListCubit extends Cubit<EventListState> {
     }
   }
 
-  /// Searches events locally by query string and re-groups results by date.
-  ///
-  /// Performs case-insensitive search on event title, venue name, and description.
-  /// If query is empty, reloads all events from the API.
-  /// Only works when the current state is [EventListLoaded].
-  Future<void> searchEvents(String query) async {
-    if (query.isEmpty) {
-      await loadEvents();
-      return;
-    }
-
-    final currentState = state;
-    if (currentState is! EventListLoaded) return;
-
-    final lowerQuery = query.toLowerCase();
-    final filteredEvents = currentState.allEvents.where((event) {
-      return event.title.toLowerCase().contains(lowerQuery) ||
-          event.venue.name.toLowerCase().contains(lowerQuery) ||
-          event.description.toLowerCase().contains(lowerQuery);
-    }).toList();
-
-    _emitGrouped(filteredEvents);
-  }
-
   /// Toggles the favorite status of an event.
   ///
   /// Updates the repository first, then updates the local state without

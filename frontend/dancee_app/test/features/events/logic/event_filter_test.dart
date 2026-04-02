@@ -297,10 +297,10 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
-    // TC-EFC-08: weekendPreset on Sunday uses next week's Saturday
+    // TC-EFC-08: weekendPreset on Sunday returns current weekend (Sat–Sun)
     // -----------------------------------------------------------------------
     test(
-        'TC-EFC-08: weekendPreset on Sunday jumps to the next weekend',
+        'TC-EFC-08: weekendPreset on Sunday returns current weekend (Sat–Sun)',
         () {
       // 2024-01-07 is a Sunday
       final sunday = DateTime(2024, 1, 7);
@@ -308,9 +308,9 @@ void main() {
 
       final (start, end) = weekendPreset(sunday);
 
-      // Next Saturday is 2024-01-13
-      expect(start, equals(DateTime(2024, 1, 13)));
-      expect(end, equals(DateTime(2024, 1, 14, 23, 59, 59)));
+      // Current weekend: Saturday 2024-01-06 through Sunday 2024-01-07
+      expect(start, equals(DateTime(2024, 1, 6)));
+      expect(end, equals(DateTime(2024, 1, 7, 23, 59, 59)));
     });
 
     // -----------------------------------------------------------------------

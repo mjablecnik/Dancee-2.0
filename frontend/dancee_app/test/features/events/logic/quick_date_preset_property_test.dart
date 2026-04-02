@@ -271,19 +271,19 @@ void main() {
         expect(to, equals(DateTime(2025, 1, 12, 23, 59, 59)));
       });
 
-      test('from is next Saturday when today is Sunday', () {
-        // 2025-01-12 is a Sunday; next Saturday is 2025-01-18
+      test('from is current Saturday when today is Sunday', () {
+        // 2025-01-12 is a Sunday; current Saturday is 2025-01-11
         final now = DateTime(2025, 1, 12);
         final (from, _) = weekendPreset(now);
-        expect(from, equals(DateTime(2025, 1, 18)));
+        expect(from, equals(DateTime(2025, 1, 11)));
         expect(from.weekday, equals(DateTime.saturday));
       });
 
-      test('to is next Sunday when today is Sunday', () {
-        // 2025-01-12 is a Sunday; next Sunday is 2025-01-19
+      test('to is today (Sunday) when today is Sunday', () {
+        // 2025-01-12 is a Sunday; end of today is 2025-01-12 23:59:59
         final now = DateTime(2025, 1, 12);
         final (_, to) = weekendPreset(now);
-        expect(to, equals(DateTime(2025, 1, 19, 23, 59, 59)));
+        expect(to, equals(DateTime(2025, 1, 12, 23, 59, 59)));
       });
 
       test('from is Saturday 00:00:00 when today is Friday', () {

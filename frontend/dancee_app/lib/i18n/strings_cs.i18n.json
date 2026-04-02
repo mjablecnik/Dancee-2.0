@@ -94,6 +94,7 @@
     "saveFilter": "Uložit toto filtrování",
     "saveFilterDescription": "Pro rychlý přístup příště",
     "saveFilterButton": "Uložit filtr",
+    "datePlaceholder": "dd.mm.yyyy",
     "clearAll": "Vymazat vše",
     "applyFilters": "Použít filtry",
     "noEventsMatch": "Žádné akce neodpovídají vašim filtrům",

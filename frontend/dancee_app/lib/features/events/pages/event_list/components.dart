@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/service_locator.dart';
 import '../../../../i18n/translations.g.dart';
@@ -681,11 +682,7 @@ String _formatDate(DateTime dateTime) {
   } else if (eventDate == today.add(const Duration(days: 1))) {
     return t.tomorrow;
   } else {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    return '${months[dateTime.month - 1]} ${dateTime.day}';
+    return DateFormat('MMM d').format(dateTime);
   }
 }
 

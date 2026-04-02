@@ -94,6 +94,7 @@
     "saveFilter": "Save this filter",
     "saveFilterDescription": "For quick access next time",
     "saveFilterButton": "Save filter",
+    "datePlaceholder": "dd.mm.yyyy",
     "clearAll": "Clear all",
     "applyFilters": "Apply filters",
     "noEventsMatch": "No events match your filters",

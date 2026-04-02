@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../design/widgets.dart';
 import '../../../../core/service_locator.dart';
@@ -237,7 +238,7 @@ class EventsByDateSection extends StatelessWidget {
         if (todayEvents.isNotEmpty) ...[
           components.SectionHeader(
             title: t.today,
-            subtitle: t.tuesdayDate(date: '4.2.2025'),
+            subtitle: DateFormat('(EEEE d.M.yyyy)').format(DateTime.now()),
             count: t.eventsCount(count: todayEvents.length),
             icon: Icons.calendar_today,
             color: const Color(0xFF6366F1),
@@ -258,7 +259,7 @@ class EventsByDateSection extends StatelessWidget {
         if (tomorrowEvents.isNotEmpty) ...[
           components.SectionHeader(
             title: t.tomorrow,
-            subtitle: t.wednesdayDate(date: '5.2.2025'),
+            subtitle: DateFormat('(EEEE d.M.yyyy)').format(DateTime.now().add(const Duration(days: 1))),
             count: t.eventsCount(count: tomorrowEvents.length),
             icon: Icons.calendar_month,
             color: const Color(0xFF8B5CF6),

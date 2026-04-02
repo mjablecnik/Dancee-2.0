@@ -185,7 +185,7 @@ int getActiveFilterCount(FilterState filters) {
   final daysUntilSaturday = now.weekday == 6
       ? 0
       : now.weekday == 7
-          ? 6
+          ? -1
           : 6 - now.weekday;
   final saturday = now.add(Duration(days: daysUntilSaturday));
   final sunday = saturday.add(const Duration(days: 1));
