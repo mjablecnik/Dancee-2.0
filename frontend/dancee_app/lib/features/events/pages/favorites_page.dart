@@ -243,7 +243,7 @@ class FavoritesListSection extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         FavoritesHeaderSection(totalEvents: totalEvents),
-        const FavoritesFilterSection(),
+        const SliverToBoxAdapter(child: SizedBox.shrink()),
         if (upcomingEvents.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: FavoritesSectionHeader(title: t.upcomingEvents),

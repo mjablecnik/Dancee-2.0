@@ -53,7 +53,10 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
     _draft = getIt<EventFilterCubit>().state.filters;
     if (widget.scrollTo != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToSection(widget.scrollTo!);
+        // Small delay to ensure ListView has laid out off-screen sections
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) _scrollToSection(widget.scrollTo!);
+        });
       });
     }
   }
@@ -72,7 +75,28 @@ class _EventFiltersPageState extends State<EventFiltersPage> {
 
   void _scrollToSection(String section) {
     GlobalKey? key;
-    if (section == 'date') key = _dateSectionKey;
+    if (section == 'date') {
+      // Date section is below location in the ListView and may not be laid out
+      // yet. First scroll to location to force layout, then scroll to date.
+      if (_locationSectionKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _locationSectionKey.currentContext!,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+        ).then((_) {
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (mounted && _dateSectionKey.currentContext != null) {
+              Scrollable.ensureVisible(
+                _dateSectionKey.currentContext!,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+              );
+            }
+          });
+        });
+      }
+      return;
+    }
     if (section == 'location') key = _locationSectionKey;
     if (key?.currentContext != null) {
       Scrollable.ensureVisible(
