@@ -95,7 +95,11 @@
     "saveFilterDescription": "Para acceso rápido la próxima vez",
     "saveFilterButton": "Guardar filtro",
     "clearAll": "Limpiar todo",
-    "applyFilters": "Aplicar filtros"
+    "applyFilters": "Aplicar filtros",
+    "noEventsMatch": "Ningún evento coincide con tus filtros",
+    "showEvents": "Mostrar {count} eventos",
+    "activeFilterCount": "{count} activo",
+    "noResults": "Sin resultados"
   },
   "auth": {
     "login": "Iniciar sesión",

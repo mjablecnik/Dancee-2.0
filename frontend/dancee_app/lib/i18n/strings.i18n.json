@@ -95,7 +95,11 @@
     "saveFilterDescription": "For quick access next time",
     "saveFilterButton": "Save filter",
     "clearAll": "Clear all",
-    "applyFilters": "Apply filters"
+    "applyFilters": "Apply filters",
+    "noEventsMatch": "No events match your filters",
+    "showEvents": "Show {count} events",
+    "activeFilterCount": "{count} active",
+    "noResults": "No results"
   },
   "auth": {
     "login": "Login",

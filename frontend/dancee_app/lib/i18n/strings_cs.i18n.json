@@ -95,7 +95,11 @@
     "saveFilterDescription": "Pro rychlý přístup příště",
     "saveFilterButton": "Uložit filtr",
     "clearAll": "Vymazat vše",
-    "applyFilters": "Použít filtry"
+    "applyFilters": "Použít filtry",
+    "noEventsMatch": "Žádné akce neodpovídají vašim filtrům",
+    "showEvents": "Zobrazit {count} akcí",
+    "activeFilterCount": "{count} aktivní",
+    "noResults": "Žádné výsledky"
   },
   "auth": {
     "login": "Přihlášení",
