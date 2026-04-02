@@ -540,6 +540,9 @@ class FilterChipsRow extends StatelessWidget {
         final hasDateFilter = filters.dateFrom != null || filters.dateTo != null;
         final hasLocationFilter = filters.selectedRegions.isNotEmpty;
 
+        final dateLabel = _dateChipLabel(filters);
+        final locationLabel = _locationChipLabel(filters);
+
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -557,7 +560,7 @@ class FilterChipsRow extends StatelessWidget {
               GestureDetector(
                 onTap: () => const EventFiltersRoute(scrollTo: 'date').push(context),
                 child: FilterChip(
-                  label: t.today,
+                  label: dateLabel,
                   icon: Icons.calendar_today,
                   isActive: hasDateFilter,
                 ),
@@ -566,9 +569,11 @@ class FilterChipsRow extends StatelessWidget {
               GestureDetector(
                 onTap: () => const EventFiltersRoute(scrollTo: 'location').push(context),
                 child: FilterChip(
-                  label: t.prague,
+                  label: locationLabel,
                   icon: Icons.location_on,
                   isActive: hasLocationFilter,
+                  hasNotification: filters.selectedRegions.length > 1,
+                  notificationCount: filters.selectedRegions.length,
                 ),
               ),
             ],
@@ -671,6 +676,37 @@ class NotificationBadge extends StatelessWidget {
 // ============================================================================
 // Helper functions (private to this file)
 // ============================================================================
+
+/// Returns a dynamic label for the date filter chip.
+///
+/// Shows formatted date range when a date filter is active; falls back to the
+/// generic "Date" label when no date filter is set.
+String _dateChipLabel(FilterState filters) {
+  if (filters.dateFrom == null && filters.dateTo == null) {
+    return t.eventFilters.date;
+  }
+  if (filters.dateFrom != null && filters.dateTo != null) {
+    final from = DateFormat('d MMM').format(filters.dateFrom!);
+    final to = DateFormat('d MMM').format(filters.dateTo!);
+    if (from == to) return from;
+    return '$from – $to';
+  }
+  if (filters.dateFrom != null) {
+    return DateFormat('d MMM').format(filters.dateFrom!);
+  }
+  return DateFormat('d MMM').format(filters.dateTo!);
+}
+
+/// Returns a dynamic label for the location filter chip.
+///
+/// Shows the selected region name for a single selection, the generic
+/// "Location" label for multiple selections (count shown via badge), or
+/// the generic label when no region is selected.
+String _locationChipLabel(FilterState filters) {
+  if (filters.selectedRegions.isEmpty) return t.eventFilters.location;
+  if (filters.selectedRegions.length == 1) return filters.selectedRegions.first;
+  return t.eventFilters.location;
+}
 
 String _formatDate(DateTime dateTime) {
   final now = DateTime.now();

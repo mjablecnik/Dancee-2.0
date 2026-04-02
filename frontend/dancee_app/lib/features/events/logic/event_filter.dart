@@ -181,11 +181,12 @@ int getActiveFilterCount(FilterState filters) {
 
 /// Computes dateFrom/dateTo for the "Weekend" preset (Saturday through Sunday).
 (DateTime, DateTime) weekendPreset(DateTime now) {
-  // If today is Saturday (6) or Sunday (7), use this week's weekend
+  // If today is Saturday (6), use today. Otherwise look forward to next Saturday.
+  // On Sunday (7) we skip ahead 6 days to the coming Saturday (forward-looking).
   final daysUntilSaturday = now.weekday == 6
       ? 0
       : now.weekday == 7
-          ? -1
+          ? 6
           : 6 - now.weekday;
   final saturday = now.add(Duration(days: daysUntilSaturday));
   final sunday = saturday.add(const Duration(days: 1));

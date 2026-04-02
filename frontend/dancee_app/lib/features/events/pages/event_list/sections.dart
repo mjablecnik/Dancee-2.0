@@ -160,12 +160,15 @@ class SearchAndFiltersSection extends StatefulWidget {
 }
 
 class _SearchAndFiltersSectionState extends State<SearchAndFiltersSection> {
-  final TextEditingController _searchController = TextEditingController();
+  late final TextEditingController _searchController;
   bool _showClearButton = false;
 
   @override
   void initState() {
     super.initState();
+    final currentQuery = getIt<EventFilterCubit>().state.filters.searchQuery;
+    _searchController = TextEditingController(text: currentQuery);
+    _showClearButton = currentQuery.isNotEmpty;
     _searchController.addListener(_onSearchChanged);
   }
 
