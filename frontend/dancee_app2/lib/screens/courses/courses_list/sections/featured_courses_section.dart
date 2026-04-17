@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/featured_course_card.dart';
 
 class FeaturedCoursesSection extends StatelessWidget {
@@ -24,9 +25,9 @@ class FeaturedCoursesSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
-                'Doporučené kurzy',
-                style: TextStyle(
+              Text(
+                t.courses.featuredCourses,
+                style: const TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize3xl,
                   fontWeight: FontWeight.bold,
@@ -34,9 +35,9 @@ class FeaturedCoursesSection extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: onShowAll,
-                child: const Text(
-                  'Zobrazit vše',
-                  style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+                child: Text(
+                  t.common.showAll,
+                  style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                 ),
               ),
             ],

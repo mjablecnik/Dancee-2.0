@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/course_list_card.dart';
 
 class AllCoursesSection extends StatelessWidget {
@@ -19,9 +20,9 @@ class AllCoursesSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
-                'Všechny kurzy',
-                style: TextStyle(
+              Text(
+                t.courses.allCourses,
+                style: const TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize3xl,
                   fontWeight: FontWeight.bold,
@@ -36,13 +37,13 @@ class AllCoursesSection extends StatelessWidget {
                   color: appSurface,
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.sort, size: 14, color: appText),
-                    SizedBox(width: AppSpacing.sm),
+                    const Icon(Icons.sort, size: 14, color: appText),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
-                      'Datum',
-                      style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
+                      t.common.date,
+                      style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
                     ),
                   ],
                 ),

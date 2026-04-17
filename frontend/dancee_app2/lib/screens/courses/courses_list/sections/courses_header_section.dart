@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class CoursesHeaderSection extends StatelessWidget {
   final VoidCallback? onFilterTap;
@@ -24,21 +25,21 @@ class CoursesHeaderSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Taneční kurzy',
-                style: TextStyle(
+                t.courses.title,
+                style: const TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize4xl,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: AppSpacing.xs),
+              const SizedBox(height: AppSpacing.xs),
               Text(
-                'Najdi svůj kurz',
-                style: TextStyle(
+                t.courses.subtitle,
+                style: const TextStyle(
                   color: appMuted,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightMedium,

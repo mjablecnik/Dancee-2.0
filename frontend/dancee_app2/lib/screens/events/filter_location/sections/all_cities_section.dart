@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class CityData {
   final String name;
@@ -37,9 +38,9 @@ class AllCitiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Všechna města',
-          style: TextStyle(
+        Text(
+          t.events.filter.allCities,
+          style: const TextStyle(
             fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
             color: appText,

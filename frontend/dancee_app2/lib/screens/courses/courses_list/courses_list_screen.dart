@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import 'sections/all_courses_section.dart';
@@ -57,23 +58,23 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
         leftItems: [
           AppNavBarItem(
             icon: FontAwesomeIcons.house,
-            label: 'Domů',
+            label: t.nav.home,
             onTap: () => context.go('/events'),
           ),
           AppNavBarItem(
             icon: FontAwesomeIcons.magnifyingGlass,
-            label: 'Hledat',
+            label: t.nav.search,
           ),
         ],
         rightItems: [
           AppNavBarItem(
             icon: FontAwesomeIcons.bookOpen,
-            label: 'Kurzy',
+            label: t.nav.courses,
             isActive: true,
           ),
           AppNavBarItem(
             icon: FontAwesomeIcons.user,
-            label: 'Profil',
+            label: t.nav.profile,
             onTap: () => context.go('/profile'),
           ),
         ],
