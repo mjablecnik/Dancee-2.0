@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../shared/components/background_circles.dart';
+import 'sections/onboarding_header_section.dart';
 import 'sections/onboarding_step1_section.dart';
 import 'sections/onboarding_step2_section.dart';
 import 'sections/onboarding_step3_section.dart';
@@ -62,7 +62,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     horizontal: AppSpacing.xxl,
                     vertical: AppSpacing.xl,
                   ),
-                  child: _buildHeader(),
+                  child: OnboardingHeaderSection(
+                    currentStep: _currentStep,
+                    onSkip: _finish,
+                  ),
                 ),
                 Expanded(
                   child: AnimatedSwitcher(
@@ -90,62 +93,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                gradient: AppGradients.primary,
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-                boxShadow: [AppShadows.primaryLg],
-              ),
-              child: const Center(
-                child: FaIcon(
-                  FontAwesomeIcons.music,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: _finish,
-              child: const Text(
-                'Přeskočit',
-                style: TextStyle(
-                  color: appMuted,
-                  fontSize: AppTypography.fontSizeMd,
-                  fontWeight: AppTypography.fontWeightMedium,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.xxl),
-        Row(
-          children: List.generate(3, (index) {
-            final isActive = index < _currentStep;
-            return Expanded(
-              child: Container(
-                height: 6,
-                margin: EdgeInsets.only(right: index < 2 ? AppSpacing.sm : 0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(3),
-                  gradient: isActive ? AppGradients.primary : null,
-                  color: isActive ? null : appBorder,
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../components/popular_city_card.dart';
@@ -21,13 +22,45 @@ class PopularCityData {
   });
 }
 
+const _defaultCities = [
+  PopularCityData(
+    name: 'Praha',
+    eventCount: '125 nadcházejících akcí',
+    gradientStart: appPrimary,
+    gradientEnd: appAccent,
+    icon: FontAwesomeIcons.building,
+    isCurrent: true,
+  ),
+  PopularCityData(
+    name: 'Brno',
+    eventCount: '47 nadcházejících akcí',
+    gradientStart: appEmerald,
+    gradientEnd: appTealDark,
+    icon: FontAwesomeIcons.city,
+  ),
+  PopularCityData(
+    name: 'Ostrava',
+    eventCount: '23 nadcházejících akcí',
+    gradientStart: appWarning,
+    gradientEnd: appError,
+    icon: FontAwesomeIcons.industry,
+  ),
+  PopularCityData(
+    name: 'Plzeň',
+    eventCount: '18 nadcházejících akcí',
+    gradientStart: appYellow,
+    gradientEnd: appAmberDark,
+    icon: FontAwesomeIcons.beerMugEmpty,
+  ),
+];
+
 class PopularCitiesSection extends StatelessWidget {
   final List<PopularCityData> cities;
   final ValueChanged<PopularCityData>? onCityTap;
 
   const PopularCitiesSection({
     super.key,
-    required this.cities,
+    this.cities = _defaultCities,
     this.onCityTap,
   });
 

@@ -19,6 +19,79 @@ class DanceStyleItem {
   });
 }
 
+const _defaultStyles = [
+  DanceStyleItem(
+    name: 'Salsa',
+    subtitle: 'Kubánská, On1, On2',
+    icon: FontAwesomeIcons.music,
+    gradientStart: appPrimary,
+    gradientEnd: appPrimaryDark,
+  ),
+  DanceStyleItem(
+    name: 'Bachata',
+    subtitle: 'Sensual, Dominicana',
+    icon: FontAwesomeIcons.heart,
+    gradientStart: appAccent,
+    gradientEnd: appPink,
+  ),
+  DanceStyleItem(
+    name: 'Kizomba',
+    subtitle: 'Urban Kiz, Semba',
+    icon: FontAwesomeIcons.fire,
+    gradientStart: appViolet,
+    gradientEnd: appVioletDark,
+  ),
+  DanceStyleItem(
+    name: 'Zouk',
+    subtitle: 'Brazilian Zouk, Lambada',
+    icon: FontAwesomeIcons.leaf,
+    gradientStart: appEmerald,
+    gradientEnd: appSuccessDark,
+  ),
+  DanceStyleItem(
+    name: 'Reggaeton',
+    subtitle: 'Urban Latin',
+    icon: FontAwesomeIcons.fireFlameSimple,
+    gradientStart: appWarning,
+    gradientEnd: appError,
+  ),
+  DanceStyleItem(
+    name: 'Tango',
+    subtitle: 'Argentinské, Ballroom',
+    icon: FontAwesomeIcons.bolt,
+    gradientStart: appYellow,
+    gradientEnd: appAmberDark,
+  ),
+  DanceStyleItem(
+    name: 'Swing',
+    subtitle: 'Lindy Hop, Charleston',
+    icon: FontAwesomeIcons.crown,
+    gradientStart: appCyan,
+    gradientEnd: appPrimary,
+  ),
+  DanceStyleItem(
+    name: 'Ballroom',
+    subtitle: 'Standardní, Latinsko-americké',
+    icon: FontAwesomeIcons.star,
+    gradientStart: appPink,
+    gradientEnd: appRose,
+  ),
+  DanceStyleItem(
+    name: 'Afro',
+    subtitle: 'Afrohouse, Kuduro',
+    icon: FontAwesomeIcons.drum,
+    gradientStart: appIndigo,
+    gradientEnd: appPurple,
+  ),
+  DanceStyleItem(
+    name: 'Forró',
+    subtitle: 'Brazilský lidový tanec',
+    icon: FontAwesomeIcons.umbrellaBeach,
+    gradientStart: appError,
+    gradientEnd: appHotPink,
+  ),
+];
+
 class DanceStylesListSection extends StatelessWidget {
   final List<DanceStyleItem> styles;
   final Map<String, bool> selected;
@@ -26,7 +99,7 @@ class DanceStylesListSection extends StatelessWidget {
 
   const DanceStylesListSection({
     super.key,
-    required this.styles,
+    this.styles = _defaultStyles,
     required this.selected,
     required this.onToggle,
   });

@@ -12,6 +12,7 @@ import 'sections/experience_level_section.dart';
 import 'sections/notifications_section.dart';
 import 'sections/personal_info_section.dart';
 import 'sections/profile_photo_section.dart';
+import 'sections/save_button_section.dart';
 import 'sections/social_links_section.dart';
 
 class ProfileEditScreen extends StatefulWidget {
@@ -135,7 +136,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           ),
         ],
       ),
-      bottomSheet: _SaveButton(onSave: () => context.pop()),
+      bottomSheet: SaveButtonSection(onSave: () => context.pop()),
       bottomNavigationBar: AppBottomNavBar(
         leftItems: [
           AppNavBarItem(icon: FontAwesomeIcons.house, label: 'Domů', onTap: () => context.go('/events')),
@@ -145,45 +146,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           AppNavBarItem(icon: FontAwesomeIcons.heart, label: 'Uložené', onTap: () => context.go('/events')),
           AppNavBarItem(icon: FontAwesomeIcons.user, label: 'Profil', isActive: true, onTap: () => context.go('/profile')),
         ],
-      ),
-    );
-  }
-}
-
-class _SaveButton extends StatelessWidget {
-  final VoidCallback onSave;
-
-  const _SaveButton({required this.onSave});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: appBg,
-      padding: EdgeInsets.only(
-        left: AppSpacing.xl,
-        right: AppSpacing.xl,
-        top: AppSpacing.md,
-        bottom: MediaQuery.of(context).padding.bottom + 80,
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: onSave,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: appPrimary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-            elevation: 0,
-          ),
-          child: const Text(
-            'Uložit změny',
-            style: TextStyle(
-              fontSize: AppTypography.fontSizeXl,
-              fontWeight: AppTypography.fontWeightSemiBold,
-            ),
-          ),
-        ),
       ),
     );
   }

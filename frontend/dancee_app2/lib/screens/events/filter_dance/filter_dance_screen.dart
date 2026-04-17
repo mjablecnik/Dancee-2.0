@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import 'sections/dance_styles_list_section.dart';
 import 'sections/filter_bottom_actions_section.dart';
+import 'sections/filter_dance_header_section.dart';
 import 'sections/selected_styles_section.dart';
 
 class FilterDanceScreen extends StatefulWidget {
@@ -28,79 +28,6 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
     'Forró': false,
   };
 
-  static const _styles = [
-    DanceStyleItem(
-      name: 'Salsa',
-      subtitle: 'Kubánská, On1, On2',
-      icon: FontAwesomeIcons.music,
-      gradientStart: appPrimary,
-      gradientEnd: appPrimaryDark,
-    ),
-    DanceStyleItem(
-      name: 'Bachata',
-      subtitle: 'Sensual, Dominicana',
-      icon: FontAwesomeIcons.heart,
-      gradientStart: appAccent,
-      gradientEnd: appPink,
-    ),
-    DanceStyleItem(
-      name: 'Kizomba',
-      subtitle: 'Urban Kiz, Semba',
-      icon: FontAwesomeIcons.fire,
-      gradientStart: appViolet,
-      gradientEnd: appVioletDark,
-    ),
-    DanceStyleItem(
-      name: 'Zouk',
-      subtitle: 'Brazilian Zouk, Lambada',
-      icon: FontAwesomeIcons.leaf,
-      gradientStart: appEmerald,
-      gradientEnd: appSuccessDark,
-    ),
-    DanceStyleItem(
-      name: 'Reggaeton',
-      subtitle: 'Urban Latin',
-      icon: FontAwesomeIcons.fireFlameSimple,
-      gradientStart: appWarning,
-      gradientEnd: appError,
-    ),
-    DanceStyleItem(
-      name: 'Tango',
-      subtitle: 'Argentinské, Ballroom',
-      icon: FontAwesomeIcons.bolt,
-      gradientStart: appYellow,
-      gradientEnd: appAmberDark,
-    ),
-    DanceStyleItem(
-      name: 'Swing',
-      subtitle: 'Lindy Hop, Charleston',
-      icon: FontAwesomeIcons.crown,
-      gradientStart: appCyan,
-      gradientEnd: appPrimary,
-    ),
-    DanceStyleItem(
-      name: 'Ballroom',
-      subtitle: 'Standardní, Latinsko-americké',
-      icon: FontAwesomeIcons.star,
-      gradientStart: appPink,
-      gradientEnd: appRose,
-    ),
-    DanceStyleItem(
-      name: 'Afro',
-      subtitle: 'Afrohouse, Kuduro',
-      icon: FontAwesomeIcons.drum,
-      gradientStart: appIndigo,
-      gradientEnd: appPurple,
-    ),
-    DanceStyleItem(
-      name: 'Forró',
-      subtitle: 'Brazilský lidový tanec',
-      icon: FontAwesomeIcons.umbrellaBeach,
-      gradientStart: appError,
-      gradientEnd: appHotPink,
-    ),
-  ];
-
   int get _selectedCount => _selected.values.where((v) => v).length;
 
   String get _selectedCountText {
@@ -111,13 +38,11 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
     return '$count vybraných';
   }
 
-  void _clearAll() {
-    setState(() {
-      for (final key in _selected.keys) {
-        _selected[key] = false;
-      }
-    });
-  }
+  void _clearAll() => setState(() {
+    for (final key in _selected.keys) {
+      _selected[key] = false;
+    }
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +55,11 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
       backgroundColor: appBg,
       body: Column(
         children: [
-          _buildHeader(context),
+          FilterDanceHeaderSection(
+            selectedCountText: _selectedCountText,
+            onBack: () => context.pop(),
+            onClear: _clearAll,
+          ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
@@ -143,7 +72,6 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DanceStylesListSection(
-                    styles: _styles,
                     selected: _selected,
                     onToggle: (name) => setState(
                       () => _selected[name] = !(_selected[name] ?? false),
@@ -166,71 +94,6 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
       bottomSheet: FilterBottomActionsSection(
         selectedCount: _selectedCount,
         onApply: () => context.pop(),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + AppSpacing.md,
-        left: AppSpacing.xl,
-        right: AppSpacing.xl,
-        bottom: AppSpacing.lg,
-      ),
-      decoration: BoxDecoration(
-        color: appBg.withValues(alpha: 0.95),
-        border: const Border(bottom: BorderSide(color: appBorder)),
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => context.pop(),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: appSurface,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Taneční styly',
-                  style: TextStyle(
-                    fontSize: AppTypography.fontSize3xl,
-                    fontWeight: AppTypography.fontWeightBold,
-                    color: appText,
-                  ),
-                ),
-                Text(
-                  _selectedCountText,
-                  style: const TextStyle(
-                    fontSize: AppTypography.fontSizeMd,
-                    color: appMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: _clearAll,
-            child: const Text(
-              'Vymazat',
-              style: TextStyle(
-                fontSize: AppTypography.fontSizeMd,
-                fontWeight: AppTypography.fontWeightMedium,
-                color: appPrimary,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

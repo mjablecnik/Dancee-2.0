@@ -163,4 +163,14 @@ class AppGradients {
       Colors.transparent,
     ],
   );
+
+  static LinearGradient premiumSubtle = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      appPrimary.withValues(alpha: 0.2),
+      appAccent.withValues(alpha: 0.2),
+      appPink.withValues(alpha: 0.2),
+    ],
+  );
 }
