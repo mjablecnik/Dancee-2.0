@@ -3,6 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
 import '../../core/theme.dart';
+import '../../shared/components/background_circles.dart';
+import '../../shared/sections/auth_header_section.dart';
+import 'forgot_password/sections/forgot_password_form_section.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -40,13 +43,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       backgroundColor: appBg,
       body: Stack(
         children: [
-          _BackgroundCircles(animation: _floatAnim),
+          BackgroundCircles(animation: _floatAnim),
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xxl,
+                    AppSpacing.sm,
+                    AppSpacing.xxl,
+                    0,
+                  ),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
@@ -72,363 +80,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                    child: Column(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xxl,
+                      vertical: AppSpacing.xxxl,
+                    ),
+                    child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildHeader(),
-                        const SizedBox(height: 48),
-                        _buildForm(context),
+                        AuthHeaderSection(
+                          title: 'Zapomenuté heslo?',
+                          subtitle:
+                              'Zadej svůj e-mail a pošleme ti odkaz pro obnovení hesla',
+                          icon: FontAwesomeIcons.key,
+                          showTagline: false,
+                        ),
+                        SizedBox(height: 48),
+                        ForgotPasswordFormSection(),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            gradient: AppGradients.primary,
-            borderRadius: BorderRadius.circular(AppRadius.round),
-            boxShadow: [
-              AppShadows.primaryLg,
-            ],
-          ),
-          child: const Center(
-            child: FaIcon(
-              FontAwesomeIcons.key,
-              color: Colors.white,
-              size: 32,
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        ShaderMask(
-          shaderCallback: (bounds) => AppGradients.primary.createShader(bounds),
-          child: const Text(
-            'Dancee',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: AppTypography.fontSize6xl,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'Zapomenuté heslo?',
-          style: TextStyle(
-            color: appText,
-            fontSize: AppTypography.fontSize4xl,
-            fontWeight: AppTypography.fontWeightBold,
-          ),
-        ),
-        const SizedBox(height: 12),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'Zadej svůj e-mail a pošleme ti odkaz pro obnovení hesla',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: appMuted,
-              height: 1.5,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildForm(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          'E-mail',
-          style: TextStyle(
-            color: appText,
-            fontSize: AppTypography.fontSizeMd,
-            fontWeight: AppTypography.fontWeightSemiBold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 56,
-          decoration: BoxDecoration(
-            color: appSurface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: appBorder),
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 16),
-              const FaIcon(FontAwesomeIcons.envelope, color: appMuted, size: 16),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: appText),
-                  decoration: const InputDecoration(
-                    hintText: 'tvuj@email.cz',
-                    hintStyle: TextStyle(color: appMuted),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        Container(
-          height: 56,
-          decoration: BoxDecoration(
-            gradient: AppGradients.primary,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            boxShadow: [
-              AppShadows.primaryLg,
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              onTap: () {},
-              child: const Center(
-                child: Text(
-                  'Odeslat odkaz',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: AppTypography.fontSizeXl,
-                    fontWeight: AppTypography.fontWeightBold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Container(
-          decoration: BoxDecoration(
-            color: appSurface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: appBorder),
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: appPrimary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                ),
-                child: const Center(
-                  child: FaIcon(FontAwesomeIcons.circleInfo, color: appPrimary, size: 16),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Zkontroluj svou e-mailovou schránku',
-                      style: TextStyle(
-                        color: appText,
-                        fontSize: AppTypography.fontSizeMd,
-                        fontWeight: AppTypography.fontWeightSemiBold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Po odeslání obdržíš e-mail s odkazem pro obnovení hesla. Odkaz je platný 24 hodin.',
-                      style: TextStyle(
-                        color: appMuted,
-                        fontSize: AppTypography.fontSizeSm,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Vzpomněl sis na heslo?',
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
-            ),
-            TextButton(
-              onPressed: () => context.go('/login'),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.only(left: 4),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: const Text(
-                'Přihlásit se',
-                style: TextStyle(
-                  color: appPrimary,
-                  fontSize: AppTypography.fontSizeMd,
-                  fontWeight: AppTypography.fontWeightSemiBold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 32),
-        Row(
-          children: [
-            const Expanded(child: Divider(color: appBorder)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Potřebuješ pomoc?',
-                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
-              ),
-            ),
-            const Expanded(child: Divider(color: appBorder)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: appSurface,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: appBorder),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    onTap: () {},
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(FontAwesomeIcons.headset, color: appPrimary, size: 16),
-                        SizedBox(width: 8),
-                        Text(
-                          'Podpora',
-                          style: TextStyle(
-                            color: appText,
-                            fontSize: AppTypography.fontSizeMd,
-                            fontWeight: AppTypography.fontWeightSemiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: appSurface,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: appBorder),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    onTap: () {},
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(FontAwesomeIcons.circleQuestion, color: appAccent, size: 16),
-                        SizedBox(width: 8),
-                        Text(
-                          'FAQ',
-                          style: TextStyle(
-                            color: appText,
-                            fontSize: AppTypography.fontSizeMd,
-                            fontWeight: AppTypography.fontWeightSemiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 32),
-      ],
-    );
-  }
-}
-
-class _BackgroundCircles extends StatelessWidget {
-  final Animation<double> animation;
-
-  const _BackgroundCircles({required this.animation});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return Stack(
-          children: [
-            Positioned(
-              top: 80 + animation.value,
-              left: 40,
-              child: _buildCircle(128, appPrimary.withValues(alpha: 0.2)),
-            ),
-            Positioned(
-              top: 240 - animation.value,
-              right: 32,
-              child: _buildCircle(96, appAccent.withValues(alpha: 0.2)),
-            ),
-            Positioned(
-              bottom: 160 + animation.value * 0.5,
-              left: 24,
-              child: _buildCircle(80, appSuccess.withValues(alpha: 0.2)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildCircle(double size, Color color) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            color: color,
-            blurRadius: size * 1.5,
-            spreadRadius: size * 0.5,
           ),
         ],
       ),
