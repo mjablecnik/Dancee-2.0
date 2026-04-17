@@ -102,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           GestureDetector(
-            onTap: () => context.push('/profile-edit'),
+            onTap: () => context.push('/profile/edit'),
             child: Container(
               width: 40,
               height: 40,
@@ -229,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.2),
             iconColor: const Color(0xFF3B82F6),
             title: 'Upravit profil',
-            onTap: () => context.push('/profile-edit'),
+            onTap: () => context.push('/profile/edit'),
             showDivider: true,
           ),
           _menuRow(
@@ -237,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             iconBgColor: const Color(0xFFF97316).withValues(alpha: 0.2),
             iconColor: const Color(0xFFF97316),
             title: 'Změnit heslo',
-            onTap: () => context.push('/change-password'),
+            onTap: () => context.push('/profile/change-password'),
             showDivider: false,
           ),
         ],
@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildPremiumSection(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/premium'),
+      onTap: () => context.push('/profile/premium'),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -362,7 +362,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.2),
             iconColor: const Color(0xFF3B82F6),
             title: 'Napsat autorovi',
-            onTap: () => context.push('/author-contact'),
+            onTap: () => context.push('/profile/author-contact'),
             showDivider: true,
           ),
           _menuRow(

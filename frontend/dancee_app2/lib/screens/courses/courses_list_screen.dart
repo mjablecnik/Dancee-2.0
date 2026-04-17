@@ -222,7 +222,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
     required String price,
   }) {
     return GestureDetector(
-      onTap: () => context.go('/course-detail'),
+      onTap: () => context.push('/courses/detail'),
       child: Container(
         width: 280,
         decoration: BoxDecoration(
@@ -465,7 +465,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
     required String price,
   }) {
     return GestureDetector(
-      onTap: () => context.go('/course-detail'),
+      onTap: () => context.push('/courses/detail'),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -572,7 +572,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
     required String price,
   }) {
     return GestureDetector(
-      onTap: () => context.go('/course-detail'),
+      onTap: () => context.push('/courses/detail'),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

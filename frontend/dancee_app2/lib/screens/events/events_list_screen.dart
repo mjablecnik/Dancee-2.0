@@ -73,7 +73,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                   ),
                   const SizedBox(height: 4),
                   GestureDetector(
-                    onTap: () => context.push('/filter-location'),
+                    onTap: () => context.push('/events/filter-location'),
                     child: Row(
                       children: [
                         const FaIcon(FontAwesomeIcons.locationDot, color: appPrimary, size: 16),
@@ -188,7 +188,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 ),
               ),
               GestureDetector(
-                onTap: () => context.push('/filter-dance'),
+                onTap: () => context.push('/events/filter-dance'),
                 child: const Text(
                   'Zobrazit vše',
                   style: TextStyle(
@@ -301,7 +301,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
     required List<_TagData> tags,
   }) {
     return GestureDetector(
-      onTap: () => context.go('/event-detail'),
+      onTap: () => context.push('/events/detail'),
       child: Container(
         width: 280,
         decoration: BoxDecoration(
@@ -529,7 +529,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
     required bool isFavorited,
   }) {
     return GestureDetector(
-      onTap: () => context.go('/event-detail'),
+      onTap: () => context.push('/events/detail'),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(

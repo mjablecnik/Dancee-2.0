@@ -24,6 +24,7 @@ void main() {
 final _router = GoRouter(
   initialLocation: '/login',
   routes: [
+    // Auth flow — root-level, back button does nothing
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
@@ -40,49 +41,56 @@ final _router = GoRouter(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
     ),
+    // Main app — root pages with sub-routes that push on top
     GoRoute(
       path: '/events',
       builder: (context, state) => const EventsListScreen(),
-    ),
-    GoRoute(
-      path: '/event-detail',
-      builder: (context, state) => const EventDetailScreen(),
-    ),
-    GoRoute(
-      path: '/filter-dance',
-      builder: (context, state) => const FilterDanceScreen(),
-    ),
-    GoRoute(
-      path: '/filter-location',
-      builder: (context, state) => const FilterLocationScreen(),
+      routes: [
+        GoRoute(
+          path: 'detail',
+          builder: (context, state) => const EventDetailScreen(),
+        ),
+        GoRoute(
+          path: 'filter-dance',
+          builder: (context, state) => const FilterDanceScreen(),
+        ),
+        GoRoute(
+          path: 'filter-location',
+          builder: (context, state) => const FilterLocationScreen(),
+        ),
+      ],
     ),
     GoRoute(
       path: '/courses',
       builder: (context, state) => const CoursesListScreen(),
-    ),
-    GoRoute(
-      path: '/course-detail',
-      builder: (context, state) => const CourseDetailScreen(),
+      routes: [
+        GoRoute(
+          path: 'detail',
+          builder: (context, state) => const CourseDetailScreen(),
+        ),
+      ],
     ),
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
-    ),
-    GoRoute(
-      path: '/profile-edit',
-      builder: (context, state) => const ProfileEditScreen(),
-    ),
-    GoRoute(
-      path: '/change-password',
-      builder: (context, state) => const ChangePasswordScreen(),
-    ),
-    GoRoute(
-      path: '/premium',
-      builder: (context, state) => const PremiumScreen(),
-    ),
-    GoRoute(
-      path: '/author-contact',
-      builder: (context, state) => const AuthorContactScreen(),
+      routes: [
+        GoRoute(
+          path: 'edit',
+          builder: (context, state) => const ProfileEditScreen(),
+        ),
+        GoRoute(
+          path: 'change-password',
+          builder: (context, state) => const ChangePasswordScreen(),
+        ),
+        GoRoute(
+          path: 'premium',
+          builder: (context, state) => const PremiumScreen(),
+        ),
+        GoRoute(
+          path: 'author-contact',
+          builder: (context, state) => const AuthorContactScreen(),
+        ),
+      ],
     ),
   ],
 );
