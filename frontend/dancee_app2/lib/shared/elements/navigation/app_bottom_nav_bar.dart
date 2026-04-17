@@ -21,12 +21,14 @@ class AppBottomNavBar extends StatelessWidget {
   final List<AppNavBarItem> leftItems;
   final List<AppNavBarItem> rightItems;
   final VoidCallback? onFabTap;
+  final IconData fabIcon;
 
   const AppBottomNavBar({
     super.key,
     required this.leftItems,
     required this.rightItems,
     this.onFabTap,
+    this.fabIcon = FontAwesomeIcons.plus,
   });
 
   @override
@@ -90,8 +92,8 @@ class AppBottomNavBar extends StatelessWidget {
             border: Border.all(color: appBg, width: 4),
             boxShadow: [AppShadows.primary],
           ),
-          child: const Center(
-            child: FaIcon(FontAwesomeIcons.plus, size: 20, color: Colors.white),
+          child: Center(
+            child: FaIcon(fabIcon, size: 20, color: Colors.white),
           ),
         ),
       ),
