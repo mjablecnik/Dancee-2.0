@@ -147,15 +147,15 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: appBg.withValues(alpha: 0.95),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 12,
         left: 20,
         right: 20,
         bottom: 16,
       ),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: appBorder)),
+      decoration: BoxDecoration(
+        color: appBg.withValues(alpha: 0.95),
+        border: const Border(bottom: BorderSide(color: appBorder)),
       ),
       child: Row(
         children: [

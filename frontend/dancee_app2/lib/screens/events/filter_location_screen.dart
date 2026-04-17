@@ -97,15 +97,15 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: appBg.withValues(alpha: 0.9),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 12,
         left: 20,
         right: 20,
         bottom: 16,
       ),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: appBorder)),
+      decoration: BoxDecoration(
+        color: appBg.withValues(alpha: 0.9),
+        border: const Border(bottom: BorderSide(color: appBorder)),
       ),
       child: Column(
         children: [
