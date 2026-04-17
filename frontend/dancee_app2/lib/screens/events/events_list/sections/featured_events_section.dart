@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/event_repository.dart' as repo;
 import '../../../../i18n/strings.g.dart';
 import '../components/featured_event_card.dart';
 
@@ -29,42 +30,40 @@ class FeaturedEventsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Row(
-            children: [
-              FeaturedEventCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/1887dced68-753b152bd32ad7f3eb9b.png',
-                title: 'Prague Latin Festival 2025 - Mega Edition',
-                date: '12. Říj - 14. Říj 2025',
-                location: 'Kongresové centrum, Praha',
-                price: 'Od 350 Kč',
-                isFree: false,
-                isFavorited: false,
-                tags: const [
-                  EventTagData('Salsa', appPrimary),
-                  EventTagData('Bachata', appAccent),
-                ],
-                onTap: onEventTap,
+        FutureBuilder<List<repo.FeaturedEventData>>(
+          future: const repo.EventRepository().getFeaturedEvents(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox.shrink();
+            final events = snapshot.data!;
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: Row(
+                children: events.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final event = entry.value;
+                  return Row(
+                    children: [
+                      if (index > 0) const SizedBox(width: AppSpacing.lg),
+                      FeaturedEventCard(
+                        imageUrl: event.imageUrl,
+                        title: event.title,
+                        date: event.date,
+                        location: event.location,
+                        price: event.price,
+                        isFree: event.isFree,
+                        isFavorited: event.isFavorited,
+                        tags: event.tags
+                            .map((tag) => EventTagData(tag.label, tag.color))
+                            .toList(),
+                        onTap: onEventTap,
+                      ),
+                    ],
+                  );
+                }).toList(),
               ),
-              const SizedBox(width: AppSpacing.lg),
-              FeaturedEventCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/35e8621ce9-d463887a55ba17b5c416.png',
-                title: 'Kizomba Open Air Social',
-                date: 'Dnes, 18:00 - 23:00',
-                location: 'Střelecký ostrov, Praha',
-                price: 'Zdarma',
-                isFree: true,
-                isFavorited: true,
-                tags: const [
-                  EventTagData('Kizomba', appLavender),
-                  EventTagData('Semba', appLightBlue),
-                ],
-                onTap: onEventTap,
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );
