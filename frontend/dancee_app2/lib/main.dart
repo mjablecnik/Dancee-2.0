@@ -7,6 +7,7 @@ import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
 import 'screens/events/events_list_screen.dart';
 import 'screens/events/event_detail_screen.dart';
+import 'screens/events/filter_dance_screen.dart';
 
 void main() {
   runApp(const DanceeApp());
@@ -38,6 +39,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/event-detail',
       builder: (context, state) => const EventDetailScreen(),
+    ),
+    GoRoute(
+      path: '/filter-dance',
+      builder: (context, state) => const FilterDanceScreen(),
     ),
   ],
 );

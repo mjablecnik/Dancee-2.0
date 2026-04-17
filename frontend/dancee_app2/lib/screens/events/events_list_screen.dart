@@ -184,11 +184,14 @@ class _EventsListScreenState extends State<EventsListScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                'Zobrazit vše',
-                style: TextStyle(
-                  color: appMuted,
-                  fontSize: 14,
+              GestureDetector(
+                onTap: () => context.push('/filter-dance'),
+                child: const Text(
+                  'Zobrazit vše',
+                  style: TextStyle(
+                    color: appMuted,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],
