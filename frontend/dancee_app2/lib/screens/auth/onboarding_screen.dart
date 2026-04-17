@@ -3,6 +3,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
 import '../../core/theme.dart';
+import '../../shared/components/background_circles.dart';
+import 'onboarding/sections/onboarding_step1_section.dart';
+import 'onboarding/sections/onboarding_step2_section.dart';
+import 'onboarding/sections/onboarding_step3_section.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -17,10 +21,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _floatAnim;
 
   int _currentStep = 1;
-
   final List<bool> _selectedDances = List.filled(8, false);
   int _selectedLevel = -1;
-  int _selectedRadius = 1; // 0=10km, 1=25km, 2=50km, 3=Celá republika
+  int _selectedRadius = 1;
 
   @override
   void initState() {
@@ -40,13 +43,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.dispose();
   }
 
-  void _goToStep(int step) {
-    setState(() => _currentStep = step);
-  }
+  void _goToStep(int step) => setState(() => _currentStep = step);
 
-  void _finish() {
-    context.go('/events');
-  }
+  void _finish() => context.go('/events');
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +53,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       backgroundColor: appBg,
       body: Stack(
         children: [
-          _BackgroundCircles(animation: _floatAnim),
+          BackgroundCircles(animation: _floatAnim),
           SafeArea(
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 20),
+                    horizontal: AppSpacing.xxl,
+                    vertical: AppSpacing.xl,
+                  ),
                   child: _buildHeader(),
                 ),
                 Expanded(
@@ -104,9 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               decoration: BoxDecoration(
                 gradient: AppGradients.primary,
                 borderRadius: BorderRadius.circular(AppRadius.xl),
-                boxShadow: [
-                  AppShadows.primaryLg,
-                ],
+                boxShadow: [AppShadows.primaryLg],
               ),
               child: const Center(
                 child: FaIcon(
@@ -129,19 +128,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
         Row(
           children: List.generate(3, (index) {
             final isActive = index < _currentStep;
             return Expanded(
               child: Container(
                 height: 6,
-                margin: EdgeInsets.only(right: index < 2 ? 8 : 0),
+                margin: EdgeInsets.only(right: index < 2 ? AppSpacing.sm : 0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
-                  gradient: isActive
-                      ? AppGradients.primary
-                      : null,
+                  gradient: isActive ? AppGradients.primary : null,
                   color: isActive ? null : appBorder,
                 ),
               ),
@@ -155,600 +152,31 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget _buildCurrentStep() {
     switch (_currentStep) {
       case 1:
-        return _buildStep1();
-      case 2:
-        return _buildStep2();
-      case 3:
-        return _buildStep3();
-      default:
-        return _buildStep1();
-    }
-  }
-
-  Widget _buildStep1() {
-    final dances = [
-      (FontAwesomeIcons.fire, 'Salsa'),
-      (FontAwesomeIcons.heart, 'Bachata'),
-      (FontAwesomeIcons.water, 'Zouk'),
-      (FontAwesomeIcons.moon, 'Kizomba'),
-      (FontAwesomeIcons.spa, 'Tango'),
-      (FontAwesomeIcons.music, 'Swing'),
-      (FontAwesomeIcons.bolt, 'Hip Hop'),
-      (FontAwesomeIcons.star, 'Jiné'),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Jaké tance tě baví?',
-            style: TextStyle(
-              color: appText,
-              fontSize: AppTypography.fontSize4xl,
-              fontWeight: AppTypography.fontWeightBold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Vyber své oblíbené taneční styly, abychom ti mohli nabídnout relevantní akce',
-            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: GridView.builder(
-              physics: const ClampingScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.6,
-              ),
-              itemCount: dances.length,
-              itemBuilder: (context, index) {
-                final (icon, name) = dances[index];
-                final selected = _selectedDances[index];
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedDances[index] = !_selectedDances[index];
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? appPrimary.withValues(alpha: 0.1)
-                          : appSurface,
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                      border: Border.all(
-                        color: selected ? appPrimary : appBorder,
-                        width: 2,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(
-                          icon,
-                          size: 24,
-                          color: selected ? appPrimary : appMuted,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          name,
-                          style: TextStyle(
-                            color: selected ? appPrimary : appText,
-                            fontSize: AppTypography.fontSizeMd,
-                            fontWeight: AppTypography.fontWeightSemiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          _GradientButton(
-            label: 'Pokračovat',
-            onTap: () => _goToStep(2),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStep2() {
-    final levels = [
-      (FontAwesomeIcons.seedling, appSuccess, 'Začátečník',
-          'Teprve začínám s tancem'),
-      (FontAwesomeIcons.chartLine, appPrimary, 'Mírně pokročilý',
-          'Mám základní zkušenosti'),
-      (FontAwesomeIcons.fire, appAccent, 'Pokročilý',
-          'Tančím pravidelně několik let'),
-      (FontAwesomeIcons.crown, appYellow, 'Expert',
-          'Profesionální úroveň'),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Jaká je tvoje úroveň?',
-            style: TextStyle(
-              color: appText,
-              fontSize: AppTypography.fontSize4xl,
-              fontWeight: AppTypography.fontWeightBold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Pomůže nám to doporučit ti vhodné akce a kurzy',
-            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: ListView.separated(
-              physics: const ClampingScrollPhysics(),
-              itemCount: levels.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final (icon, iconColor, title, subtitle) = levels[index];
-                final selected = _selectedLevel == index;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedLevel = index),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? appPrimary.withValues(alpha: 0.1)
-                          : appSurface,
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                      border: Border.all(
-                        color: selected ? appPrimary : appBorder,
-                        width: 2,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: appCard,
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                          ),
-                          child: Center(
-                            child: FaIcon(icon,
-                                size: 20, color: iconColor),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                  color: appText,
-                                  fontSize: AppTypography.fontSizeLg,
-                                  fontWeight: AppTypography.fontWeightSemiBold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                subtitle,
-                                style: const TextStyle(
-                                    color: appMuted, fontSize: AppTypography.fontSizeSm),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: selected ? appPrimary : appBorder,
-                              width: 2,
-                            ),
-                          ),
-                          child: selected
-                              ? Center(
-                                  child: Container(
-                                    width: 10,
-                                    height: 10,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: appPrimary,
-                                    ),
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _OutlineButton(
-                  label: 'Zpět',
-                  onTap: () => _goToStep(1),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: _GradientButton(
-                  label: 'Pokračovat',
-                  onTap: () => _goToStep(3),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStep3() {
-    final radii = ['10 km', '25 km', '50 km', 'Celá republika'];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Kde se nacházíš?',
-            style: TextStyle(
-              color: appText,
-              fontSize: AppTypography.fontSize4xl,
-              fontWeight: AppTypography.fontWeightBold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Najdeme pro tebe nejbližší taneční akce ve tvém okolí',
-            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: appSurface,
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                      border: Border.all(color: appBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Město',
-                          style: TextStyle(
-                            color: appMuted,
-                            fontSize: AppTypography.fontSizeSm,
-                            fontWeight: AppTypography.fontWeightMedium,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: appCard,
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            border: Border.all(color: appBorder),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 16),
-                              const FaIcon(
-                                FontAwesomeIcons.locationDot,
-                                color: appPrimary,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: TextField(
-                                  style:
-                                      const TextStyle(color: appText),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Např. Praha, Brno...',
-                                    hintStyle:
-                                        TextStyle(color: appMuted),
-                                    border: InputBorder.none,
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.zero,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: appSurface,
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                      border: Border.all(color: appBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Vyhledat akce v okruhu',
-                          style: TextStyle(
-                            color: appMuted,
-                            fontSize: AppTypography.fontSizeSm,
-                            fontWeight: AppTypography.fontWeightMedium,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        ...List.generate(radii.length, (index) {
-                          final selected = _selectedRadius == index;
-                          return GestureDetector(
-                            onTap: () =>
-                                setState(() => _selectedRadius = index),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  bottom: index < radii.length - 1
-                                      ? 12
-                                      : 0),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: selected
-                                            ? appPrimary
-                                            : appBorder,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: selected
-                                        ? Center(
-                                            child: Container(
-                                              width: 10,
-                                              height: 10,
-                                              decoration:
-                                                  const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: appPrimary,
-                                              ),
-                                            ),
-                                          )
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    radii[index],
-                                    style: const TextStyle(
-                                      color: appText,
-                                      fontSize: AppTypography.fontSizeMd,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: appSurface,
-                        borderRadius: BorderRadius.circular(AppRadius.xl),
-                        border: Border.all(
-                            color: appPrimary.withValues(alpha: 0.3)),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.locationCrosshairs,
-                            color: appPrimary,
-                            size: 18,
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            'Použít aktuální polohu',
-                            style: TextStyle(
-                              color: appPrimary,
-                              fontSize: AppTypography.fontSizeLg,
-                              fontWeight: AppTypography.fontWeightSemiBold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _OutlineButton(
-                  label: 'Zpět',
-                  onTap: () => _goToStep(2),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: _GradientButton(
-                  label: 'Dokončit',
-                  onTap: _finish,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-}
-
-class _BackgroundCircles extends StatelessWidget {
-  final Animation<double> animation;
-
-  const _BackgroundCircles({required this.animation});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return Stack(
-          children: [
-            Positioned(
-              top: 80 + animation.value,
-              left: 40,
-              child: _buildCircle(128, appPrimary.withValues(alpha: 0.2)),
-            ),
-            Positioned(
-              top: 240 - animation.value,
-              right: 32,
-              child: _buildCircle(96, appAccent.withValues(alpha: 0.2)),
-            ),
-            Positioned(
-              bottom: 160 + animation.value * 0.5,
-              left: 24,
-              child: _buildCircle(80, appSuccess.withValues(alpha: 0.2)),
-            ),
-          ],
+        return OnboardingStep1Section(
+          selectedDances: _selectedDances,
+          onDanceTap: (i) => setState(() => _selectedDances[i] = !_selectedDances[i]),
+          onNext: () => _goToStep(2),
         );
-      },
-    );
-  }
-
-  Widget _buildCircle(double size, Color color) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            color: color,
-            blurRadius: size * 1.5,
-            spreadRadius: size * 0.5,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GradientButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _GradientButton({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        gradient: AppGradients.primary,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: [
-          AppShadows.primaryLg,
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: AppTypography.fontSizeLg,
-                fontWeight: AppTypography.fontWeightBold,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OutlineButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _OutlineButton({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: appSurface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: appBorder),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: appText,
-                fontSize: AppTypography.fontSizeLg,
-                fontWeight: AppTypography.fontWeightSemiBold,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+      case 2:
+        return OnboardingStep2Section(
+          selectedLevel: _selectedLevel,
+          onLevelSelected: (i) => setState(() => _selectedLevel = i),
+          onBack: () => _goToStep(1),
+          onNext: () => _goToStep(3),
+        );
+      case 3:
+        return OnboardingStep3Section(
+          selectedRadius: _selectedRadius,
+          onRadiusSelected: (i) => setState(() => _selectedRadius = i),
+          onBack: () => _goToStep(2),
+          onFinish: _finish,
+        );
+      default:
+        return OnboardingStep1Section(
+          selectedDances: _selectedDances,
+          onDanceTap: (i) => setState(() => _selectedDances[i] = !_selectedDances[i]),
+          onNext: () => _goToStep(2),
+        );
+    }
   }
 }
