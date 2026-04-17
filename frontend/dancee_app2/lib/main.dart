@@ -12,6 +12,7 @@ import 'screens/events/filter_location_screen.dart';
 import 'screens/courses/courses_list_screen.dart';
 import 'screens/courses/course_detail_screen.dart';
 import 'screens/profile/profile_screen.dart';
+import 'screens/profile/profile_edit_screen.dart';
 
 void main() {
   runApp(const DanceeApp());
@@ -63,6 +64,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/profile-edit',
+      builder: (context, state) => const ProfileEditScreen(),
     ),
   ],
 );
