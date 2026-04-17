@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/schedule_card.dart';
 
 class ScheduleDetail {
@@ -26,9 +27,9 @@ class CourseScheduleSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Podrobnosti kurzu',
-          style: TextStyle(
+        Text(
+          t.courses.detail.details,
+          style: const TextStyle(
             color: appText,
             fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
@@ -53,9 +54,9 @@ class CourseScheduleSection extends StatelessWidget {
         ),
         if (learningItems.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.xxl),
-          const Text(
-            'Co se naučíte',
-            style: TextStyle(
+          Text(
+            t.courses.detail.whatYouLearn,
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize2xl,
               fontWeight: FontWeight.bold,

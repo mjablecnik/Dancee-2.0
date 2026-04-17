@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/pricing_option_card.dart';
 
 class CoursePricingSection extends StatelessWidget {
@@ -66,8 +67,8 @@ class CoursePricingSection extends StatelessWidget {
                     FaIcon(FontAwesomeIcons.shareNodes, size: 14, color: appText),
                     SizedBox(width: AppSpacing.sm),
                     Text(
-                      'Sdílet kurz',
-                      style: TextStyle(
+                      t.courses.detail.shareCourse,
+                      style: const TextStyle(
                         color: appText,
                         fontSize: AppTypography.fontSizeMd,
                         fontWeight: AppTypography.fontWeightSemiBold,
@@ -97,8 +98,8 @@ class CoursePricingSection extends StatelessWidget {
                     FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, size: 14, color: appText),
                     SizedBox(width: AppSpacing.sm),
                     Text(
-                      'Původní zdroj',
-                      style: TextStyle(
+                      t.events.detail.originalSource,
+                      style: const TextStyle(
                         color: appText,
                         fontSize: AppTypography.fontSizeMd,
                         fontWeight: AppTypography.fontWeightSemiBold,

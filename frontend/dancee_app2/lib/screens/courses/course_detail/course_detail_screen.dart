@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import '../../../shared/sections/description_section.dart';
 import '../../../shared/sections/detail_header_section.dart';
@@ -23,7 +24,7 @@ class CourseDetailScreen extends StatelessWidget {
       body: Column(
         children: [
           DetailHeaderSection(
-            title: 'Detail kurzu',
+            title: t.courses.detail.header,
             onBack: () => context.pop(),
           ),
           Expanded(
@@ -74,8 +75,8 @@ class CourseDetailScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.xxl),
-                        const DescriptionSection(
-                          title: 'Popis kurzu',
+                        DescriptionSection(
+                          title: t.courses.detail.description,
                           paragraphs: [
                             'Objevte krásu kubánské salsy v našem kurzu určeném pro úplné začátečníky. Naučíte se základní kroky, rytmus a techniky, které vám umožní tancovat s jistotou na jakékoli taneční akci.',
                             'Kurz je veden zkušeným lektorem Carlosem Rodriguezem, který má více než 10 let zkušeností s výukou latinsko-amerických tanců. Každá lekce je strukturovaná tak, aby postupně budovala vaše dovednosti.',
@@ -134,24 +135,24 @@ class CourseDetailScreen extends StatelessWidget {
         leftItems: [
           AppNavBarItem(
             icon: FontAwesomeIcons.house,
-            label: 'Domů',
+            label: t.nav.home,
             onTap: () => context.go('/events'),
           ),
           AppNavBarItem(
             icon: FontAwesomeIcons.magnifyingGlass,
-            label: 'Hledat',
+            label: t.nav.search,
           ),
         ],
         rightItems: [
           AppNavBarItem(
             icon: FontAwesomeIcons.bookOpen,
-            label: 'Kurzy',
+            label: t.nav.courses,
             isActive: true,
             onTap: () => context.go('/courses'),
           ),
           AppNavBarItem(
             icon: FontAwesomeIcons.user,
-            label: 'Profil',
+            label: t.nav.profile,
           ),
         ],
       ),

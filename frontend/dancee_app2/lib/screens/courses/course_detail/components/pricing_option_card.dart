@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PricingOptionCard extends StatelessWidget {
   final String price;
@@ -36,9 +37,9 @@ class PricingOptionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Cena kurzu',
-                    style: TextStyle(
+                  Text(
+                    t.courses.detail.coursePrice,
+                    style: const TextStyle(
                       color: appText,
                       fontSize: AppTypography.fontSizeMd,
                       fontWeight: FontWeight.bold,
@@ -64,9 +65,9 @@ class PricingOptionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
-                    'Volná místa',
-                    style: TextStyle(
+                  Text(
+                    t.courses.detail.availableSpots,
+                    style: const TextStyle(
                       color: appSuccess,
                       fontSize: AppTypography.fontSizeMd,
                       fontWeight: AppTypography.fontWeightMedium,
@@ -102,8 +103,8 @@ class PricingOptionCard extends StatelessWidget {
                     FaIcon(FontAwesomeIcons.userPlus, size: 16, color: Colors.white),
                     SizedBox(width: 10),
                     Text(
-                      'Registrovat se na kurz',
-                      style: TextStyle(
+                      t.courses.detail.register,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: AppTypography.fontSizeXl,
                         fontWeight: FontWeight.bold,

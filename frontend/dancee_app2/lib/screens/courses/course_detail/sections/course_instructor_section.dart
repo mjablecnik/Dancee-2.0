@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/instructor_card.dart';
 
 export '../components/instructor_card.dart' show InstructorStat;
@@ -24,9 +25,9 @@ class CourseInstructorSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'O lektorovi',
-          style: TextStyle(
+        Text(
+          t.courses.detail.aboutInstructor,
+          style: const TextStyle(
             color: appText,
             fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
