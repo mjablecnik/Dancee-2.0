@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../data/event_repository.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
@@ -19,7 +20,15 @@ class EventsListScreen extends StatefulWidget {
 
 class _EventsListScreenState extends State<EventsListScreen> {
   int _selectedStyleIndex = 0;
-  final List<String> _styles = ['Vše', 'Salsa', 'Bachata', 'Kizomba', 'Zouk'];
+  List<String> _styles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    const EventRepository().getDanceStyleFilters().then((styles) {
+      if (mounted) setState(() => _styles = styles);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

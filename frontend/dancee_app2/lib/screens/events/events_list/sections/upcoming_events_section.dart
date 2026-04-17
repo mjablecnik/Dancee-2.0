@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/event_repository.dart';
 import '../../../../i18n/strings.g.dart';
 import '../components/upcoming_event_card.dart';
 
@@ -38,13 +39,13 @@ class UpcomingEventsSection extends StatelessWidget {
                   color: appSurface,
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    FaIcon(FontAwesomeIcons.arrowUpWideShort, size: 14, color: appText),
-                    SizedBox(width: AppSpacing.sm),
+                    const FaIcon(FontAwesomeIcons.arrowUpWideShort, size: 14, color: appText),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       t.common.date,
-                      style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
+                      style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
                     ),
                   ],
                 ),
@@ -53,44 +54,36 @@ class UpcomingEventsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Column(
-            children: [
-              UpcomingEventCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/a7414ef4de-19550fae1cabebe15c09.png',
-                title: 'Bachata Sensual Workshop s mezinárodními lektory',
-                location: 'Dance Studio 1, Brno',
-                date: '20. Říj, 14:00',
-                style: 'Bachata',
-                styleColor: appAccent,
-                isFavorited: false,
-                onTap: onEventTap,
+        FutureBuilder<List<UpcomingEventData>>(
+          future: const EventRepository().getUpcomingEvents(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox.shrink();
+            final events = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: Column(
+                children: events.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final event = entry.value;
+                  return Column(
+                    children: [
+                      if (index > 0) const SizedBox(height: AppSpacing.lg),
+                      UpcomingEventCard(
+                        imageUrl: event.imageUrl,
+                        title: event.title,
+                        location: event.location,
+                        date: event.date,
+                        style: event.style,
+                        styleColor: event.styleColor,
+                        isFavorited: event.isFavorited,
+                        onTap: onEventTap,
+                      ),
+                    ],
+                  );
+                }).toList(),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              UpcomingEventCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/9d038750ea-18e3a1b3f78567f6cc57.png',
-                title: 'Havana Night - Živá kapela a animace',
-                location: 'Klub Tres, Ostrava',
-                date: '22. Říj, 20:00',
-                style: 'Salsa',
-                styleColor: appPrimary,
-                isFavorited: true,
-                onTap: onEventTap,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              UpcomingEventCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/858406cadf-a18221d3c2f7fc2a6f2a.png',
-                title: 'Zouk Weekend Marathon 2025',
-                location: 'Hotel Pyramida, Praha',
-                date: '1. Lis - 3. Lis',
-                style: 'Zouk',
-                styleColor: appTeal,
-                isFavorited: false,
-                onTap: onEventTap,
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );
