@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PasswordStrengthIndicator extends StatelessWidget {
   final int strength;
@@ -28,13 +29,13 @@ class PasswordStrengthIndicator extends StatelessWidget {
     switch (strength) {
       case 0:
       case 1:
-        return 'Slabé heslo';
+        return t.auth.passwordStrength.weak;
       case 2:
-        return 'Středně silné';
+        return t.auth.passwordStrength.medium;
       case 3:
-        return 'Silné heslo';
+        return t.auth.passwordStrength.strong;
       default:
-        return 'Velmi silné';
+        return t.auth.passwordStrength.veryStrong;
     }
   }
 
@@ -61,7 +62,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          isEmpty ? 'Alespoň 8 znaků' : _strengthLabel(),
+          isEmpty ? t.auth.passwordStrength.hint : _strengthLabel(),
           style: TextStyle(
             fontSize: AppTypography.fontSizeSm,
             color: isEmpty ? appMuted : color,

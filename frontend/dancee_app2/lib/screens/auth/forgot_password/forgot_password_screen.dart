@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/background_circles.dart';
 import '../../../shared/sections/auth_header_section.dart';
 import 'sections/forgot_password_form_section.dart';
@@ -84,13 +85,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       horizontal: AppSpacing.xxl,
                       vertical: AppSpacing.xxxl,
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         AuthHeaderSection(
-                          title: 'Zapomenuté heslo?',
-                          subtitle:
-                              'Zadej svůj e-mail a pošleme ti odkaz pro obnovení hesla',
+                          title: t.auth.forgotPassword.title,
+                          subtitle: t.auth.forgotPassword.subtitle,
                           icon: FontAwesomeIcons.key,
                           showTagline: false,
                         ),

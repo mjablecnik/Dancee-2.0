@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class OnboardingHeaderSection extends StatelessWidget {
   final int currentStep;
@@ -40,9 +41,9 @@ class OnboardingHeaderSection extends StatelessWidget {
             ),
             TextButton(
               onPressed: onSkip,
-              child: const Text(
-                'Přeskočit',
-                style: TextStyle(
+              child: Text(
+                t.common.skip,
+                style: const TextStyle(
                   color: appMuted,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightMedium,

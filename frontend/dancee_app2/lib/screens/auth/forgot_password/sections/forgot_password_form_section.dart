@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
 
@@ -15,14 +16,14 @@ class ForgotPasswordFormSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AppInputField(
-          label: 'E-mail',
-          hintText: 'tvuj@email.cz',
+          label: t.common.form.email,
+          hintText: t.common.form.emailHint,
           keyboardType: TextInputType.emailAddress,
           icon: const FaIcon(FontAwesomeIcons.envelope, color: appMuted, size: 16),
         ),
         const SizedBox(height: AppSpacing.xxl),
         GradientButton(
-          label: 'Odeslat odkaz',
+          label: t.auth.forgotPassword.submit,
           onTap: () {},
         ),
         const SizedBox(height: AppSpacing.xxl),
@@ -52,22 +53,22 @@ class ForgotPasswordFormSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Zkontroluj svou e-mailovou schránku',
-                      style: TextStyle(
+                      t.auth.forgotPassword.checkInbox,
+                      style: const TextStyle(
                         color: appText,
                         fontSize: AppTypography.fontSizeMd,
                         fontWeight: AppTypography.fontWeightSemiBold,
                       ),
                     ),
-                    SizedBox(height: AppSpacing.sm),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Po odeslání obdržíš e-mail s odkazem pro obnovení hesla. Odkaz je platný 24 hodin.',
-                      style: TextStyle(
+                      t.auth.forgotPassword.checkInboxDetail,
+                      style: const TextStyle(
                         color: appMuted,
                         fontSize: AppTypography.fontSizeSm,
                         height: 1.5,
@@ -83,9 +84,9 @@ class ForgotPasswordFormSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Vzpomněl sis na heslo?',
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+            Text(
+              t.auth.forgotPassword.rememberPassword,
+              style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             TextButton(
               onPressed: () => context.go('/login'),
@@ -94,9 +95,9 @@ class ForgotPasswordFormSection extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'Přihlásit se',
-                style: TextStyle(
+              child: Text(
+                t.auth.forgotPassword.login,
+                style: const TextStyle(
                   color: appPrimary,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightSemiBold,
@@ -106,17 +107,17 @@ class ForgotPasswordFormSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.xxxl),
-        const Row(
+        Row(
           children: [
-            Expanded(child: Divider(color: appBorder)),
+            const Expanded(child: Divider(color: appBorder)),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Text(
-                'Potřebuješ pomoc?',
-                style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+                t.auth.forgotPassword.needHelp,
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ),
-            Expanded(child: Divider(color: appBorder)),
+            const Expanded(child: Divider(color: appBorder)),
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -125,7 +126,7 @@ class ForgotPasswordFormSection extends StatelessWidget {
             Expanded(
               child: _HelpButton(
                 icon: const FaIcon(FontAwesomeIcons.headset, color: appPrimary, size: 16),
-                label: 'Podpora',
+                label: t.common.support,
                 onTap: () {},
               ),
             ),
@@ -133,7 +134,7 @@ class ForgotPasswordFormSection extends StatelessWidget {
             Expanded(
               child: _HelpButton(
                 icon: const FaIcon(FontAwesomeIcons.circleQuestion, color: appAccent, size: 16),
-                label: 'FAQ',
+                label: t.common.faq,
                 onTap: () {},
               ),
             ),

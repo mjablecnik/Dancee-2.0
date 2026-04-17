@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_checkbox.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
@@ -70,26 +71,26 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AppInputField(
-          label: 'Jméno',
-          hintText: 'Tvoje jméno',
+          label: t.common.form.firstName,
+          hintText: t.common.form.firstNameHint,
           icon: const FaIcon(FontAwesomeIcons.user, color: appMuted, size: 16),
         ),
         const SizedBox(height: AppSpacing.lg),
         AppInputField(
-          label: 'Příjmení',
-          hintText: 'Tvoje příjmení',
+          label: t.common.form.lastName,
+          hintText: t.common.form.lastNameHint,
           icon: const FaIcon(FontAwesomeIcons.user, color: appMuted, size: 16),
         ),
         const SizedBox(height: AppSpacing.lg),
         AppInputField(
-          label: 'E-mail',
-          hintText: 'tvuj@email.cz',
+          label: t.common.form.email,
+          hintText: t.common.form.emailHint,
           keyboardType: TextInputType.emailAddress,
           icon: const FaIcon(FontAwesomeIcons.envelope, color: appMuted, size: 16),
         ),
         const SizedBox(height: AppSpacing.lg),
         AppPasswordField(
-          label: 'Heslo',
+          label: t.common.form.password,
           controller: _passwordController,
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -99,13 +100,13 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
         ),
         const SizedBox(height: AppSpacing.lg),
         AppPasswordField(
-          label: 'Potvrzení hesla',
+          label: t.common.form.confirmPassword,
           controller: _confirmPasswordController,
         ),
         if (_confirmTouched) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(
-            _passwordsMatch ? 'Hesla se shodují' : 'Hesla se neshodují',
+            _passwordsMatch ? t.auth.register.passwordsMatch : t.auth.register.passwordsMismatch,
             style: TextStyle(
               fontSize: AppTypography.fontSizeSm,
               color: _passwordsMatch ? appSuccess : appError,
@@ -125,22 +126,22 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: const TextStyle(
                       color: appMuted,
                       fontSize: AppTypography.fontSizeMd,
                       height: 1.5,
                     ),
                     children: [
-                      TextSpan(text: 'Souhlasím s '),
+                      TextSpan(text: t.auth.agreeWith),
                       TextSpan(
-                        text: 'Podmínkami používání',
-                        style: TextStyle(color: appPrimary),
+                        text: t.auth.termsOfUse,
+                        style: const TextStyle(color: appPrimary),
                       ),
-                      TextSpan(text: ' a '),
+                      TextSpan(text: t.auth.and),
                       TextSpan(
-                        text: 'Zásadami ochrany osobních údajů',
-                        style: TextStyle(color: appPrimary),
+                        text: t.auth.privacyPolicy,
+                        style: const TextStyle(color: appPrimary),
                       ),
                     ],
                   ),
@@ -159,10 +160,10 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
                 onChanged: (val) => setState(() => _newsletter = val),
               ),
               const SizedBox(width: AppSpacing.md),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Chci dostávat novinky o tanečních akcích',
-                  style: TextStyle(
+                  t.auth.register.newsletter,
+                  style: const TextStyle(
                     color: appMuted,
                     fontSize: AppTypography.fontSizeMd,
                   ),
@@ -173,45 +174,45 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
         ),
         const SizedBox(height: AppSpacing.xxl),
         GradientButton(
-          label: 'Vytvořit účet',
+          label: t.auth.register.submit,
           onTap: () => context.go('/onboarding'),
         ),
         const SizedBox(height: AppSpacing.xxxl),
-        const Row(
+        Row(
           children: [
-            Expanded(child: Divider(color: appBorder)),
+            const Expanded(child: Divider(color: appBorder)),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Text(
-                'nebo se zaregistruj s',
-                style: TextStyle(
+                t.auth.orRegisterWith,
+                style: const TextStyle(
                   color: appMuted,
                   fontSize: AppTypography.fontSizeMd,
                 ),
               ),
             ),
-            Expanded(child: Divider(color: appBorder)),
+            const Expanded(child: Divider(color: appBorder)),
           ],
         ),
         const SizedBox(height: AppSpacing.xxl),
         _SocialButton(
           icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 20),
-          label: 'Pokračovat s Google',
+          label: t.auth.continueWithGoogle,
           onTap: () {},
         ),
         const SizedBox(height: AppSpacing.md),
         _SocialButton(
           icon: const FaIcon(FontAwesomeIcons.apple, color: appText, size: 20),
-          label: 'Pokračovat s Apple',
+          label: t.auth.continueWithApple,
           onTap: () {},
         ),
         const SizedBox(height: AppSpacing.xxl),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Už máš účet?',
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+            Text(
+              t.auth.register.hasAccount,
+              style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const SizedBox(width: AppSpacing.xs),
             TextButton(
@@ -221,9 +222,9 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'Přihlaš se',
-                style: TextStyle(
+              child: Text(
+                t.auth.register.login,
+                style: const TextStyle(
                   color: appPrimary,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightSemiBold,
