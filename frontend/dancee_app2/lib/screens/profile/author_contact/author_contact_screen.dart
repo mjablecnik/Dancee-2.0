@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import 'sections/author_info_section.dart';
 import 'sections/contact_form_section.dart';
@@ -16,7 +17,7 @@ class AuthorContactScreen extends StatelessWidget {
       body: Column(
         children: [
           BackButtonHeader(
-            title: 'Napsat autorovi',
+            title: t.profile.support.contactAuthor,
             onBack: () => context.pop(),
           ),
           Expanded(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PasswordStrengthBar extends StatelessWidget {
   final int strength;
@@ -26,13 +27,13 @@ class PasswordStrengthBar extends StatelessWidget {
   String get _label {
     switch (strength) {
       case 1:
-        return 'Síla hesla: Velmi slabé';
+        return t.profile.changePassword.strengthVeryWeak;
       case 2:
-        return 'Síla hesla: Slabé';
+        return t.profile.changePassword.strengthWeak;
       case 3:
-        return 'Síla hesla: Střední';
+        return t.profile.changePassword.strengthMedium;
       case 4:
-        return 'Síla hesla: Silné';
+        return t.profile.changePassword.strengthStrong;
       default:
         return '';
     }

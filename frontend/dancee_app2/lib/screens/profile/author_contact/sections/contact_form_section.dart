@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../core/colors.dart';
 import '../../../../../core/theme.dart';
+import '../../../../../i18n/strings.g.dart';
 import '../components/subject_option.dart';
 import '../components/device_info_card.dart';
 
@@ -78,9 +79,9 @@ class _ContactFormSectionState extends State<ContactFormSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Předmět zprávy',
-          style: TextStyle(
+        Text(
+          t.contact.form.subject,
+          style: const TextStyle(
             fontSize: AppTypography.fontSizeMd,
             fontWeight: AppTypography.fontWeightMedium,
             color: appText,
@@ -91,7 +92,7 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           value: 'feedback',
           icon: FontAwesomeIcons.comment,
           iconColor: appPrimary,
-          label: 'Zpětná vazba',
+          label: t.contact.form.feedback,
           groupValue: _selectedSubject,
           onChanged: (v) => setState(() => _selectedSubject = v),
         ),
@@ -100,7 +101,7 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           value: 'bug',
           icon: FontAwesomeIcons.bug,
           iconColor: appError,
-          label: 'Nahlásit problém',
+          label: t.contact.form.reportBug,
           groupValue: _selectedSubject,
           onChanged: (v) => setState(() => _selectedSubject = v),
         ),
@@ -109,7 +110,7 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           value: 'feature',
           icon: FontAwesomeIcons.lightbulb,
           iconColor: appYellow,
-          label: 'Návrh na vylepšení',
+          label: t.contact.form.featureRequest,
           groupValue: _selectedSubject,
           onChanged: (v) => setState(() => _selectedSubject = v),
         ),
@@ -118,14 +119,14 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           value: 'other',
           icon: FontAwesomeIcons.question,
           iconColor: appMuted,
-          label: 'Ostatní',
+          label: t.contact.form.other,
           groupValue: _selectedSubject,
           onChanged: (v) => setState(() => _selectedSubject = v),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const Text(
-          'Název zprávy',
-          style: TextStyle(
+        Text(
+          t.contact.form.title,
+          style: const TextStyle(
             fontSize: AppTypography.fontSizeMd,
             fontWeight: AppTypography.fontWeightMedium,
             color: appText,
@@ -136,13 +137,13 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           controller: _titleController,
           style: const TextStyle(color: appText),
           decoration: _fieldDecoration(
-            hintText: 'Stručně popište váš problém nebo návrh',
+            hintText: t.contact.form.titleHint,
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const Text(
-          'Zpráva',
-          style: TextStyle(
+        Text(
+          t.contact.form.message,
+          style: const TextStyle(
             fontSize: AppTypography.fontSizeMd,
             fontWeight: AppTypography.fontWeightMedium,
             color: appText,
@@ -154,8 +155,7 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           maxLines: 6,
           style: const TextStyle(color: appText),
           decoration: _fieldDecoration(
-            hintText:
-                'Podrobně popište váš problém, návrh nebo zpětnou vazbu. Pokud hlásíte problém, uveďte prosím kroky jak ho reprodukovat.',
+            hintText: t.contact.form.messageHint,
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -167,9 +167,9 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
-        const Text(
-          'Váš e-mail pro odpověď',
-          style: TextStyle(
+        Text(
+          t.contact.form.replyEmail,
+          style: const TextStyle(
             fontSize: AppTypography.fontSizeMd,
             fontWeight: AppTypography.fontWeightMedium,
             color: appText,
@@ -217,10 +217,10 @@ class _ContactFormSectionState extends State<ContactFormSection> {
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   _isLoading
-                      ? 'Odesílání...'
+                      ? t.contact.form.sending
                       : _isSent
-                          ? 'Odesláno!'
-                          : 'Odeslat zprávu',
+                          ? t.contact.form.sent
+                          : t.contact.form.submit,
                   style: const TextStyle(
                     fontSize: AppTypography.fontSizeXl,
                     fontWeight: AppTypography.fontWeightMedium,
@@ -249,19 +249,19 @@ class _ContactFormSectionState extends State<ContactFormSection> {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Doba odezvy',
-                      style: TextStyle(
+                      t.contact.responseTime,
+                      style: const TextStyle(
                         fontSize: AppTypography.fontSizeMd,
                         fontWeight: AppTypography.fontWeightMedium,
                         color: appLightBlueTint,
                       ),
                     ),
-                    SizedBox(height: AppSpacing.xs),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'Obvykle odpovídáme do 24 hodin v pracovní dny. Děkujeme za trpělivost!',
-                      style: TextStyle(
+                      t.contact.responseTimeDetail,
+                      style: const TextStyle(
                         fontSize: AppTypography.fontSizeSm,
                         color: appLightBlue,
                       ),

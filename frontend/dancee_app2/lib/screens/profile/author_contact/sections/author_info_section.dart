@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../core/colors.dart';
 import '../../../../../core/theme.dart';
+import '../../../../../i18n/strings.g.dart';
 
 class AuthorInfoSection extends StatelessWidget {
   const AuthorInfoSection({super.key});
@@ -30,29 +31,29 @@ class AuthorInfoSection extends StatelessWidget {
                 child: const Icon(FontAwesomeIcons.user, color: Colors.white, size: 18),
               ),
               const SizedBox(width: AppSpacing.md),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tým Dancee',
-                    style: TextStyle(
+                    t.contact.teamName,
+                    style: const TextStyle(
                       fontSize: AppTypography.fontSize2xl,
                       fontWeight: FontWeight.bold,
                       color: appText,
                     ),
                   ),
                   Text(
-                    'hello@dancee.app',
-                    style: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
+                    t.contact.email,
+                    style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                   ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          const Text(
-            'Rádi si přečteme vaše zpětné vazby, návrhy na vylepšení nebo nahlášení problémů. Odpovíme vám co nejdříve!',
-            style: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
+          Text(
+            t.contact.description,
+            style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
           ),
         ],
       ),

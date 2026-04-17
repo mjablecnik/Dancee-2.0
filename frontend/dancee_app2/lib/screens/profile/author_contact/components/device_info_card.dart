@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../core/colors.dart';
 import '../../../../../core/theme.dart';
+import '../../../../../i18n/strings.g.dart';
 
 class DeviceInfoRow {
   final String label;
@@ -31,9 +32,9 @@ class DeviceInfoCard extends StatelessWidget {
             children: [
               const Icon(FontAwesomeIcons.mobileScreen, color: appMuted, size: 14),
               const SizedBox(width: AppSpacing.sm),
-              const Text(
-                'Informace o zařízení',
-                style: TextStyle(
+              Text(
+                t.contact.deviceInfo,
+                style: const TextStyle(
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightMedium,
                   color: appText,
@@ -49,9 +50,9 @@ class DeviceInfoCard extends StatelessWidget {
                   color: appPrimary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppRadius.round),
                 ),
-                child: const Text(
-                  'Automaticky přiloženo',
-                  style: TextStyle(fontSize: AppTypography.fontSizeSm, color: appPrimary),
+                child: Text(
+                  t.contact.autoAttached,
+                  style: const TextStyle(fontSize: AppTypography.fontSizeSm, color: appPrimary),
                 ),
               ),
             ],
