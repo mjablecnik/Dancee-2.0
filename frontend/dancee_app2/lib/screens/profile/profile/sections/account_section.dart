@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/profile_menu_item.dart';
 
 class AccountSection extends StatelessWidget {
@@ -28,7 +29,7 @@ class AccountSection extends StatelessWidget {
             icon: FontAwesomeIcons.user,
             iconBgColor: appPrimary.withValues(alpha: 0.2),
             iconColor: appPrimary,
-            title: 'Upravit profil',
+            title: t.profile.account.editProfile,
             onTap: onEditProfile,
             showDivider: true,
           ),
@@ -36,7 +37,7 @@ class AccountSection extends StatelessWidget {
             icon: FontAwesomeIcons.lock,
             iconBgColor: appWarning.withValues(alpha: 0.2),
             iconColor: appWarning,
-            title: 'Změnit heslo',
+            title: t.profile.account.changePassword,
             onTap: onChangePassword,
             showDivider: false,
           ),

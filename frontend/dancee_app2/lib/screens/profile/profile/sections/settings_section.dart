@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/profile_menu_item.dart';
 
 class SettingsSection extends StatelessWidget {
@@ -28,10 +29,10 @@ class SettingsSection extends StatelessWidget {
             icon: FontAwesomeIcons.globe,
             iconBgColor: appSuccess.withValues(alpha: 0.2),
             iconColor: appSuccess,
-            title: 'Jazyk',
-            trailing: const Text(
-              'Čeština',
-              style: TextStyle(
+            title: t.profile.settings.language,
+            trailing: Text(
+              t.profile.settings.czech,
+              style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeMd,
               ),
@@ -43,7 +44,7 @@ class SettingsSection extends StatelessWidget {
             icon: FontAwesomeIcons.bell,
             iconBgColor: appAccent.withValues(alpha: 0.2),
             iconColor: appAccent,
-            title: 'Oznámení',
+            title: t.profile.settings.notifications,
             trailing: Switch(
               value: notificationsEnabled,
               onChanged: onNotificationsChanged,

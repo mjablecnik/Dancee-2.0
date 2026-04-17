@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/profile_menu_item.dart';
 
 class AppInfoSection extends StatelessWidget {
@@ -21,7 +22,7 @@ class AppInfoSection extends StatelessWidget {
             icon: FontAwesomeIcons.circleInfo,
             iconBgColor: appBorder,
             iconColor: appMuted,
-            title: 'Verze aplikace',
+            title: t.profile.appInfo.version,
             trailing: const Text(
               '1.2.5 (Build 125)',
               style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
@@ -33,7 +34,7 @@ class AppInfoSection extends StatelessWidget {
             icon: FontAwesomeIcons.shieldHalved,
             iconBgColor: appBorder,
             iconColor: appMuted,
-            title: 'Podmínky použití',
+            title: t.profile.appInfo.termsOfUse,
             onTap: null,
             showDivider: true,
           ),
@@ -41,7 +42,7 @@ class AppInfoSection extends StatelessWidget {
             icon: FontAwesomeIcons.userShield,
             iconBgColor: appBorder,
             iconColor: appMuted,
-            title: 'Ochrana soukromí',
+            title: t.profile.appInfo.privacy,
             onTap: null,
             showDivider: false,
           ),

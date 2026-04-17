@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import '../../../shared/elements/labels/section_label.dart';
 import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
@@ -31,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Column(
         children: [
           BackButtonHeader(
-            title: 'Profil',
+            title: t.profile.title,
             onBack: () => context.pop(),
             trailing: GestureDetector(
               onTap: () => context.push('/profile/edit'),
@@ -70,14 +71,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  const SectionLabel(title: 'Účet'),
+                  SectionLabel(title: t.profile.sections.account),
                   const SizedBox(height: AppSpacing.md),
                   AccountSection(
                     onEditProfile: () => context.push('/profile/edit'),
                     onChangePassword: () => context.push('/profile/change-password'),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  const SectionLabel(title: 'Nastavení'),
+                  SectionLabel(title: t.profile.sections.settings),
                   const SizedBox(height: AppSpacing.md),
                   SettingsSection(
                     notificationsEnabled: _notificationsEnabled,
@@ -86,18 +87,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: AppSpacing.xxl),
                   PremiumBanner(onTap: () => context.push('/profile/premium')),
                   const SizedBox(height: AppSpacing.xxl),
-                  const SectionLabel(title: 'Podpora'),
+                  SectionLabel(title: t.profile.sections.support),
                   const SizedBox(height: AppSpacing.md),
                   SupportSection(
                     onContactAuthor: () => context.push('/profile/author-contact'),
                     onRateApp: null,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  const SectionLabel(title: 'O aplikaci'),
+                  SectionLabel(title: t.profile.sections.appInfo),
                   const SizedBox(height: AppSpacing.md),
                   const AppInfoSection(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const SectionLabel(title: 'Nebezpečná zóna'),
+                  SectionLabel(title: t.profile.sections.dangerZone),
                   const SizedBox(height: AppSpacing.md),
                   LogoutSection(
                     onLogout: () {},
@@ -111,12 +112,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       bottomNavigationBar: AppBottomNavBar(
         leftItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.house, label: 'Domů', onTap: () => context.go('/events')),
-          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: 'Hledat'),
+          AppNavBarItem(icon: FontAwesomeIcons.house, label: t.nav.home, onTap: () => context.go('/events')),
+          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: t.nav.search),
         ],
         rightItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.heart, label: 'Uložené'),
-          AppNavBarItem(icon: FontAwesomeIcons.user, label: 'Profil', isActive: true),
+          AppNavBarItem(icon: FontAwesomeIcons.heart, label: t.nav.saved),
+          AppNavBarItem(icon: FontAwesomeIcons.user, label: t.nav.profile, isActive: true),
         ],
       ),
     );

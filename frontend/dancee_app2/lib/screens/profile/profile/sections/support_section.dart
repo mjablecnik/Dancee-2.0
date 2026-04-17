@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/profile_menu_item.dart';
 
 class SupportSection extends StatelessWidget {
@@ -28,7 +29,7 @@ class SupportSection extends StatelessWidget {
             icon: FontAwesomeIcons.message,
             iconBgColor: appPrimary.withValues(alpha: 0.2),
             iconColor: appPrimary,
-            title: 'Napsat autorovi',
+            title: t.profile.support.contactAuthor,
             onTap: onContactAuthor,
             showDivider: true,
           ),
@@ -36,7 +37,7 @@ class SupportSection extends StatelessWidget {
             icon: FontAwesomeIcons.star,
             iconBgColor: appGold.withValues(alpha: 0.2),
             iconColor: appGold,
-            title: 'Ohodnotit aplikaci',
+            title: t.profile.support.rateApp,
             onTap: onRateApp,
             showDivider: false,
           ),
