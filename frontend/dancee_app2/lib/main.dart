@@ -6,6 +6,7 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
 import 'screens/events/events_list_screen.dart';
+import 'screens/events/event_detail_screen.dart';
 
 void main() {
   runApp(const DanceeApp());
@@ -33,6 +34,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/events',
       builder: (context, state) => const EventsListScreen(),
+    ),
+    GoRoute(
+      path: '/event-detail',
+      builder: (context, state) => const EventDetailScreen(),
     ),
   ],
 );
