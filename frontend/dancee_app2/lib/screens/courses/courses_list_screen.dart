@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class CoursesListScreen extends StatefulWidget {
   const CoursesListScreen({super.key});
@@ -64,7 +65,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 'Taneční kurzy',
                 style: TextStyle(
                   color: appText,
-                  fontSize: 24,
+                  fontSize: AppTypography.fontSize4xl,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -73,8 +74,8 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 'Najdi svůj kurz',
                 style: TextStyle(
                   color: appMuted,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightMedium,
                 ),
               ),
             ],
@@ -84,7 +85,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
             height: 40,
             decoration: BoxDecoration(
               color: appSurface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppRadius.round),
             ),
             child: const Center(
               child: FaIcon(FontAwesomeIcons.sliders, size: 18, color: appText),
@@ -105,8 +106,8 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
             'TANEČNÍ STYLY',
             style: TextStyle(
               color: appMuted,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSizeSm,
+              fontWeight: AppTypography.fontWeightSemiBold,
               letterSpacing: 1.0,
             ),
           ),
@@ -127,17 +128,17 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                     decoration: BoxDecoration(
                       color: isActive ? appPrimary : appSurface,
                       border: Border.all(color: isActive ? appPrimary : appBorder),
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
                       boxShadow: isActive
-                          ? [BoxShadow(color: appPrimary.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: -5)]
+                          ? [AppShadows.primary]
                           : null,
                     ),
                     child: Text(
                       _styles[index],
                       style: TextStyle(
                         color: isActive ? Colors.white : appText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightMedium,
                       ),
                     ),
                   ),
@@ -162,13 +163,13 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
             children: [
               const Text(
                 'Doporučené kurzy',
-                style: TextStyle(color: appText, fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(color: appText, fontSize: AppTypography.fontSize3xl, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: () {},
                 child: const Text(
                   'Zobrazit vše',
-                  style: TextStyle(color: appMuted, fontSize: 14),
+                  style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                 ),
               ),
             ],
@@ -228,7 +229,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
         decoration: BoxDecoration(
           color: appCard,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.round),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,13 +268,13 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: levelColor.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Text(
                       levelLabel,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: AppTypography.fontSizeSm,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -292,7 +293,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: appText,
-                      fontSize: 18,
+                      fontSize: AppTypography.fontSize2xl,
                       fontWeight: FontWeight.bold,
                       height: 1.3,
                     ),
@@ -302,7 +303,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                     children: [
                       const FaIcon(FontAwesomeIcons.userTie, size: 14, color: appPrimary),
                       const SizedBox(width: 8),
-                      Text(instructor, style: const TextStyle(color: appMuted, fontSize: 14)),
+                      Text(instructor, style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -310,7 +311,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                     children: [
                       const FaIcon(FontAwesomeIcons.calendar, size: 14, color: appMuted),
                       const SizedBox(width: 8),
-                      Text(dateRange, style: const TextStyle(color: appMuted, fontSize: 14)),
+                      Text(dateRange, style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -321,14 +322,14 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: appSurface,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
                         ),
                         child: Text(
                           styleLabel,
                           style: TextStyle(
                             color: styleColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppTypography.fontSizeXs,
+                            fontWeight: AppTypography.fontWeightSemiBold,
                           ),
                         ),
                       ),
@@ -336,7 +337,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                         price,
                         style: const TextStyle(
                           color: appText,
-                          fontSize: 14,
+                          fontSize: AppTypography.fontSizeMd,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -363,19 +364,19 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
             children: [
               const Text(
                 'Všechny kurzy',
-                style: TextStyle(color: appText, fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(color: appText, fontSize: AppTypography.fontSize3xl, fontWeight: FontWeight.bold),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: appSurface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: const Row(
                   children: [
                     FaIcon(FontAwesomeIcons.arrowUpWideShort, size: 14, color: appText),
                     SizedBox(width: 8),
-                    Text('Datum', style: TextStyle(color: appText, fontSize: 14)),
+                    Text('Datum', style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd)),
                   ],
                 ),
               ),
@@ -393,7 +394,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 instructor: 'Dance Academy Brno',
                 dateRange: '10. Led - 20. Bře 2025',
                 styleLabel: 'Kizomba',
-                styleColor: const Color(0xFFC084FC),
+                styleColor: appLavender,
                 price: '1 800 Kč',
               ),
               const SizedBox(height: 12),
@@ -403,7 +404,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 instructor: 'Rodrigo Silva',
                 dateRange: '5. Úno - 25. Dub 2025',
                 styleLabel: 'Zouk',
-                styleColor: const Color(0xFF34D399),
+                styleColor: appTeal,
                 price: '2 900 Kč',
               ),
               const SizedBox(height: 12),
@@ -433,7 +434,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 instructor: 'Swing Time Praha',
                 dateRange: '8. Úno - 15. Kvě 2025',
                 styleLabel: 'Swing',
-                styleColor: const Color(0xFFFACC15),
+                styleColor: appGold,
                 price: '2 700 Kč',
               ),
               const SizedBox(height: 12),
@@ -471,7 +472,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,7 +490,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: appText,
-                          fontSize: 16,
+                          fontSize: AppTypography.fontSizeXl,
                           fontWeight: FontWeight.bold,
                           height: 1.3,
                         ),
@@ -501,7 +502,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                           const SizedBox(width: 6),
                           Text(
                             instructor,
-                            style: const TextStyle(color: appMuted, fontSize: 12),
+                            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                           ),
                         ],
                       ),
@@ -510,7 +511,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 ),
                 const SizedBox(width: 12),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   child: Image.network(
                     imageUrl,
                     width: 64,
@@ -525,7 +526,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
               children: [
                 const FaIcon(FontAwesomeIcons.calendar, size: 12, color: appMuted),
                 const SizedBox(width: 8),
-                Text(dateRange, style: const TextStyle(color: appMuted, fontSize: 12)),
+                Text(dateRange, style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm)),
               ],
             ),
             const SizedBox(height: 8),
@@ -536,14 +537,14 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: appCard,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
                   ),
                   child: Text(
                     styleLabel,
                     style: TextStyle(
                       color: styleColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeXs,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                 ),
@@ -551,7 +552,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                   price,
                   style: const TextStyle(
                     color: appText,
-                    fontSize: 14,
+                    fontSize: AppTypography.fontSizeMd,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -578,7 +579,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -596,7 +597,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: appText,
-                          fontSize: 16,
+                          fontSize: AppTypography.fontSizeXl,
                           fontWeight: FontWeight.bold,
                           height: 1.3,
                         ),
@@ -608,7 +609,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                           const SizedBox(width: 6),
                           Text(
                             instructor,
-                            style: const TextStyle(color: appMuted, fontSize: 12),
+                            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                           ),
                         ],
                       ),
@@ -617,7 +618,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                 ),
                 const SizedBox(width: 12),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   child: Image.network(
                     imageUrl,
                     width: 64,
@@ -632,7 +633,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
               children: [
                 const FaIcon(FontAwesomeIcons.calendar, size: 12, color: appMuted),
                 const SizedBox(width: 8),
-                Text(dateRange, style: const TextStyle(color: appMuted, fontSize: 12)),
+                Text(dateRange, style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm)),
               ],
             ),
             const SizedBox(height: 8),
@@ -647,14 +648,14 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: appCard,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(AppRadius.xs),
                               ),
                               child: Text(
                                 t.label,
                                 style: TextStyle(
                                   color: t.color,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: AppTypography.fontSizeXs,
+                                  fontWeight: AppTypography.fontWeightSemiBold,
                                 ),
                               ),
                             ),
@@ -665,7 +666,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
                   price,
                   style: const TextStyle(
                     color: appText,
-                    fontSize: 14,
+                    fontSize: AppTypography.fontSizeMd,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -712,7 +713,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
         children: [
           FaIcon(icon, size: 22, color: color),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: color, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
         ],
       ),
     );
@@ -729,11 +730,7 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(

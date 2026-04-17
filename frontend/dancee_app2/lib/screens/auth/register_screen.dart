@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -76,9 +77,9 @@ class _RegisterScreenState extends State<RegisterScreen>
     switch (_passwordStrength) {
       case 0:
       case 1:
-        return const Color(0xFFEF4444);
+        return appError;
       case 2:
-        return const Color(0xFFF59E0B);
+        return appAmber;
       default:
         return appSuccess;
     }
@@ -130,18 +131,10 @@ class _RegisterScreenState extends State<RegisterScreen>
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [appPrimary, appAccent],
-            ),
-            borderRadius: BorderRadius.circular(16),
+            gradient: AppGradients.primary,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             boxShadow: [
-              BoxShadow(
-                color: appPrimary.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
+              AppShadows.primaryLg,
             ],
           ),
           child: const Center(
@@ -154,14 +147,12 @@ class _RegisterScreenState extends State<RegisterScreen>
         ),
         const SizedBox(height: 16),
         ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [appPrimary, appAccent],
-          ).createShader(bounds),
+          shaderCallback: (bounds) => AppGradients.primary.createShader(bounds),
           child: const Text(
             'Dancee',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: AppTypography.fontSize5xl,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -171,8 +162,8 @@ class _RegisterScreenState extends State<RegisterScreen>
           'Objevuj taneční svět',
           style: TextStyle(
             color: appMuted,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
           ),
         ),
         const SizedBox(height: 20),
@@ -180,15 +171,15 @@ class _RegisterScreenState extends State<RegisterScreen>
           'Vytvoř si účet',
           style: TextStyle(
             color: appText,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
+            fontSize: AppTypography.fontSize3xl,
+            fontWeight: AppTypography.fontWeightBold,
           ),
         ),
         const SizedBox(height: 4),
         const Text(
           'Zaregistruj se a začni objevovat taneční akce',
           textAlign: TextAlign.center,
-          style: TextStyle(color: appMuted, fontSize: 14),
+          style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
         ),
       ],
     );
@@ -234,8 +225,8 @@ class _RegisterScreenState extends State<RegisterScreen>
           Text(
             _passwordsMatch ? 'Hesla se shodují' : 'Hesla se neshodují',
             style: TextStyle(
-              fontSize: 12,
-              color: _passwordsMatch ? appSuccess : const Color(0xFFEF4444),
+              fontSize: AppTypography.fontSizeSm,
+              color: _passwordsMatch ? appSuccess : appError,
             ),
           ),
         ],
@@ -250,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen>
               Expanded(
                 child: RichText(
                   text: const TextSpan(
-                    style: TextStyle(color: appMuted, fontSize: 14, height: 1.5),
+                    style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, height: 1.5),
                     children: [
                       TextSpan(text: 'Souhlasím s '),
                       TextSpan(
@@ -279,7 +270,7 @@ class _RegisterScreenState extends State<RegisterScreen>
               const Expanded(
                 child: Text(
                   'Chci dostávat novinky o tanečních akcích',
-                  style: TextStyle(color: appMuted, fontSize: 14),
+                  style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                 ),
               ),
             ],
@@ -298,7 +289,7 @@ class _RegisterScreenState extends State<RegisterScreen>
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'nebo se zaregistruj s',
-                style: TextStyle(color: appMuted, fontSize: 14),
+                style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ),
             Expanded(child: Divider(color: appBorder)),
@@ -322,7 +313,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           children: [
             const Text(
               'Už máš účet?',
-              style: TextStyle(color: appMuted, fontSize: 14),
+              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const SizedBox(width: 4),
             TextButton(
@@ -336,8 +327,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                 'Přihlaš se',
                 style: TextStyle(
                   color: appPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
             ),
@@ -353,8 +344,8 @@ class _RegisterScreenState extends State<RegisterScreen>
       text,
       style: const TextStyle(
         color: appText,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontSize: AppTypography.fontSizeMd,
+        fontWeight: AppTypography.fontWeightSemiBold,
       ),
     );
   }
@@ -365,7 +356,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       height: 20,
       margin: const EdgeInsets.only(top: 2),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppRadius.xs),
         border: Border.all(
           color: checked ? appPrimary : appBorder,
           width: 2,
@@ -390,7 +381,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       height: 48,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: appBorder),
       ),
       child: Row(
@@ -427,7 +418,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       height: 48,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: appBorder),
       ),
       child: Row(
@@ -468,7 +459,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       height: 48,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: appBorder),
       ),
       child: Row(
@@ -528,7 +519,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         Text(
           _passwordController.text.isEmpty ? 'Alespoň 8 znaků' : _strengthLabel(),
           style: TextStyle(
-            fontSize: 12,
+            fontSize: AppTypography.fontSizeSm,
             color: _passwordController.text.isEmpty ? appMuted : color,
           ),
         ),
@@ -545,13 +536,13 @@ class _RegisterScreenState extends State<RegisterScreen>
       height: 48,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: appBorder),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           onTap: onTap,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -562,8 +553,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                 label,
                 style: const TextStyle(
                   color: appText,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeLg,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
             ],
@@ -637,30 +628,24 @@ class _GradientButton extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [appPrimary, appAccent],
-        ),
-        borderRadius: BorderRadius.circular(12),
+        gradient: AppGradients.primary,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
-          BoxShadow(
-            color: appPrimary.withValues(alpha: 0.5),
-            blurRadius: 20,
-            offset: const Offset(0, 5),
-          ),
+          AppShadows.primaryLg,
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           onTap: onTap,
           child: Center(
             child: Text(
               label,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontSize: AppTypography.fontSizeXl,
+                fontWeight: AppTypography.fontWeightBold,
               ),
             ),
           ),

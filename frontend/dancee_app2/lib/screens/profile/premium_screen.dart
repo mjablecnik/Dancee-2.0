@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class PremiumScreen extends StatelessWidget {
   const PremiumScreen({super.key});
@@ -59,7 +60,7 @@ class PremiumScreen extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
@@ -67,17 +68,13 @@ class PremiumScreen extends StatelessWidget {
             ),
           ),
           ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [Color(0xFF3B82F6), Color(0xFFA855F7), Color(0xFFEC4899)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ).createShader(bounds),
+            shaderCallback: (bounds) => AppGradients.premium.createShader(bounds),
             child: const Text(
               'Dancee Premium',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
+                fontSize: AppTypography.fontSize2xl,
+                fontWeight: AppTypography.fontWeightSemiBold,
               ),
             ),
           ),
@@ -97,18 +94,10 @@ class PremiumScreen extends StatelessWidget {
               width: 96,
               height: 96,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFFA855F7), Color(0xFFEC4899)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: AppGradients.premium,
                 borderRadius: BorderRadius.circular(48),
                 boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF3B82F6).withValues(alpha: 0.6),
-                    blurRadius: 40,
-                    spreadRadius: -5,
-                  ),
+                  AppShadows.primary,
                 ],
               ),
               child: const Center(
@@ -119,17 +108,13 @@ class PremiumScreen extends StatelessWidget {
           const SizedBox(height: 24),
           Center(
             child: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF3B82F6), Color(0xFFA855F7), Color(0xFFEC4899)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ).createShader(bounds),
+              shaderCallback: (bounds) => AppGradients.premium.createShader(bounds),
               child: const Text(
                 'Odemkněte plný potenciál',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: AppTypography.fontSize5xl,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -142,7 +127,7 @@ class PremiumScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: appMuted,
-                fontSize: 14,
+                fontSize: AppTypography.fontSizeMd,
                 height: 1.5,
               ),
             ),
@@ -163,14 +148,14 @@ class PremiumScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF3B82F6).withValues(alpha: 0.1),
-                  const Color(0xFFA855F7).withValues(alpha: 0.1),
+                  appPrimary.withValues(alpha: 0.1),
+                  appAccent.withValues(alpha: 0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
-              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: appPrimary.withValues(alpha: 0.3)),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
             ),
             child: Stack(
               children: [
@@ -182,14 +167,14 @@ class PremiumScreen extends StatelessWidget {
                       'Roční předplatné',
                       style: TextStyle(
                         color: appText,
-                        fontSize: 20,
+                        fontSize: AppTypography.fontSize3xl,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'Nejlepší hodnota',
-                      style: TextStyle(color: appMuted, fontSize: 14),
+                      style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -197,16 +182,12 @@ class PremiumScreen extends StatelessWidget {
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         ShaderMask(
-                          shaderCallback: (bounds) => const LinearGradient(
-                            colors: [Color(0xFF3B82F6), Color(0xFFA855F7)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ).createShader(bounds),
+                          shaderCallback: (bounds) => AppGradients.primary.createShader(bounds),
                           child: const Text(
                             '499 Kč',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 36,
+                              fontSize: AppTypography.fontSize6xl,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -216,7 +197,7 @@ class PremiumScreen extends StatelessWidget {
                           '999 Kč',
                           style: TextStyle(
                             color: appMuted,
-                            fontSize: 14,
+                            fontSize: AppTypography.fontSizeMd,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
@@ -225,24 +206,16 @@ class PremiumScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     const Text(
                       'Pouze 42 Kč/měsíc · Ušetříte 50%',
-                      style: TextStyle(color: appMuted, fontSize: 12),
+                      style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF3B82F6), Color(0xFFA855F7)],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: AppGradients.primary,
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                         boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF3B82F6).withValues(alpha: 0.5),
-                            blurRadius: 20,
-                            spreadRadius: -5,
-                          ),
+                          AppShadows.primary,
                         ],
                       ),
                       child: TextButton(
@@ -250,15 +223,15 @@ class PremiumScreen extends StatelessWidget {
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                           ),
                         ),
                         child: const Text(
                           'Vybrat roční plán',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppTypography.fontSizeLg,
+                            fontWeight: AppTypography.fontWeightSemiBold,
                           ),
                         ),
                       ),
@@ -271,18 +244,14 @@ class PremiumScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF3B82F6), Color(0xFFA855F7)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(50),
+                      gradient: AppGradients.primary,
+                      borderRadius: BorderRadius.circular(AppRadius.full),
                     ),
                     child: const Text(
                       'POPULÁRNÍ',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
+                        fontSize: AppTypography.fontSizeXs,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -298,7 +267,7 @@ class PremiumScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,28 +276,28 @@ class PremiumScreen extends StatelessWidget {
                   'Měsíční předplatné',
                   style: TextStyle(
                     color: appText,
-                    fontSize: 20,
+                    fontSize: AppTypography.fontSize3xl,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   'Flexibilní možnost',
-                  style: TextStyle(color: appMuted, fontSize: 14),
+                  style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   '99 Kč',
                   style: TextStyle(
                     color: appText,
-                    fontSize: 36,
+                    fontSize: AppTypography.fontSize6xl,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Fakturováno měsíčně',
-                  style: TextStyle(color: appMuted, fontSize: 12),
+                  style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                 ),
                 const SizedBox(height: 24),
                 Container(
@@ -336,22 +305,22 @@ class PremiumScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: appCard,
                     border: Border.all(color: appBorder),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
                   child: TextButton(
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                       ),
                     ),
                     child: const Text(
                       'Vybrat měsíční plán',
                       style: TextStyle(
                         color: appText,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                        fontSize: AppTypography.fontSizeLg,
+                        fontWeight: AppTypography.fontWeightSemiBold,
                       ),
                     ),
                   ),
@@ -385,7 +354,7 @@ class PremiumScreen extends StatelessWidget {
             'Co získáte s Premium',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
+              fontSize: AppTypography.fontSize2xl,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -397,7 +366,7 @@ class PremiumScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: appSurface,
                     border: Border.all(color: appBorder),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,12 +375,8 @@ class PremiumScreen extends StatelessWidget {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF3B82F6), Color(0xFFA855F7)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
+                          gradient: AppGradients.primary,
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: const Center(
                           child: FaIcon(FontAwesomeIcons.check, size: 14, color: Colors.white),
@@ -426,8 +391,8 @@ class PremiumScreen extends StatelessWidget {
                               feature.$1,
                               style: const TextStyle(
                                 color: appText,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                                fontSize: AppTypography.fontSizeMd,
+                                fontWeight: AppTypography.fontWeightSemiBold,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -435,7 +400,7 @@ class PremiumScreen extends StatelessWidget {
                               feature.$2,
                               style: const TextStyle(
                                 color: appMuted,
-                                fontSize: 13,
+                                fontSize: AppTypography.fontSizeMd,
                               ),
                             ),
                           ],
@@ -460,7 +425,7 @@ class PremiumScreen extends StatelessWidget {
             'Co říkají naši uživatelé',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
+              fontSize: AppTypography.fontSize2xl,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -491,7 +456,7 @@ class PremiumScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,7 +464,7 @@ class PremiumScreen extends StatelessWidget {
           Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
                 child: Image.network(
                   avatarUrl,
                   width: 40,
@@ -515,8 +480,8 @@ class PremiumScreen extends StatelessWidget {
                     name,
                     style: const TextStyle(
                       color: appText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -528,7 +493,7 @@ class PremiumScreen extends StatelessWidget {
                         child: FaIcon(
                           FontAwesomeIcons.solidStar,
                           size: 11,
-                          color: Color(0xFFFACC15),
+                          color: appGold,
                         ),
                       ),
                     ),
@@ -542,7 +507,7 @@ class PremiumScreen extends StatelessWidget {
             quote,
             style: const TextStyle(
               color: appMuted,
-              fontSize: 13,
+              fontSize: AppTypography.fontSizeMd,
               height: 1.5,
             ),
           ),
@@ -580,7 +545,7 @@ class PremiumScreen extends StatelessWidget {
             'Časté otázky',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
+              fontSize: AppTypography.fontSize2xl,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -602,23 +567,19 @@ class PremiumScreen extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF3B82F6).withValues(alpha: 0.1),
-              const Color(0xFFA855F7).withValues(alpha: 0.1),
+              appPrimary.withValues(alpha: 0.1),
+              appAccent.withValues(alpha: 0.1),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
-          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appPrimary.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         child: Column(
           children: [
             ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF3B82F6), Color(0xFFA855F7), Color(0xFFEC4899)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ).createShader(bounds),
+              shaderCallback: (bounds) => AppGradients.premium.createShader(bounds),
               child: const FaIcon(
                 FontAwesomeIcons.solidStarHalfStroke,
                 size: 36,
@@ -630,7 +591,7 @@ class PremiumScreen extends StatelessWidget {
               'Připraveni začít?',
               style: TextStyle(
                 color: appText,
-                fontSize: 20,
+                fontSize: AppTypography.fontSize3xl,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -638,24 +599,16 @@ class PremiumScreen extends StatelessWidget {
             const Text(
               'Připojte se k tisícům spokojených tanečníků',
               textAlign: TextAlign.center,
-              style: TextStyle(color: appMuted, fontSize: 14),
+              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const SizedBox(height: 24),
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFFA855F7)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
+                gradient: AppGradients.primary,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
                 boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF3B82F6).withValues(alpha: 0.5),
-                    blurRadius: 20,
-                    spreadRadius: -5,
-                  ),
+                  AppShadows.primary,
                 ],
               ),
               child: TextButton(
@@ -663,15 +616,15 @@ class PremiumScreen extends StatelessWidget {
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
                 ),
                 child: const Text(
                   'Získat Premium nyní',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontSize: AppTypography.fontSizeLg,
+                    fontWeight: AppTypography.fontWeightSemiBold,
                   ),
                 ),
               ),
@@ -679,7 +632,7 @@ class PremiumScreen extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               '7 dní zdarma · Zrušte kdykoliv',
-              style: TextStyle(color: appMuted, fontSize: 12),
+              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
             ),
           ],
         ),
@@ -722,7 +675,7 @@ class PremiumScreen extends StatelessWidget {
         children: [
           FaIcon(icon, size: 22, color: color),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: color, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
         ],
       ),
     );
@@ -739,11 +692,7 @@ class PremiumScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(
@@ -773,7 +722,7 @@ class _FaqItemState extends State<_FaqItem> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
@@ -790,8 +739,8 @@ class _FaqItemState extends State<_FaqItem> {
                       widget.question,
                       style: const TextStyle(
                         color: appText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightSemiBold,
                       ),
                     ),
                   ),
@@ -811,7 +760,7 @@ class _FaqItemState extends State<_FaqItem> {
                 widget.answer,
                 style: const TextStyle(
                   color: appMuted,
-                  fontSize: 13,
+                  fontSize: AppTypography.fontSizeMd,
                   height: 1.5,
                 ),
               ),

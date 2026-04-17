@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class EventDetailScreen extends StatefulWidget {
   const EventDetailScreen({super.key});
@@ -78,7 +79,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
@@ -89,8 +90,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             'Detail akce',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSize2xl,
+              fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
           Container(
@@ -98,7 +99,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             height: 40,
             decoration: BoxDecoration(
               color: appSurface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppRadius.round),
             ),
             child: const Center(
               child: FaIcon(FontAwesomeIcons.ellipsisVertical, size: 16, color: appText),
@@ -141,7 +142,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.solidHeart, size: 18, color: Colors.red),
@@ -155,13 +156,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: appPrimary.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: const Text(
                 'Od 350 Kč',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: AppTypography.fontSizeMd,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -180,7 +181,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           'Prague Latin Festival 2025 - Mega Edition',
           style: TextStyle(
             color: appText,
-            fontSize: 24,
+            fontSize: AppTypography.fontSize4xl,
             fontWeight: FontWeight.bold,
             height: 1.3,
           ),
@@ -192,8 +193,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           children: [
             _styleChip('Salsa', appPrimary),
             _styleChip('Bachata', appAccent),
-            _styleChip('Zouk', const Color(0xFF34D399)),
-            _styleChip('Kizomba', const Color(0xFFC084FC)),
+            _styleChip('Zouk', appTeal),
+            _styleChip('Kizomba', appLavender),
           ],
         ),
       ],
@@ -206,14 +207,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontSize: AppTypography.fontSizeSm,
+          fontWeight: AppTypography.fontWeightSemiBold,
         ),
       ),
     );
@@ -225,7 +226,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
@@ -269,14 +270,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 title,
                 style: const TextStyle(
                   color: appText,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeLg,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(color: appMuted, fontSize: 14),
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ],
           ),
@@ -292,13 +293,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: appPrimary,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               boxShadow: [
-                BoxShadow(
-                  color: appPrimary.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                  spreadRadius: -5,
-                ),
+                AppShadows.primary,
               ],
             ),
             child: const Padding(
@@ -312,8 +309,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     'Uložit',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                 ],
@@ -327,7 +324,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -340,8 +337,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     'Sdílet',
                     style: TextStyle(
                       color: appText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                 ],
@@ -355,7 +352,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -368,8 +365,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     'Mapa',
                     style: TextStyle(
                       color: appText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                 ],
@@ -389,7 +386,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           'Popis akce',
           style: TextStyle(
             color: appText,
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -398,7 +395,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           'Největší latinsko-americký taneční festival v České republice se vrací! Tři dny plné workshopů s mezinárodními lektory, sociálních tanečních večírků a nezapomenutelné atmosféry.',
           style: TextStyle(
             color: appMuted,
-            fontSize: 14,
+            fontSize: AppTypography.fontSizeMd,
             height: 1.6,
           ),
         ),
@@ -407,7 +404,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           'Připravte se na intenzivní víkend plný tance, kde se setkáte s nejlepšími tanečníky a lektory z celého světa. Festival nabízí workshopy pro všechny úrovně - od začátečníků až po pokročilé tanečníky.',
           style: TextStyle(
             color: appMuted,
-            fontSize: 14,
+            fontSize: AppTypography.fontSizeMd,
             height: 1.6,
           ),
         ),
@@ -423,7 +420,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           'Dodatečné informace',
           style: TextStyle(
             color: appText,
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -433,7 +430,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Column(
             children: [
@@ -442,11 +439,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 children: const [
                   Text(
                     'Vstupné',
-                    style: TextStyle(color: appMuted, fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightMedium),
                   ),
                   Text(
                     '350 - 1200 Kč',
-                    style: TextStyle(color: appText, fontSize: 14, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightSemiBold),
                   ),
                 ],
               ),
@@ -456,11 +453,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 children: const [
                   Text(
                     'Dresscode',
-                    style: TextStyle(color: appMuted, fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightMedium),
                   ),
                   Text(
                     'Elegantní casual',
-                    style: TextStyle(color: appText, fontSize: 14, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightSemiBold),
                   ),
                 ],
               ),
@@ -470,7 +467,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   color: appPrimary,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -481,8 +478,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       'Koupit vstupenky',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightSemiBold,
                       ),
                     ),
                   ],
@@ -495,7 +492,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 decoration: BoxDecoration(
                   color: appSurface,
                   border: Border.all(color: appBorder),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -506,8 +503,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       'Původní zdroj',
                       style: TextStyle(
                         color: appText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightSemiBold,
                       ),
                     ),
                   ],
@@ -533,7 +530,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 'Program akce',
                 style: TextStyle(
                   color: appText,
-                  fontSize: 18,
+                  fontSize: AppTypography.fontSize2xl,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -623,7 +620,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +637,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               day,
               style: const TextStyle(
                 color: appText,
-                fontSize: 15,
+                fontSize: AppTypography.fontSizeLg,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -672,8 +669,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             textAlign: TextAlign.right,
             style: const TextStyle(
               color: appMuted,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontSize: AppTypography.fontSizeSm,
+              fontWeight: AppTypography.fontWeightMedium,
             ),
           ),
         ),
@@ -686,14 +683,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 slot.title,
                 style: const TextStyle(
                   color: appText,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 slot.description,
-                style: const TextStyle(color: appMuted, fontSize: 12),
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
               ),
               if (slot.extra != null) ...[
                 const SizedBox(height: 4),
@@ -701,7 +698,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   slot.extra!,
                   style: TextStyle(
                     color: slot.extraColor,
-                    fontSize: 12,
+                    fontSize: AppTypography.fontSizeSm,
                   ),
                 ),
               ],
@@ -747,7 +744,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         children: [
           FaIcon(icon, size: 22, color: color),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: color, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
         ],
       ),
     );
@@ -759,7 +756,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       children: const [
         FaIcon(FontAwesomeIcons.solidHeart, size: 22, color: Colors.red),
         SizedBox(height: 4),
-        Text('Uložené', style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.w500)),
+        Text('Uložené', style: TextStyle(color: Colors.red, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
       ],
     );
   }
@@ -775,11 +772,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(

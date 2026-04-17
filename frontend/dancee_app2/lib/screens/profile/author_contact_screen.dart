@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class AuthorContactScreen extends StatefulWidget {
   const AuthorContactScreen({super.key});
@@ -78,9 +79,9 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xE60F172A),
-        border: Border(bottom: BorderSide(color: appBorder)),
+      decoration: BoxDecoration(
+        color: appBg.withValues(alpha: 0.9),
+        border: const Border(bottom: BorderSide(color: appBorder)),
       ),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 12,
@@ -107,8 +108,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
           const Text(
             'Napsat autorovi',
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSize2xl,
+              fontWeight: AppTypography.fontWeightSemiBold,
               color: appText,
             ),
           ),
@@ -123,7 +124,7 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -134,12 +135,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
               Container(
                 width: 48,
                 height: 48,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [appPrimary, appAccent],
-                  ),
+                decoration: BoxDecoration(
+                  gradient: AppGradients.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(FontAwesomeIcons.user,
@@ -152,14 +149,14 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
                   Text(
                     'Tým Dancee',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: AppTypography.fontSize2xl,
                       fontWeight: FontWeight.bold,
                       color: appText,
                     ),
                   ),
                   Text(
                     'hello@dancee.app',
-                    style: TextStyle(fontSize: 14, color: appMuted),
+                    style: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                   ),
                 ],
               ),
@@ -168,7 +165,7 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
           const SizedBox(height: 12),
           const Text(
             'Rádi si přečteme vaše zpětné vazby, návrhy na vylepšení nebo nahlášení problémů. Odpovíme vám co nejdříve!',
-            style: TextStyle(fontSize: 14, color: appMuted),
+            style: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
           ),
         ],
       ),
@@ -183,20 +180,20 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
         const Text(
           'Předmět zprávy',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
             color: appText,
           ),
         ),
         const SizedBox(height: 8),
         _buildSubjectOption('feedback', FontAwesomeIcons.comment,
-            const Color(0xFF3B82F6), 'Zpětná vazba'),
+            appPrimary, 'Zpětná vazba'),
         const SizedBox(height: 8),
         _buildSubjectOption('bug', FontAwesomeIcons.bug,
-            const Color(0xFFEF4444), 'Nahlásit problém'),
+            appError, 'Nahlásit problém'),
         const SizedBox(height: 8),
         _buildSubjectOption('feature', FontAwesomeIcons.lightbulb,
-            const Color(0xFFEAB308), 'Návrh na vylepšení'),
+            appYellow, 'Návrh na vylepšení'),
         const SizedBox(height: 8),
         _buildSubjectOption(
             'other', FontAwesomeIcons.question, appMuted, 'Ostatní'),
@@ -206,8 +203,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
         const Text(
           'Název zprávy',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
             color: appText,
           ),
         ),
@@ -221,15 +218,15 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
             filled: true,
             fillColor: appSurface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appBorder),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appBorder),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appPrimary, width: 2),
             ),
             contentPadding:
@@ -242,8 +239,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
         const Text(
           'Zpráva',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
             color: appText,
           ),
         ),
@@ -259,15 +256,15 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
             filled: true,
             fillColor: appSurface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appBorder),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appBorder),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appPrimary, width: 2),
             ),
             contentPadding:
@@ -281,7 +278,7 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -295,8 +292,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
                   const Text(
                     'Informace o zařízení',
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightMedium,
                       color: appText,
                     ),
                   ),
@@ -306,12 +303,12 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: appPrimary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.round),
                     ),
                     child: const Text(
                       'Automaticky přiloženo',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: AppTypography.fontSizeSm,
                         color: appPrimary,
                       ),
                     ),
@@ -333,8 +330,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
         const Text(
           'Váš e-mail pro odpověď',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
             color: appText,
           ),
         ),
@@ -347,15 +344,15 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
             filled: true,
             fillColor: appSurface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appBorder),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appBorder),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: appPrimary, width: 2),
             ),
             contentPadding:
@@ -371,14 +368,14 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
             onPressed: (_isLoading || _isSent) ? null : _submit,
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  _isSent ? const Color(0xFF16A34A) : appPrimary,
+                  _isSent ? appSuccessDark : appPrimary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               disabledBackgroundColor:
-                  _isSent ? const Color(0xFF16A34A) : appPrimary.withValues(alpha: 0.7),
+                  _isSent ? appSuccessDark : appPrimary.withValues(alpha: 0.7),
               disabledForegroundColor: Colors.white,
             ),
             child: Row(
@@ -405,8 +402,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
                           ? 'Odesláno!'
                           : 'Odeslat zprávu',
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontSize: AppTypography.fontSizeXl,
+                    fontWeight: AppTypography.fontWeightMedium,
                   ),
                 ),
               ],
@@ -418,10 +415,10 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
         // Response time info
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+            color: appPrimary.withValues(alpha: 0.1),
             border: Border.all(
-                color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
-            borderRadius: BorderRadius.circular(8),
+                color: appPrimary.withValues(alpha: 0.2)),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -430,7 +427,7 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
               const Padding(
                 padding: EdgeInsets.only(top: 2),
                 child: Icon(FontAwesomeIcons.circleInfo,
-                    color: Color(0xFF60A5FA), size: 14),
+                    color: appLightBlue, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -440,17 +437,17 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
                     Text(
                       'Doba odezvy',
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF93C5FD),
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightMedium,
+                        color: appLightBlueTint,
                       ),
                     ),
                     SizedBox(height: 4),
                     Text(
                       'Obvykle odpovídáme do 24 hodin v pracovní dny. Děkujeme za trpělivost!',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF60A5FA),
+                        fontSize: AppTypography.fontSizeSm,
+                        color: appLightBlue,
                       ),
                     ),
                   ],
@@ -475,7 +472,7 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
           border: Border.all(
             color: isSelected ? appPrimary : appBorder,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: Row(
           children: [
@@ -495,7 +492,7 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(fontSize: 14, color: appText),
+              style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appText),
             ),
           ],
         ),
@@ -507,8 +504,8 @@ class _AuthorContactScreenState extends State<AuthorContactScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: appMuted)),
-        Text(value, style: const TextStyle(fontSize: 12, color: appMuted)),
+        Text(label, style: const TextStyle(fontSize: AppTypography.fontSizeSm, color: appMuted)),
+        Text(value, style: const TextStyle(fontSize: AppTypography.fontSizeSm, color: appMuted)),
       ],
     );
   }

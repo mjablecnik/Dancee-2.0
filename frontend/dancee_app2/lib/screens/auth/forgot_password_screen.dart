@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -55,7 +56,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                         height: 44,
                         decoration: BoxDecoration(
                           color: appSurface,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: Border.all(color: appBorder),
                         ),
                         child: const Center(
@@ -97,18 +98,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [appPrimary, appAccent],
-            ),
-            borderRadius: BorderRadius.circular(20),
+            gradient: AppGradients.primary,
+            borderRadius: BorderRadius.circular(AppRadius.round),
             boxShadow: [
-              BoxShadow(
-                color: appPrimary.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
+              AppShadows.primaryLg,
             ],
           ),
           child: const Center(
@@ -121,14 +114,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         ),
         const SizedBox(height: 24),
         ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [appPrimary, appAccent],
-          ).createShader(bounds),
+          shaderCallback: (bounds) => AppGradients.primary.createShader(bounds),
           child: const Text(
             'Dancee',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 36,
+              fontSize: AppTypography.fontSize6xl,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -138,8 +129,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           'Zapomenuté heslo?',
           style: TextStyle(
             color: appText,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
+            fontSize: AppTypography.fontSize4xl,
+            fontWeight: AppTypography.fontWeightBold,
           ),
         ),
         const SizedBox(height: 12),
@@ -166,8 +157,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           'E-mail',
           style: TextStyle(
             color: appText,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightSemiBold,
           ),
         ),
         const SizedBox(height: 8),
@@ -175,7 +166,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           height: 56,
           decoration: BoxDecoration(
             color: appSurface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: appBorder),
           ),
           child: Row(
@@ -203,30 +194,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         Container(
           height: 56,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [appPrimary, appAccent],
-            ),
-            borderRadius: BorderRadius.circular(16),
+            gradient: AppGradients.primary,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             boxShadow: [
-              BoxShadow(
-                color: appPrimary.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
+              AppShadows.primaryLg,
             ],
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               onTap: () {},
               child: const Center(
                 child: Text(
                   'Odeslat odkaz',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                    fontSize: AppTypography.fontSizeXl,
+                    fontWeight: AppTypography.fontWeightBold,
                   ),
                 ),
               ),
@@ -237,7 +222,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         Container(
           decoration: BoxDecoration(
             color: appSurface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: appBorder),
           ),
           padding: const EdgeInsets.all(20),
@@ -249,7 +234,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 height: 40,
                 decoration: BoxDecoration(
                   color: appPrimary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
                 child: const Center(
                   child: FaIcon(FontAwesomeIcons.circleInfo, color: appPrimary, size: 16),
@@ -264,8 +249,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       'Zkontroluj svou e-mailovou schránku',
                       style: TextStyle(
                         color: appText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightSemiBold,
                       ),
                     ),
                     SizedBox(height: 8),
@@ -273,7 +258,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       'Po odeslání obdržíš e-mail s odkazem pro obnovení hesla. Odkaz je platný 24 hodin.',
                       style: TextStyle(
                         color: appMuted,
-                        fontSize: 12,
+                        fontSize: AppTypography.fontSizeSm,
                         height: 1.5,
                       ),
                     ),
@@ -289,7 +274,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           children: [
             const Text(
               'Vzpomněl sis na heslo?',
-              style: TextStyle(color: appMuted, fontSize: 14),
+              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             TextButton(
               onPressed: () => context.go('/login'),
@@ -302,8 +287,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 'Přihlásit se',
                 style: TextStyle(
                   color: appPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
             ),
@@ -317,7 +302,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'Potřebuješ pomoc?',
-                style: const TextStyle(color: appMuted, fontSize: 14),
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ),
             const Expanded(child: Divider(color: appBorder)),
@@ -331,13 +316,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 height: 48,
                 decoration: BoxDecoration(
                   color: appSurface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(color: appBorder),
                 ),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     onTap: () {},
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -348,8 +333,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                           'Podpora',
                           style: TextStyle(
                             color: appText,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppTypography.fontSizeMd,
+                            fontWeight: AppTypography.fontWeightSemiBold,
                           ),
                         ),
                       ],
@@ -364,13 +349,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 height: 48,
                 decoration: BoxDecoration(
                   color: appSurface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(color: appBorder),
                 ),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     onTap: () {},
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -381,8 +366,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                           'FAQ',
                           style: TextStyle(
                             color: appText,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppTypography.fontSizeMd,
+                            fontWeight: AppTypography.fontWeightSemiBold,
                           ),
                         ),
                       ],

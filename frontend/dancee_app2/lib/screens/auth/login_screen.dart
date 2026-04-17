@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -69,18 +70,10 @@ class _LoginScreenState extends State<LoginScreen>
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [appPrimary, appAccent],
-            ),
-            borderRadius: BorderRadius.circular(20),
+            gradient: AppGradients.primary,
+            borderRadius: BorderRadius.circular(AppRadius.round),
             boxShadow: [
-              BoxShadow(
-                color: appPrimary.withValues(alpha:0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
+              AppShadows.primaryLg,
             ],
           ),
           child: const Center(
@@ -93,14 +86,12 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: 24),
         ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [appPrimary, appAccent],
-          ).createShader(bounds),
+          shaderCallback: (bounds) => AppGradients.primary.createShader(bounds),
           child: const Text(
             'Dancee',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 36,
+              fontSize: AppTypography.fontSize6xl,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -110,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen>
           'Objevuj taneční svět',
           style: TextStyle(
             color: appMuted,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSize2xl,
+            fontWeight: AppTypography.fontWeightMedium,
           ),
         ),
         const SizedBox(height: 32),
@@ -119,8 +110,8 @@ class _LoginScreenState extends State<LoginScreen>
           'Vítej zpět!',
           style: TextStyle(
             color: appText,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
+            fontSize: AppTypography.fontSize4xl,
+            fontWeight: AppTypography.fontWeightBold,
           ),
         ),
         const SizedBox(height: 8),
@@ -163,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen>
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
                       border: Border.all(
                         color: _stayLoggedIn ? appPrimary : appBorder,
                         width: 2,
@@ -177,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen>
                   const SizedBox(width: 12),
                   const Text(
                     'Zůstat přihlášen',
-                    style: TextStyle(color: appMuted, fontSize: 14),
+                    style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                   ),
                 ],
               ),
@@ -194,8 +185,8 @@ class _LoginScreenState extends State<LoginScreen>
                 'Zapomenuté heslo?',
                 style: TextStyle(
                   color: appPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightMedium,
                 ),
               ),
             ),
@@ -214,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen>
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'nebo pokračuj s',
-                style: TextStyle(color: appMuted, fontSize: 14),
+                style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ),
             Expanded(child: Divider(color: appBorder)),
@@ -238,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             const Text(
               'Nemáš ještě účet?',
-              style: TextStyle(color: appMuted, fontSize: 14),
+              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const SizedBox(width: 4),
             TextButton(
@@ -252,8 +243,8 @@ class _LoginScreenState extends State<LoginScreen>
                 'Zaregistruj se',
                 style: TextStyle(
                   color: appPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
             ),
@@ -265,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen>
         RichText(
           textAlign: TextAlign.center,
           text: const TextSpan(
-            style: TextStyle(color: appMuted, fontSize: 12, height: 1.5),
+            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm, height: 1.5),
             children: [
               TextSpan(text: 'Pokračováním souhlasíš s našimi '),
               TextSpan(
@@ -290,8 +281,8 @@ class _LoginScreenState extends State<LoginScreen>
       text,
       style: const TextStyle(
         color: appText,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontSize: AppTypography.fontSizeMd,
+        fontWeight: AppTypography.fontWeightSemiBold,
       ),
     );
   }
@@ -307,7 +298,7 @@ class _LoginScreenState extends State<LoginScreen>
       height: 56,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: appBorder),
       ),
       child: Row(
@@ -363,13 +354,13 @@ class _LoginScreenState extends State<LoginScreen>
       height: 56,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: appBorder),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           onTap: onTap,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -380,8 +371,8 @@ class _LoginScreenState extends State<LoginScreen>
                 label,
                 style: const TextStyle(
                   color: appText,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeLg,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
             ],
@@ -455,30 +446,24 @@ class _GradientButton extends StatelessWidget {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [appPrimary, appAccent],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        gradient: AppGradients.primary,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         boxShadow: [
-          BoxShadow(
-            color: appPrimary.withValues(alpha:0.5),
-            blurRadius: 20,
-            offset: const Offset(0, 5),
-          ),
+          AppShadows.primaryLg,
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           onTap: onTap,
           child: Center(
             child: Text(
               label,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontSize: AppTypography.fontSizeXl,
+                fontWeight: AppTypography.fontWeightBold,
               ),
             ),
           ),

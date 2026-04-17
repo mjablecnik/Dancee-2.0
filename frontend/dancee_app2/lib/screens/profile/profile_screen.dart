@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -86,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
@@ -97,8 +98,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'Profil',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSize2xl,
+              fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
           GestureDetector(
@@ -108,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.pen, size: 16, color: appText),
@@ -126,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Row(
         children: [
@@ -154,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'Tereza Nováková',
                   style: TextStyle(
                     color: appText,
-                    fontSize: 18,
+                    fontSize: AppTypography.fontSize2xl,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -163,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'tereza.novakova@email.cz',
                   style: TextStyle(
                     color: appMuted,
-                    fontSize: 14,
+                    fontSize: AppTypography.fontSizeMd,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -173,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _danceTag('Salsa', appPrimary),
                     _danceTag('Bachata', appAccent),
-                    _danceTag('Zouk', const Color(0xFF34D399)),
+                    _danceTag('Zouk', appTeal),
                   ],
                 ),
               ],
@@ -190,14 +191,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         border: Border.all(color: color.withValues(alpha: 0.4)),
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontSize: AppTypography.fontSizeSm,
+          fontWeight: AppTypography.fontWeightSemiBold,
         ),
       ),
     );
@@ -208,8 +209,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       title,
       style: const TextStyle(
         color: appMuted,
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
+        fontSize: AppTypography.fontSizeSm,
+        fontWeight: AppTypography.fontWeightSemiBold,
         letterSpacing: 0.8,
       ),
     );
@@ -220,22 +221,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
           _menuRow(
             icon: FontAwesomeIcons.user,
-            iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.2),
-            iconColor: const Color(0xFF3B82F6),
+            iconBgColor: appPrimary.withValues(alpha: 0.2),
+            iconColor: appPrimary,
             title: 'Upravit profil',
             onTap: () => context.push('/profile/edit'),
             showDivider: true,
           ),
           _menuRow(
             icon: FontAwesomeIcons.lock,
-            iconBgColor: const Color(0xFFF97316).withValues(alpha: 0.2),
-            iconColor: const Color(0xFFF97316),
+            iconBgColor: appWarning.withValues(alpha: 0.2),
+            iconColor: appWarning,
             title: 'Změnit heslo',
             onTap: () => context.push('/profile/change-password'),
             showDivider: false,
@@ -250,20 +251,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
           _menuRow(
             icon: FontAwesomeIcons.globe,
-            iconBgColor: const Color(0xFF22C55E).withValues(alpha: 0.2),
-            iconColor: const Color(0xFF22C55E),
+            iconBgColor: appSuccess.withValues(alpha: 0.2),
+            iconColor: appSuccess,
             title: 'Jazyk',
             trailingWidget: const Text(
               'Čeština',
               style: TextStyle(
                 color: appMuted,
-                fontSize: 14,
+                fontSize: AppTypography.fontSizeMd,
               ),
             ),
             onTap: null,
@@ -292,13 +293,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             colors: [
               appPrimary.withValues(alpha: 0.2),
               appAccent.withValues(alpha: 0.2),
-              const Color(0xFFEC4899).withValues(alpha: 0.2),
+              appPink.withValues(alpha: 0.2),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           border: Border.all(color: appPrimary.withValues(alpha: 0.3)),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
@@ -306,11 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFFA855F7)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: AppGradients.primary,
                 borderRadius: BorderRadius.circular(22),
               ),
               child: const Center(
@@ -326,7 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     'Dancee Premium',
                     style: TextStyle(
                       color: appText,
-                      fontSize: 16,
+                      fontSize: AppTypography.fontSizeXl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -335,7 +332,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     'Odemkněte všechny funkce',
                     style: TextStyle(
                       color: appMuted,
-                      fontSize: 13,
+                      fontSize: AppTypography.fontSizeMd,
                     ),
                   ),
                 ],
@@ -353,22 +350,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
           _menuRow(
             icon: FontAwesomeIcons.message,
-            iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.2),
-            iconColor: const Color(0xFF3B82F6),
+            iconBgColor: appPrimary.withValues(alpha: 0.2),
+            iconColor: appPrimary,
             title: 'Napsat autorovi',
             onTap: () => context.push('/profile/author-contact'),
             showDivider: true,
           ),
           _menuRow(
             icon: FontAwesomeIcons.star,
-            iconBgColor: const Color(0xFFFACC15).withValues(alpha: 0.2),
-            iconColor: const Color(0xFFFACC15),
+            iconBgColor: appGold.withValues(alpha: 0.2),
+            iconColor: appGold,
             title: 'Ohodnotit aplikaci',
             onTap: null,
             showDivider: false,
@@ -383,7 +380,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
@@ -394,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: 'Verze aplikace',
             trailingWidget: const Text(
               '1.2.5 (Build 125)',
-              style: TextStyle(color: appMuted, fontSize: 13),
+              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             onTap: null,
             showDivider: true,
@@ -425,7 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
@@ -480,8 +477,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title,
                       style: const TextStyle(
                         color: appText,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                        fontSize: AppTypography.fontSizeLg,
+                        fontWeight: AppTypography.fontWeightMedium,
                       ),
                     ),
                   ),
@@ -528,8 +525,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title,
               style: const TextStyle(
                 color: appText,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeLg,
+                fontWeight: AppTypography.fontWeightMedium,
               ),
             ),
           ),
@@ -576,8 +573,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   title,
                   style: const TextStyle(
                     color: Colors.red,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+                    fontSize: AppTypography.fontSizeLg,
+                    fontWeight: AppTypography.fontWeightMedium,
                   ),
                 ),
               ],
@@ -625,7 +622,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           FaIcon(icon, size: 22, color: color),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: color, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
         ],
       ),
     );
@@ -642,11 +639,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(

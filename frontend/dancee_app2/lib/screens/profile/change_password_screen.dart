@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -52,13 +53,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     if (_passwordStrength == 0 || index >= _passwordStrength) return appBorder;
     switch (_passwordStrength) {
       case 1:
-        return const Color(0xFFEF4444);
+        return appError;
       case 2:
-        return const Color(0xFFF97316);
+        return appWarning;
       case 3:
-        return const Color(0xFFEAB308);
+        return appAmber;
       case 4:
-        return const Color(0xFF22C55E);
+        return appSuccess;
       default:
         return appBorder;
     }
@@ -135,7 +136,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
@@ -146,8 +147,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             'Změnit heslo',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSize2xl,
+              fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
           const SizedBox(width: 40),
@@ -159,13 +160,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget _buildSecurityBanner() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0x1AF97316), Color(0x0DF97316)],
+          colors: [appWarning.withValues(alpha: 0.1), appWarning.withValues(alpha: 0.05)],
         ),
-        border: Border.all(color: const Color(0x4DF97316)),
-        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: appWarning.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -175,11 +176,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0x33F97316),
-              borderRadius: BorderRadius.circular(8),
+              color: appWarning.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: const Center(
-              child: FaIcon(FontAwesomeIcons.shieldHalved, size: 18, color: Color(0xFFF97316)),
+              child: FaIcon(FontAwesomeIcons.shieldHalved, size: 18, color: appWarning),
             ),
           ),
           const SizedBox(width: 12),
@@ -191,8 +192,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   'Zabezpečte svůj účet',
                   style: TextStyle(
                     color: appText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontSize: AppTypography.fontSizeMd,
+                    fontWeight: AppTypography.fontWeightSemiBold,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -200,7 +201,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   'Silné heslo musí obsahovat alespoň 8 znaků, velká a malá písmena, čísla a speciální znaky.',
                   style: TextStyle(
                     color: appMuted,
-                    fontSize: 12,
+                    fontSize: AppTypography.fontSizeSm,
                     height: 1.5,
                   ),
                 ),
@@ -247,8 +248,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           label,
           style: const TextStyle(
             color: appText,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
           ),
         ),
         const SizedBox(height: 8),
@@ -256,7 +257,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             children: [
@@ -264,10 +265,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextField(
                   controller: controller,
                   obscureText: !visible,
-                  style: const TextStyle(color: appText, fontSize: 14),
+                  style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
                   decoration: InputDecoration(
                     hintText: placeholder,
-                    hintStyle: const TextStyle(color: Color(0x99475569)),
+                    hintStyle: TextStyle(color: appMuted.withValues(alpha: 0.6)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
@@ -299,8 +300,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           'Nové heslo',
           style: TextStyle(
             color: appText,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
           ),
         ),
         const SizedBox(height: 8),
@@ -308,7 +309,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             children: [
@@ -322,12 +323,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       _checkMatch(_confirmPasswordController.text);
                     }
                   },
-                  style: const TextStyle(color: appText, fontSize: 14),
-                  decoration: const InputDecoration(
+                  style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
+                  decoration: InputDecoration(
                     hintText: 'Zadejte nové heslo',
-                    hintStyle: TextStyle(color: Color(0x99475569)),
+                    hintStyle: TextStyle(color: appMuted.withValues(alpha: 0.6)),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
               ),
@@ -362,7 +363,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           const SizedBox(height: 6),
           Text(
             _strengthLabel(),
-            style: const TextStyle(color: appMuted, fontSize: 12),
+            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
           ),
         ],
       ],
@@ -377,8 +378,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           'Potvrdit nové heslo',
           style: TextStyle(
             color: appText,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: AppTypography.fontSizeMd,
+            fontWeight: AppTypography.fontWeightMedium,
           ),
         ),
         const SizedBox(height: 8),
@@ -386,7 +387,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             children: [
@@ -395,12 +396,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   controller: _confirmPasswordController,
                   obscureText: !_confirmPasswordVisible,
                   onChanged: _checkMatch,
-                  style: const TextStyle(color: appText, fontSize: 14),
-                  decoration: const InputDecoration(
+                  style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
+                  decoration: InputDecoration(
                     hintText: 'Zadejte nové heslo znovu',
-                    hintStyle: TextStyle(color: Color(0x99475569)),
+                    hintStyle: TextStyle(color: appMuted.withValues(alpha: 0.6)),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
               ),
@@ -422,7 +423,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           const SizedBox(height: 6),
           const Text(
             'Hesla se neshodují',
-            style: TextStyle(color: Color(0xFFEF4444), fontSize: 12),
+            style: TextStyle(color: appError, fontSize: AppTypography.fontSizeSm),
           ),
         ],
       ],
@@ -440,7 +441,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               backgroundColor: appPrimary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
               elevation: 4,
               shadowColor: appPrimary.withValues(alpha: 0.4),
             ),
@@ -452,8 +453,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 Text(
                   'Uložit nové heslo',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontSize: AppTypography.fontSizeLg,
+                    fontWeight: AppTypography.fontWeightSemiBold,
                   ),
                 ),
               ],
@@ -470,13 +471,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               side: const BorderSide(color: appBorder),
               backgroundColor: appSurface,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
             ),
             child: const Text(
               'Zrušit',
               style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeLg,
+                fontWeight: AppTypography.fontWeightMedium,
               ),
             ),
           ),
@@ -494,8 +495,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           'POŽADAVKY NA HESLO',
           style: TextStyle(
             color: appMuted,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontSize: AppTypography.fontSizeSm,
+            fontWeight: AppTypography.fontWeightSemiBold,
             letterSpacing: 1.0,
           ),
         ),
@@ -522,7 +523,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: appMuted, fontSize: 14),
+            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
         ),
       ],
@@ -542,8 +543,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               'Zapomněli jste heslo?',
               style: TextStyle(
                 color: appPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeMd,
+                fontWeight: AppTypography.fontWeightMedium,
               ),
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -101,18 +102,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [appPrimary, appAccent],
-                ),
-                borderRadius: BorderRadius.circular(16),
+                gradient: AppGradients.primary,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 boxShadow: [
-                  BoxShadow(
-                    color: appPrimary.withValues(alpha: 0.5),
-                    blurRadius: 20,
-                    offset: const Offset(0, 5),
-                  ),
+                  AppShadows.primaryLg,
                 ],
               ),
               child: const Center(
@@ -129,8 +122,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 'Přeskočit',
                 style: TextStyle(
                   color: appMuted,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightMedium,
                 ),
               ),
             ),
@@ -147,9 +140,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
                   gradient: isActive
-                      ? const LinearGradient(
-                          colors: [appPrimary, appAccent],
-                        )
+                      ? AppGradients.primary
                       : null,
                   color: isActive ? null : appBorder,
                 ),
@@ -195,14 +186,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             'Jaké tance tě baví?',
             style: TextStyle(
               color: appText,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
+              fontSize: AppTypography.fontSize4xl,
+              fontWeight: AppTypography.fontWeightBold,
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'Vyber své oblíbené taneční styly, abychom ti mohli nabídnout relevantní akce',
-            style: TextStyle(color: appMuted, fontSize: 14),
+            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
           const SizedBox(height: 24),
           Expanded(
@@ -230,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       color: selected
                           ? appPrimary.withValues(alpha: 0.1)
                           : appSurface,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
                         color: selected ? appPrimary : appBorder,
                         width: 2,
@@ -249,8 +240,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           name,
                           style: TextStyle(
                             color: selected ? appPrimary : appText,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppTypography.fontSizeMd,
+                            fontWeight: AppTypography.fontWeightSemiBold,
                           ),
                         ),
                       ],
@@ -279,7 +270,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           'Mám základní zkušenosti'),
       (FontAwesomeIcons.fire, appAccent, 'Pokročilý',
           'Tančím pravidelně několik let'),
-      (FontAwesomeIcons.crown, const Color(0xFFEAB308), 'Expert',
+      (FontAwesomeIcons.crown, appYellow, 'Expert',
           'Profesionální úroveň'),
     ];
 
@@ -292,14 +283,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             'Jaká je tvoje úroveň?',
             style: TextStyle(
               color: appText,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
+              fontSize: AppTypography.fontSize4xl,
+              fontWeight: AppTypography.fontWeightBold,
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'Pomůže nám to doporučit ti vhodné akce a kurzy',
-            style: TextStyle(color: appMuted, fontSize: 14),
+            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
           const SizedBox(height: 24),
           Expanded(
@@ -319,7 +310,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       color: selected
                           ? appPrimary.withValues(alpha: 0.1)
                           : appSurface,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
                         color: selected ? appPrimary : appBorder,
                         width: 2,
@@ -332,7 +323,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           height: 48,
                           decoration: BoxDecoration(
                             color: appCard,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                           ),
                           child: Center(
                             child: FaIcon(icon,
@@ -348,15 +339,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 title,
                                 style: const TextStyle(
                                   color: appText,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: AppTypography.fontSizeLg,
+                                  fontWeight: AppTypography.fontWeightSemiBold,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 subtitle,
                                 style: const TextStyle(
-                                    color: appMuted, fontSize: 12),
+                                    color: appMuted, fontSize: AppTypography.fontSizeSm),
                               ),
                             ],
                           ),
@@ -428,14 +419,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             'Kde se nacházíš?',
             style: TextStyle(
               color: appText,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
+              fontSize: AppTypography.fontSize4xl,
+              fontWeight: AppTypography.fontWeightBold,
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'Najdeme pro tebe nejbližší taneční akce ve tvém okolí',
-            style: TextStyle(color: appMuted, fontSize: 14),
+            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
           const SizedBox(height: 24),
           Expanded(
@@ -448,7 +439,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: appSurface,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(color: appBorder),
                     ),
                     child: Column(
@@ -458,8 +449,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           'Město',
                           style: TextStyle(
                             color: appMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            fontSize: AppTypography.fontSizeSm,
+                            fontWeight: AppTypography.fontWeightMedium,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -467,7 +458,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           height: 48,
                           decoration: BoxDecoration(
                             color: appCard,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                             border: Border.all(color: appBorder),
                           ),
                           child: Row(
@@ -505,7 +496,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: appSurface,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(color: appBorder),
                     ),
                     child: Column(
@@ -515,8 +506,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           'Vyhledat akce v okruhu',
                           style: TextStyle(
                             color: appMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            fontSize: AppTypography.fontSizeSm,
+                            fontWeight: AppTypography.fontWeightMedium,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -563,7 +554,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                     radii[index],
                                     style: const TextStyle(
                                       color: appText,
-                                      fontSize: 14,
+                                      fontSize: AppTypography.fontSizeMd,
                                     ),
                                   ),
                                 ],
@@ -581,7 +572,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: appSurface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                         border: Border.all(
                             color: appPrimary.withValues(alpha: 0.3)),
                       ),
@@ -598,8 +589,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             'Použít aktuální polohu',
                             style: TextStyle(
                               color: appPrimary,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
+                              fontSize: AppTypography.fontSizeLg,
+                              fontWeight: AppTypography.fontWeightSemiBold,
                             ),
                           ),
                         ],
@@ -699,30 +690,24 @@ class _GradientButton extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [appPrimary, appAccent],
-        ),
-        borderRadius: BorderRadius.circular(12),
+        gradient: AppGradients.primary,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
-          BoxShadow(
-            color: appPrimary.withValues(alpha: 0.5),
-            blurRadius: 20,
-            offset: const Offset(0, 5),
-          ),
+          AppShadows.primaryLg,
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           onTap: onTap,
           child: Center(
             child: Text(
               label,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
+                fontSize: AppTypography.fontSizeLg,
+                fontWeight: AppTypography.fontWeightBold,
               ),
             ),
           ),
@@ -744,21 +729,21 @@ class _OutlineButton extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: appBorder),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           onTap: onTap,
           child: Center(
             child: Text(
               label,
               style: const TextStyle(
                 color: appText,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontSize: AppTypography.fontSizeLg,
+                fontWeight: AppTypography.fontWeightSemiBold,
               ),
             ),
           ),

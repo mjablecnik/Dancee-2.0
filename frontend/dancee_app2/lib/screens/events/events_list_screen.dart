@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class EventsListScreen extends StatefulWidget {
   const EventsListScreen({super.key});
@@ -67,8 +68,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     'Lokalita',
                     style: TextStyle(
                       color: appMuted,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightMedium,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -82,8 +83,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
                           'Praha, CZ',
                           style: TextStyle(
                             color: appText,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppTypography.fontSize2xl,
+                            fontWeight: AppTypography.fontWeightSemiBold,
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -100,7 +101,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     height: 40,
                     decoration: BoxDecoration(
                       color: appSurface,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.round),
                     ),
                     child: const Center(
                       child: FaIcon(FontAwesomeIcons.bell, size: 18, color: appText),
@@ -114,7 +115,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                       height: 8,
                       decoration: BoxDecoration(
                         color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                         border: Border.all(color: appSurface, width: 1.5),
                       ),
                     ),
@@ -149,7 +150,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Row(
         children: [
@@ -161,8 +162,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
             label,
             style: const TextStyle(
               color: appText,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontSize: AppTypography.fontSizeSm,
+              fontWeight: AppTypography.fontWeightMedium,
             ),
           ),
         ],
@@ -183,7 +184,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 'Taneční styly',
                 style: TextStyle(
                   color: appText,
-                  fontSize: 20,
+                  fontSize: AppTypography.fontSize3xl,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -193,7 +194,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                   'Zobrazit vše',
                   style: TextStyle(
                     color: appMuted,
-                    fontSize: 14,
+                    fontSize: AppTypography.fontSizeMd,
                   ),
                 ),
               ),
@@ -216,17 +217,17 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     decoration: BoxDecoration(
                       color: isActive ? appPrimary : appSurface,
                       border: Border.all(color: isActive ? appPrimary : appBorder),
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
                       boxShadow: isActive
-                          ? [BoxShadow(color: appPrimary.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: -5)]
+                          ? [AppShadows.primary]
                           : null,
                     ),
                     child: Text(
                       _styles[index],
                       style: TextStyle(
                         color: isActive ? Colors.white : appText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightMedium,
                       ),
                     ),
                   ),
@@ -247,7 +248,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'Doporučené akce',
-            style: TextStyle(color: appText, fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(color: appText, fontSize: AppTypography.fontSize3xl, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 16),
@@ -279,8 +280,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 isFree: true,
                 isFavorited: true,
                 tags: [
-                  _TagData('Kizomba', const Color(0xFFC084FC)),
-                  _TagData('Semba', const Color(0xFF60A5FA)),
+                  _TagData('Kizomba', appLavender),
+                  _TagData('Semba', appLightBlue),
                 ],
               ),
             ],
@@ -307,7 +308,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
         decoration: BoxDecoration(
           color: appCard,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.round),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,7 +348,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     height: 32,
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Center(
                       child: FaIcon(
@@ -365,13 +366,13 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isFree ? appSuccess.withValues(alpha: 0.9) : appPrimary.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Text(
                       price,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: AppTypography.fontSizeSm,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -390,7 +391,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: appText,
-                      fontSize: 18,
+                      fontSize: AppTypography.fontSize2xl,
                       fontWeight: FontWeight.bold,
                       height: 1.3,
                     ),
@@ -400,7 +401,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     children: [
                       const FaIcon(FontAwesomeIcons.calendar, size: 14, color: appMuted),
                       const SizedBox(width: 8),
-                      Text(date, style: const TextStyle(color: appMuted, fontSize: 14)),
+                      Text(date, style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -411,7 +412,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                       Expanded(
                         child: Text(
                           location,
-                          style: const TextStyle(color: appMuted, fontSize: 14),
+                          style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -425,14 +426,14 @@ class _EventsListScreenState extends State<EventsListScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: appSurface,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(AppRadius.xs),
                               ),
                               child: Text(
                                 t.label,
                                 style: TextStyle(
                                   color: t.color,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: AppTypography.fontSizeXs,
+                                  fontWeight: AppTypography.fontWeightSemiBold,
                                 ),
                               ),
                             ))
@@ -459,19 +460,19 @@ class _EventsListScreenState extends State<EventsListScreen> {
             children: [
               const Text(
                 'Nadcházející akce',
-                style: TextStyle(color: appText, fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(color: appText, fontSize: AppTypography.fontSize3xl, fontWeight: FontWeight.bold),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: appSurface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Row(
                   children: [
                     const FaIcon(FontAwesomeIcons.arrowUpWideShort, size: 14, color: appText),
                     const SizedBox(width: 8),
-                    const Text('Datum', style: TextStyle(color: appText, fontSize: 14)),
+                    const Text('Datum', style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd)),
                   ],
                 ),
               ),
@@ -509,7 +510,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 location: 'Hotel Pyramida, Praha',
                 date: '1. Lis - 3. Lis',
                 style: 'Zouk',
-                styleColor: const Color(0xFF34D399),
+                styleColor: appTeal,
                 isFavorited: false,
               ),
             ],
@@ -535,7 +536,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         child: Stack(
           children: [
@@ -543,7 +544,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   child: Image.network(
                     imageUrl,
                     width: 96,
@@ -565,7 +566,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: appText,
-                            fontSize: 16,
+                            fontSize: AppTypography.fontSizeXl,
                             fontWeight: FontWeight.bold,
                             height: 1.3,
                           ),
@@ -578,7 +579,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                             Expanded(
                               child: Text(
                                 location,
-                                style: const TextStyle(color: appMuted, fontSize: 12),
+                                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -592,14 +593,14 @@ class _EventsListScreenState extends State<EventsListScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: appCard,
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
                               ),
                               child: Text(
                                 date,
                                 style: const TextStyle(
                                   color: appText,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: AppTypography.fontSizeSm,
+                                  fontWeight: AppTypography.fontWeightMedium,
                                 ),
                               ),
                             ),
@@ -607,7 +608,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                               style.toUpperCase(),
                               style: TextStyle(
                                 color: styleColor,
-                                fontSize: 10,
+                                fontSize: AppTypography.fontSizeXs,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.0,
                               ),
@@ -628,7 +629,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 height: 32,
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
                 child: Center(
                   child: FaIcon(
@@ -680,7 +681,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
         children: [
           FaIcon(icon, size: 22, color: color),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: color, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
         ],
       ),
     );
@@ -697,11 +698,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(

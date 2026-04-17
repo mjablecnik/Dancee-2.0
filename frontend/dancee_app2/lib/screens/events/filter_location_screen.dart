@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class FilterLocationScreen extends StatefulWidget {
   const FilterLocationScreen({super.key});
@@ -17,32 +18,32 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
     _City(
       name: 'Praha',
       eventCount: '125 nadcházejících akcí',
-      gradientStart: Color(0xFF3B82F6),
-      gradientEnd: Color(0xFFA855F7),
+      gradientStart: appPrimary,
+      gradientEnd: appAccent,
       icon: FontAwesomeIcons.building,
       isCurrent: true,
     ),
     _City(
       name: 'Brno',
       eventCount: '47 nadcházejících akcí',
-      gradientStart: Color(0xFF10B981),
-      gradientEnd: Color(0xFF0D9488),
+      gradientStart: appEmerald,
+      gradientEnd: appTealDark,
       icon: FontAwesomeIcons.city,
       isCurrent: false,
     ),
     _City(
       name: 'Ostrava',
       eventCount: '23 nadcházejících akcí',
-      gradientStart: Color(0xFFF97316),
-      gradientEnd: Color(0xFFEF4444),
+      gradientStart: appWarning,
+      gradientEnd: appError,
       icon: FontAwesomeIcons.industry,
       isCurrent: false,
     ),
     _City(
       name: 'Plzeň',
       eventCount: '18 nadcházejících akcí',
-      gradientStart: Color(0xFFEAB308),
-      gradientEnd: Color(0xFFD97706),
+      gradientStart: appYellow,
+      gradientEnd: appAmberDark,
       icon: FontAwesomeIcons.beerMugEmpty,
       isCurrent: false,
     ),
@@ -127,7 +128,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
               const Text(
                 'Vybrat lokalitu',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: AppTypography.fontSize3xl,
                   fontWeight: FontWeight.bold,
                   color: appText,
                 ),
@@ -139,7 +140,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: Row(
               children: [
@@ -150,10 +151,10 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    style: const TextStyle(fontSize: 14, color: appText),
+                    style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appText),
                     decoration: const InputDecoration(
                       hintText: 'Hledat město nebo oblast...',
-                      hintStyle: TextStyle(fontSize: 14, color: appMuted),
+                      hintStyle: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
@@ -175,7 +176,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
@@ -196,15 +197,15 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
                   Text(
                     'Použít moji polohu',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeLg,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                       color: appText,
                     ),
                   ),
                   SizedBox(height: 2),
                   Text(
                     'Automaticky najde akce ve vašem okolí',
-                    style: TextStyle(fontSize: 14, color: appMuted),
+                    style: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                   ),
                 ],
               ),
@@ -223,7 +224,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         const Text(
           'Oblíbená města',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
             color: appText,
           ),
@@ -247,7 +248,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
@@ -272,15 +273,15 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
                   Text(
                     city.name,
                     style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeLg,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                       color: appText,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     city.eventCount,
-                    style: const TextStyle(fontSize: 14, color: appMuted),
+                    style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                   ),
                 ],
               ),
@@ -292,13 +293,13 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: appPrimary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
                     ),
                     child: const Text(
                       'Aktuální',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontSize: AppTypography.fontSizeSm,
+                        fontWeight: AppTypography.fontWeightMedium,
                         color: appPrimary,
                       ),
                     ),
@@ -321,7 +322,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         const Text(
           'Všechna města',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
             color: appText,
           ),
@@ -337,7 +338,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
   Widget _buildCityRow(_CitySimple city) {
     return InkWell(
       onTap: () {},
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -345,11 +346,11 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
           children: [
             Text(
               city.name,
-              style: const TextStyle(fontSize: 15, color: appText),
+              style: const TextStyle(fontSize: AppTypography.fontSizeLg, color: appText),
             ),
             Text(
               city.count,
-              style: const TextStyle(fontSize: 14, color: appMuted),
+              style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
             ),
           ],
         ),
@@ -394,7 +395,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
           children: [
             Icon(icon, size: 22, color: color),
             const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: color)),
+            Text(label, style: TextStyle(fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium, color: color)),
           ],
         ),
       ),
@@ -412,11 +413,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
           shape: BoxShape.circle,
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              offset: const Offset(0, 5),
-            ),
+            AppShadows.primaryLg,
           ],
         ),
         child: const Icon(FontAwesomeIcons.plus, color: Colors.white, size: 20),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class FilterDanceScreen extends StatefulWidget {
   const FilterDanceScreen({super.key});
@@ -29,71 +30,71 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
       name: 'Salsa',
       subtitle: 'Kubánská, On1, On2',
       icon: FontAwesomeIcons.music,
-      gradientStart: Color(0xFF3B82F6),
-      gradientEnd: Color(0xFF2563EB),
+      gradientStart: appPrimary,
+      gradientEnd: appPrimaryDark,
     ),
     _DanceStyle(
       name: 'Bachata',
       subtitle: 'Sensual, Dominicana',
       icon: FontAwesomeIcons.heart,
-      gradientStart: Color(0xFFA855F7),
-      gradientEnd: Color(0xFFEC4899),
+      gradientStart: appAccent,
+      gradientEnd: appPink,
     ),
     _DanceStyle(
       name: 'Kizomba',
       subtitle: 'Urban Kiz, Semba',
       icon: FontAwesomeIcons.fire,
-      gradientStart: Color(0xFF8B5CF6),
-      gradientEnd: Color(0xFF7C3AED),
+      gradientStart: appViolet,
+      gradientEnd: appVioletDark,
     ),
     _DanceStyle(
       name: 'Zouk',
       subtitle: 'Brazilian Zouk, Lambada',
       icon: FontAwesomeIcons.leaf,
-      gradientStart: Color(0xFF10B981),
-      gradientEnd: Color(0xFF16A34A),
+      gradientStart: appEmerald,
+      gradientEnd: appSuccessDark,
     ),
     _DanceStyle(
       name: 'Reggaeton',
       subtitle: 'Urban Latin',
       icon: FontAwesomeIcons.fireFlameSimple,
-      gradientStart: Color(0xFFF97316),
-      gradientEnd: Color(0xFFEF4444),
+      gradientStart: appWarning,
+      gradientEnd: appError,
     ),
     _DanceStyle(
       name: 'Tango',
       subtitle: 'Argentinské, Ballroom',
       icon: FontAwesomeIcons.bolt,
-      gradientStart: Color(0xFFEAB308),
-      gradientEnd: Color(0xFFD97706),
+      gradientStart: appYellow,
+      gradientEnd: appAmberDark,
     ),
     _DanceStyle(
       name: 'Swing',
       subtitle: 'Lindy Hop, Charleston',
       icon: FontAwesomeIcons.crown,
-      gradientStart: Color(0xFF06B6D4),
-      gradientEnd: Color(0xFF3B82F6),
+      gradientStart: appCyan,
+      gradientEnd: appPrimary,
     ),
     _DanceStyle(
       name: 'Ballroom',
       subtitle: 'Standardní, Latinsko-americké',
       icon: FontAwesomeIcons.star,
-      gradientStart: Color(0xFFEC4899),
-      gradientEnd: Color(0xFFE11D48),
+      gradientStart: appPink,
+      gradientEnd: appRose,
     ),
     _DanceStyle(
       name: 'Afro',
       subtitle: 'Afrohouse, Kuduro',
       icon: FontAwesomeIcons.drum,
-      gradientStart: Color(0xFF6366F1),
-      gradientEnd: Color(0xFF9333EA),
+      gradientStart: appIndigo,
+      gradientEnd: appPurple,
     ),
     _DanceStyle(
       name: 'Forró',
       subtitle: 'Brazilský lidový tanec',
       icon: FontAwesomeIcons.umbrellaBeach,
-      gradientStart: Color(0xFFEF4444),
-      gradientEnd: Color(0xFFDB2777),
+      gradientStart: appError,
+      gradientEnd: appHotPink,
     ),
   ];
 
@@ -179,14 +180,14 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
                 const Text(
                   'Taneční styly',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: AppTypography.fontSize3xl,
                     fontWeight: FontWeight.bold,
                     color: appText,
                   ),
                 ),
                 Text(
                   _selectedCountText,
-                  style: const TextStyle(fontSize: 14, color: appMuted),
+                  style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                 ),
               ],
             ),
@@ -195,7 +196,7 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
             onPressed: _clearAll,
             child: const Text(
               'Vymazat',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: appPrimary),
+              style: TextStyle(fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightMedium, color: appPrimary),
             ),
           ),
         ],
@@ -208,7 +209,7 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -257,14 +258,14 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
                   Text(
                     style.name,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeXl,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                       color: appText,
                     ),
                   ),
                   Text(
                     style.subtitle,
-                    style: const TextStyle(fontSize: 12, color: appMuted),
+                    style: const TextStyle(fontSize: AppTypography.fontSizeSm, color: appMuted),
                   ),
                 ],
               ),
@@ -293,7 +294,7 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
             color: isChecked ? appPrimary : appBorder,
             width: 2,
           ),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
         ),
         child: isChecked
             ? const Icon(FontAwesomeIcons.check, size: 12, color: Colors.white)
@@ -309,8 +310,8 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
         const Text(
           'VYBRANÉ STYLY',
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontSize: AppTypography.fontSizeSm,
+            fontWeight: AppTypography.fontWeightSemiBold,
             color: appMuted,
             letterSpacing: 1.0,
           ),
@@ -339,8 +340,8 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
           Text(
             style,
             style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: AppTypography.fontSizeMd,
+              fontWeight: AppTypography.fontWeightMedium,
               color: appPrimary,
             ),
           ),
@@ -385,20 +386,16 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: appPrimary,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             boxShadow: [
-              BoxShadow(
-                color: appPrimary.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
+              AppShadows.primaryLg,
             ],
           ),
           child: Text(
             count > 0 ? 'Použít filtr ($count)' : 'Použít filtr',
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: AppTypography.fontSizeXl,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

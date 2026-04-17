@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
@@ -95,7 +96,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
@@ -106,8 +107,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             'Upravit profil',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSize2xl,
+              fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
           GestureDetector(
@@ -117,7 +118,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: appPrimary,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.check, size: 16, color: Colors.white),
@@ -160,7 +161,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     height: 32,
                     decoration: BoxDecoration(
                       color: appPrimary,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(color: appBg, width: 2),
                     ),
                     child: const Center(
@@ -176,8 +177,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             'Změnit fotku',
             style: TextStyle(
               color: appPrimary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: AppTypography.fontSizeMd,
+              fontWeight: AppTypography.fontWeightMedium,
             ),
           ),
         ],
@@ -192,8 +193,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         title.toUpperCase(),
         style: const TextStyle(
           color: appMuted,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontSize: AppTypography.fontSizeSm,
+          fontWeight: AppTypography.fontWeightSemiBold,
           letterSpacing: 1.0,
         ),
       ),
@@ -223,7 +224,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,8 +233,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             label,
             style: const TextStyle(
               color: appMuted,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontSize: AppTypography.fontSizeSm,
+              fontWeight: AppTypography.fontWeightMedium,
             ),
           ),
           const SizedBox(height: 8),
@@ -242,7 +243,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             keyboardType: keyboardType,
             style: const TextStyle(
               color: appText,
-              fontWeight: FontWeight.w500,
+              fontWeight: AppTypography.fontWeightMedium,
             ),
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -263,7 +264,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,8 +273,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               'Popis',
               style: TextStyle(
                 color: appMuted,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeSm,
+                fontWeight: AppTypography.fontWeightMedium,
               ),
             ),
             const SizedBox(height: 8),
@@ -304,7 +305,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,8 +314,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               'Vyberte své oblíbené tanční styly',
               style: TextStyle(
                 color: appMuted,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeSm,
+                fontWeight: AppTypography.fontWeightMedium,
               ),
             ),
             const SizedBox(height: 12),
@@ -334,7 +335,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       const SizedBox(width: 12),
                       Text(
                         dance,
-                        style: const TextStyle(color: appText, fontSize: 14),
+                        style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
                       ),
                     ],
                   ),
@@ -357,7 +358,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           color: checked ? appPrimary : appBorder,
           width: 2,
         ),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppRadius.xs),
       ),
       child: checked
           ? const Center(
@@ -376,7 +377,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,8 +386,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               'Vaše taneční úroveň',
               style: TextStyle(
                 color: appMuted,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeSm,
+                fontWeight: AppTypography.fontWeightMedium,
               ),
             ),
             const SizedBox(height: 12),
@@ -424,7 +425,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       const SizedBox(width: 12),
                       Text(
                         level,
-                        style: const TextStyle(color: appText, fontSize: 14),
+                        style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
                       ),
                     ],
                   ),
@@ -447,7 +448,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,8 +457,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   'Instagram',
                   style: TextStyle(
                     color: appMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                    fontSize: AppTypography.fontSizeSm,
+                    fontWeight: AppTypography.fontWeightMedium,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -488,7 +489,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -497,8 +498,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   'Facebook',
                   style: TextStyle(
                     color: appMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                    fontSize: AppTypography.fontSizeSm,
+                    fontWeight: AppTypography.fontWeightMedium,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -536,7 +537,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         decoration: BoxDecoration(
           color: appSurface,
           border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Column(
           children: keys.asMap().entries.map((entry) {
@@ -558,7 +559,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                               key,
                               style: const TextStyle(
                                 color: appText,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: AppTypography.fontWeightMedium,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -566,7 +567,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                               _notificationSubtitles[key]!,
                               style: const TextStyle(
                                 color: appMuted,
-                                fontSize: 12,
+                                fontSize: AppTypography.fontSizeSm,
                               ),
                             ),
                           ],
@@ -607,14 +608,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             backgroundColor: appPrimary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
             elevation: 0,
           ),
           child: const Text(
             'Uložit změny',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSizeXl,
+              fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
         ),
@@ -664,8 +665,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
+                fontSize: AppTypography.fontSizeXs,
+                fontWeight: AppTypography.fontWeightMedium,
                 color: active ? appPrimary : appMuted,
               ),
             ),
@@ -686,11 +687,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(

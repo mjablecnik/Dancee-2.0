@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
+import '../../core/theme.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   const CourseDetailScreen({super.key});
@@ -75,7 +76,7 @@ class CourseDetailScreen extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: appSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.round),
               ),
               child: const Center(
                 child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
@@ -86,8 +87,8 @@ class CourseDetailScreen extends StatelessWidget {
             'Detail kurzu',
             style: TextStyle(
               color: appText,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: AppTypography.fontSize2xl,
+              fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
           Container(
@@ -95,7 +96,7 @@ class CourseDetailScreen extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               color: appSurface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppRadius.round),
             ),
             child: const Center(
               child: FaIcon(FontAwesomeIcons.ellipsisVertical, size: 16, color: appText),
@@ -137,13 +138,13 @@ class CourseDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: appPrimary.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: const Text(
                 '2 500 Kč',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: AppTypography.fontSizeMd,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -157,14 +158,14 @@ class CourseDetailScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: appSurface.withValues(alpha: 0.9),
                 border: Border.all(color: appBorder),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: const Text(
                 'Začátečníci',
                 style: TextStyle(
                   color: appText,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightMedium,
                 ),
               ),
             ),
@@ -182,7 +183,7 @@ class CourseDetailScreen extends StatelessWidget {
           'Salsa Cubana pro začátečníky',
           style: TextStyle(
             color: appText,
-            fontSize: 24,
+            fontSize: AppTypography.fontSize4xl,
             fontWeight: FontWeight.bold,
             height: 1.3,
           ),
@@ -205,14 +206,14 @@ class CourseDetailScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontSize: AppTypography.fontSizeSm,
+          fontWeight: AppTypography.fontWeightSemiBold,
         ),
       ),
     );
@@ -224,7 +225,7 @@ class CourseDetailScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: appSurface,
         border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
@@ -274,14 +275,14 @@ class CourseDetailScreen extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   color: appText,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppTypography.fontSizeLg,
+                  fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(color: appMuted, fontSize: 14),
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ],
           ),
@@ -298,24 +299,24 @@ class CourseDetailScreen extends StatelessWidget {
           'Popis kurzu',
           style: TextStyle(
             color: appText,
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 12),
         Text(
           'Objevte krásu kubánské salsy v našem kurzu určeném pro úplné začátečníky. Naučíte se základní kroky, rytmus a techniky, které vám umožní tancovat s jistotou na jakékoli taneční akci.',
-          style: TextStyle(color: appMuted, fontSize: 14, height: 1.6),
+          style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, height: 1.6),
         ),
         SizedBox(height: 12),
         Text(
           'Kurz je veden zkušeným lektorem Carlosem Rodriguezem, který má více než 10 let zkušeností s výukou latinsko-amerických tanců. Každá lekce je strukturovaná tak, aby postupně budovala vaše dovednosti.',
-          style: TextStyle(color: appMuted, fontSize: 14, height: 1.6),
+          style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, height: 1.6),
         ),
         SizedBox(height: 12),
         Text(
           'Žádné předchozí zkušenosti nejsou potřeba. Přijďte si užít skvělou atmosféru a poznat nové přátele!',
-          style: TextStyle(color: appMuted, fontSize: 14, height: 1.6),
+          style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, height: 1.6),
         ),
       ],
     );
@@ -329,7 +330,7 @@ class CourseDetailScreen extends StatelessWidget {
           'Podrobnosti kurzu',
           style: TextStyle(
             color: appText,
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -339,7 +340,7 @@ class CourseDetailScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Column(
             children: [
@@ -365,11 +366,11 @@ class CourseDetailScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: appMuted, fontSize: 14, fontWeight: FontWeight.w500),
+          style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightMedium),
         ),
         Text(
           value,
-          style: const TextStyle(color: appText, fontSize: 14, fontWeight: FontWeight.w600),
+          style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightSemiBold),
         ),
       ],
     );
@@ -383,7 +384,7 @@ class CourseDetailScreen extends StatelessWidget {
           'O lektorovi',
           style: TextStyle(
             color: appText,
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -393,7 +394,7 @@ class CourseDetailScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: appSurface,
             border: Border.all(color: appBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,14 +417,14 @@ class CourseDetailScreen extends StatelessWidget {
                       'Carlos Rodriguez',
                       style: TextStyle(
                         color: appText,
-                        fontSize: 16,
+                        fontSize: AppTypography.fontSizeXl,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(height: 4),
                     Text(
                       'Profesionální tanečník a lektor s více než 10 let zkušeností. Specializuje se na kubánskou salsu a bachatu. Vyučoval v prestižních studiích po celé Evropě.',
-                      style: TextStyle(color: appMuted, fontSize: 14, height: 1.5),
+                      style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd, height: 1.5),
                     ),
                     SizedBox(height: 12),
                     Row(
@@ -434,13 +435,13 @@ class CourseDetailScreen extends StatelessWidget {
                               '10+',
                               style: TextStyle(
                                 color: appPrimary,
-                                fontSize: 18,
+                                fontSize: AppTypography.fontSize2xl,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               'let zkušeností',
-                              style: TextStyle(color: appMuted, fontSize: 12),
+                              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                             ),
                           ],
                         ),
@@ -451,13 +452,13 @@ class CourseDetailScreen extends StatelessWidget {
                               '500+',
                               style: TextStyle(
                                 color: appPrimary,
-                                fontSize: 18,
+                                fontSize: AppTypography.fontSize2xl,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               'studentů',
-                              style: TextStyle(color: appMuted, fontSize: 12),
+                              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                             ),
                           ],
                         ),
@@ -489,7 +490,7 @@ class CourseDetailScreen extends StatelessWidget {
           'Co se naučíte',
           style: TextStyle(
             color: appText,
-            fontSize: 18,
+            fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -504,7 +505,7 @@ class CourseDetailScreen extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(item, style: const TextStyle(color: appMuted, fontSize: 14)),
+                child: Text(item, style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd)),
               ),
             ],
           ),
@@ -520,7 +521,7 @@ class CourseDetailScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: appPrimary.withValues(alpha: 0.1),
         border: Border.all(color: appPrimary.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         children: [
@@ -532,19 +533,19 @@ class CourseDetailScreen extends StatelessWidget {
                 children: const [
                   Text(
                     'Cena kurzu',
-                    style: TextStyle(color: appText, fontSize: 14, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     '2 500 Kč',
                     style: TextStyle(
                       color: appPrimary,
-                      fontSize: 24,
+                      fontSize: AppTypography.fontSize4xl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     'Platba na místě nebo převodem',
-                    style: TextStyle(color: appMuted, fontSize: 12),
+                    style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
                   ),
                 ],
               ),
@@ -553,13 +554,13 @@ class CourseDetailScreen extends StatelessWidget {
                 children: [
                   Text(
                     'Volná místa',
-                    style: TextStyle(color: appSuccess, fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: appSuccess, fontSize: AppTypography.fontSizeMd, fontWeight: AppTypography.fontWeightMedium),
                   ),
                   Text(
                     '12/20',
                     style: TextStyle(
                       color: appSuccess,
-                      fontSize: 18,
+                      fontSize: AppTypography.fontSize2xl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -572,13 +573,9 @@ class CourseDetailScreen extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: appPrimary,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               boxShadow: [
-                BoxShadow(
-                  color: appPrimary.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                  spreadRadius: -5,
-                ),
+                AppShadows.primary,
               ],
             ),
             child: const Padding(
@@ -592,7 +589,7 @@ class CourseDetailScreen extends StatelessWidget {
                     'Registrovat se na kurz',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: AppTypography.fontSizeXl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -613,7 +610,7 @@ class CourseDetailScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -626,8 +623,8 @@ class CourseDetailScreen extends StatelessWidget {
                     'Sdílet kurz',
                     style: TextStyle(
                       color: appText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                 ],
@@ -641,7 +638,7 @@ class CourseDetailScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: appSurface,
               border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
             child: const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -654,8 +651,8 @@ class CourseDetailScreen extends StatelessWidget {
                     'Původní zdroj',
                     style: TextStyle(
                       color: appText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: AppTypography.fontSizeMd,
+                      fontWeight: AppTypography.fontWeightSemiBold,
                     ),
                   ),
                 ],
@@ -702,7 +699,7 @@ class CourseDetailScreen extends StatelessWidget {
         children: [
           FaIcon(icon, size: 22, color: color),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: color, fontSize: AppTypography.fontSizeXs, fontWeight: AppTypography.fontWeightMedium)),
         ],
       ),
     );
@@ -719,11 +716,7 @@ class CourseDetailScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: appBg, width: 4),
           boxShadow: [
-            BoxShadow(
-              color: appPrimary.withValues(alpha: 0.5),
-              blurRadius: 20,
-              spreadRadius: -5,
-            ),
+            AppShadows.primary,
           ],
         ),
         child: const Center(
