@@ -1,35 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/city_repository.dart';
 import '../../../../i18n/strings.g.dart';
 
-class CityData {
-  final String name;
-  final String count;
-
-  const CityData({required this.name, required this.count});
-}
-
-const _defaultCities = [
-  CityData(name: 'Bratislava, SK', count: '12 akcí'),
-  CityData(name: 'České Budějovice', count: '8 akcí'),
-  CityData(name: 'Hradec Králové', count: '6 akcí'),
-  CityData(name: 'Jihlava', count: '4 akce'),
-  CityData(name: 'Karlovy Vary', count: '3 akce'),
-  CityData(name: 'Liberec', count: '9 akcí'),
-  CityData(name: 'Olomouc', count: '14 akcí'),
-  CityData(name: 'Pardubice', count: '5 akcí'),
-  CityData(name: 'Ústí nad Labem', count: '7 akcí'),
-  CityData(name: 'Zlín', count: '11 akcí'),
-];
-
 class AllCitiesSection extends StatelessWidget {
-  final List<CityData> cities;
   final ValueChanged<CityData>? onCityTap;
 
   const AllCitiesSection({
     super.key,
-    this.cities = _defaultCities,
     this.onCityTap,
   });
 
@@ -47,10 +26,17 @@ class AllCitiesSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        Column(
-          children: cities
-              .map((city) => _CityRow(city: city, onTap: () => onCityTap?.call(city)))
-              .toList(),
+        FutureBuilder<List<CityData>>(
+          future: const CityRepository().getAllCities(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox.shrink();
+            final cities = snapshot.data!;
+            return Column(
+              children: cities
+                  .map((city) => _CityRow(city: city, onTap: () => onCityTap?.call(city)))
+                  .toList(),
+            );
+          },
         ),
       ],
     );

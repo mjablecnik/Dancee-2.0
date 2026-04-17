@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../data/user_repository.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import '../../../shared/elements/labels/section_label.dart';
@@ -50,62 +51,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                left: AppSpacing.xl,
-                right: AppSpacing.xl,
-                top: AppSpacing.xxl,
-                bottom: MediaQuery.of(context).padding.bottom + 100,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProfileCardSection(
-                    name: 'Tereza Nováková',
-                    email: 'tereza.novakova@email.cz',
-                    avatarUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
-                    danceTags: const [
-                      (label: 'Salsa', color: appPrimary),
-                      (label: 'Bachata', color: appAccent),
-                      (label: 'Zouk', color: appTeal),
+            child: FutureBuilder<UserData>(
+              future: const UserRepository().getCurrentUser(),
+              builder: (context, snapshot) {
+                final user = snapshot.data;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    left: AppSpacing.xl,
+                    right: AppSpacing.xl,
+                    top: AppSpacing.xxl,
+                    bottom: MediaQuery.of(context).padding.bottom + 100,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ProfileCardSection(
+                        name: user?.name ?? '',
+                        email: user?.email ?? '',
+                        avatarUrl: user?.avatarUrl ?? '',
+                        danceTags: user?.danceTags
+                                .map((tag) => (label: tag.label, color: tag.color))
+                                .toList() ??
+                            const [],
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      SectionLabel(title: t.profile.sections.account),
+                      const SizedBox(height: AppSpacing.md),
+                      AccountSection(
+                        onEditProfile: () => context.push('/profile/edit'),
+                        onChangePassword: () => context.push('/profile/change-password'),
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      SectionLabel(title: t.profile.sections.settings),
+                      const SizedBox(height: AppSpacing.md),
+                      SettingsSection(
+                        notificationsEnabled: _notificationsEnabled,
+                        onNotificationsChanged: (val) => setState(() => _notificationsEnabled = val),
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      PremiumBanner(onTap: () => context.push('/profile/premium')),
+                      const SizedBox(height: AppSpacing.xxl),
+                      SectionLabel(title: t.profile.sections.support),
+                      const SizedBox(height: AppSpacing.md),
+                      SupportSection(
+                        onContactAuthor: () => context.push('/profile/author-contact'),
+                        onRateApp: null,
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      SectionLabel(title: t.profile.sections.appInfo),
+                      const SizedBox(height: AppSpacing.md),
+                      const AppInfoSection(),
+                      const SizedBox(height: AppSpacing.xxl),
+                      SectionLabel(title: t.profile.sections.dangerZone),
+                      const SizedBox(height: AppSpacing.md),
+                      LogoutSection(
+                        onLogout: () {},
+                        onDeleteAccount: () {},
+                      ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  SectionLabel(title: t.profile.sections.account),
-                  const SizedBox(height: AppSpacing.md),
-                  AccountSection(
-                    onEditProfile: () => context.push('/profile/edit'),
-                    onChangePassword: () => context.push('/profile/change-password'),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  SectionLabel(title: t.profile.sections.settings),
-                  const SizedBox(height: AppSpacing.md),
-                  SettingsSection(
-                    notificationsEnabled: _notificationsEnabled,
-                    onNotificationsChanged: (val) => setState(() => _notificationsEnabled = val),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  PremiumBanner(onTap: () => context.push('/profile/premium')),
-                  const SizedBox(height: AppSpacing.xxl),
-                  SectionLabel(title: t.profile.sections.support),
-                  const SizedBox(height: AppSpacing.md),
-                  SupportSection(
-                    onContactAuthor: () => context.push('/profile/author-contact'),
-                    onRateApp: null,
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  SectionLabel(title: t.profile.sections.appInfo),
-                  const SizedBox(height: AppSpacing.md),
-                  const AppInfoSection(),
-                  const SizedBox(height: AppSpacing.xxl),
-                  SectionLabel(title: t.profile.sections.dangerZone),
-                  const SizedBox(height: AppSpacing.md),
-                  LogoutSection(
-                    onLogout: () {},
-                    onDeleteAccount: () {},
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],

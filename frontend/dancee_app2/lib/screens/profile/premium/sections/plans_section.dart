@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/premium_repository.dart';
 import '../components/plan_card.dart';
 
 class PlansSection extends StatelessWidget {
@@ -16,30 +15,32 @@ class PlansSection extends StatelessWidget {
         AppSpacing.xl,
         AppSpacing.xxl,
       ),
-      child: Column(
-        children: [
-          PlanCard(
-            title: 'Roční předplatné',
-            subtitle: 'Nejlepší hodnota',
-            price: '499 Kč',
-            originalPrice: '999 Kč',
-            note: 'Pouze 42 Kč/měsíc · Ušetříte 50%',
-            ctaLabel: 'Vybrat roční plán',
-            badge: 'POPULÁRNÍ',
-            isPrimary: true,
-            onTap: () {},
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          PlanCard(
-            title: 'Měsíční předplatné',
-            subtitle: 'Flexibilní možnost',
-            price: '99 Kč',
-            note: 'Fakturováno měsíčně',
-            ctaLabel: 'Vybrat měsíční plán',
-            isPrimary: false,
-            onTap: () {},
-          ),
-        ],
+      child: FutureBuilder<List<PremiumPlanData>>(
+        future: const PremiumRepository().getPlans(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const SizedBox.shrink();
+          final plans = snapshot.data!;
+          return Column(
+            children: plans
+                .map(
+                  (plan) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: PlanCard(
+                      title: plan.title,
+                      subtitle: plan.subtitle,
+                      price: plan.price,
+                      originalPrice: plan.originalPrice,
+                      note: plan.note,
+                      ctaLabel: plan.ctaLabel,
+                      badge: plan.badge,
+                      isPrimary: plan.isPrimary,
+                      onTap: () {},
+                    ),
+                  ),
+                )
+                .toList(),
+          );
+        },
       ),
     );
   }

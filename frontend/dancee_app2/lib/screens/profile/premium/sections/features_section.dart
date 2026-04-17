@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/premium_repository.dart';
 import '../../../../i18n/strings.g.dart';
 import '../components/feature_item.dart';
 
 class FeaturesSection extends StatelessWidget {
   const FeaturesSection({super.key});
-
-  static const List<(String, String)> _features = [
-    ('Neomezené oblíbené akce', 'Ukládejte si neomezený počet tanečních akcí'),
-    ('Pokročilé filtry', 'Filtrujte podle více kritérií najednou'),
-    ('Upozornění na nové akce', 'Buďte první, kdo se dozví o nových eventtech'),
-    ('Offline režim', 'Přístup k uloženým akcím bez internetu'),
-    ('Prioritní podpora', 'Rychlejší odpovědi na vaše dotazy'),
-    ('Žádné reklamy', 'Užívejte si aplikaci bez přerušení'),
-    ('Exkluzivní odznaky', 'Speciální odznaky na vašem profilu'),
-    ('Kalendářová integrace', 'Synchronizace s vaším kalendářem'),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +29,24 @@ class FeaturesSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          ..._features.map(
-            (feature) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: FeatureItem(
-                title: feature.$1,
-                description: feature.$2,
-              ),
-            ),
+          FutureBuilder<List<PremiumFeatureData>>(
+            future: const PremiumRepository().getFeatures(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox.shrink();
+              return Column(
+                children: snapshot.data!
+                    .map(
+                      (feature) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: FeatureItem(
+                          title: feature.title,
+                          description: feature.description,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ],
       ),

@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../data/event_repository.dart';
+import '../../../data/user_repository.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import '../../../shared/elements/labels/section_label.dart';
@@ -24,19 +26,13 @@ class ProfileEditScreen extends StatefulWidget {
 }
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
-  final Map<String, bool> _dancePrefs = {
-    'Salsa': true,
-    'Bachata': true,
-    'Zouk': true,
-    'Kizomba': false,
-    'Tango': false,
-    'Swing': false,
-  };
-
-  String _level = 'Mírně pokročilý';
-
+  late Map<String, bool> _dancePrefs;
+  late String _level;
   late Map<String, bool> _notifications;
   late Map<String, String> _notificationSubtitles;
+  bool _initialized = false;
+
+  Future<(UserData, List<DanceStyleData>, List<ExperienceLevelData>)>? _dataFuture;
 
   @override
   void initState() {
@@ -51,6 +47,23 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       t.profile.editProfile.notifications.eventReminders: t.profile.editProfile.notificationSubtitles.eventReminders,
       t.profile.editProfile.notifications.marketing: t.profile.editProfile.notificationSubtitles.marketing,
     };
+    _dataFuture = Future.wait([
+      const UserRepository().getCurrentUser(),
+      const EventRepository().getDanceStyles(),
+      const EventRepository().getExperienceLevels(),
+    ]).then((results) => (
+          results[0] as UserData,
+          results[1] as List<DanceStyleData>,
+          results[2] as List<ExperienceLevelData>,
+        ));
+  }
+
+  void _initFromData(UserData user, List<DanceStyleData> styles, List<ExperienceLevelData> levels) {
+    if (_initialized) return;
+    _initialized = true;
+    final userDanceLabels = user.danceTags.map((tag) => tag.label).toSet();
+    _dancePrefs = {for (final s in styles) s.name: userDanceLabels.contains(s.name)};
+    _level = user.experienceLevel;
   }
 
   @override
@@ -78,67 +91,79 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom + 140,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProfilePhotoSection(
-                    avatarUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: t.profile.editProfile.sections.personalInfo),
-                  ),
-                  const PersonalInfoSection(
-                    initialName: 'Tereza Nováková',
-                    initialEmail: 'tereza.novakova@email.cz',
-                    initialPhone: '+420 123 456 789',
-                    initialCity: 'Praha',
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: t.profile.editProfile.sections.aboutMe),
-                  ),
-                  BioSection(
-                    initialBio: 'Miluji tanec a poznávání nových lidí. Tancuji už 5 let a stále se učím nové styly.',
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: t.profile.editProfile.sections.favoriteDances),
-                  ),
-                  DancePreferencesSection(
-                    preferences: _dancePrefs,
-                    onChanged: (prefs) => setState(() => _dancePrefs
-                      ..clear()
-                      ..addAll(prefs)),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: t.profile.editProfile.sections.level),
-                  ),
-                  ExperienceLevelSection(
-                    levels: const ['Začátečník', 'Mírně pokročilý', 'Pokročilý', 'Expert'],
-                    selectedLevel: _level,
-                    onChanged: (level) => setState(() => _level = level),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: t.profile.editProfile.sections.socialNetworks),
-                  ),
-                  const SocialLinksSection(),
-                  Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: t.profile.editProfile.sections.notifications),
-                  ),
-                  NotificationsSection(
-                    notifications: _notifications,
-                    subtitles: _notificationSubtitles,
-                  ),
-                ],
-              ),
+            child: FutureBuilder<(UserData, List<DanceStyleData>, List<ExperienceLevelData>)>(
+              future: _dataFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const SizedBox.shrink();
+                final (user, styles, levels) = snapshot.data!;
+                _initFromData(user, styles, levels);
+                return StatefulBuilder(
+                  builder: (context, setInnerState) {
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).padding.bottom + 140,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ProfilePhotoSection(
+                            avatarUrl: user.avatarUrl ?? '',
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                            child: SectionLabel(title: t.profile.editProfile.sections.personalInfo),
+                          ),
+                          PersonalInfoSection(
+                            initialName: user.name,
+                            initialEmail: user.email,
+                            initialPhone: user.phone ?? '',
+                            initialCity: user.city ?? '',
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                            child: SectionLabel(title: t.profile.editProfile.sections.aboutMe),
+                          ),
+                          BioSection(
+                            initialBio: user.bio ?? '',
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                            child: SectionLabel(title: t.profile.editProfile.sections.favoriteDances),
+                          ),
+                          DancePreferencesSection(
+                            preferences: _dancePrefs,
+                            onChanged: (prefs) => setState(() => _dancePrefs
+                              ..clear()
+                              ..addAll(prefs)),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                            child: SectionLabel(title: t.profile.editProfile.sections.level),
+                          ),
+                          ExperienceLevelSection(
+                            levels: levels.map((l) => l.name).toList(),
+                            selectedLevel: _level,
+                            onChanged: (level) => setState(() => _level = level),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                            child: SectionLabel(title: t.profile.editProfile.sections.socialNetworks),
+                          ),
+                          const SocialLinksSection(),
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                            child: SectionLabel(title: t.profile.editProfile.sections.notifications),
+                          ),
+                          NotificationsSection(
+                            notifications: _notifications,
+                            subtitles: _notificationSubtitles,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
