@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class SaveButtonSection extends StatelessWidget {
   final VoidCallback onSave;
@@ -31,8 +32,8 @@ class SaveButtonSection extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
             elevation: 0,
           ),
-          child: const Text(
-            'Uložit změny',
+          child: Text(
+            t.common.saveChanges,
             style: TextStyle(
               fontSize: AppTypography.fontSizeXl,
               fontWeight: AppTypography.fontWeightSemiBold,

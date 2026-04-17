@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/forms/app_checkbox.dart';
 
 class DancePreferencesSection extends StatefulWidget {
@@ -50,8 +51,8 @@ class _DancePreferencesSectionState extends State<DancePreferencesSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Vyberte své oblíbené tanční styly',
+            Text(
+              t.profile.editProfile.selectDanceStyles,
               style: TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeSm,

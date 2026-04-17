@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class SocialLinksSection extends StatelessWidget {
   final TextEditingController? instagramController;
@@ -24,16 +25,16 @@ class SocialLinksSection extends StatelessWidget {
       child: Column(
         children: [
           _SocialLinkField(
-            label: 'Instagram',
+            label: t.profile.editProfile.instagram,
             icon: const FaIcon(FontAwesomeIcons.instagram, size: 16, color: appMuted),
-            hintText: '@vase_uzivatelske_jmeno',
+            hintText: t.profile.editProfile.instagramHint,
             controller: instagramController,
           ),
           const SizedBox(height: AppSpacing.lg),
           _SocialLinkField(
-            label: 'Facebook',
+            label: t.profile.editProfile.facebook,
             icon: const FaIcon(FontAwesomeIcons.facebook, size: 16, color: appMuted),
-            hintText: 'facebook.com/vase.jmeno',
+            hintText: t.profile.editProfile.facebookHint,
             controller: facebookController,
           ),
         ],

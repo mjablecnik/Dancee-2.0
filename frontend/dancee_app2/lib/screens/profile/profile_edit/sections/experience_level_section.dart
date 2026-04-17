@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/forms/app_radio_button.dart';
 
 class ExperienceLevelSection extends StatefulWidget {
@@ -51,8 +52,8 @@ class _ExperienceLevelSectionState extends State<ExperienceLevelSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Vaše taneční úroveň',
+            Text(
+              t.profile.editProfile.yourLevel,
               style: TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeSm,
