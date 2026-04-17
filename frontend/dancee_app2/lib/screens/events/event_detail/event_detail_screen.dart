@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import '../../../shared/sections/description_section.dart';
 import '../../../shared/sections/detail_header_section.dart';
@@ -23,7 +24,7 @@ class EventDetailScreen extends StatelessWidget {
       body: Column(
         children: [
           DetailHeaderSection(
-            title: 'Detail akce',
+            title: t.events.detail.header,
             onBack: () => context.pop(),
           ),
           Expanded(
@@ -81,8 +82,8 @@ class EventDetailScreen extends StatelessWidget {
                           onMap: () {},
                         ),
                         const SizedBox(height: AppSpacing.xxl),
-                        const DescriptionSection(
-                          title: 'Popis akce',
+                        DescriptionSection(
+                          title: t.events.detail.description,
                           paragraphs: [
                             'Největší latinsko-americký taneční festival v České republice se vrací! Tři dny plné workshopů s mezinárodními lektory, sociálních tanečních večírků a nezapomenutelné atmosféry.',
                             'Připravte se na intenzivní víkend plný tance, kde se setkáte s nejlepšími tanečníky a lektory z celého světa. Festival nabízí workshopy pro všechny úrovně - od začátečníků až po pokročilé tanečníky.',
@@ -175,23 +176,23 @@ class EventDetailScreen extends StatelessWidget {
         leftItems: [
           AppNavBarItem(
             icon: FontAwesomeIcons.house,
-            label: 'Domů',
+            label: t.nav.home,
             onTap: () => context.go('/events'),
           ),
           AppNavBarItem(
             icon: FontAwesomeIcons.magnifyingGlass,
-            label: 'Hledat',
+            label: t.nav.search,
           ),
         ],
         rightItems: [
           AppNavBarItem(
             icon: FontAwesomeIcons.solidHeart,
-            label: 'Uložené',
+            label: t.nav.saved,
             isActive: true,
           ),
           AppNavBarItem(
             icon: FontAwesomeIcons.user,
-            label: 'Profil',
+            label: t.nav.profile,
           ),
         ],
       ),

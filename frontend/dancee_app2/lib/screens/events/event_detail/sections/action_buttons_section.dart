@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class ActionButtonsSection extends StatelessWidget {
   final VoidCallback? onSave;
@@ -23,13 +24,13 @@ class ActionButtonsSection extends StatelessWidget {
         const SizedBox(width: AppSpacing.md),
         Expanded(child: _buildOutlineButton(
           icon: FontAwesomeIcons.shareNodes,
-          label: 'Sdílet',
+          label: t.common.share,
           onTap: onShare,
         )),
         const SizedBox(width: AppSpacing.md),
         Expanded(child: _buildOutlineButton(
           icon: FontAwesomeIcons.mapLocationDot,
-          label: 'Mapa',
+          label: t.common.map,
           onTap: onMap,
         )),
       ],
@@ -53,7 +54,7 @@ class ActionButtonsSection extends StatelessWidget {
               FaIcon(FontAwesomeIcons.heart, size: 14, color: Colors.white),
               SizedBox(width: AppSpacing.sm),
               Text(
-                'Uložit',
+                t.common.save,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: AppTypography.fontSizeMd,

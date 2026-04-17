@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/upcoming_event_card.dart';
 
 class UpcomingEventsSection extends StatelessWidget {
@@ -23,8 +24,8 @@ class UpcomingEventsSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
-                'Nadcházející akce',
+              Text(
+                t.events.upcomingEvents,
                 style: TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize3xl,
@@ -42,7 +43,7 @@ class UpcomingEventsSection extends StatelessWidget {
                     FaIcon(FontAwesomeIcons.arrowUpWideShort, size: 14, color: appText),
                     SizedBox(width: AppSpacing.sm),
                     Text(
-                      'Datum',
+                      t.common.date,
                       style: TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
                     ),
                   ],

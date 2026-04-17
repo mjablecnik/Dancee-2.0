@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/featured_event_card.dart';
 
 class FeaturedEventsSection extends StatelessWidget {
@@ -16,10 +17,10 @@ class FeaturedEventsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Text(
-            'Doporučené akce',
+            t.events.featuredEvents,
             style: TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize3xl,

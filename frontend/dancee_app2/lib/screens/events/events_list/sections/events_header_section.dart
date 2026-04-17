@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class EventsHeaderSection extends StatelessWidget {
   final String location;
@@ -44,8 +45,8 @@ class EventsHeaderSection extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Lokalita',
+            Text(
+              t.events.location,
               style: TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeMd,
@@ -115,13 +116,13 @@ class EventsHeaderSection extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildQuickFilterPill(FontAwesomeIcons.calendarDay, 'Dnes'),
+          _buildQuickFilterPill(FontAwesomeIcons.calendarDay, t.events.filters.today),
           const SizedBox(width: AppSpacing.sm),
-          _buildQuickFilterPill(FontAwesomeIcons.calendarWeek, 'Tento týden'),
+          _buildQuickFilterPill(FontAwesomeIcons.calendarWeek, t.events.filters.thisWeek),
           const SizedBox(width: AppSpacing.sm),
-          _buildQuickFilterPill(null, 'Tento měsíc'),
+          _buildQuickFilterPill(null, t.events.filters.thisMonth),
           const SizedBox(width: AppSpacing.sm),
-          _buildQuickFilterPill(null, 'Tento víkend'),
+          _buildQuickFilterPill(null, t.events.filters.thisWeekend),
         ],
       ),
     );
