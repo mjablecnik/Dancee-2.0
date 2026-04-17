@@ -72,21 +72,24 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const FaIcon(FontAwesomeIcons.locationDot, color: appPrimary, size: 16),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'Praha, CZ',
-                        style: TextStyle(
-                          color: appText,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: () => context.push('/filter-location'),
+                    child: Row(
+                      children: [
+                        const FaIcon(FontAwesomeIcons.locationDot, color: appPrimary, size: 16),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Praha, CZ',
+                          style: TextStyle(
+                            color: appText,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      const FaIcon(FontAwesomeIcons.chevronDown, color: appMuted, size: 12),
-                    ],
+                        const SizedBox(width: 6),
+                        const FaIcon(FontAwesomeIcons.chevronDown, color: appMuted, size: 12),
+                      ],
+                    ),
                   ),
                 ],
               ),
