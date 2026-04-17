@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'core/theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/forgot_password_screen.dart';
 
 void main() {
   runApp(const DanceeApp());
@@ -18,6 +19,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
     ),
   ],
 );
