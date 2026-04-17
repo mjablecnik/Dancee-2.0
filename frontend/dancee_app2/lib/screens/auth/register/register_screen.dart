@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/background_circles.dart';
-import '../../shared/sections/auth_header_section.dart';
-import 'register/sections/register_form_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/background_circles.dart';
+import '../../../shared/sections/auth_header_section.dart';
+import 'sections/register_form_section.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

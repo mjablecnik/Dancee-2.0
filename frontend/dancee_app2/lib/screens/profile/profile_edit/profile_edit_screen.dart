@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/back_button_header.dart';
-import '../../shared/elements/labels/section_label.dart';
-import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
-import 'profile_edit/sections/bio_section.dart';
-import 'profile_edit/sections/dance_preferences_section.dart';
-import 'profile_edit/sections/experience_level_section.dart';
-import 'profile_edit/sections/notifications_section.dart';
-import 'profile_edit/sections/personal_info_section.dart';
-import 'profile_edit/sections/profile_photo_section.dart';
-import 'profile_edit/sections/social_links_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/back_button_header.dart';
+import '../../../shared/elements/labels/section_label.dart';
+import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import 'sections/bio_section.dart';
+import 'sections/dance_preferences_section.dart';
+import 'sections/experience_level_section.dart';
+import 'sections/notifications_section.dart';
+import 'sections/personal_info_section.dart';
+import 'sections/profile_photo_section.dart';
+import 'sections/social_links_section.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});

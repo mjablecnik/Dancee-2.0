@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
-import '../../shared/sections/description_section.dart';
-import '../../shared/sections/detail_header_section.dart';
-import '../../shared/sections/hero_image_section.dart';
-import '../../shared/sections/key_info_section.dart';
-import 'course_detail/sections/course_instructor_section.dart';
-import 'course_detail/sections/course_pricing_section.dart';
-import 'course_detail/sections/course_schedule_section.dart';
-import 'course_detail/sections/course_title_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import '../../../shared/sections/description_section.dart';
+import '../../../shared/sections/detail_header_section.dart';
+import '../../../shared/sections/hero_image_section.dart';
+import '../../../shared/sections/key_info_section.dart';
+import 'sections/course_instructor_section.dart';
+import 'sections/course_pricing_section.dart';
+import 'sections/course_schedule_section.dart';
+import 'sections/course_title_section.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   const CourseDetailScreen({super.key});

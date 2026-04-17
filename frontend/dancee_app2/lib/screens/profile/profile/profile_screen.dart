@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/back_button_header.dart';
-import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
-import 'profile/components/profile_menu_item.dart';
-import 'profile/sections/account_section.dart';
-import 'profile/sections/logout_section.dart';
-import 'profile/sections/profile_card_section.dart';
-import 'profile/sections/settings_section.dart';
-import 'profile/sections/support_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/back_button_header.dart';
+import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import 'components/profile_menu_item.dart';
+import 'sections/account_section.dart';
+import 'sections/logout_section.dart';
+import 'sections/profile_card_section.dart';
+import 'sections/settings_section.dart';
+import 'sections/support_section.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

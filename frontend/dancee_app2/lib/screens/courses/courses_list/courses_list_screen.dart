@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
-import '../../shared/sections/dance_styles_filter_section.dart';
-import 'courses_list/sections/all_courses_section.dart';
-import 'courses_list/sections/courses_header_section.dart';
-import 'courses_list/sections/featured_courses_section.dart';
+import '../../../core/colors.dart';
+import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import '../../../shared/sections/dance_styles_filter_section.dart';
+import 'sections/all_courses_section.dart';
+import 'sections/courses_header_section.dart';
+import 'sections/featured_courses_section.dart';
 
 class CoursesListScreen extends StatefulWidget {
   const CoursesListScreen({super.key});

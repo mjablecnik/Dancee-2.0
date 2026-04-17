@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import 'filter_dance/sections/dance_styles_list_section.dart';
-import 'filter_dance/sections/filter_bottom_actions_section.dart';
-import 'filter_dance/sections/selected_styles_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import 'sections/dance_styles_list_section.dart';
+import 'sections/filter_bottom_actions_section.dart';
+import 'sections/selected_styles_section.dart';
 
 class FilterDanceScreen extends StatefulWidget {
   const FilterDanceScreen({super.key});

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/background_circles.dart';
-import '../../shared/sections/auth_header_section.dart';
-import 'forgot_password/sections/forgot_password_form_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/background_circles.dart';
+import '../../../shared/sections/auth_header_section.dart';
+import 'sections/forgot_password_form_section.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/back_button_header.dart';
-import 'author_contact/sections/author_info_section.dart';
-import 'author_contact/sections/contact_form_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/back_button_header.dart';
+import 'sections/author_info_section.dart';
+import 'sections/contact_form_section.dart';
 
 class AuthorContactScreen extends StatelessWidget {
   const AuthorContactScreen({super.key});

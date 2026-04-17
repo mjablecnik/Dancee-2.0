@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/back_button_header.dart';
-import 'change_password/sections/password_form_section.dart';
-import 'change_password/sections/security_banner_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/back_button_header.dart';
+import 'sections/password_form_section.dart';
+import 'sections/security_banner_section.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
   const ChangePasswordScreen({super.key});

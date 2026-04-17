@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/register_screen.dart';
-import 'screens/auth/forgot_password_screen.dart';
-import 'screens/auth/onboarding_screen.dart';
+import 'screens/auth/login/login_screen.dart';
+import 'screens/auth/register/register_screen.dart';
+import 'screens/auth/forgot_password/forgot_password_screen.dart';
+import 'screens/auth/onboarding/onboarding_screen.dart';
 import 'screens/events/events_list/events_list_screen.dart';
-import 'screens/events/event_detail_screen.dart';
-import 'screens/events/filter_dance_screen.dart';
-import 'screens/events/filter_location_screen.dart';
-import 'screens/courses/courses_list_screen.dart';
-import 'screens/courses/course_detail_screen.dart';
-import 'screens/profile/profile_screen.dart';
-import 'screens/profile/profile_edit_screen.dart';
-import 'screens/profile/change_password_screen.dart';
-import 'screens/profile/premium_screen.dart';
-import 'screens/profile/author_contact_screen.dart';
+import 'screens/events/event_detail/event_detail_screen.dart';
+import 'screens/events/filter_dance/filter_dance_screen.dart';
+import 'screens/events/filter_location/filter_location_screen.dart';
+import 'screens/courses/courses_list/courses_list_screen.dart';
+import 'screens/courses/course_detail/course_detail_screen.dart';
+import 'screens/profile/profile/profile_screen.dart';
+import 'screens/profile/profile_edit/profile_edit_screen.dart';
+import 'screens/profile/change_password/change_password_screen.dart';
+import 'screens/profile/premium/premium_screen.dart';
+import 'screens/profile/author_contact/author_contact_screen.dart';
 
 void main() {
   runApp(const DanceeApp());

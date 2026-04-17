@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
-import 'premium/sections/faq_section.dart';
-import 'premium/sections/features_section.dart';
-import 'premium/sections/final_cta_section.dart';
-import 'premium/sections/plans_section.dart';
-import 'premium/sections/premium_hero_section.dart';
-import 'premium/sections/testimonials_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import 'sections/faq_section.dart';
+import 'sections/features_section.dart';
+import 'sections/final_cta_section.dart';
+import 'sections/plans_section.dart';
+import 'sections/premium_hero_section.dart';
+import 'sections/testimonials_section.dart';
 
 class PremiumScreen extends StatelessWidget {
   const PremiumScreen({super.key});

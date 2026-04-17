@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/background_circles.dart';
-import 'onboarding/sections/onboarding_step1_section.dart';
-import 'onboarding/sections/onboarding_step2_section.dart';
-import 'onboarding/sections/onboarding_step3_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/background_circles.dart';
+import 'sections/onboarding_step1_section.dart';
+import 'sections/onboarding_step2_section.dart';
+import 'sections/onboarding_step3_section.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
-import '../../shared/sections/description_section.dart';
-import '../../shared/sections/detail_header_section.dart';
-import '../../shared/sections/hero_image_section.dart';
-import '../../shared/sections/key_info_section.dart';
-import 'event_detail/sections/action_buttons_section.dart';
-import 'event_detail/sections/additional_info_section.dart';
-import 'event_detail/sections/event_program_section.dart';
-import 'event_detail/sections/event_title_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import '../../../shared/sections/description_section.dart';
+import '../../../shared/sections/detail_header_section.dart';
+import '../../../shared/sections/hero_image_section.dart';
+import '../../../shared/sections/key_info_section.dart';
+import 'sections/action_buttons_section.dart';
+import 'sections/additional_info_section.dart';
+import 'sections/event_program_section.dart';
+import 'sections/event_title_section.dart';
 
 class EventDetailScreen extends StatelessWidget {
   const EventDetailScreen({super.key});

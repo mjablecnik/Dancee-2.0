@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/colors.dart';
-import '../../core/theme.dart';
-import '../../shared/components/background_circles.dart';
-import '../../shared/sections/auth_header_section.dart';
-import 'login/sections/login_form_section.dart';
+import '../../../core/colors.dart';
+import '../../../core/theme.dart';
+import '../../../shared/components/background_circles.dart';
+import '../../../shared/sections/auth_header_section.dart';
+import 'sections/login_form_section.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
