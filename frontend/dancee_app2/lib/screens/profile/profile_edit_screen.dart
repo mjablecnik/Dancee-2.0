@@ -3,6 +3,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/colors.dart';
 import '../../core/theme.dart';
+import '../../shared/components/back_button_header.dart';
+import '../../shared/elements/labels/section_label.dart';
+import '../../shared/elements/navigation/app_bottom_nav_bar.dart';
+import 'profile_edit/sections/bio_section.dart';
+import 'profile_edit/sections/dance_preferences_section.dart';
+import 'profile_edit/sections/experience_level_section.dart';
+import 'profile_edit/sections/notifications_section.dart';
+import 'profile_edit/sections/personal_info_section.dart';
+import 'profile_edit/sections/profile_photo_section.dart';
+import 'profile_edit/sections/social_links_section.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
@@ -41,7 +51,24 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       backgroundColor: appBg,
       body: Column(
         children: [
-          _buildHeader(context),
+          BackButtonHeader(
+            title: 'Upravit profil',
+            onBack: () => context.pop(),
+            trailing: GestureDetector(
+              onTap: () => context.pop(),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: appPrimary,
+                  borderRadius: BorderRadius.circular(AppRadius.round),
+                ),
+                child: const Center(
+                  child: FaIcon(FontAwesomeIcons.check, size: 16, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.only(
@@ -50,564 +77,102 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildProfilePhoto(),
-                  _buildSectionLabel('Osobní údaje'),
-                  _buildPersonalInfo(),
-                  _buildSectionLabel('O mně'),
-                  _buildBio(),
-                  _buildSectionLabel('Oblíbené tance'),
-                  _buildDancePreferences(),
-                  _buildSectionLabel('Úroveň'),
-                  _buildExperienceLevel(),
-                  _buildSectionLabel('Sociální sítě'),
-                  _buildSocialLinks(),
-                  _buildSectionLabel('Oznámení'),
-                  _buildNotifications(),
+                  ProfilePhotoSection(
+                    avatarUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: 'Osobní údaje'),
+                  ),
+                  const PersonalInfoSection(
+                    initialName: 'Tereza Nováková',
+                    initialEmail: 'tereza.novakova@email.cz',
+                    initialPhone: '+420 123 456 789',
+                    initialCity: 'Praha',
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: 'O mně'),
+                  ),
+                  BioSection(
+                    initialBio: 'Miluji tanec a poznávání nových lidí. Tancuji už 5 let a stále se učím nové styly.',
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: 'Oblíbené tance'),
+                  ),
+                  DancePreferencesSection(
+                    preferences: _dancePrefs,
+                    onChanged: (prefs) => setState(() => _dancePrefs
+                      ..clear()
+                      ..addAll(prefs)),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: 'Úroveň'),
+                  ),
+                  ExperienceLevelSection(
+                    levels: const ['Začátečník', 'Mírně pokročilý', 'Pokročilý', 'Expert'],
+                    selectedLevel: _level,
+                    onChanged: (level) => setState(() => _level = level),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: 'Sociální sítě'),
+                  ),
+                  const SocialLinksSection(),
+                  const Padding(
+                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: 'Oznámení'),
+                  ),
+                  NotificationsSection(
+                    notifications: _notifications,
+                    subtitles: _notificationSubtitles,
+                  ),
                 ],
               ),
             ),
           ),
         ],
       ),
-      bottomSheet: _buildSaveButton(context),
-      bottomNavigationBar: _buildBottomNav(context),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 20,
-        right: 20,
-        bottom: 16,
-      ),
-      decoration: BoxDecoration(
-        color: appBg.withValues(alpha: 0.9),
-        border: const Border(bottom: BorderSide(color: appBorder)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () => context.pop(),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: appSurface,
-                borderRadius: BorderRadius.circular(AppRadius.round),
-              ),
-              child: const Center(
-                child: FaIcon(FontAwesomeIcons.arrowLeft, size: 16, color: appText),
-              ),
-            ),
-          ),
-          const Text(
-            'Upravit profil',
-            style: TextStyle(
-              color: appText,
-              fontSize: AppTypography.fontSize2xl,
-              fontWeight: AppTypography.fontWeightSemiBold,
-            ),
-          ),
-          GestureDetector(
-            onTap: () => context.pop(),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: appPrimary,
-                borderRadius: BorderRadius.circular(AppRadius.round),
-              ),
-              child: const Center(
-                child: FaIcon(FontAwesomeIcons.check, size: 16, color: Colors.white),
-              ),
-            ),
-          ),
+      bottomSheet: _SaveButton(onSave: () => context.pop()),
+      bottomNavigationBar: AppBottomNavBar(
+        leftItems: [
+          AppNavBarItem(icon: FontAwesomeIcons.house, label: 'Domů', onTap: () => context.go('/events')),
+          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: 'Hledat', onTap: () => context.go('/events')),
+        ],
+        rightItems: [
+          AppNavBarItem(icon: FontAwesomeIcons.heart, label: 'Uložené', onTap: () => context.go('/events')),
+          AppNavBarItem(icon: FontAwesomeIcons.user, label: 'Profil', isActive: true, onTap: () => context.go('/profile')),
         ],
       ),
     );
   }
+}
 
-  Widget _buildProfilePhoto() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        children: [
-          Center(
-            child: Stack(
-              children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(48),
-                    border: Border.all(color: appPrimary, width: 2),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(48),
-                    child: Image.network(
-                      'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: appPrimary,
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                      border: Border.all(color: appBg, width: 2),
-                    ),
-                    child: const Center(
-                      child: FaIcon(FontAwesomeIcons.camera, size: 12, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Změnit fotku',
-            style: TextStyle(
-              color: appPrimary,
-              fontSize: AppTypography.fontSizeMd,
-              fontWeight: AppTypography.fontWeightMedium,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+class _SaveButton extends StatelessWidget {
+  final VoidCallback onSave;
 
-  Widget _buildSectionLabel(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
-      child: Text(
-        title.toUpperCase(),
-        style: const TextStyle(
-          color: appMuted,
-          fontSize: AppTypography.fontSizeSm,
-          fontWeight: AppTypography.fontWeightSemiBold,
-          letterSpacing: 1.0,
-        ),
-      ),
-    );
-  }
+  const _SaveButton({required this.onSave});
 
-  Widget _buildPersonalInfo() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24),
-      child: Column(
-        children: [
-          _buildInputField('Jméno a příjmení', 'Tereza Nováková', TextInputType.name),
-          const SizedBox(height: 16),
-          _buildInputField('E-mail', 'tereza.novakova@email.cz', TextInputType.emailAddress),
-          const SizedBox(height: 16),
-          _buildInputField('Telefon', '+420 123 456 789', TextInputType.phone),
-          const SizedBox(height: 16),
-          _buildInputField('Město', 'Praha', TextInputType.text),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInputField(String label, String value, TextInputType keyboardType) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: appSurface,
-        border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: appMuted,
-              fontSize: AppTypography.fontSizeSm,
-              fontWeight: AppTypography.fontWeightMedium,
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextFormField(
-            initialValue: value,
-            keyboardType: keyboardType,
-            style: const TextStyle(
-              color: appText,
-              fontWeight: AppTypography.fontWeightMedium,
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBio() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: appSurface,
-          border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Popis',
-              style: TextStyle(
-                color: appMuted,
-                fontSize: AppTypography.fontSizeSm,
-                fontWeight: AppTypography.fontWeightMedium,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              initialValue: 'Miluji tanec a poznávání nových lidí. Tancuji už 5 let a stále se učím nové styly.',
-              maxLines: 3,
-              style: const TextStyle(color: appText),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-                hintText: 'Napište něco o sobě...',
-                hintStyle: TextStyle(color: appMuted),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDancePreferences() {
-    final dances = _dancePrefs.keys.toList();
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: appSurface,
-          border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Vyberte své oblíbené tanční styly',
-              style: TextStyle(
-                color: appMuted,
-                fontSize: AppTypography.fontSizeSm,
-                fontWeight: AppTypography.fontWeightMedium,
-              ),
-            ),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 5,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              children: dances.map((dance) {
-                return GestureDetector(
-                  onTap: () => setState(() => _dancePrefs[dance] = !_dancePrefs[dance]!),
-                  child: Row(
-                    children: [
-                      _buildCheckbox(_dancePrefs[dance]!),
-                      const SizedBox(width: 12),
-                      Text(
-                        dance,
-                        style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCheckbox(bool checked) {
-    return Container(
-      width: 20,
-      height: 20,
-      decoration: BoxDecoration(
-        color: checked ? appPrimary : Colors.transparent,
-        border: Border.all(
-          color: checked ? appPrimary : appBorder,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.xs),
-      ),
-      child: checked
-          ? const Center(
-              child: FaIcon(FontAwesomeIcons.check, size: 10, color: Colors.white),
-            )
-          : null,
-    );
-  }
-
-  Widget _buildExperienceLevel() {
-    final levels = ['Začátečník', 'Mírně pokročilý', 'Pokročilý', 'Expert'];
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: appSurface,
-          border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Vaše taneční úroveň',
-              style: TextStyle(
-                color: appMuted,
-                fontSize: AppTypography.fontSizeSm,
-                fontWeight: AppTypography.fontWeightMedium,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...levels.map((level) {
-              final selected = _level == level;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: GestureDetector(
-                  onTap: () => setState(() => _level = level),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: selected ? appPrimary : appBorder,
-                            width: 2,
-                          ),
-                        ),
-                        child: selected
-                            ? Center(
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: appPrimary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              )
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        level,
-                        style: const TextStyle(color: appText, fontSize: AppTypography.fontSizeMd),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialLinks() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: appSurface,
-              border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Instagram',
-                  style: TextStyle(
-                    color: appMuted,
-                    fontSize: AppTypography.fontSizeSm,
-                    fontWeight: AppTypography.fontWeightMedium,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const FaIcon(FontAwesomeIcons.instagram, size: 16, color: appMuted),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        style: const TextStyle(color: appText),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                          hintText: '@vase_uzivatelske_jmeno',
-                          hintStyle: TextStyle(color: appMuted),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: appSurface,
-              border: Border.all(color: appBorder),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Facebook',
-                  style: TextStyle(
-                    color: appMuted,
-                    fontSize: AppTypography.fontSizeSm,
-                    fontWeight: AppTypography.fontWeightMedium,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const FaIcon(FontAwesomeIcons.facebook, size: 16, color: appMuted),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        style: const TextStyle(color: appText),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                          hintText: 'facebook.com/vase.jmeno',
-                          hintStyle: TextStyle(color: appMuted),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotifications() {
-    final keys = _notifications.keys.toList();
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24),
-      child: Container(
-        decoration: BoxDecoration(
-          color: appSurface,
-          border: Border.all(color: appBorder),
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        child: Column(
-          children: keys.asMap().entries.map((entry) {
-            final i = entry.key;
-            final key = entry.value;
-            return Column(
-              children: [
-                if (i > 0)
-                  const Divider(height: 1, color: appBorder),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              key,
-                              style: const TextStyle(
-                                color: appText,
-                                fontWeight: AppTypography.fontWeightMedium,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _notificationSubtitles[key]!,
-                              style: const TextStyle(
-                                color: appMuted,
-                                fontSize: AppTypography.fontSizeSm,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch(
-                        value: _notifications[key]!,
-                        onChanged: (val) => setState(() => _notifications[key] = val),
-                        activeColor: appPrimary,
-                        inactiveTrackColor: appBorder,
-                        inactiveThumbColor: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSaveButton(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Container(
       color: appBg,
       padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 12,
+        left: AppSpacing.xl,
+        right: AppSpacing.xl,
+        top: AppSpacing.md,
         bottom: MediaQuery.of(context).padding.bottom + 80,
       ),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () => context.pop(),
+          onPressed: onSave,
           style: ElevatedButton.styleFrom(
             backgroundColor: appPrimary,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
             elevation: 0,
           ),
@@ -618,80 +183,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               fontWeight: AppTypography.fontWeightSemiBold,
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: appCard,
-        border: Border(top: BorderSide(color: appBorder)),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 8,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _navItem(context, FontAwesomeIcons.house, 'Domů', false, '/events'),
-          _navItem(context, FontAwesomeIcons.magnifyingGlass, 'Hledat', false, '/events'),
-          _navFab(context),
-          _navItem(context, FontAwesomeIcons.heart, 'Uložené', false, '/events'),
-          _navItem(context, FontAwesomeIcons.user, 'Profil', true, '/profile'),
-        ],
-      ),
-    );
-  }
-
-  Widget _navItem(BuildContext context, IconData icon, String label, bool active, String route) {
-    return GestureDetector(
-      onTap: () => context.go(route),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(icon, size: 20, color: active ? appPrimary : appMuted),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: AppTypography.fontSizeXs,
-                fontWeight: AppTypography.fontWeightMedium,
-                color: active ? appPrimary : appMuted,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _navFab(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: appPrimary,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: appBg, width: 4),
-          boxShadow: [
-            AppShadows.primary,
-          ],
-        ),
-        child: const Center(
-          child: FaIcon(FontAwesomeIcons.plus, size: 20, color: Colors.white),
         ),
       ),
     );
