@@ -318,6 +318,7 @@ class _StringsContactEn {
 	String get deviceInfo => 'Device information';
 	String get autoAttached => 'Automatically attached';
 	late final _StringsContactFormEn form = _StringsContactFormEn._(_root);
+	late final _StringsContactDeviceInfoLabelsEn deviceInfoLabels = _StringsContactDeviceInfoLabelsEn._(_root);
 }
 
 // Path: common.form
@@ -546,6 +547,7 @@ class _StringsProfileSettingsEn {
 	// Translations
 	String get language => 'Language';
 	String get czech => 'Czech';
+	String get english => 'English';
 	String get notifications => 'Notifications';
 }
 
@@ -655,6 +657,18 @@ class _StringsContactFormEn {
 	String get sending => 'Sending...';
 	String get sent => 'Sent!';
 	String get submit => 'Send message';
+}
+
+// Path: contact.deviceInfoLabels
+class _StringsContactDeviceInfoLabelsEn {
+	_StringsContactDeviceInfoLabelsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get app => 'App:';
+	String get device => 'Device:';
+	String get os => 'System:';
 }
 
 // Path: profile.editProfile.sections
@@ -892,6 +906,7 @@ class _StringsContactCs extends _StringsContactEn {
 	@override String get deviceInfo => 'Informace o zařízení';
 	@override String get autoAttached => 'Automaticky přiloženo';
 	@override late final _StringsContactFormCs form = _StringsContactFormCs._(_root);
+	@override late final _StringsContactDeviceInfoLabelsCs deviceInfoLabels = _StringsContactDeviceInfoLabelsCs._(_root);
 }
 
 // Path: common.form
@@ -1120,6 +1135,7 @@ class _StringsProfileSettingsCs extends _StringsProfileSettingsEn {
 	// Translations
 	@override String get language => 'Jazyk';
 	@override String get czech => 'Čeština';
+	@override String get english => 'Angličtina';
 	@override String get notifications => 'Oznámení';
 }
 
@@ -1229,6 +1245,18 @@ class _StringsContactFormCs extends _StringsContactFormEn {
 	@override String get sending => 'Odesílání...';
 	@override String get sent => 'Odesláno!';
 	@override String get submit => 'Odeslat zprávu';
+}
+
+// Path: contact.deviceInfoLabels
+class _StringsContactDeviceInfoLabelsCs extends _StringsContactDeviceInfoLabelsEn {
+	_StringsContactDeviceInfoLabelsCs._(_StringsCs root) : this._root = root, super._(root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get app => 'Aplikace:';
+	@override String get device => 'Zařízení:';
+	@override String get os => 'Systém:';
 }
 
 // Path: profile.editProfile.sections
@@ -1410,6 +1438,7 @@ extension on Translations {
 			case 'profile.account.changePassword': return 'Change password';
 			case 'profile.settings.language': return 'Language';
 			case 'profile.settings.czech': return 'Czech';
+			case 'profile.settings.english': return 'English';
 			case 'profile.settings.notifications': return 'Notifications';
 			case 'profile.support.contactAuthor': return 'Contact author';
 			case 'profile.support.rateApp': return 'Rate app';
@@ -1479,6 +1508,9 @@ extension on Translations {
 			case 'contact.responseTimeDetail': return 'We usually respond within 24 hours on working days. Thank you for your patience!';
 			case 'contact.deviceInfo': return 'Device information';
 			case 'contact.autoAttached': return 'Automatically attached';
+			case 'contact.deviceInfoLabels.app': return 'App:';
+			case 'contact.deviceInfoLabels.device': return 'Device:';
+			case 'contact.deviceInfoLabels.os': return 'System:';
 			case 'contact.form.subject': return 'Message subject';
 			case 'contact.form.feedback': return 'Feedback';
 			case 'contact.form.reportBug': return 'Report bug';
@@ -1634,6 +1666,7 @@ extension on _StringsCs {
 			case 'profile.account.changePassword': return 'Změnit heslo';
 			case 'profile.settings.language': return 'Jazyk';
 			case 'profile.settings.czech': return 'Čeština';
+			case 'profile.settings.english': return 'Angličtina';
 			case 'profile.settings.notifications': return 'Oznámení';
 			case 'profile.support.contactAuthor': return 'Napsat autorovi';
 			case 'profile.support.rateApp': return 'Ohodnotit aplikaci';

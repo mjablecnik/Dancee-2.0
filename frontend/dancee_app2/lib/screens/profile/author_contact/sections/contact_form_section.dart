@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../core/colors.dart';
 import '../../../../../core/theme.dart';
+import '../../../../../data/user_repository.dart';
 import '../../../../../i18n/strings.g.dart';
 import '../components/subject_option.dart';
 import '../components/device_info_card.dart';
@@ -19,6 +20,8 @@ class _ContactFormSectionState extends State<ContactFormSection> {
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _emailController =
       TextEditingController(text: 'tereza.novakova@email.cz');
+  late final Future<DeviceInfoData> _deviceInfoFuture =
+      const UserRepository().getDeviceInfo();
 
   bool _isLoading = false;
   bool _isSent = false;
@@ -159,12 +162,27 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        DeviceInfoCard(
-          rows: const [
-            DeviceInfoRow(label: 'Aplikace:', value: 'Dancee v1.2.5'),
-            DeviceInfoRow(label: 'Zařízení:', value: 'iPhone 14 Pro'),
-            DeviceInfoRow(label: 'Systém:', value: 'iOS 17.2'),
-          ],
+        FutureBuilder<DeviceInfoData>(
+          future: _deviceInfoFuture,
+          builder: (context, snapshot) {
+            final info = snapshot.data;
+            return DeviceInfoCard(
+              rows: [
+                DeviceInfoRow(
+                  label: t.contact.deviceInfoLabels.app,
+                  value: info?.appVersion ?? '',
+                ),
+                DeviceInfoRow(
+                  label: t.contact.deviceInfoLabels.device,
+                  value: info?.device ?? '',
+                ),
+                DeviceInfoRow(
+                  label: t.contact.deviceInfoLabels.os,
+                  value: info?.os ?? '',
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: AppSpacing.lg),
         Text(

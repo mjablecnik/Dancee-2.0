@@ -175,7 +175,8 @@
     "settings": {
       "language": "Language",
       "czech": "Czech",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "english": "English"
     },
     "support": {
       "contactAuthor": "Contact author",
@@ -279,6 +280,11 @@
       "sending": "Sending...",
       "sent": "Sent!",
       "submit": "Send message"
+    },
+    "deviceInfoLabels": {
+      "app": "App:",
+      "device": "Device:",
+      "os": "System:"
     }
   }
 }

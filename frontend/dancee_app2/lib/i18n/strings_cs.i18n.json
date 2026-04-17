@@ -175,7 +175,8 @@
     "settings": {
       "language": "Jazyk",
       "czech": "Čeština",
-      "notifications": "Oznámení"
+      "notifications": "Oznámení",
+      "english": "Angličtina"
     },
     "support": {
       "contactAuthor": "Napsat autorovi",
@@ -279,6 +280,11 @@
       "sending": "Odesílání...",
       "sent": "Odesláno!",
       "submit": "Odeslat zprávu"
+    },
+    "deviceInfoLabels": {
+      "app": "Aplikace:",
+      "device": "Zařízení:",
+      "os": "Systém:"
     }
   }
 }

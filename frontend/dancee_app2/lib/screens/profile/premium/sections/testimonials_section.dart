@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/premium_repository.dart';
 import '../../../../i18n/strings.g.dart';
 import '../components/testimonial_card.dart';
 
@@ -28,20 +29,25 @@ class TestimonialsSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          const TestimonialCard(
-            avatarUrl:
-                'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg',
-            name: 'Martin Dvořák',
-            quote:
-                '"Premium předplatné mi úplně změnilo způsob, jak objevuji taneční akce. Upozornění jsou skvělá!"',
-          ),
-          const SizedBox(height: AppSpacing.md),
-          const TestimonialCard(
-            avatarUrl:
-                'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
-            name: 'Jana Svobodová',
-            quote:
-                '"Nejlepší investice pro tanečníka! Pokročilé filtry mi ušetřily spoustu času."',
+          FutureBuilder<List<TestimonialData>>(
+            future: const PremiumRepository().getTestimonials(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox.shrink();
+              return Column(
+                children: snapshot.data!
+                    .map(
+                      (testimonial) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: TestimonialCard(
+                          avatarUrl: testimonial.avatarUrl,
+                          name: testimonial.name,
+                          quote: testimonial.quote,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ],
       ),
