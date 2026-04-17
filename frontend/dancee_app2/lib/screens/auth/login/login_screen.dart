@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/background_circles.dart';
 import '../../../shared/sections/auth_header_section.dart';
 import 'sections/login_form_section.dart';
@@ -48,16 +49,16 @@ class _LoginScreenState extends State<LoginScreen>
                 horizontal: AppSpacing.xxl,
                 vertical: AppSpacing.xxxl,
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: AppSpacing.xxxl),
                   AuthHeaderSection(
-                    title: 'Vítej zpět!',
-                    subtitle: 'Přihlaš se a pokračuj v objevování tanečních akcí',
+                    title: t.auth.login.title,
+                    subtitle: t.auth.login.subtitle,
                   ),
-                  SizedBox(height: 48),
-                  LoginFormSection(),
+                  const SizedBox(height: 48),
+                  const LoginFormSection(),
                 ],
               ),
             ),

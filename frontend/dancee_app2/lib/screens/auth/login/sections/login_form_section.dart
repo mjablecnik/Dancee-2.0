@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_checkbox.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
@@ -24,13 +25,13 @@ class _LoginFormSectionState extends State<LoginFormSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AppInputField(
-          label: 'E-mail',
-          hintText: 'tvuj@email.cz',
+          label: t.common.form.email,
+          hintText: t.common.form.emailHint,
           keyboardType: TextInputType.emailAddress,
           icon: const FaIcon(FontAwesomeIcons.envelope, color: appMuted, size: 16),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const AppPasswordField(label: 'Heslo'),
+        AppPasswordField(label: t.common.form.password),
         const SizedBox(height: AppSpacing.lg),
         Row(
           children: [
@@ -39,9 +40,9 @@ class _LoginFormSectionState extends State<LoginFormSection> {
               onChanged: (val) => setState(() => _stayLoggedIn = val),
             ),
             const SizedBox(width: AppSpacing.md),
-            const Text(
-              'Zůstat přihlášen',
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+            Text(
+              t.auth.login.stayLoggedIn,
+              style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const Spacer(),
             TextButton(
@@ -51,9 +52,9 @@ class _LoginFormSectionState extends State<LoginFormSection> {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'Zapomenuté heslo?',
-                style: TextStyle(
+              child: Text(
+                t.auth.login.forgotPassword,
+                style: const TextStyle(
                   color: appPrimary,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightMedium,
@@ -64,42 +65,42 @@ class _LoginFormSectionState extends State<LoginFormSection> {
         ),
         const SizedBox(height: AppSpacing.xxl),
         GradientButton(
-          label: 'Přihlásit se',
+          label: t.auth.login.submit,
           onTap: () => context.go('/events'),
         ),
         const SizedBox(height: AppSpacing.xxxl),
-        const Row(
+        Row(
           children: [
-            Expanded(child: Divider(color: appBorder)),
+            const Expanded(child: Divider(color: appBorder)),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Text(
-                'nebo pokračuj s',
-                style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+                t.auth.orContinueWith,
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
             ),
-            Expanded(child: Divider(color: appBorder)),
+            const Expanded(child: Divider(color: appBorder)),
           ],
         ),
         const SizedBox(height: AppSpacing.xxl),
         _SocialButton(
           icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 20),
-          label: 'Pokračovat s Google',
+          label: t.auth.continueWithGoogle,
           onTap: () {},
         ),
         const SizedBox(height: AppSpacing.md),
         _SocialButton(
           icon: const FaIcon(FontAwesomeIcons.apple, color: appText, size: 20),
-          label: 'Pokračovat s Apple',
+          label: t.auth.continueWithApple,
           onTap: () {},
         ),
         const SizedBox(height: AppSpacing.xxl),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Nemáš ještě účet?',
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+            Text(
+              t.auth.login.noAccount,
+              style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const SizedBox(width: AppSpacing.xs),
             TextButton(
@@ -109,9 +110,9 @@ class _LoginFormSectionState extends State<LoginFormSection> {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'Zaregistruj se',
-                style: TextStyle(
+              child: Text(
+                t.auth.login.register,
+                style: const TextStyle(
                   color: appPrimary,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightSemiBold,
@@ -125,22 +126,22 @@ class _LoginFormSectionState extends State<LoginFormSection> {
         const SizedBox(height: AppSpacing.lg),
         RichText(
           textAlign: TextAlign.center,
-          text: const TextSpan(
-            style: TextStyle(
+          text: TextSpan(
+            style: const TextStyle(
               color: appMuted,
               fontSize: AppTypography.fontSizeSm,
               height: 1.5,
             ),
             children: [
-              TextSpan(text: 'Pokračováním souhlasíš s našimi '),
+              TextSpan(text: t.auth.termsPrefix),
               TextSpan(
-                text: 'Podmínkami používání',
-                style: TextStyle(color: appPrimary),
+                text: t.auth.termsOfUse,
+                style: const TextStyle(color: appPrimary),
               ),
-              TextSpan(text: ' a '),
+              TextSpan(text: t.auth.and),
               TextSpan(
-                text: 'Zásadami ochrany osobních údajů',
-                style: TextStyle(color: appPrimary),
+                text: t.auth.privacyPolicy,
+                style: const TextStyle(color: appPrimary),
               ),
             ],
           ),

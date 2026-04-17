@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 
 class AppPasswordField extends StatefulWidget {
   final String label;
@@ -57,7 +58,7 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
                   onChanged: widget.onChanged,
                   style: const TextStyle(color: appText),
                   decoration: InputDecoration(
-                    hintText: widget.hintText ?? '••••••••',
+                    hintText: widget.hintText ?? t.common.form.passwordPlaceholder,
                     hintStyle: const TextStyle(color: appMuted),
                     border: InputBorder.none,
                     isDense: true,

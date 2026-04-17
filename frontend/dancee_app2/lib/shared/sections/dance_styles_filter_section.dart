@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/colors.dart';
 import '../../core/theme.dart';
+import '../../i18n/strings.g.dart';
 
 class DanceStylesFilterSection extends StatelessWidget {
   final List<String> styles;
@@ -39,8 +40,8 @@ class DanceStylesFilterSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text(
-              'Taneční styly',
+            Text(
+              t.events.danceStyles,
               style: TextStyle(
                 color: appText,
                 fontSize: AppTypography.fontSize3xl,
@@ -49,8 +50,8 @@ class DanceStylesFilterSection extends StatelessWidget {
             ),
             GestureDetector(
               onTap: onShowAll,
-              child: const Text(
-                'Zobrazit vše',
+              child: Text(
+                t.common.showAll,
                 style: TextStyle(
                   color: appMuted,
                   fontSize: AppTypography.fontSizeMd,
@@ -62,10 +63,10 @@ class DanceStylesFilterSection extends StatelessWidget {
       );
     }
 
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Text(
-        'TANEČNÍ STYLY',
+        t.events.danceStylesLabel,
         style: TextStyle(
           color: appMuted,
           fontSize: AppTypography.fontSizeSm,

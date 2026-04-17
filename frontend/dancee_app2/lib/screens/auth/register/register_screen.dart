@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/background_circles.dart';
 import '../../../shared/sections/auth_header_section.dart';
 import 'sections/register_form_section.dart';
@@ -48,16 +49,16 @@ class _RegisterScreenState extends State<RegisterScreen>
                 horizontal: AppSpacing.xxl,
                 vertical: AppSpacing.xxxl,
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   AuthHeaderSection(
-                    title: 'Vytvoř si účet',
-                    subtitle: 'Zaregistruj se a začni objevovat taneční akce',
+                    title: t.auth.register.title,
+                    subtitle: t.auth.register.subtitle,
                     compact: true,
                   ),
-                  SizedBox(height: AppSpacing.xxxl),
-                  RegisterFormSection(),
+                  const SizedBox(height: AppSpacing.xxxl),
+                  const RegisterFormSection(),
                 ],
               ),
             ),
