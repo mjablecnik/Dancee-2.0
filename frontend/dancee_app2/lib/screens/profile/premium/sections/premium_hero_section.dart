@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PremiumHeroSection extends StatelessWidget {
   const PremiumHeroSection({super.key});
@@ -35,8 +36,8 @@ class PremiumHeroSection extends StatelessWidget {
           Center(
             child: ShaderMask(
               shaderCallback: (bounds) => AppGradients.premium.createShader(bounds),
-              child: const Text(
-                'Odemkněte plný potenciál',
+              child: Text(
+                t.premium.heroTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -47,9 +48,9 @@ class PremiumHeroSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          const Center(
+          Center(
             child: Text(
-              'Získejte přístup ke všem prémiové funkcím a zlepšete své taneční zážitky',
+              t.premium.heroSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: appMuted,

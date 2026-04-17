@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PremiumHeaderSection extends StatelessWidget {
   final VoidCallback onBack;
@@ -43,8 +44,8 @@ class PremiumHeaderSection extends StatelessWidget {
           ),
           ShaderMask(
             shaderCallback: (bounds) => AppGradients.premium.createShader(bounds),
-            child: const Text(
-              'Dancee Premium',
+            child: Text(
+              t.premium.title,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: AppTypography.fontSize2xl,

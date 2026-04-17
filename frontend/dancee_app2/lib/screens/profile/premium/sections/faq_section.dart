@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/faq_item.dart';
 
 class FaqSection extends StatelessWidget {
@@ -37,8 +38,8 @@ class FaqSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Časté otázky',
+          Text(
+            t.premium.faqTitle,
             style: TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize2xl,

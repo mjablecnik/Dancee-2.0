@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/testimonial_card.dart';
 
 class TestimonialsSection extends StatelessWidget {
@@ -17,25 +18,25 @@ class TestimonialsSection extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
-            'Co říkají naši uživatelé',
-            style: TextStyle(
+            t.premium.testimonialsTitle,
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize2xl,
               fontWeight: AppTypography.fontWeightBold,
             ),
           ),
-          SizedBox(height: AppSpacing.lg),
-          TestimonialCard(
+          const SizedBox(height: AppSpacing.lg),
+          const TestimonialCard(
             avatarUrl:
                 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg',
             name: 'Martin Dvořák',
             quote:
                 '"Premium předplatné mi úplně změnilo způsob, jak objevuji taneční akce. Upozornění jsou skvělá!"',
           ),
-          SizedBox(height: AppSpacing.md),
-          TestimonialCard(
+          const SizedBox(height: AppSpacing.md),
+          const TestimonialCard(
             avatarUrl:
                 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
             name: 'Jana Svobodová',

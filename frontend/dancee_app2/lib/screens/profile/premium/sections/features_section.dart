@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/feature_item.dart';
 
 class FeaturesSection extends StatelessWidget {
@@ -29,8 +30,8 @@ class FeaturesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Co získáte s Premium',
+          Text(
+            t.premium.featuresTitle,
             style: TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize2xl,
