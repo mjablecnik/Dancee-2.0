@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../core/colors.dart';
 import '../../core/theme.dart';
+import '../../i18n/strings.g.dart';
 
 class AuthHeaderSection extends StatelessWidget {
   final String title;
@@ -51,7 +52,7 @@ class AuthHeaderSection extends StatelessWidget {
         ShaderMask(
           shaderCallback: (bounds) => AppGradients.primary.createShader(bounds),
           child: Text(
-            'Dancee',
+            t.common.appName,
             style: TextStyle(
               color: Colors.white,
               fontSize: appNameFontSize,
@@ -62,7 +63,7 @@ class AuthHeaderSection extends StatelessWidget {
         if (showTagline) ...[
           SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),
           Text(
-            'Objevuj taneční svět',
+            t.auth.tagline,
             style: TextStyle(
               color: appMuted,
               fontSize: compact
