@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/course_repository.dart';
 import '../../../../i18n/strings.g.dart';
 import '../components/featured_course_card.dart';
 
@@ -44,38 +45,39 @@ class FeaturedCoursesSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Row(
-            children: [
-              FeaturedCourseCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/b7b07c55da-1a5df97edf8c1ed85c9a.png',
-                levelLabel: 'Začátečníci',
-                levelColor: appPrimary,
-                title: 'Salsa Cubana pro začátečníky',
-                instructor: 'Dance Studio Praha',
-                dateRange: '15. Led - 30. Dub 2025',
-                styleLabel: 'Salsa',
-                styleColor: appPrimary,
-                price: '2 500 Kč',
-                onTap: () => onCourseTap?.call('salsa-cubana'),
+        FutureBuilder<List<FeaturedCourseData>>(
+          future: const CourseRepository().getFeaturedCourses(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox.shrink();
+            final courses = snapshot.data!;
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: Row(
+                children: courses.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final course = entry.value;
+                  return Row(
+                    children: [
+                      if (index > 0) const SizedBox(width: AppSpacing.lg),
+                      FeaturedCourseCard(
+                        imageUrl: course.imageUrl,
+                        levelLabel: course.levelLabel,
+                        levelColor: course.levelColor,
+                        title: course.title,
+                        instructor: course.instructor,
+                        dateRange: course.dateRange,
+                        styleLabel: course.styleLabel,
+                        styleColor: course.styleColor,
+                        price: course.price,
+                        onTap: () => onCourseTap?.call(course.id),
+                      ),
+                    ],
+                  );
+                }).toList(),
               ),
-              const SizedBox(width: AppSpacing.lg),
-              FeaturedCourseCard(
-                imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/5a2ccba7af-f45a64d9fa0f2acd8902.png',
-                levelLabel: 'Pokročilí',
-                levelColor: appAccent,
-                title: 'Bachata Sensual Advanced',
-                instructor: 'Carlos & Maria',
-                dateRange: '1. Úno - 15. Kvě 2025',
-                styleLabel: 'Bachata',
-                styleColor: appAccent,
-                price: '3 200 Kč',
-                onTap: () => onCourseTap?.call('bachata-sensual'),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );

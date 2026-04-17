@@ -2,104 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
-
-class DanceStyleItem {
-  final String name;
-  final String subtitle;
-  final IconData icon;
-  final Color gradientStart;
-  final Color gradientEnd;
-
-  const DanceStyleItem({
-    required this.name,
-    required this.subtitle,
-    required this.icon,
-    required this.gradientStart,
-    required this.gradientEnd,
-  });
-}
-
-const _defaultStyles = [
-  DanceStyleItem(
-    name: 'Salsa',
-    subtitle: 'Kubánská, On1, On2',
-    icon: FontAwesomeIcons.music,
-    gradientStart: appPrimary,
-    gradientEnd: appPrimaryDark,
-  ),
-  DanceStyleItem(
-    name: 'Bachata',
-    subtitle: 'Sensual, Dominicana',
-    icon: FontAwesomeIcons.heart,
-    gradientStart: appAccent,
-    gradientEnd: appPink,
-  ),
-  DanceStyleItem(
-    name: 'Kizomba',
-    subtitle: 'Urban Kiz, Semba',
-    icon: FontAwesomeIcons.fire,
-    gradientStart: appViolet,
-    gradientEnd: appVioletDark,
-  ),
-  DanceStyleItem(
-    name: 'Zouk',
-    subtitle: 'Brazilian Zouk, Lambada',
-    icon: FontAwesomeIcons.leaf,
-    gradientStart: appEmerald,
-    gradientEnd: appSuccessDark,
-  ),
-  DanceStyleItem(
-    name: 'Reggaeton',
-    subtitle: 'Urban Latin',
-    icon: FontAwesomeIcons.fireFlameSimple,
-    gradientStart: appWarning,
-    gradientEnd: appError,
-  ),
-  DanceStyleItem(
-    name: 'Tango',
-    subtitle: 'Argentinské, Ballroom',
-    icon: FontAwesomeIcons.bolt,
-    gradientStart: appYellow,
-    gradientEnd: appAmberDark,
-  ),
-  DanceStyleItem(
-    name: 'Swing',
-    subtitle: 'Lindy Hop, Charleston',
-    icon: FontAwesomeIcons.crown,
-    gradientStart: appCyan,
-    gradientEnd: appPrimary,
-  ),
-  DanceStyleItem(
-    name: 'Ballroom',
-    subtitle: 'Standardní, Latinsko-americké',
-    icon: FontAwesomeIcons.star,
-    gradientStart: appPink,
-    gradientEnd: appRose,
-  ),
-  DanceStyleItem(
-    name: 'Afro',
-    subtitle: 'Afrohouse, Kuduro',
-    icon: FontAwesomeIcons.drum,
-    gradientStart: appIndigo,
-    gradientEnd: appPurple,
-  ),
-  DanceStyleItem(
-    name: 'Forró',
-    subtitle: 'Brazilský lidový tanec',
-    icon: FontAwesomeIcons.umbrellaBeach,
-    gradientStart: appError,
-    gradientEnd: appHotPink,
-  ),
-];
+import '../../../../data/event_repository.dart';
 
 class DanceStylesListSection extends StatelessWidget {
-  final List<DanceStyleItem> styles;
+  final List<DanceStyleData> styles;
   final Map<String, bool> selected;
   final ValueChanged<String> onToggle;
 
   const DanceStylesListSection({
     super.key,
-    this.styles = _defaultStyles,
+    required this.styles,
     required this.selected,
     required this.onToggle,
   });
@@ -131,7 +43,7 @@ class DanceStylesListSection extends StatelessWidget {
 }
 
 class _StyleRow extends StatelessWidget {
-  final DanceStyleItem style;
+  final DanceStyleData style;
   final bool isChecked;
   final bool isLast;
   final VoidCallback onToggle;

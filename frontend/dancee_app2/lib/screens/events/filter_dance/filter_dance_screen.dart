@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../data/event_repository.dart';
 import '../../../i18n/strings.g.dart';
 import 'sections/dance_styles_list_section.dart';
 import 'sections/filter_bottom_actions_section.dart';
@@ -16,18 +16,21 @@ class FilterDanceScreen extends StatefulWidget {
 }
 
 class _FilterDanceScreenState extends State<FilterDanceScreen> {
-  final Map<String, bool> _selected = {
-    'Salsa': false,
-    'Bachata': false,
-    'Kizomba': false,
-    'Zouk': false,
-    'Reggaeton': false,
-    'Tango': false,
-    'Swing': false,
-    'Ballroom': false,
-    'Afro': false,
-    'Forró': false,
-  };
+  List<DanceStyleData> _styles = [];
+  Map<String, bool> _selected = {};
+
+  @override
+  void initState() {
+    super.initState();
+    const EventRepository().getDanceStyles().then((styles) {
+      if (mounted) {
+        setState(() {
+          _styles = styles;
+          _selected = {for (final s in styles) s.name: false};
+        });
+      }
+    });
+  }
 
   int get _selectedCount => _selected.values.where((v) => v).length;
 
@@ -70,6 +73,7 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DanceStylesListSection(
+                    styles: _styles,
                     selected: _selected,
                     onToggle: (name) => setState(
                       () => _selected[name] = !(_selected[name] ?? false),
