@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class FilterLocationHeaderSection extends StatelessWidget {
   final TextEditingController controller;
@@ -43,8 +44,8 @@ class FilterLocationHeaderSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.lg),
-              const Text(
-                'Vybrat lokalitu',
+              Text(
+                t.events.filter.selectLocation,
                 style: TextStyle(
                   fontSize: AppTypography.fontSize3xl,
                   fontWeight: AppTypography.fontWeightBold,
@@ -73,8 +74,8 @@ class FilterLocationHeaderSection extends StatelessWidget {
                       fontSize: AppTypography.fontSizeMd,
                       color: appText,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: 'Hledat město nebo oblast...',
+                    decoration: InputDecoration(
+                      hintText: t.events.filter.searchCityHint,
                       hintStyle: TextStyle(
                         fontSize: AppTypography.fontSizeMd,
                         color: appMuted,

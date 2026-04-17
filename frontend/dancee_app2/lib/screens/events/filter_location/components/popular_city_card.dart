@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PopularCityCard extends StatelessWidget {
   final String name;
@@ -82,8 +83,8 @@ class PopularCityCard extends StatelessWidget {
                       color: appPrimary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(AppRadius.xs),
                     ),
-                    child: const Text(
-                      'Aktuální',
+                    child: Text(
+                      t.common.current,
                       style: TextStyle(
                         fontSize: AppTypography.fontSizeSm,
                         fontWeight: AppTypography.fontWeightMedium,

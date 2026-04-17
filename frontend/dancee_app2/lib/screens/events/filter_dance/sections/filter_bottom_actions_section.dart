@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class FilterBottomActionsSection extends StatelessWidget {
   final int selectedCount;
@@ -43,7 +44,7 @@ class FilterBottomActionsSection extends StatelessWidget {
             boxShadow: [AppShadows.primaryLg],
           ),
           child: Text(
-            selectedCount > 0 ? 'Použít filtr ($selectedCount)' : 'Použít filtr',
+            selectedCount > 0 ? t.events.filter.applyCount(count: selectedCount) : t.events.filter.apply,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: AppTypography.fontSizeXl,

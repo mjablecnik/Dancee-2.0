@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class CurrentLocationSection extends StatelessWidget {
   final VoidCallback? onTap;
@@ -31,22 +32,22 @@ class CurrentLocationSection extends StatelessWidget {
               child: const Icon(FontAwesomeIcons.locationCrosshairs, size: 20, color: appPrimary),
             ),
             const SizedBox(width: AppSpacing.lg),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Použít moji polohu',
-                    style: TextStyle(
+                    t.events.filter.useMyLocation,
+                    style: const TextStyle(
                       fontSize: AppTypography.fontSizeLg,
                       fontWeight: AppTypography.fontWeightSemiBold,
                       color: appText,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
-                    'Automaticky najde akce ve vašem okolí',
-                    style: TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
+                    t.events.filter.useMyLocationSubtitle,
+                    style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
                   ),
                 ],
               ),

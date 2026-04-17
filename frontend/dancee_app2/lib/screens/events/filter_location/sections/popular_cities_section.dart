@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/popular_city_card.dart';
 
 class PopularCityData {
@@ -69,8 +70,8 @@ class PopularCitiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Oblíbená města',
+        Text(
+          t.events.filter.popularCities,
           style: TextStyle(
             fontSize: AppTypography.fontSize2xl,
             fontWeight: FontWeight.bold,
