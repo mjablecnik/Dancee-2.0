@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 
 class OnboardingStep1Section extends StatelessWidget {
@@ -34,18 +35,18 @@ class OnboardingStep1Section extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Jaké tance tě baví?',
-            style: TextStyle(
+          Text(
+            t.onboarding.step1.title,
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize4xl,
               fontWeight: AppTypography.fontWeightBold,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'Vyber své oblíbené taneční styly, abychom ti mohli nabídnout relevantní akce',
-            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+          Text(
+            t.onboarding.step1.subtitle,
+            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
           const SizedBox(height: AppSpacing.xxl),
           Expanded(
@@ -101,7 +102,7 @@ class OnboardingStep1Section extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           GradientButton(
-            label: 'Pokračovat',
+            label: t.common.continue_,
             onTap: onNext,
           ),
           const SizedBox(height: AppSpacing.xxl),

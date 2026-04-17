@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class RadiusSelector extends StatelessWidget {
   final List<String> radii;
@@ -26,9 +27,9 @@ class RadiusSelector extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Vyhledat akce v okruhu',
-            style: TextStyle(
+          Text(
+            t.onboarding.step3.searchRadius,
+            style: const TextStyle(
               color: appMuted,
               fontSize: AppTypography.fontSizeSm,
               fontWeight: AppTypography.fontWeightMedium,

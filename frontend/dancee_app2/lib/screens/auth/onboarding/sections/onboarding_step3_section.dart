@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/buttons/outline_button.dart';
 import '../components/radius_selector.dart';
@@ -20,7 +21,12 @@ class OnboardingStep3Section extends StatelessWidget {
     required this.onFinish,
   });
 
-  static const _radii = ['10 km', '25 km', '50 km', 'Celá republika'];
+  List<String> get _radii => [
+        t.onboarding.step3.radius10km,
+        t.onboarding.step3.radius25km,
+        t.onboarding.step3.radius50km,
+        t.onboarding.step3.radiusAll,
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +35,18 @@ class OnboardingStep3Section extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Kde se nacházíš?',
-            style: TextStyle(
+          Text(
+            t.onboarding.step3.title,
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize4xl,
               fontWeight: AppTypography.fontWeightBold,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'Najdeme pro tebe nejbližší taneční akce ve tvém okolí',
-            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+          Text(
+            t.onboarding.step3.subtitle,
+            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
           const SizedBox(height: AppSpacing.xxl),
           Expanded(
@@ -67,7 +73,7 @@ class OnboardingStep3Section extends StatelessWidget {
             children: [
               Expanded(
                 child: AppOutlineButton(
-                  label: 'Zpět',
+                  label: t.common.back,
                   onTap: onBack,
                 ),
               ),
@@ -75,7 +81,7 @@ class OnboardingStep3Section extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: GradientButton(
-                  label: 'Dokončit',
+                  label: t.common.finish,
                   onTap: onFinish,
                 ),
               ),
@@ -101,9 +107,9 @@ class _CityInputField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Město',
-            style: TextStyle(
+          Text(
+            t.common.form.city,
+            style: const TextStyle(
               color: appMuted,
               fontSize: AppTypography.fontSizeSm,
               fontWeight: AppTypography.fontWeightMedium,
@@ -117,28 +123,28 @@ class _CityInputField extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: appBorder),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                SizedBox(width: AppSpacing.lg),
-                FaIcon(
+                const SizedBox(width: AppSpacing.lg),
+                const FaIcon(
                   FontAwesomeIcons.locationDot,
                   color: appPrimary,
                   size: 14,
                 ),
-                SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: TextField(
-                    style: TextStyle(color: appText),
+                    style: const TextStyle(color: appText),
                     decoration: InputDecoration(
-                      hintText: 'Např. Praha, Brno...',
-                      hintStyle: TextStyle(color: appMuted),
+                      hintText: t.onboarding.step3.cityHint,
+                      hintStyle: const TextStyle(color: appMuted),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
                 ),
-                SizedBox(width: AppSpacing.lg),
+                const SizedBox(width: AppSpacing.lg),
               ],
             ),
           ),
@@ -160,18 +166,18 @@ class _UseCurrentLocationButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: appPrimary.withValues(alpha: 0.3)),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(
+            const FaIcon(
               FontAwesomeIcons.locationCrosshairs,
               color: appPrimary,
               size: 18,
             ),
-            SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.md),
             Text(
-              'Použít aktuální polohu',
-              style: TextStyle(
+              t.onboarding.step3.useCurrentLocation,
+              style: const TextStyle(
                 color: appPrimary,
                 fontSize: AppTypography.fontSizeLg,
                 fontWeight: AppTypography.fontWeightSemiBold,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/buttons/outline_button.dart';
 
@@ -33,18 +34,18 @@ class OnboardingStep2Section extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Jaká je tvoje úroveň?',
-            style: TextStyle(
+          Text(
+            t.onboarding.step2.title,
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize4xl,
               fontWeight: AppTypography.fontWeightBold,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'Pomůže nám to doporučit ti vhodné akce a kurzy',
-            style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+          Text(
+            t.onboarding.step2.subtitle,
+            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
           ),
           const SizedBox(height: AppSpacing.xxl),
           Expanded(
@@ -142,7 +143,7 @@ class OnboardingStep2Section extends StatelessWidget {
             children: [
               Expanded(
                 child: AppOutlineButton(
-                  label: 'Zpět',
+                  label: t.common.back,
                   onTap: onBack,
                 ),
               ),
@@ -150,7 +151,7 @@ class OnboardingStep2Section extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: GradientButton(
-                  label: 'Pokračovat',
+                  label: t.common.continue_,
                   onTap: onNext,
                 ),
               ),
