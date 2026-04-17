@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class FilterDanceHeaderSection extends StatelessWidget {
   final String selectedCountText;
@@ -47,8 +48,8 @@ class FilterDanceHeaderSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Taneční styly',
+                Text(
+                  t.events.danceStyles,
                   style: TextStyle(
                     fontSize: AppTypography.fontSize3xl,
                     fontWeight: AppTypography.fontWeightBold,
@@ -67,8 +68,8 @@ class FilterDanceHeaderSection extends StatelessWidget {
           ),
           TextButton(
             onPressed: onClear,
-            child: const Text(
-              'Vymazat',
+            child: Text(
+              t.common.clear,
               style: TextStyle(
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightMedium,

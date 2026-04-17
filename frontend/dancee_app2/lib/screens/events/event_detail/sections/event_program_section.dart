@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/program_day_card.dart';
 import '../components/program_slot_item.dart';
 
@@ -30,8 +31,8 @@ class _EventProgramSectionState extends State<EventProgramSection> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Program akce',
+              Text(
+                t.events.detail.program,
                 style: TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize2xl,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class AdditionalInfoSection extends StatelessWidget {
   final String priceRange;
@@ -22,8 +23,8 @@ class AdditionalInfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Dodatečné informace',
+        Text(
+          t.events.detail.additionalInfo,
           style: TextStyle(
             color: appText,
             fontSize: AppTypography.fontSize2xl,
@@ -40,9 +41,9 @@ class AdditionalInfoSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildInfoRow(label: 'Vstupné', value: priceRange),
+              _buildInfoRow(label: t.events.detail.admission, value: priceRange),
               const SizedBox(height: AppSpacing.md),
-              _buildInfoRow(label: 'Dresscode', value: dresscode),
+              _buildInfoRow(label: t.events.detail.dresscode, value: dresscode),
               const SizedBox(height: AppSpacing.lg),
               _buildBuyTicketsButton(),
               const SizedBox(height: AppSpacing.sm),
@@ -88,13 +89,13 @@ class AdditionalInfoSection extends StatelessWidget {
           color: appPrimary,
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(FontAwesomeIcons.ticket, size: 14, color: Colors.white),
-            SizedBox(width: AppSpacing.sm),
+            const FaIcon(FontAwesomeIcons.ticket, size: 14, color: Colors.white),
+            const SizedBox(width: AppSpacing.sm),
             Text(
-              'Koupit vstupenky',
+              t.events.detail.buyTickets,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: AppTypography.fontSizeMd,
@@ -118,13 +119,13 @@ class AdditionalInfoSection extends StatelessWidget {
           border: Border.all(color: appBorder),
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, size: 14, color: appText),
-            SizedBox(width: AppSpacing.sm),
+            const FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, size: 14, color: appText),
+            const SizedBox(width: AppSpacing.sm),
             Text(
-              'Původní zdroj',
+              t.events.detail.originalSource,
               style: TextStyle(
                 color: appText,
                 fontSize: AppTypography.fontSizeMd,

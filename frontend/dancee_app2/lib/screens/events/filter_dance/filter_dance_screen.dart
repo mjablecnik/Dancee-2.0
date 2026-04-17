@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import 'sections/dance_styles_list_section.dart';
 import 'sections/filter_bottom_actions_section.dart';
 import 'sections/filter_dance_header_section.dart';
@@ -32,10 +33,7 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
 
   String get _selectedCountText {
     final count = _selectedCount;
-    if (count == 0) return '0 vybraných';
-    if (count == 1) return '1 vybraný';
-    if (count < 5) return '$count vybrané';
-    return '$count vybraných';
+    return t.events.filter.selectedCount(count: count);
   }
 
   void _clearAll() => setState(() {
