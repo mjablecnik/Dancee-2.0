@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class LogoutSection extends StatelessWidget {
   final VoidCallback onLogout;
@@ -25,13 +26,13 @@ class LogoutSection extends StatelessWidget {
         children: [
           _DangerRow(
             icon: FontAwesomeIcons.rightFromBracket,
-            title: 'Odhlásit se',
+            title: t.profile.danger.logout,
             onTap: onLogout,
             showDivider: true,
           ),
           _DangerRow(
             icon: FontAwesomeIcons.trash,
-            title: 'Smazat účet',
+            title: t.profile.danger.deleteAccount,
             onTap: onDeleteAccount,
             showDivider: false,
           ),

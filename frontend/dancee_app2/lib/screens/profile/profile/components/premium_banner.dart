@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PremiumBanner extends StatelessWidget {
   final VoidCallback onTap;
@@ -36,22 +37,22 @@ class PremiumBanner extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.lg),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Dancee Premium',
-                    style: TextStyle(
+                    t.premium.title,
+                    style: const TextStyle(
                       color: appText,
                       fontSize: AppTypography.fontSizeXl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
-                    'Odemkněte všechny funkce',
-                    style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+                    t.premium.bannerSubtitle,
+                    style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                   ),
                 ],
               ),

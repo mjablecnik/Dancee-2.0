@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import 'sections/password_form_section.dart';
 import 'sections/security_banner_section.dart';
@@ -16,7 +17,7 @@ class ChangePasswordScreen extends StatelessWidget {
       body: Column(
         children: [
           BackButtonHeader(
-            title: 'Změnit heslo',
+            title: t.profile.changePassword.title,
             onBack: () => context.pop(),
           ),
           Expanded(

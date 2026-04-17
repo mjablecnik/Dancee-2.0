@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 import '../components/password_strength_bar.dart';
 import '../components/password_requirement_row.dart';
 
@@ -63,8 +64,8 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
     return Column(
       children: [
         _buildPasswordField(
-          label: 'Současné heslo',
-          placeholder: 'Zadejte současné heslo',
+          label: t.profile.changePassword.currentPassword,
+          placeholder: t.profile.changePassword.currentPasswordHint,
           controller: _currentPasswordController,
           visible: _currentPasswordVisible,
           onToggle: () =>
@@ -153,9 +154,9 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Nové heslo',
-          style: TextStyle(
+        Text(
+          t.profile.changePassword.newPassword,
+          style: const TextStyle(
             color: appText,
             fontSize: AppTypography.fontSizeMd,
             fontWeight: AppTypography.fontWeightMedium,
@@ -185,7 +186,7 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
                     fontSize: AppTypography.fontSizeMd,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Zadejte nové heslo',
+                    hintText: t.profile.changePassword.newPasswordHint,
                     hintStyle: TextStyle(color: appMuted.withValues(alpha: 0.6)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -224,9 +225,9 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Potvrdit nové heslo',
-          style: TextStyle(
+        Text(
+          t.profile.changePassword.confirmPassword,
+          style: const TextStyle(
             color: appText,
             fontSize: AppTypography.fontSizeMd,
             fontWeight: AppTypography.fontWeightMedium,
@@ -251,7 +252,7 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
                     fontSize: AppTypography.fontSizeMd,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Zadejte nové heslo znovu',
+                    hintText: t.profile.changePassword.confirmPasswordHint,
                     hintStyle: TextStyle(color: appMuted.withValues(alpha: 0.6)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -280,9 +281,9 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
         ),
         if (_passwordMismatch) ...[
           const SizedBox(height: 6),
-          const Text(
-            'Hesla se neshodují',
-            style: TextStyle(
+          Text(
+            t.auth.register.passwordsMismatch,
+            style: const TextStyle(
               color: appError,
               fontSize: AppTypography.fontSizeSm,
             ),
@@ -308,14 +309,14 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
               elevation: 4,
               shadowColor: appPrimary.withValues(alpha: 0.4),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FaIcon(FontAwesomeIcons.check, size: 14, color: Colors.white),
-                SizedBox(width: AppSpacing.sm),
+                const FaIcon(FontAwesomeIcons.check, size: 14, color: Colors.white),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
-                  'Uložit nové heslo',
-                  style: TextStyle(
+                  t.profile.changePassword.save,
+                  style: const TextStyle(
                     fontSize: AppTypography.fontSizeLg,
                     fontWeight: AppTypography.fontWeightSemiBold,
                   ),
@@ -337,9 +338,9 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppRadius.lg)),
             ),
-            child: const Text(
-              'Zrušit',
-              style: TextStyle(
+            child: Text(
+              t.common.cancel,
+              style: const TextStyle(
                 fontSize: AppTypography.fontSizeLg,
                 fontWeight: AppTypography.fontWeightMedium,
               ),
@@ -355,9 +356,9 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(color: appBorder, height: 48),
-        const Text(
-          'POŽADAVKY NA HESLO',
-          style: TextStyle(
+        Text(
+          t.profile.changePassword.requirements,
+          style: const TextStyle(
             color: appMuted,
             fontSize: AppTypography.fontSizeSm,
             fontWeight: AppTypography.fontWeightSemiBold,
@@ -365,16 +366,15 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        const PasswordRequirementRow(text: 'Minimálně 8 znaků'),
+        PasswordRequirementRow(text: t.profile.changePassword.req8chars),
         const SizedBox(height: 10),
-        const PasswordRequirementRow(text: 'Alespoň jedno velké písmeno (A-Z)'),
+        PasswordRequirementRow(text: t.profile.changePassword.reqUppercase),
         const SizedBox(height: 10),
-        const PasswordRequirementRow(text: 'Alespoň jedno malé písmeno (a-z)'),
+        PasswordRequirementRow(text: t.profile.changePassword.reqLowercase),
         const SizedBox(height: 10),
-        const PasswordRequirementRow(text: 'Alespoň jedno číslo (0-9)'),
+        PasswordRequirementRow(text: t.profile.changePassword.reqNumber),
         const SizedBox(height: 10),
-        const PasswordRequirementRow(
-            text: r'Alespoň jeden speciální znak (!@#$%^&*)'),
+        PasswordRequirementRow(text: t.profile.changePassword.reqSpecial),
       ],
     );
   }
@@ -389,8 +389,8 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
             FaIcon(FontAwesomeIcons.circleQuestion, size: 14, color: appPrimary),
             SizedBox(width: 6),
             Text(
-              'Zapomněli jste heslo?',
-              style: TextStyle(
+              t.profile.changePassword.forgotPassword,
+              style: const TextStyle(
                 color: appPrimary,
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightMedium,

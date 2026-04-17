@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class SecurityBannerSection extends StatelessWidget {
   const SecurityBannerSection({super.key});
@@ -37,22 +38,22 @@ class SecurityBannerSection extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.md),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Zabezpečte svůj účet',
-                  style: TextStyle(
+                  t.profile.changePassword.secureAccount,
+                  style: const TextStyle(
                     color: appText,
                     fontSize: AppTypography.fontSizeMd,
                     fontWeight: AppTypography.fontWeightSemiBold,
                   ),
                 ),
-                SizedBox(height: AppSpacing.xs),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Silné heslo musí obsahovat alespoň 8 znaků, velká a malá písmena, čísla a speciální znaky.',
-                  style: TextStyle(
+                  t.profile.changePassword.secureAccountDetail,
+                  style: const TextStyle(
                     color: appMuted,
                     fontSize: AppTypography.fontSizeSm,
                     height: 1.5,
