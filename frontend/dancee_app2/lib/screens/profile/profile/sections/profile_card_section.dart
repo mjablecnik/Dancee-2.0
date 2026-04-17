@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../components/dance_tag.dart';
 
 class ProfileCardSection extends StatelessWidget {
   final String name;
@@ -65,40 +66,13 @@ class ProfileCardSection extends StatelessWidget {
                   spacing: 6,
                   runSpacing: 6,
                   children: danceTags
-                      .map((tag) => _DanceTag(label: tag.label, color: tag.color))
+                      .map((tag) => DanceTag(label: tag.label, color: tag.color))
                       .toList(),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DanceTag extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _DanceTag({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-        borderRadius: BorderRadius.circular(AppRadius.full),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: AppTypography.fontSizeSm,
-          fontWeight: AppTypography.fontWeightSemiBold,
-        ),
       ),
     );
   }
