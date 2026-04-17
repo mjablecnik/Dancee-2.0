@@ -15,6 +15,7 @@ import 'screens/profile/profile_screen.dart';
 import 'screens/profile/profile_edit_screen.dart';
 import 'screens/profile/change_password_screen.dart';
 import 'screens/profile/premium_screen.dart';
+import 'screens/profile/author_contact_screen.dart';
 
 void main() {
   runApp(const DanceeApp());
@@ -78,6 +79,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/premium',
       builder: (context, state) => const PremiumScreen(),
+    ),
+    GoRoute(
+      path: '/author-contact',
+      builder: (context, state) => const AuthorContactScreen(),
     ),
   ],
 );
