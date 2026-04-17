@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+import '../../../../core/colors.dart';
+import '../../../../core/theme.dart';
+
+class CityData {
+  final String name;
+  final String count;
+
+  const CityData({required this.name, required this.count});
+}
+
+class AllCitiesSection extends StatelessWidget {
+  final List<CityData> cities;
+  final ValueChanged<CityData>? onCityTap;
+
+  const AllCitiesSection({
+    super.key,
+    required this.cities,
+    this.onCityTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Všechna města',
+          style: TextStyle(
+            fontSize: AppTypography.fontSize2xl,
+            fontWeight: FontWeight.bold,
+            color: appText,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Column(
+          children: cities
+              .map((city) => _CityRow(city: city, onTap: () => onCityTap?.call(city)))
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _CityRow extends StatelessWidget {
+  final CityData city;
+  final VoidCallback? onTap;
+
+  const _CityRow({required this.city, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              city.name,
+              style: const TextStyle(fontSize: AppTypography.fontSizeLg, color: appText),
+            ),
+            Text(
+              city.count,
+              style: const TextStyle(fontSize: AppTypography.fontSizeMd, color: appMuted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
