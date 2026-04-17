@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class BioSection extends StatelessWidget {
   final String initialBio;
@@ -28,8 +29,8 @@ class BioSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Popis',
+            Text(
+              t.profile.editProfile.bio,
               style: TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeSm,
@@ -45,7 +46,7 @@ class BioSection extends StatelessWidget {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Napište něco o sobě...',
+                hintText: t.profile.editProfile.bioHint,
                 hintStyle: TextStyle(color: appMuted),
               ),
             ),

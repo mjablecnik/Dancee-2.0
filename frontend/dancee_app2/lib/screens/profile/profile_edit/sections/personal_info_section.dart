@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class PersonalInfoSection extends StatelessWidget {
   final String initialName;
@@ -27,25 +28,25 @@ class PersonalInfoSection extends StatelessWidget {
       child: Column(
         children: [
           _PersonalInfoField(
-            label: 'Jméno a příjmení',
+            label: t.common.form.fullName,
             initialValue: initialName,
             keyboardType: TextInputType.name,
           ),
           const SizedBox(height: AppSpacing.lg),
           _PersonalInfoField(
-            label: 'E-mail',
+            label: t.common.form.email,
             initialValue: initialEmail,
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: AppSpacing.lg),
           _PersonalInfoField(
-            label: 'Telefon',
+            label: t.common.form.phone,
             initialValue: initialPhone,
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: AppSpacing.lg),
           _PersonalInfoField(
-            label: 'Město',
+            label: t.common.form.city,
             initialValue: initialCity,
             keyboardType: TextInputType.text,
           ),

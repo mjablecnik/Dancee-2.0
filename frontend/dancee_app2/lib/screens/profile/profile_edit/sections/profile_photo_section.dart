@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../i18n/strings.g.dart';
 
 class ProfilePhotoSection extends StatelessWidget {
   final String avatarUrl;
@@ -59,8 +60,8 @@ class ProfilePhotoSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           GestureDetector(
             onTap: onChangeTap,
-            child: const Text(
-              'Změnit fotku',
+            child: Text(
+              t.profile.editProfile.changePhoto,
               style: TextStyle(
                 color: appPrimary,
                 fontSize: AppTypography.fontSizeMd,

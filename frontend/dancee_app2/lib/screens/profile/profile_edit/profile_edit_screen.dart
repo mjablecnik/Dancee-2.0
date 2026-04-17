@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import '../../../shared/elements/labels/section_label.dart';
 import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
@@ -34,17 +35,23 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   String _level = 'Mírně pokročilý';
 
-  final Map<String, bool> _notifications = {
-    'Nové akce': true,
-    'Připomínky akcí': true,
-    'Marketingové zprávy': false,
-  };
+  late Map<String, bool> _notifications;
+  late Map<String, String> _notificationSubtitles;
 
-  final Map<String, String> _notificationSubtitles = {
-    'Nové akce': 'Upozornění na nové taneční akce',
-    'Připomínky akcí': 'Připomenout uložené akce',
-    'Marketingové zprávy': 'Tipy a novinky o tancování',
-  };
+  @override
+  void initState() {
+    super.initState();
+    _notifications = {
+      t.profile.editProfile.notifications.newEvents: true,
+      t.profile.editProfile.notifications.eventReminders: true,
+      t.profile.editProfile.notifications.marketing: false,
+    };
+    _notificationSubtitles = {
+      t.profile.editProfile.notifications.newEvents: t.profile.editProfile.notificationSubtitles.newEvents,
+      t.profile.editProfile.notifications.eventReminders: t.profile.editProfile.notificationSubtitles.eventReminders,
+      t.profile.editProfile.notifications.marketing: t.profile.editProfile.notificationSubtitles.marketing,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +60,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       body: Column(
         children: [
           BackButtonHeader(
-            title: 'Upravit profil',
+            title: t.profile.editProfile.title,
             onBack: () => context.pop(),
             trailing: GestureDetector(
               onTap: () => context.pop(),
@@ -81,9 +88,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   ProfilePhotoSection(
                     avatarUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg',
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: 'Osobní údaje'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: t.profile.editProfile.sections.personalInfo),
                   ),
                   const PersonalInfoSection(
                     initialName: 'Tereza Nováková',
@@ -91,16 +98,16 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     initialPhone: '+420 123 456 789',
                     initialCity: 'Praha',
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: 'O mně'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: t.profile.editProfile.sections.aboutMe),
                   ),
                   BioSection(
                     initialBio: 'Miluji tanec a poznávání nových lidí. Tancuji už 5 let a stále se učím nové styly.',
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: 'Oblíbené tance'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: t.profile.editProfile.sections.favoriteDances),
                   ),
                   DancePreferencesSection(
                     preferences: _dancePrefs,
@@ -108,23 +115,23 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       ..clear()
                       ..addAll(prefs)),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: 'Úroveň'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: t.profile.editProfile.sections.level),
                   ),
                   ExperienceLevelSection(
                     levels: const ['Začátečník', 'Mírně pokročilý', 'Pokročilý', 'Expert'],
                     selectedLevel: _level,
                     onChanged: (level) => setState(() => _level = level),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: 'Sociální sítě'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: t.profile.editProfile.sections.socialNetworks),
                   ),
                   const SocialLinksSection(),
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
-                    child: SectionLabel(title: 'Oznámení'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.md),
+                    child: SectionLabel(title: t.profile.editProfile.sections.notifications),
                   ),
                   NotificationsSection(
                     notifications: _notifications,
@@ -139,12 +146,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       bottomSheet: SaveButtonSection(onSave: () => context.pop()),
       bottomNavigationBar: AppBottomNavBar(
         leftItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.house, label: 'Domů', onTap: () => context.go('/events')),
-          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: 'Hledat', onTap: () => context.go('/events')),
+          AppNavBarItem(icon: FontAwesomeIcons.house, label: t.nav.home, onTap: () => context.go('/events')),
+          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: t.nav.search, onTap: () => context.go('/events')),
         ],
         rightItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.heart, label: 'Uložené', onTap: () => context.go('/events')),
-          AppNavBarItem(icon: FontAwesomeIcons.user, label: 'Profil', isActive: true, onTap: () => context.go('/profile')),
+          AppNavBarItem(icon: FontAwesomeIcons.heart, label: t.nav.saved, onTap: () => context.go('/events')),
+          AppNavBarItem(icon: FontAwesomeIcons.user, label: t.nav.profile, isActive: true, onTap: () => context.go('/profile')),
         ],
       ),
     );

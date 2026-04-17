@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../core/colors.dart';
 import '../../../../../core/theme.dart';
+import '../../../../../i18n/strings.g.dart';
 
 class FinalCtaSection extends StatelessWidget {
   const FinalCtaSection({super.key});
@@ -35,8 +36,8 @@ class FinalCtaSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text(
-              'Připraveni začít?',
+            Text(
+              t.premium.ctaTitle,
               style: TextStyle(
                 color: appText,
                 fontSize: AppTypography.fontSize3xl,
@@ -44,8 +45,8 @@ class FinalCtaSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            const Text(
-              'Připojte se k tisícům spokojených tanečníků',
+            Text(
+              t.premium.ctaSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
@@ -65,8 +66,8 @@ class FinalCtaSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
                 ),
-                child: const Text(
-                  'Získat Premium nyní',
+                child: Text(
+                  t.premium.ctaButton,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: AppTypography.fontSizeLg,
@@ -76,8 +77,8 @@ class FinalCtaSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text(
-              '7 dní zdarma · Zrušte kdykoliv',
+            Text(
+              t.premium.ctaNote,
               style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
             ),
           ],
