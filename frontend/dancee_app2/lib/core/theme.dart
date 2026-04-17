@@ -155,7 +155,7 @@ class AppGradients {
     colors: [appPrimary, appAccent, appPink],
   );
 
-  static LinearGradient heroOverlay = LinearGradient(
+  static LinearGradient heroOverlay = const LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [

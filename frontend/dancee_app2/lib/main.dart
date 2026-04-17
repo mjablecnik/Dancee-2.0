@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
+import 'i18n/strings.g.dart';
 import 'screens/auth/login/login_screen.dart';
 import 'screens/auth/register/register_screen.dart';
 import 'screens/auth/forgot_password/forgot_password_screen.dart';
@@ -17,8 +19,24 @@ import 'screens/profile/change_password/change_password_screen.dart';
 import 'screens/profile/premium/premium_screen.dart';
 import 'screens/profile/author_contact/author_contact_screen.dart';
 
-void main() {
-  runApp(const DanceeApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _initLocale();
+  runApp(TranslationProvider(child: const DanceeApp()));
+}
+
+Future<void> _initLocale() async {
+  final prefs = await SharedPreferences.getInstance();
+  final localeCode = prefs.getString('locale');
+  if (localeCode != null) {
+    final locale = AppLocale.values.firstWhere(
+      (l) => l.languageCode == localeCode,
+      orElse: () => AppLocale.en,
+    );
+    LocaleSettings.setLocale(locale);
+  } else {
+    LocaleSettings.setLocale(AppLocale.en);
+  }
 }
 
 final _router = GoRouter(
@@ -101,10 +119,12 @@ class DanceeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Dancee',
+      title: t.common.appName,
       theme: AppTheme.theme,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocale.values.map((l) => l.flutterLocale).toList(),
     );
   }
 }

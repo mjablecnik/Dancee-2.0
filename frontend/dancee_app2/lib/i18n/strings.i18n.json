@@ -1,0 +1,284 @@
+{
+  "common": {
+    "appName": "Dancee",
+    "showAll": "Show all",
+    "date": "Date",
+    "save": "Save",
+    "share": "Share",
+    "map": "Map",
+    "skip": "Skip",
+    "continue_": "Continue",
+    "back": "Back",
+    "finish": "Finish",
+    "cancel": "Cancel",
+    "support": "Support",
+    "faq": "FAQ",
+    "clear": "Clear",
+    "current": "Current",
+    "saveChanges": "Save changes",
+    "form": {
+      "email": "E-mail",
+      "emailHint": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "Confirm password",
+      "firstName": "First name",
+      "firstNameHint": "Your first name",
+      "lastName": "Last name",
+      "lastNameHint": "Your last name",
+      "city": "City",
+      "phone": "Phone",
+      "fullName": "Full name"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "saved": "Saved",
+    "profile": "Profile",
+    "courses": "Courses"
+  },
+  "auth": {
+    "tagline": "Discover the dancing world",
+    "orContinueWith": "or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "termsPrefix": "By continuing you agree to our ",
+    "termsOfUse": "Terms of use",
+    "and": " and ",
+    "privacyPolicy": "Privacy policy",
+    "agreeWith": "I agree with ",
+    "orRegisterWith": "or register with",
+    "login": {
+      "title": "Welcome back!",
+      "subtitle": "Sign in and continue exploring dance events",
+      "stayLoggedIn": "Stay logged in",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "register": "Register"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Register and start exploring dance events",
+      "passwordsMatch": "Passwords match",
+      "passwordsMismatch": "Passwords don't match",
+      "newsletter": "I want to receive news about dance events",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot password?",
+      "subtitle": "Enter your email and we'll send you a link to reset your password",
+      "submit": "Send link",
+      "checkInbox": "Check your inbox",
+      "checkInboxDetail": "After sending you'll receive an email with a link to reset your password. The link is valid for 24 hours.",
+      "rememberPassword": "Remembered your password?",
+      "login": "Sign in",
+      "needHelp": "Need help?"
+    },
+    "passwordStrength": {
+      "weak": "Weak password",
+      "medium": "Medium",
+      "strong": "Strong password",
+      "veryStrong": "Very strong",
+      "hint": "At least 8 characters"
+    }
+  },
+  "onboarding": {
+    "step1": {
+      "title": "What dances do you like?",
+      "subtitle": "Choose your favorite dance styles so we can offer you relevant events"
+    },
+    "step2": {
+      "title": "What is your level?",
+      "subtitle": "It will help us recommend suitable events and courses"
+    },
+    "step3": {
+      "title": "Where are you located?",
+      "subtitle": "We'll find the nearest dance events in your area",
+      "radius10km": "10 km",
+      "radius25km": "25 km",
+      "radius50km": "50 km",
+      "radiusAll": "Whole country",
+      "cityHint": "E.g. Prague, Brno...",
+      "searchRadius": "Search events within radius",
+      "useCurrentLocation": "Use current location"
+    }
+  },
+  "events": {
+    "featuredEvents": "Featured events",
+    "upcomingEvents": "Upcoming events",
+    "danceStyles": "Dance styles",
+    "danceStylesLabel": "DANCE STYLES",
+    "location": "Location",
+    "detail": {
+      "header": "Event detail",
+      "description": "Event description",
+      "additionalInfo": "Additional information",
+      "admission": "Admission",
+      "dresscode": "Dresscode",
+      "buyTickets": "Buy tickets",
+      "originalSource": "Original source",
+      "program": "Event program"
+    },
+    "filter": {
+      "selectedCount": "${count} selected",
+      "selectedStyles": "SELECTED STYLES",
+      "apply": "Apply filter",
+      "applyCount": "Apply filter (${count})",
+      "selectLocation": "Select location",
+      "searchCityHint": "Search city or area...",
+      "useMyLocation": "Use my location",
+      "useMyLocationSubtitle": "Automatically finds events near you",
+      "popularCities": "Popular cities",
+      "allCities": "All cities"
+    },
+    "filters": {
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "thisWeekend": "This weekend"
+    }
+  },
+  "courses": {
+    "title": "Dance courses",
+    "subtitle": "Find your course",
+    "featuredCourses": "Featured courses",
+    "allCourses": "All courses",
+    "detail": {
+      "header": "Course detail",
+      "description": "Course description",
+      "details": "Course details",
+      "whatYouLearn": "What you'll learn",
+      "aboutInstructor": "About instructor",
+      "shareCourse": "Share course",
+      "coursePrice": "Course price",
+      "availableSpots": "Available spots",
+      "register": "Register for course"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "sections": {
+      "account": "Account",
+      "settings": "Settings",
+      "support": "Support",
+      "appInfo": "About app",
+      "dangerZone": "Danger zone"
+    },
+    "account": {
+      "editProfile": "Edit profile",
+      "changePassword": "Change password"
+    },
+    "settings": {
+      "language": "Language",
+      "czech": "Czech",
+      "notifications": "Notifications"
+    },
+    "support": {
+      "contactAuthor": "Contact author",
+      "rateApp": "Rate app"
+    },
+    "appInfo": {
+      "version": "App version",
+      "termsOfUse": "Terms of use",
+      "privacy": "Privacy"
+    },
+    "danger": {
+      "logout": "Log out",
+      "deleteAccount": "Delete account"
+    },
+    "changePassword": {
+      "title": "Change password",
+      "secureAccount": "Secure your account",
+      "secureAccountDetail": "A strong password must contain at least 8 characters, uppercase and lowercase letters, numbers and special characters.",
+      "currentPassword": "Current password",
+      "currentPasswordHint": "Enter current password",
+      "newPassword": "New password",
+      "newPasswordHint": "Enter new password",
+      "confirmPassword": "Confirm new password",
+      "confirmPasswordHint": "Enter new password again",
+      "save": "Save new password",
+      "requirements": "PASSWORD REQUIREMENTS",
+      "req8chars": "Minimum 8 characters",
+      "reqUppercase": "At least one uppercase letter (A-Z)",
+      "reqLowercase": "At least one lowercase letter (a-z)",
+      "reqNumber": "At least one number (0-9)",
+      "reqSpecial": "At least one special character (!@#\\$%^&*)",
+      "forgotPassword": "Forgot your password?",
+      "strengthVeryWeak": "Password strength: Very weak",
+      "strengthWeak": "Password strength: Weak",
+      "strengthMedium": "Password strength: Medium",
+      "strengthStrong": "Password strength: Strong"
+    },
+    "editProfile": {
+      "title": "Edit profile",
+      "sections": {
+        "personalInfo": "Personal information",
+        "aboutMe": "About me",
+        "favoriteDances": "Favorite dances",
+        "level": "Level",
+        "socialNetworks": "Social networks",
+        "notifications": "Notifications"
+      },
+      "changePhoto": "Change photo",
+      "bio": "Description",
+      "bioHint": "Write something about yourself...",
+      "selectDanceStyles": "Select your favorite dance styles",
+      "yourLevel": "Your dance level",
+      "instagram": "Instagram",
+      "instagramHint": "@your_username",
+      "facebook": "Facebook",
+      "facebookHint": "facebook.com/your.name",
+      "notifications": {
+        "newEvents": "New events",
+        "eventReminders": "Event reminders",
+        "marketing": "Marketing messages"
+      },
+      "notificationSubtitles": {
+        "newEvents": "Get notified about new events in your area",
+        "eventReminders": "Reminders before your saved events",
+        "marketing": "Promotional messages and offers"
+      }
+    }
+  },
+  "premium": {
+    "title": "Dancee Premium",
+    "bannerSubtitle": "Unlock all features",
+    "heroTitle": "Unlock full potential",
+    "heroSubtitle": "Get access to all premium features and improve your dance experiences",
+    "featuresTitle": "What you get with Premium",
+    "testimonialsTitle": "What our users say",
+    "faqTitle": "Frequently asked questions",
+    "ctaTitle": "Ready to start?",
+    "ctaSubtitle": "Join thousands of satisfied dancers",
+    "ctaButton": "Get Premium now",
+    "ctaNote": "7 days free · Cancel anytime"
+  },
+  "contact": {
+    "teamName": "Dancee Team",
+    "email": "hello@dancee.app",
+    "description": "We'd love to read your feedback...",
+    "responseTime": "Response time",
+    "responseTimeDetail": "We usually respond within 24 hours on working days. Thank you for your patience!",
+    "deviceInfo": "Device information",
+    "autoAttached": "Automatically attached",
+    "form": {
+      "subject": "Message subject",
+      "feedback": "Feedback",
+      "reportBug": "Report bug",
+      "featureRequest": "Feature request",
+      "other": "Other",
+      "title": "Message title",
+      "titleHint": "Briefly describe your issue or suggestion",
+      "message": "Message",
+      "messageHint": "Describe your issue in detail...",
+      "replyEmail": "Your reply email",
+      "sending": "Sending...",
+      "sent": "Sent!",
+      "submit": "Send message"
+    }
+  }
+}

@@ -65,8 +65,8 @@ class FeaturedCourseCard extends StatelessWidget {
         ),
         Positioned.fill(
           child: Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.round)),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.round)),
               gradient: AppGradients.heroOverlay,
             ),
           ),
