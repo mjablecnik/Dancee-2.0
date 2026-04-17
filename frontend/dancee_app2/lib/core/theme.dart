@@ -122,6 +122,7 @@ class AppRadius {
   static const double lg = 12;
   static const double xl = 16;
   static const double round = 20;
+  static const double xxl = 24;
   static const double full = 50;
 }
 
