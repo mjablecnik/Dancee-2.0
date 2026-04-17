@@ -41,7 +41,7 @@ class _SettingsSectionState extends State<SettingsSection> {
                 else
                   const SizedBox(width: 18),
                 const SizedBox(width: 8),
-                Text('English', style: TextStyle(color: current == AppLocale.en ? appPrimary : appText)),
+                Text(t.profile.settings.english, style: TextStyle(color: current == AppLocale.en ? appPrimary : appText)),
               ],
             ),
           ),
@@ -54,7 +54,7 @@ class _SettingsSectionState extends State<SettingsSection> {
                 else
                   const SizedBox(width: 18),
                 const SizedBox(width: 8),
-                Text('Čeština', style: TextStyle(color: current == AppLocale.cs ? appPrimary : appText)),
+                Text(t.profile.settings.czech, style: TextStyle(color: current == AppLocale.cs ? appPrimary : appText)),
               ],
             ),
           ),
