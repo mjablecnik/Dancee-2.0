@@ -10,6 +10,7 @@ import 'screens/events/event_detail_screen.dart';
 import 'screens/events/filter_dance_screen.dart';
 import 'screens/events/filter_location_screen.dart';
 import 'screens/courses/courses_list_screen.dart';
+import 'screens/courses/course_detail_screen.dart';
 
 void main() {
   runApp(const DanceeApp());
@@ -53,6 +54,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/courses',
       builder: (context, state) => const CoursesListScreen(),
+    ),
+    GoRoute(
+      path: '/course-detail',
+      builder: (context, state) => const CourseDetailScreen(),
     ),
   ],
 );
