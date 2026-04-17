@@ -5,7 +5,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
-import 'screens/events/events_list_screen.dart';
+import 'screens/events/events_list/events_list_screen.dart';
 import 'screens/events/event_detail_screen.dart';
 import 'screens/events/filter_dance_screen.dart';
 import 'screens/events/filter_location_screen.dart';
