@@ -85,7 +85,7 @@ class PopularCityCard extends StatelessWidget {
                     ),
                     child: Text(
                       t.common.current,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: AppTypography.fontSizeSm,
                         fontWeight: AppTypography.fontWeightMedium,
                         color: appPrimary,

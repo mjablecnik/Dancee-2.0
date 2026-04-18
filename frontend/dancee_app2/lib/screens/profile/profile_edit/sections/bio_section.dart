@@ -31,7 +31,7 @@ class BioSection extends StatelessWidget {
           children: [
             Text(
               t.profile.editProfile.bio,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeSm,
                 fontWeight: AppTypography.fontWeightMedium,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/colors.dart';
-import '../../../core/theme.dart';
 
 class AppRadioButton extends StatelessWidget {
   final bool selected;

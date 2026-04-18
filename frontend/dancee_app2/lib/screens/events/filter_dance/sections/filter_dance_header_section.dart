@@ -50,7 +50,7 @@ class FilterDanceHeaderSection extends StatelessWidget {
               children: [
                 Text(
                   t.events.danceStyles,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: AppTypography.fontSize3xl,
                     fontWeight: AppTypography.fontWeightBold,
                     color: appText,
@@ -70,7 +70,7 @@ class FilterDanceHeaderSection extends StatelessWidget {
             onPressed: onClear,
             child: Text(
               t.common.clear,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightMedium,
                 color: appPrimary,

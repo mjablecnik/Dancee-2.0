@@ -54,7 +54,7 @@ class _ExperienceLevelSectionState extends State<ExperienceLevelSection> {
           children: [
             Text(
               t.profile.editProfile.yourLevel,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeSm,
                 fontWeight: AppTypography.fontWeightMedium,

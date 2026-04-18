@@ -42,7 +42,7 @@ class DanceStylesFilterSection extends StatelessWidget {
           children: [
             Text(
               t.events.danceStyles,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appText,
                 fontSize: AppTypography.fontSize3xl,
                 fontWeight: AppTypography.fontWeightBold,
@@ -52,7 +52,7 @@ class DanceStylesFilterSection extends StatelessWidget {
               onTap: onShowAll,
               child: Text(
                 t.common.showAll,
-                style: TextStyle(
+                style: const TextStyle(
                   color: appMuted,
                   fontSize: AppTypography.fontSizeMd,
                 ),
@@ -67,7 +67,7 @@ class DanceStylesFilterSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Text(
         t.events.danceStylesLabel,
-        style: TextStyle(
+        style: const TextStyle(
           color: appMuted,
           fontSize: AppTypography.fontSizeSm,
           fontWeight: AppTypography.fontWeightSemiBold,

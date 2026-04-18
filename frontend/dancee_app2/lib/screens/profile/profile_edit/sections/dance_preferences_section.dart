@@ -53,7 +53,7 @@ class _DancePreferencesSectionState extends State<DancePreferencesSection> {
           children: [
             Text(
               t.profile.editProfile.selectDanceStyles,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeSm,
                 fontWeight: AppTypography.fontWeightMedium,

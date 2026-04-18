@@ -22,7 +22,7 @@ class FeaturesSection extends StatelessWidget {
         children: [
           Text(
             t.premium.featuresTitle,
-            style: TextStyle(
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize2xl,
               fontWeight: AppTypography.fontWeightBold,

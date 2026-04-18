@@ -21,7 +21,7 @@ class SelectedStylesSection extends StatelessWidget {
       children: [
         Text(
           t.events.filter.selectedStyles,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: AppTypography.fontSizeSm,
             fontWeight: AppTypography.fontWeightSemiBold,
             color: appMuted,

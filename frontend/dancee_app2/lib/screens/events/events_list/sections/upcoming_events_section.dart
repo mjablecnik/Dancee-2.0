@@ -27,7 +27,7 @@ class UpcomingEventsSection extends StatelessWidget {
             children: [
               Text(
                 t.events.upcomingEvents,
-                style: TextStyle(
+                style: const TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize3xl,
                   fontWeight: AppTypography.fontWeightBold,

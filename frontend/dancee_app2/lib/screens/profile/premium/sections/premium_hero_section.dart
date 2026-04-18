@@ -39,7 +39,7 @@ class PremiumHeroSection extends StatelessWidget {
               child: Text(
                 t.premium.heroTitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: AppTypography.fontSize5xl,
                   fontWeight: AppTypography.fontWeightBold,
@@ -52,7 +52,7 @@ class PremiumHeroSection extends StatelessWidget {
             child: Text(
               t.premium.heroSubtitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeMd,
                 height: 1.5,

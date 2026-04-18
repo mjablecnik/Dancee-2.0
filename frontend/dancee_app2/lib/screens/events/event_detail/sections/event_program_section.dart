@@ -4,8 +4,6 @@ import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
 import '../components/program_day_card.dart';
-import '../components/program_slot_item.dart';
-
 export '../components/program_day_card.dart' show ProgramDayData;
 export '../components/program_slot_item.dart' show ProgramSlotData;
 
@@ -33,7 +31,7 @@ class _EventProgramSectionState extends State<EventProgramSection> {
             children: [
               Text(
                 t.events.detail.program,
-                style: TextStyle(
+                style: const TextStyle(
                   color: appText,
                   fontSize: AppTypography.fontSize2xl,
                   fontWeight: AppTypography.fontWeightBold,

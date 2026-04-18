@@ -46,7 +46,7 @@ class FilterLocationHeaderSection extends StatelessWidget {
               const SizedBox(width: AppSpacing.lg),
               Text(
                 t.events.filter.selectLocation,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: AppTypography.fontSize3xl,
                   fontWeight: AppTypography.fontWeightBold,
                   color: appText,
@@ -76,12 +76,12 @@ class FilterLocationHeaderSection extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       hintText: t.events.filter.searchCityHint,
-                      hintStyle: TextStyle(
+                      hintStyle: const TextStyle(
                         fontSize: AppTypography.fontSizeMd,
                         color: appMuted,
                       ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
                         vertical: 14,
                       ),

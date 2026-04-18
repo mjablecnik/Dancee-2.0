@@ -55,7 +55,7 @@ class ActionButtonsSection extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Text(
                 t.common.save,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: AppTypography.fontSizeMd,
                   fontWeight: AppTypography.fontWeightSemiBold,

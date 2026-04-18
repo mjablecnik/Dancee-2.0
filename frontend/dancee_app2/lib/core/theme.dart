@@ -128,19 +128,19 @@ class AppRadius {
 
 class AppShadows {
   static final BoxShadow primary = BoxShadow(
-    color: appPrimary.withOpacity(0.5),
+    color: appPrimary.withValues(alpha: 0.5),
     blurRadius: 20,
     spreadRadius: -5,
   );
 
   static final BoxShadow primaryLg = BoxShadow(
-    color: appPrimary.withOpacity(0.5),
+    color: appPrimary.withValues(alpha: 0.5),
     blurRadius: 20,
     offset: const Offset(0, 5),
   );
 
   static final BoxShadow card = BoxShadow(
-    color: Colors.black.withOpacity(0.2),
+    color: Colors.black.withValues(alpha: 0.2),
     blurRadius: 20,
     spreadRadius: -5,
   );

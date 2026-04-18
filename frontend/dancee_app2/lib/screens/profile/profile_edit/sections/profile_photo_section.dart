@@ -62,7 +62,7 @@ class ProfilePhotoSection extends StatelessWidget {
             onTap: onChangeTap,
             child: Text(
               t.profile.editProfile.changePhoto,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appPrimary,
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightMedium,

@@ -34,7 +34,7 @@ class SaveButtonSection extends StatelessWidget {
           ),
           child: Text(
             t.common.saveChanges,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: AppTypography.fontSizeXl,
               fontWeight: AppTypography.fontWeightSemiBold,
             ),

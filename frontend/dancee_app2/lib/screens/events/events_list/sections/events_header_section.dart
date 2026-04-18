@@ -47,7 +47,7 @@ class EventsHeaderSection extends StatelessWidget {
           children: [
             Text(
               t.events.location,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightMedium,

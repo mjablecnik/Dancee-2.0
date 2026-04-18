@@ -46,7 +46,7 @@ class PremiumHeaderSection extends StatelessWidget {
             shaderCallback: (bounds) => AppGradients.premium.createShader(bounds),
             child: Text(
               t.premium.title,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: AppTypography.fontSize2xl,
                 fontWeight: AppTypography.fontWeightSemiBold,

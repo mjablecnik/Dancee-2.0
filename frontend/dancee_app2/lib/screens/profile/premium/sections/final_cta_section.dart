@@ -38,7 +38,7 @@ class FinalCtaSection extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             Text(
               t.premium.ctaTitle,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appText,
                 fontSize: AppTypography.fontSize3xl,
                 fontWeight: FontWeight.bold,
@@ -48,7 +48,7 @@ class FinalCtaSection extends StatelessWidget {
             Text(
               t.premium.ctaSubtitle,
               textAlign: TextAlign.center,
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+              style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
             ),
             const SizedBox(height: AppSpacing.xxl),
             Container(
@@ -68,7 +68,7 @@ class FinalCtaSection extends StatelessWidget {
                 ),
                 child: Text(
                   t.premium.ctaButton,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: AppTypography.fontSizeLg,
                     fontWeight: AppTypography.fontWeightSemiBold,
@@ -79,7 +79,7 @@ class FinalCtaSection extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             Text(
               t.premium.ctaNote,
-              style: TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
+              style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
             ),
           ],
         ),

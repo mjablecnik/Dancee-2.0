@@ -22,7 +22,7 @@ class FeaturedEventsSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Text(
             t.events.featuredEvents,
-            style: TextStyle(
+            style: const TextStyle(
               color: appText,
               fontSize: AppTypography.fontSize3xl,
               fontWeight: AppTypography.fontWeightBold,

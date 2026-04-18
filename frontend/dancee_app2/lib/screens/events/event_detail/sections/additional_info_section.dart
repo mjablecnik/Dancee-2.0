@@ -25,7 +25,7 @@ class AdditionalInfoSection extends StatelessWidget {
       children: [
         Text(
           t.events.detail.additionalInfo,
-          style: TextStyle(
+          style: const TextStyle(
             color: appText,
             fontSize: AppTypography.fontSize2xl,
             fontWeight: AppTypography.fontWeightBold,
@@ -96,7 +96,7 @@ class AdditionalInfoSection extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               t.events.detail.buyTickets,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightSemiBold,
@@ -126,7 +126,7 @@ class AdditionalInfoSection extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               t.events.detail.originalSource,
-              style: TextStyle(
+              style: const TextStyle(
                 color: appText,
                 fontSize: AppTypography.fontSizeMd,
                 fontWeight: AppTypography.fontWeightSemiBold,
