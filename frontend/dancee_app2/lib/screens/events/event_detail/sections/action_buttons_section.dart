@@ -46,13 +46,13 @@ class ActionButtonsSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: [AppShadows.primary],
         ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FaIcon(FontAwesomeIcons.heart, size: 14, color: Colors.white),
-              SizedBox(width: AppSpacing.sm),
+              const FaIcon(FontAwesomeIcons.heart, size: 14, color: Colors.white),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 t.common.save,
                 style: TextStyle(

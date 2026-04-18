@@ -59,13 +59,13 @@ class CoursePricingSection extends StatelessWidget {
                 border: Border.all(color: appBorder),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FaIcon(FontAwesomeIcons.shareNodes, size: 14, color: appText),
-                    SizedBox(width: AppSpacing.sm),
+                    const FaIcon(FontAwesomeIcons.shareNodes, size: 14, color: appText),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       t.courses.detail.shareCourse,
                       style: const TextStyle(
@@ -90,13 +90,13 @@ class CoursePricingSection extends StatelessWidget {
                 border: Border.all(color: appBorder),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, size: 14, color: appText),
-                    SizedBox(width: AppSpacing.sm),
+                    const FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, size: 14, color: appText),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       t.events.detail.originalSource,
                       style: const TextStyle(

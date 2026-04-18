@@ -42,12 +42,12 @@ class BioSection extends StatelessWidget {
               initialValue: initialBio,
               maxLines: 3,
               style: const TextStyle(color: appText),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
                 hintText: t.profile.editProfile.bioHint,
-                hintStyle: TextStyle(color: appMuted),
+                hintStyle: const TextStyle(color: appMuted),
               ),
             ),
           ],

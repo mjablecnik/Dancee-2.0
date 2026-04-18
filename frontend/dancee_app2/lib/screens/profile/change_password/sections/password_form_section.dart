@@ -383,11 +383,11 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
     return Center(
       child: TextButton(
         onPressed: () => context.push('/forgot-password'),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(FontAwesomeIcons.circleQuestion, size: 14, color: appPrimary),
-            SizedBox(width: 6),
+            const FaIcon(FontAwesomeIcons.circleQuestion, size: 14, color: appPrimary),
+            const SizedBox(width: 6),
             Text(
               t.profile.changePassword.forgotPassword,
               style: const TextStyle(

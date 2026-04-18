@@ -95,13 +95,13 @@ class PricingOptionCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.lg),
                 boxShadow: [AppShadows.primary],
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FaIcon(FontAwesomeIcons.userPlus, size: 16, color: Colors.white),
-                    SizedBox(width: 10),
+                    const FaIcon(FontAwesomeIcons.userPlus, size: 16, color: Colors.white),
+                    const SizedBox(width: 10),
                     Text(
                       t.courses.detail.register,
                       style: const TextStyle(
