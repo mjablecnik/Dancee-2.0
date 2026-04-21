@@ -13,6 +13,28 @@ import {
 } from "../../core/schemas";
 
 describe("parseEventType", () => {
+  const allValidTypes = ["party", "workshop", "lesson", "course", "festival", "holiday", "other"] as const;
+
+  it("Property 1: maps all valid types correctly", () => {
+    fc.assert(
+      fc.property(fc.constantFrom(...allValidTypes), (type) => {
+        expect(parseEventType(type)).toBe(type);
+      })
+    );
+  });
+
+  it("Property 1: defaults invalid types to 'other'", () => {
+    fc.assert(
+      fc.property(
+        fc.string().filter((s) => !allValidTypes.includes(s.toLowerCase().trim() as (typeof allValidTypes)[number])),
+        (invalidType) => {
+          expect(parseEventType(invalidType)).toBe("other");
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
   it("Property 4: always returns a valid EventType", () => {
     fc.assert(
       fc.property(fc.string(), (value) => {

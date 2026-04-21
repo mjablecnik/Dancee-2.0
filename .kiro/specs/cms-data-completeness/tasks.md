@@ -38,7 +38,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - **Property 9: FacebookEventSchema accepts optional imageUrl**
     - **Validates: Requirements 12.2**
 
-  - [ ]* 1.8 Write property test: `parseEventType` maps all valid types and defaults invalid to "other"
+  - [x]* 1.8 Write property test: `parseEventType` maps all valid types and defaults invalid to "other"
     - **Property 1: parseEventType maps all valid types and defaults invalid to "other"**
     - **Validates: Requirements 2.2**
 
