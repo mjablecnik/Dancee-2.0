@@ -32,11 +32,10 @@
     }
   },
   "nav": {
-    "home": "Domů",
-    "search": "Hledat",
+    "events": "Události",
+    "courses": "Kurzy",
     "saved": "Uložené",
-    "profile": "Profil",
-    "courses": "Kurzy"
+    "profile": "Profil"
   },
   "auth": {
     "tagline": "Objevuj taneční svět",

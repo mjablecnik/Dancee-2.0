@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
 import 'i18n/strings.g.dart';
+import 'shared/elements/navigation/app_bottom_nav_bar.dart';
+import 'shared/elements/navigation/main_shell.dart';
 import 'screens/auth/login/login_screen.dart';
 import 'screens/auth/register/register_screen.dart';
 import 'screens/auth/forgot_password/forgot_password_screen.dart';
@@ -42,7 +44,7 @@ Future<void> _initLocale() async {
 final _router = GoRouter(
   initialLocation: '/login',
   routes: [
-    // Auth flow — root-level, back button does nothing
+    // Auth flow
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
@@ -59,56 +61,69 @@ final _router = GoRouter(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
     ),
-    // Main app — root pages with sub-routes that push on top
-    GoRoute(
-      path: '/events',
-      builder: (context, state) => const EventsListScreen(),
+
+    // Main app — top-level pages wrapped in shell with bottom nav
+    ShellRoute(
+      builder: (context, state, child) {
+        final location = state.uri.path;
+        final NavTab currentTab;
+        if (location.startsWith('/courses')) {
+          currentTab = NavTab.courses;
+        } else if (location.startsWith('/profile')) {
+          currentTab = NavTab.profile;
+        } else {
+          currentTab = NavTab.events;
+        }
+        return MainShell(currentTab: currentTab, child: child);
+      },
       routes: [
         GoRoute(
-          path: 'detail',
-          builder: (context, state) => const EventDetailScreen(),
+          path: '/events',
+          builder: (context, state) => const EventsListScreen(),
         ),
         GoRoute(
-          path: 'filter-dance',
-          builder: (context, state) => const FilterDanceScreen(),
+          path: '/courses',
+          builder: (context, state) => const CoursesListScreen(),
         ),
         GoRoute(
-          path: 'filter-location',
-          builder: (context, state) => const FilterLocationScreen(),
+          path: '/profile',
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     ),
+
+    // Sub-pages — no bottom nav bar
     GoRoute(
-      path: '/courses',
-      builder: (context, state) => const CoursesListScreen(),
-      routes: [
-        GoRoute(
-          path: 'detail',
-          builder: (context, state) => const CourseDetailScreen(),
-        ),
-      ],
+      path: '/events/detail',
+      builder: (context, state) => const EventDetailScreen(),
     ),
     GoRoute(
-      path: '/profile',
-      builder: (context, state) => const ProfileScreen(),
-      routes: [
-        GoRoute(
-          path: 'edit',
-          builder: (context, state) => const ProfileEditScreen(),
-        ),
-        GoRoute(
-          path: 'change-password',
-          builder: (context, state) => const ChangePasswordScreen(),
-        ),
-        GoRoute(
-          path: 'premium',
-          builder: (context, state) => const PremiumScreen(),
-        ),
-        GoRoute(
-          path: 'author-contact',
-          builder: (context, state) => const AuthorContactScreen(),
-        ),
-      ],
+      path: '/events/filter-dance',
+      builder: (context, state) => const FilterDanceScreen(),
+    ),
+    GoRoute(
+      path: '/events/filter-location',
+      builder: (context, state) => const FilterLocationScreen(),
+    ),
+    GoRoute(
+      path: '/courses/detail',
+      builder: (context, state) => const CourseDetailScreen(),
+    ),
+    GoRoute(
+      path: '/profile/edit',
+      builder: (context, state) => const ProfileEditScreen(),
+    ),
+    GoRoute(
+      path: '/profile/change-password',
+      builder: (context, state) => const ChangePasswordScreen(),
+    ),
+    GoRoute(
+      path: '/profile/premium',
+      builder: (context, state) => const PremiumScreen(),
+    ),
+    GoRoute(
+      path: '/profile/author-contact',
+      builder: (context, state) => const AuthorContactScreen(),
     ),
   ],
 );

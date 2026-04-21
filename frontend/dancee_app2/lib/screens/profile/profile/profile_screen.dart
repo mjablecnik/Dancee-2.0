@@ -7,7 +7,6 @@ import '../../../data/user_repository.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import '../../../shared/elements/labels/section_label.dart';
-import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import 'components/premium_banner.dart';
 import 'sections/account_section.dart';
 import 'sections/app_info_section.dart';
@@ -28,9 +27,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: appBg,
-      body: Column(
+    return ColoredBox(
+      color: appBg,
+      child: Column(
         children: [
           BackButtonHeader(
             title: t.profile.title,
@@ -60,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     left: AppSpacing.xl,
                     right: AppSpacing.xl,
                     top: AppSpacing.xxl,
-                    bottom: MediaQuery.of(context).padding.bottom + 100,
+                    bottom: MediaQuery.of(context).padding.bottom + 16,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,16 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        leftItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.house, label: t.nav.home, onTap: () => context.go('/events')),
-          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: t.nav.search),
-        ],
-        rightItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.heart, label: t.nav.saved),
-          AppNavBarItem(icon: FontAwesomeIcons.user, label: t.nav.profile, isActive: true),
         ],
       ),
     );

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/event_repository.dart' as repo;
 import '../../../i18n/strings.g.dart';
-import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import '../../../shared/sections/description_section.dart';
 import '../../../shared/sections/detail_header_section.dart';
 import '../../../shared/sections/hero_image_section.dart';
@@ -111,30 +109,6 @@ class EventDetailScreen extends StatelessWidget {
                 );
               },
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        leftItems: [
-          AppNavBarItem(
-            icon: FontAwesomeIcons.house,
-            label: t.nav.home,
-            onTap: () => context.go('/events'),
-          ),
-          AppNavBarItem(
-            icon: FontAwesomeIcons.magnifyingGlass,
-            label: t.nav.search,
-          ),
-        ],
-        rightItems: [
-          AppNavBarItem(
-            icon: FontAwesomeIcons.solidHeart,
-            label: t.nav.saved,
-            isActive: true,
-          ),
-          AppNavBarItem(
-            icon: FontAwesomeIcons.user,
-            label: t.nav.profile,
           ),
         ],
       ),

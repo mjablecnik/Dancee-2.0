@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 432 (216 per locale)
+/// Strings: 438 (219 per locale)
 ///
-/// Built on 2026-04-17 at 22:36 UTC
+/// Built on 2026-04-21 at 10:20 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -192,11 +192,10 @@ class _StringsNavEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
-	String get home => 'Home';
-	String get search => 'Search';
+	String get events => 'Events';
+	String get courses => 'Courses';
 	String get saved => 'Saved';
 	String get profile => 'Profile';
-	String get courses => 'Courses';
 }
 
 // Path: auth
@@ -547,8 +546,8 @@ class _StringsProfileSettingsEn {
 	// Translations
 	String get language => 'Language';
 	String get czech => 'Czech';
-	String get english => 'English';
 	String get notifications => 'Notifications';
+	String get english => 'English';
 }
 
 // Path: profile.support
@@ -780,11 +779,10 @@ class _StringsNavCs extends _StringsNavEn {
 	@override final _StringsCs _root; // ignore: unused_field
 
 	// Translations
-	@override String get home => 'Domů';
-	@override String get search => 'Hledat';
+	@override String get events => 'Události';
+	@override String get courses => 'Kurzy';
 	@override String get saved => 'Uložené';
 	@override String get profile => 'Profil';
-	@override String get courses => 'Kurzy';
 }
 
 // Path: auth
@@ -1135,8 +1133,8 @@ class _StringsProfileSettingsCs extends _StringsProfileSettingsEn {
 	// Translations
 	@override String get language => 'Jazyk';
 	@override String get czech => 'Čeština';
-	@override String get english => 'Angličtina';
 	@override String get notifications => 'Oznámení';
+	@override String get english => 'Angličtina';
 }
 
 // Path: profile.support
@@ -1332,11 +1330,10 @@ extension on Translations {
 			case 'common.form.city': return 'City';
 			case 'common.form.phone': return 'Phone';
 			case 'common.form.fullName': return 'Full name';
-			case 'nav.home': return 'Home';
-			case 'nav.search': return 'Search';
+			case 'nav.events': return 'Events';
+			case 'nav.courses': return 'Courses';
 			case 'nav.saved': return 'Saved';
 			case 'nav.profile': return 'Profile';
-			case 'nav.courses': return 'Courses';
 			case 'auth.tagline': return 'Discover the dancing world';
 			case 'auth.orContinueWith': return 'or continue with';
 			case 'auth.continueWithGoogle': return 'Continue with Google';
@@ -1438,8 +1435,8 @@ extension on Translations {
 			case 'profile.account.changePassword': return 'Change password';
 			case 'profile.settings.language': return 'Language';
 			case 'profile.settings.czech': return 'Czech';
-			case 'profile.settings.english': return 'English';
 			case 'profile.settings.notifications': return 'Notifications';
+			case 'profile.settings.english': return 'English';
 			case 'profile.support.contactAuthor': return 'Contact author';
 			case 'profile.support.rateApp': return 'Rate app';
 			case 'profile.appInfo.version': return 'App version';
@@ -1508,9 +1505,6 @@ extension on Translations {
 			case 'contact.responseTimeDetail': return 'We usually respond within 24 hours on working days. Thank you for your patience!';
 			case 'contact.deviceInfo': return 'Device information';
 			case 'contact.autoAttached': return 'Automatically attached';
-			case 'contact.deviceInfoLabels.app': return 'App:';
-			case 'contact.deviceInfoLabels.device': return 'Device:';
-			case 'contact.deviceInfoLabels.os': return 'System:';
 			case 'contact.form.subject': return 'Message subject';
 			case 'contact.form.feedback': return 'Feedback';
 			case 'contact.form.reportBug': return 'Report bug';
@@ -1524,6 +1518,9 @@ extension on Translations {
 			case 'contact.form.sending': return 'Sending...';
 			case 'contact.form.sent': return 'Sent!';
 			case 'contact.form.submit': return 'Send message';
+			case 'contact.deviceInfoLabels.app': return 'App:';
+			case 'contact.deviceInfoLabels.device': return 'Device:';
+			case 'contact.deviceInfoLabels.os': return 'System:';
 			default: return null;
 		}
 	}
@@ -1560,11 +1557,10 @@ extension on _StringsCs {
 			case 'common.form.city': return 'Město';
 			case 'common.form.phone': return 'Telefon';
 			case 'common.form.fullName': return 'Jméno a příjmení';
-			case 'nav.home': return 'Domů';
-			case 'nav.search': return 'Hledat';
+			case 'nav.events': return 'Události';
+			case 'nav.courses': return 'Kurzy';
 			case 'nav.saved': return 'Uložené';
 			case 'nav.profile': return 'Profil';
-			case 'nav.courses': return 'Kurzy';
 			case 'auth.tagline': return 'Objevuj taneční svět';
 			case 'auth.orContinueWith': return 'nebo pokračuj s';
 			case 'auth.continueWithGoogle': return 'Pokračovat s Google';
@@ -1666,8 +1662,8 @@ extension on _StringsCs {
 			case 'profile.account.changePassword': return 'Změnit heslo';
 			case 'profile.settings.language': return 'Jazyk';
 			case 'profile.settings.czech': return 'Čeština';
-			case 'profile.settings.english': return 'Angličtina';
 			case 'profile.settings.notifications': return 'Oznámení';
+			case 'profile.settings.english': return 'Angličtina';
 			case 'profile.support.contactAuthor': return 'Napsat autorovi';
 			case 'profile.support.rateApp': return 'Ohodnotit aplikaci';
 			case 'profile.appInfo.version': return 'Verze aplikace';
@@ -1749,6 +1745,9 @@ extension on _StringsCs {
 			case 'contact.form.sending': return 'Odesílání...';
 			case 'contact.form.sent': return 'Odesláno!';
 			case 'contact.form.submit': return 'Odeslat zprávu';
+			case 'contact.deviceInfoLabels.app': return 'Aplikace:';
+			case 'contact.deviceInfoLabels.device': return 'Zařízení:';
+			case 'contact.deviceInfoLabels.os': return 'Systém:';
 			default: return null;
 		}
 	}

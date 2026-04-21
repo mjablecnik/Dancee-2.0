@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/event_repository.dart';
-import '../../../i18n/strings.g.dart';
-import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import 'sections/events_header_section.dart';
 import 'sections/featured_events_section.dart';
@@ -32,9 +29,9 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: appBg,
-      body: Column(
+    return ColoredBox(
+      color: appBg,
+      child: Column(
         children: [
           EventsHeaderSection(
             location: 'Praha, CZ',
@@ -42,7 +39,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 96, top: AppSpacing.xxl),
+              padding: const EdgeInsets.only(bottom: 16, top: AppSpacing.xxl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -63,24 +60,6 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        leftItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.house, label: t.nav.home),
-          AppNavBarItem(
-            icon: FontAwesomeIcons.magnifyingGlass,
-            label: t.nav.search,
-            isActive: true,
-          ),
-        ],
-        rightItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.heart, label: t.nav.saved),
-          AppNavBarItem(
-            icon: FontAwesomeIcons.user,
-            label: t.nav.profile,
-            onTap: () => context.go('/profile'),
           ),
         ],
       ),

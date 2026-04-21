@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
-import '../../../i18n/strings.g.dart';
-import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import 'sections/all_cities_section.dart';
 import 'sections/current_location_section.dart';
 import 'sections/filter_location_header_section.dart';
@@ -55,29 +52,6 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        leftItems: [
-          AppNavBarItem(
-            icon: FontAwesomeIcons.house,
-            label: t.nav.home,
-            onTap: () => context.go('/events'),
-          ),
-          AppNavBarItem(
-            icon: FontAwesomeIcons.magnifyingGlass,
-            label: t.nav.search,
-          ),
-        ],
-        rightItems: [
-          AppNavBarItem(
-            icon: FontAwesomeIcons.heart,
-            label: t.nav.saved,
-          ),
-          AppNavBarItem(
-            icon: FontAwesomeIcons.user,
-            label: t.nav.profile,
           ),
         ],
       ),

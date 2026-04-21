@@ -8,7 +8,6 @@ import '../../../data/user_repository.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
 import '../../../shared/elements/labels/section_label.dart';
-import '../../../shared/elements/navigation/app_bottom_nav_bar.dart';
 import 'sections/bio_section.dart';
 import 'sections/dance_preferences_section.dart';
 import 'sections/experience_level_section.dart';
@@ -169,16 +168,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         ],
       ),
       bottomSheet: SaveButtonSection(onSave: () => context.pop()),
-      bottomNavigationBar: AppBottomNavBar(
-        leftItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.house, label: t.nav.home, onTap: () => context.go('/events')),
-          AppNavBarItem(icon: FontAwesomeIcons.magnifyingGlass, label: t.nav.search, onTap: () => context.go('/events')),
-        ],
-        rightItems: [
-          AppNavBarItem(icon: FontAwesomeIcons.heart, label: t.nav.saved, onTap: () => context.go('/events')),
-          AppNavBarItem(icon: FontAwesomeIcons.user, label: t.nav.profile, isActive: true, onTap: () => context.go('/profile')),
-        ],
-      ),
     );
   }
 }

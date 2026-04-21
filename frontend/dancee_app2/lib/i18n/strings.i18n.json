@@ -32,11 +32,10 @@
     }
   },
   "nav": {
-    "home": "Home",
-    "search": "Search",
+    "events": "Events",
+    "courses": "Courses",
     "saved": "Saved",
-    "profile": "Profile",
-    "courses": "Courses"
+    "profile": "Profile"
   },
   "auth": {
     "tagline": "Discover the dancing world",
