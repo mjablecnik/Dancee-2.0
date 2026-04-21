@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'core/service_locator.dart';
 import 'core/theme.dart';
 import 'i18n/strings.g.dart';
+import 'logic/cubits/event_cubit.dart';
+import 'logic/cubits/course_cubit.dart';
+import 'logic/cubits/favorites_cubit.dart';
+import 'logic/cubits/filter_cubit.dart';
+import 'logic/cubits/settings_cubit.dart';
+import 'logic/states/filter_state.dart';
+import 'logic/states/settings_state.dart';
 import 'shared/elements/navigation/app_bottom_nav_bar.dart';
 import 'shared/elements/navigation/main_shell.dart';
 import 'screens/auth/login/login_screen.dart';
@@ -24,22 +32,12 @@ import 'screens/saved/saved_events_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _initLocale();
-  runApp(TranslationProvider(child: const DanceeApp()));
-}
-
-Future<void> _initLocale() async {
-  final prefs = await SharedPreferences.getInstance();
-  final localeCode = prefs.getString('locale');
-  if (localeCode != null) {
-    final locale = AppLocale.values.firstWhere(
-      (l) => l.languageCode == localeCode,
-      orElse: () => AppLocale.en,
-    );
-    LocaleSettings.setLocale(locale);
-  } else {
-    LocaleSettings.setLocale(AppLocale.en);
-  }
+  setupServiceLocator();
+  final settingsCubit = sl<SettingsCubit>();
+  await settingsCubit.init();
+  runApp(TranslationProvider(
+    child: DanceeApp(settingsCubit: settingsCubit),
+  ));
 }
 
 final _router = GoRouter(
@@ -136,17 +134,86 @@ final _router = GoRouter(
 );
 
 class DanceeApp extends StatelessWidget {
-  const DanceeApp({super.key});
+  const DanceeApp({super.key, required this.settingsCubit});
+
+  final SettingsCubit settingsCubit;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: t.common.appName,
-      theme: AppTheme.theme,
-      routerConfig: _router,
-      debugShowCheckedModeBanner: false,
-      locale: TranslationProvider.of(context).flutterLocale,
-      supportedLocales: AppLocale.values.map((l) => l.flutterLocale).toList(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<SettingsCubit>.value(value: settingsCubit),
+        BlocProvider<FilterCubit>(create: (_) => sl<FilterCubit>()),
+        BlocProvider<EventCubit>(create: (_) => sl<EventCubit>()),
+        BlocProvider<CourseCubit>(create: (_) => sl<CourseCubit>()),
+        BlocProvider<FavoritesCubit>(create: (_) => sl<FavoritesCubit>()),
+      ],
+      child: _AppListeners(
+        child: MaterialApp.router(
+          title: t.common.appName,
+          theme: AppTheme.theme,
+          routerConfig: _router,
+          debugShowCheckedModeBanner: false,
+          locale: TranslationProvider.of(context).flutterLocale,
+          supportedLocales: AppLocale.values.map((l) => l.flutterLocale).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Coordinates cross-cubit reactions:
+/// - Language changes → re-fetch events, courses, dance styles
+/// - Filter changes → apply filters on EventCubit and CourseCubit
+class _AppListeners extends StatefulWidget {
+  const _AppListeners({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_AppListeners> createState() => _AppListenersState();
+}
+
+class _AppListenersState extends State<_AppListeners> {
+  @override
+  void initState() {
+    super.initState();
+    // Trigger initial data load once cubits are in the tree
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initialLoad());
+  }
+
+  void _initialLoad() {
+    final languageCode = context.read<SettingsCubit>().currentLanguageCode;
+    context.read<EventCubit>().loadEvents(languageCode);
+    context.read<CourseCubit>().loadCourses(languageCode);
+    context.read<FilterCubit>().loadDanceStyles(languageCode);
+    context.read<FavoritesCubit>().loadFavorites();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocListener(
+      listeners: [
+        // 7.3 — Language change: re-fetch all data in the new language
+        BlocListener<SettingsCubit, SettingsState>(
+          listenWhen: (prev, curr) => prev.languageCode != curr.languageCode,
+          listener: (context, state) {
+            final code = state.languageCode;
+            context.read<EventCubit>().loadEvents(code);
+            context.read<CourseCubit>().loadCourses(code);
+            context.read<FilterCubit>().loadDanceStyles(code);
+          },
+        ),
+        // 7.4 — Filter change: apply new filters to events and courses
+        BlocListener<FilterCubit, FilterState>(
+          listener: (context, filterState) {
+            final allStyles = context.read<FilterCubit>().allDanceStyles;
+            context.read<EventCubit>().applyFilters(filterState, allStyles);
+            context.read<CourseCubit>().applyFilters(filterState, allStyles);
+          },
+        ),
+      ],
+      child: widget.child,
     );
   }
 }
