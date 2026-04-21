@@ -9,6 +9,7 @@ class SavedEventsHeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 12,
         left: AppSpacing.xl,

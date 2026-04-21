@@ -81,33 +81,12 @@ class EventsHeaderSection extends StatelessWidget {
   }
 
   Widget _buildNotificationBell() {
-    return Stack(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: appSurface,
-            borderRadius: BorderRadius.circular(AppRadius.round),
-          ),
-          child: const Center(
-            child: FaIcon(FontAwesomeIcons.bell, size: 18, color: appText),
-          ),
-        ),
-        Positioned(
-          top: AppSpacing.sm,
-          right: AppSpacing.sm,
-          child: Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(AppRadius.xs),
-              border: Border.all(color: appSurface, width: 1.5),
-            ),
-          ),
-        ),
-      ],
+    return const Visibility(
+      visible: false,
+      maintainSize: true,
+      maintainAnimation: true,
+      maintainState: true,
+      child: SizedBox(width: 40, height: 40),
     );
   }
 
