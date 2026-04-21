@@ -78,6 +78,7 @@ const FacebookEventObjectSchema = z.object({
     )
     .optional(),
   url: z.string(),
+  imageUrl: z.string().nullable().optional(),
 });
 
 // The scraper API wraps the event in a `{ payload: ... }` envelope.
@@ -110,7 +111,7 @@ export type FacebookEventListItem = z.infer<typeof FacebookEventListItemSchema>;
 
 // ---- Event type ----
 
-export const SUPPORTED_EVENT_TYPES = ["party", "workshop", "festival", "holiday"] as const;
+export const SUPPORTED_EVENT_TYPES = ["party", "workshop", "festival", "holiday", "course", "lesson"] as const;
 const ALL_EVENT_TYPES = ["party", "workshop", "lesson", "course", "festival", "holiday", "other"] as const;
 
 export const EventTypeSchema = z.enum(ALL_EVENT_TYPES);
@@ -141,9 +142,9 @@ export type EventPart = z.infer<typeof EventPartSchema>;
 // ---- EventInfo ----
 
 export const EventInfoSchema = z.object({
-  type: z.enum(["url", "price"]),
-  key: z.string(),
-  value: z.string(),
+  type: z.enum(["url", "price", "dresscode"]),
+  key: z.string().min(1),
+  value: z.string().min(1),
 });
 
 export type EventInfo = z.infer<typeof EventInfoSchema>;
@@ -164,12 +165,16 @@ export function filterEventInfo(items: unknown[]): EventInfo[] {
 
 export function computeDances(parts: EventPart[]): string[] {
   const seen = new Set<string>();
+  const ordered: string[] = [];
   for (const part of parts) {
     for (const dance of part.dances) {
-      seen.add(dance);
+      if (!seen.has(dance)) {
+        seen.add(dance);
+        ordered.push(dance);
+      }
     }
   }
-  return Array.from(seen);
+  return ordered.slice(0, 6);
 }
 
 // ---- Directus schemas ----
@@ -216,6 +221,9 @@ export const DirectusEventSchema = z.object({
   parts: z.array(EventPartSchema),
   info: z.array(EventInfoSchema),
   dances: z.array(z.string()),
+  image: z.union([z.number(), z.string()]).nullable().optional(),
+  image_source: z.string().nullable().optional(),
+  event_type: z.string().nullable().optional(),
   status: z.enum(["published", "draft", "archived", "incomplete"]).optional(),
   translation_status: z.enum(["complete", "partial", "missing"]).optional(),
   // Directus returns translations as full objects when expanded (?fields=*.*),
@@ -320,6 +328,91 @@ export function toIsoOrNull(timestamp: number | null | undefined): string | null
     return null;
   }
 }
+
+// ---- Course schemas ----
+
+export const CourseExtractionSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  instructor_name: z.string().nullable(),
+  level: z.enum(["beginner", "intermediate", "advanced", "all_levels"]).default("all_levels"),
+  schedule_day: z.string().nullable(),
+  schedule_time: z.string().nullable(),
+  lesson_count: z.number().int().positive().nullable(),
+  lesson_duration_minutes: z.number().int().positive().nullable(),
+  max_participants: z.number().int().positive().nullable(),
+  price: z.string().nullable(),
+  price_note: z.string().nullable(),
+  learning_items: z.array(z.string()),
+  dances: z.array(z.string()),
+});
+
+export type CourseExtraction = z.infer<typeof CourseExtractionSchema>;
+
+export const DirectusCourseTranslationSchema = z.object({
+  id: z.union([z.number(), z.string()]).optional(),
+  courses_id: z.union([z.number(), z.string()]).optional(),
+  languages_code: z.string(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  learning_items: z.array(z.string()).optional(),
+});
+
+export type DirectusCourseTranslation = z.infer<typeof DirectusCourseTranslationSchema>;
+
+export const DirectusCourseSchema = z.object({
+  id: z.union([z.number(), z.string()]).optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  instructor_name: z.string().nullable().optional(),
+  instructor_bio: z.string().nullable().optional(),
+  instructor_avatar_url: z.string().nullable().optional(),
+  venue: z.union([z.number(), z.string(), DirectusVenueSchema]).nullable().optional(),
+  start_date: z.string().nullable().optional(),
+  end_date: z.string().nullable().optional(),
+  schedule_day: z.string().nullable().optional(),
+  schedule_time: z.string().nullable().optional(),
+  lesson_count: z.number().nullable().optional(),
+  lesson_duration_minutes: z.number().nullable().optional(),
+  max_participants: z.number().nullable().optional(),
+  current_participants: z.number().optional(),
+  price: z.string().nullable().optional(),
+  price_note: z.string().nullable().optional(),
+  level: z.string().nullable().optional(),
+  dances: z.array(z.string()).optional(),
+  image: z.union([z.number(), z.string()]).nullable().optional(),
+  image_source: z.string().nullable().optional(),
+  original_url: z.string().nullable().optional(),
+  original_description: z.string().nullable().optional(),
+  status: z.enum(["published", "draft", "archived"]).optional(),
+  translation_status: z.enum(["complete", "partial", "missing"]).optional(),
+  translations: z.array(z.union([z.any(), z.number(), z.string()])).optional(),
+});
+
+export type DirectusCourse = z.infer<typeof DirectusCourseSchema>;
+
+// ---- Dance style schemas ----
+
+export const DirectusDanceStyleSchema = z.object({
+  code: z.string(),
+  name: z.string(),
+  parent_code: z.string().nullable().optional(),
+  sort_order: z.number().optional(),
+});
+
+export type DirectusDanceStyle = z.infer<typeof DirectusDanceStyleSchema>;
+
+// ---- Favorites schema ----
+
+export const DirectusFavoriteSchema = z.object({
+  id: z.union([z.number(), z.string()]).optional(),
+  user_id: z.string(),
+  item_type: z.enum(["event", "course"]),
+  item_id: z.number(),
+  created_at: z.string().optional(),
+});
+
+export type DirectusFavorite = z.infer<typeof DirectusFavoriteSchema>;
 
 // ---- JSON parsing ----
 

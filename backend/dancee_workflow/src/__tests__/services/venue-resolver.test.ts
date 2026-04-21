@@ -259,12 +259,14 @@ describe("Property 2: Null end timestamp preservation", () => {
 // ---- Property 5: Unsupported event types are skipped ----
 
 describe("Property 5: Unsupported event types are skipped", () => {
-  it("SUPPORTED_EVENT_TYPES contains only party, workshop, festival, holiday", () => {
+  it("SUPPORTED_EVENT_TYPES contains party, workshop, festival, holiday, course, lesson", () => {
     expect(SUPPORTED_EVENT_TYPES).toContain("party");
     expect(SUPPORTED_EVENT_TYPES).toContain("workshop");
     expect(SUPPORTED_EVENT_TYPES).toContain("festival");
     expect(SUPPORTED_EVENT_TYPES).toContain("holiday");
-    expect(SUPPORTED_EVENT_TYPES).toHaveLength(4);
+    expect(SUPPORTED_EVENT_TYPES).toContain("course");
+    expect(SUPPORTED_EVENT_TYPES).toContain("lesson");
+    expect(SUPPORTED_EVENT_TYPES).toHaveLength(6);
   });
 
   it("any event type not in SUPPORTED_EVENT_TYPES should not pass the supported check", () => {
@@ -282,11 +284,8 @@ describe("Property 5: Unsupported event types are skipped", () => {
     );
   });
 
-  it("'other', 'lesson', and 'course' event types are not in SUPPORTED_EVENT_TYPES", () => {
-    const unsupportedTypes = ["other", "lesson", "course"];
-    for (const type of unsupportedTypes) {
-      expect((SUPPORTED_EVENT_TYPES as readonly string[]).includes(type)).toBe(false);
-    }
+  it("'other' event type is not in SUPPORTED_EVENT_TYPES", () => {
+    expect((SUPPORTED_EVENT_TYPES as readonly string[]).includes("other")).toBe(false);
   });
 
   it("parseEventType returns 'other' for unknown strings, which is then not in SUPPORTED_EVENT_TYPES", () => {

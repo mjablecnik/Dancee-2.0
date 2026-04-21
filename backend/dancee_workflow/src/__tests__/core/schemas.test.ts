@@ -143,7 +143,7 @@ describe("filterEventInfo", () => {
 });
 
 describe("computeDances", () => {
-  it("Property 15: computed dances is the unique set from all parts", () => {
+  it("Property 15: computed dances is the unique set from all parts, capped at 6", () => {
     fc.assert(
       fc.property(
         fc.array(
@@ -164,12 +164,12 @@ describe("computeDances", () => {
           const result = computeDances(parts);
           // Result must be a unique set
           expect(result).toHaveLength(new Set(result).size);
-          // Result must contain all dances from parts
+          // Result must be capped at 6
+          expect(result.length).toBeLessThanOrEqual(6);
+          // All result entries must come from the parts' dances (first-seen order)
           const allDances = parts.flatMap((p) => p.dances);
-          for (const dance of allDances) {
-            if (dance !== "") {
-              expect(result).toContain(dance);
-            }
+          for (const dance of result) {
+            expect(allDances).toContain(dance);
           }
         }
       )
