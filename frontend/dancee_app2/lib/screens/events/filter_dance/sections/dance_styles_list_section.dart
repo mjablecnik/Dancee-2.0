@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
-import '../../../../data/event_repository.dart';
+import '../../../../data/entities/dance_style.dart';
 
 class DanceStylesListSection extends StatelessWidget {
-  final List<DanceStyleData> styles;
-  final Map<String, bool> selected;
-  final ValueChanged<String> onToggle;
+  final List<DanceStyle> styles;
+  final Map<String, bool> selected; // key = dance style code
+  final ValueChanged<String> onToggle; // passes dance style code
 
   const DanceStylesListSection({
     super.key,
@@ -18,6 +18,7 @@ class DanceStylesListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (styles.isEmpty) return const SizedBox.shrink();
     return Container(
       decoration: BoxDecoration(
         color: appSurface,
@@ -29,12 +30,12 @@ class DanceStylesListSection extends StatelessWidget {
         children: List.generate(styles.length, (index) {
           final style = styles[index];
           final isLast = index == styles.length - 1;
-          final isChecked = selected[style.name] ?? false;
+          final isChecked = selected[style.code] ?? false;
           return _StyleRow(
             style: style,
             isChecked: isChecked,
             isLast: isLast,
-            onToggle: () => onToggle(style.name),
+            onToggle: () => onToggle(style.code),
           );
         }),
       ),
@@ -43,7 +44,7 @@ class DanceStylesListSection extends StatelessWidget {
 }
 
 class _StyleRow extends StatelessWidget {
-  final DanceStyleData style;
+  final DanceStyle style;
   final bool isChecked;
   final bool isLast;
   final VoidCallback onToggle;
@@ -70,33 +71,20 @@ class _StyleRow extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [style.gradientStart, style.gradientEnd],
-                ),
+                color: appPrimary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(style.icon, color: Colors.white, size: 18),
+              child: const Icon(FontAwesomeIcons.music, color: appPrimary, size: 16),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    style.name,
-                    style: const TextStyle(
-                      fontSize: AppTypography.fontSizeXl,
-                      fontWeight: AppTypography.fontWeightSemiBold,
-                      color: appText,
-                    ),
-                  ),
-                  Text(
-                    style.subtitle,
-                    style: const TextStyle(fontSize: AppTypography.fontSizeSm, color: appMuted),
-                  ),
-                ],
+              child: Text(
+                style.name,
+                style: const TextStyle(
+                  fontSize: AppTypography.fontSizeXl,
+                  fontWeight: AppTypography.fontWeightSemiBold,
+                  color: appText,
+                ),
               ),
             ),
             _Checkbox(isChecked: isChecked, onToggle: onToggle),

@@ -230,14 +230,14 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Modify GoRouter route for `/courses/detail` to accept an `id` parameter
     - _Requirements: 14.1_
 
-- [ ] 10. Update filter screens
-  - [ ] 10.1 Update dance style filter screen
+- [x] 10. Update filter screens
+  - [x] 10.1 Update dance style filter screen
     - Replace mock data with dance styles from FilterCubit (fetched from CMS with translated names)
     - Allow multi-select of dance styles, update FilterCubit on confirmation
     - Show currently selected styles as pre-checked
     - _Requirements: 8.1, 8.2, 8.6_
 
-  - [ ] 10.2 Update location filter screen
+  - [x] 10.2 Update location filter screen
     - Derive available regions from loaded events and courses venue data (union of all non-empty venue.region values)
     - Allow multi-select of regions, update FilterCubit on confirmation
     - Show currently selected regions as pre-checked

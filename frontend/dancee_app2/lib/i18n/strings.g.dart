@@ -493,6 +493,8 @@ class _StringsEventsFilterEn {
 	String get useMyLocationSubtitle => 'Automatically finds events near you';
 	String get popularCities => 'Popular cities';
 	String get allCities => 'All cities';
+	String get selectedRegions => 'SELECTED REGIONS';
+	String get noResults => 'No results found';
 }
 
 // Path: events.filters
@@ -1092,6 +1094,8 @@ class _StringsEventsFilterCs implements _StringsEventsFilterEn {
 	@override String get useMyLocationSubtitle => 'Automaticky najde akce ve vašem okolí';
 	@override String get popularCities => 'Oblíbená města';
 	@override String get allCities => 'Všechna města';
+	@override String get selectedRegions => 'VYBRANÉ OBLASTI';
+	@override String get noResults => 'Žádné výsledky';
 }
 
 // Path: events.filters
@@ -1434,6 +1438,8 @@ extension on Translations {
 			case 'events.filter.useMyLocationSubtitle': return 'Automatically finds events near you';
 			case 'events.filter.popularCities': return 'Popular cities';
 			case 'events.filter.allCities': return 'All cities';
+			case 'events.filter.selectedRegions': return 'SELECTED REGIONS';
+			case 'events.filter.noResults': return 'No results found';
 			case 'events.filters.today': return 'Today';
 			case 'events.filters.thisWeek': return 'This week';
 			case 'events.filters.thisMonth': return 'This month';
@@ -1665,6 +1671,8 @@ extension on _StringsCs {
 			case 'events.filter.useMyLocationSubtitle': return 'Automaticky najde akce ve vašem okolí';
 			case 'events.filter.popularCities': return 'Oblíbená města';
 			case 'events.filter.allCities': return 'Všechna města';
+			case 'events.filter.selectedRegions': return 'VYBRANÉ OBLASTI';
+			case 'events.filter.noResults': return 'Žádné výsledky';
 			case 'events.filters.today': return 'Dnes';
 			case 'events.filters.thisWeek': return 'Tento týden';
 			case 'events.filters.thisMonth': return 'Tento měsíc';

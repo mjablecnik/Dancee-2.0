@@ -132,7 +132,9 @@
       "useMyLocation": "Použít moji polohu",
       "useMyLocationSubtitle": "Automaticky najde akce ve vašem okolí",
       "popularCities": "Oblíbená města",
-      "allCities": "Všechna města"
+      "allCities": "Všechna města",
+      "selectedRegions": "VYBRANÉ OBLASTI",
+      "noResults": "Žádné výsledky"
     },
     "filters": {
       "today": "Dnes",

@@ -132,7 +132,9 @@
       "useMyLocation": "Use my location",
       "useMyLocationSubtitle": "Automatically finds events near you",
       "popularCities": "Popular cities",
-      "allCities": "All cities"
+      "allCities": "All cities",
+      "selectedRegions": "SELECTED REGIONS",
+      "noResults": "No results found"
     },
     "filters": {
       "today": "Today",
