@@ -226,7 +226,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Use `retryOnJsonError` pattern
     - _Requirements: 6.3_
 
-- [ ] 12. Final checkpoint — Ensure all tests pass
+- [x] 12. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
