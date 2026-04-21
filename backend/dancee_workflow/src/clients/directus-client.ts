@@ -6,12 +6,17 @@ import {
   DirectusErrorSchema,
   DirectusSkippedEventSchema,
   DirectusLanguageSchema,
+  DirectusCourseSchema,
+  DirectusDanceStyleSchema,
+  DirectusFavoriteSchema,
   type DirectusEvent,
   type DirectusVenue,
   type DirectusGroup,
   type DirectusError,
   type DirectusSkippedEvent,
   type DirectusLanguage,
+  type DirectusCourse,
+  type DirectusFavorite,
 } from "../core/schemas";
 import { z } from "zod";
 
@@ -280,4 +285,132 @@ export async function createLanguage(
 ): Promise<DirectusLanguage> {
   const data = await directusPost("/items/languages", { code, name });
   return DirectusLanguageSchema.parse(extractDirectusData(data, "createLanguage"));
+}
+
+// ---- Files ----
+
+export async function uploadFile(
+  buffer: Buffer,
+  filename: string,
+  mimeType: string,
+): Promise<string> {
+  const formData = new FormData();
+  const blob = new Blob([buffer], { type: mimeType });
+  formData.append("file", blob, filename);
+
+  const response = await fetch(`${config.directusBaseUrl}/files`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.directusAccessToken}`,
+    },
+    body: formData,
+    signal: AbortSignal.timeout(config.directusTimeoutMs),
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Directus POST /files error ${response.status}: ${text}`);
+  }
+  const responseData = await response.json();
+  const fileData = extractDirectusData(responseData, "uploadFile") as { id: string };
+  if (!fileData || typeof fileData.id !== "string") {
+    throw new Error(`Unexpected response from Directus file upload: ${JSON.stringify(responseData)?.slice(0, 100)}`);
+  }
+  return fileData.id;
+}
+
+// ---- Courses ----
+
+export async function createCourse(course: DirectusCourse): Promise<DirectusCourse> {
+  const data = await directusPost("/items/courses", course);
+  return DirectusCourseSchema.parse(extractDirectusData(data, "createCourse"));
+}
+
+export async function findCourseByOriginalUrl(originalUrl: string): Promise<DirectusCourse | null> {
+  const encoded = encodeURIComponent(originalUrl);
+  const data = await directusGet(`/items/courses?filter[original_url][_eq]=${encoded}&limit=1`);
+  const items = extractDirectusData(data, "findCourseByOriginalUrl") as unknown[];
+  if (!items || items.length === 0) return null;
+  return DirectusCourseSchema.parse(items[0]);
+}
+
+// ---- Dance Styles ----
+
+let danceStyleCodesCache: string[] | null = null;
+
+export function clearDanceStyleCodesCache(): void {
+  danceStyleCodesCache = null;
+}
+
+export async function getDanceStyleCodes(): Promise<string[]> {
+  if (danceStyleCodesCache !== null) {
+    return danceStyleCodesCache;
+  }
+  const data = await directusGet("/items/dance_styles?fields=code&limit=-1");
+  const items = extractDirectusData(data, "getDanceStyleCodes") as unknown[];
+  const parsed = z.array(DirectusDanceStyleSchema.pick({ code: true })).parse(items);
+  danceStyleCodesCache = parsed.map((item) => item.code);
+  return danceStyleCodesCache;
+}
+
+// ---- Image reuse ----
+
+export async function findExpiredEventWithImage(
+  primaryDance: string,
+  eventType: string,
+): Promise<string | null> {
+  const now = new Date().toISOString();
+  const filter = {
+    _and: [
+      { end_time: { _lt: now } },
+      { image: { _nnull: true } },
+      { image_source: { _eq: "ai_generated" } },
+      { dances: { _contains: primaryDance } },
+      { event_type: { _eq: eventType } },
+    ],
+  };
+  const encoded = encodeURIComponent(JSON.stringify(filter));
+  const data = await directusGet(
+    `/items/events?filter=${encoded}&fields=image&sort[]=-end_time&limit=1`,
+  );
+  const items = extractDirectusData(data, "findExpiredEventWithImage") as { image?: string | number | null }[];
+  if (!items || items.length === 0) return null;
+  const fileId = items[0].image;
+  if (fileId === null || fileId === undefined) return null;
+  return String(fileId);
+}
+
+// ---- Favorites ----
+
+export async function createFavorite(favorite: DirectusFavorite): Promise<DirectusFavorite> {
+  const data = await directusPost("/items/favorites", favorite);
+  return DirectusFavoriteSchema.parse(extractDirectusData(data, "createFavorite"));
+}
+
+export async function deleteFavorite(
+  userId: string,
+  itemType: "event" | "course",
+  itemId: number,
+): Promise<void> {
+  const filter = {
+    _and: [
+      { user_id: { _eq: userId } },
+      { item_type: { _eq: itemType } },
+      { item_id: { _eq: itemId } },
+    ],
+  };
+  const encoded = encodeURIComponent(JSON.stringify(filter));
+  const data = await directusGet(`/items/favorites?filter=${encoded}&fields=id&limit=1`);
+  const items = extractDirectusData(data, "deleteFavorite") as { id: number | string }[];
+  if (!items || items.length === 0) return;
+
+  const id = items[0].id;
+  const response = await fetch(`${config.directusBaseUrl}/items/favorites/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+    signal: AbortSignal.timeout(config.directusTimeoutMs),
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Directus DELETE /items/favorites/${id} error ${response.status}: ${text}`);
+  }
 }
