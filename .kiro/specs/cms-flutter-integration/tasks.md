@@ -212,21 +212,21 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Modify GoRouter route for `/events/detail` to accept an `id` parameter (path or query param)
     - _Requirements: 13.1_
 
-- [ ] 9. Update courses UI screens
-  - [ ] 9.1 Update courses list screen
+- [x] 9. Update courses UI screens
+  - [x] 9.1 Update courses list screen
     - Replace mock data with BlocBuilder on CourseCubit
     - Display loading, error with retry, or loaded list (no featured section)
     - Show each course with: image, title, instructor, date range, dance style tags, price, favorite button
     - Wire favorite button to FavoritesCubit.toggleFavorite
     - _Requirements: 6.1, 6.2, 6.3, 6.5, 6.6, 6.7, 12.6_
 
-  - [ ] 9.2 Update course detail screen
+  - [x] 9.2 Update course detail screen
     - Accept course ID via route parameter, look up course from CourseCubit's loaded state
     - Display: hero image, title, level, dance style chips, key info, description, schedule details, learning items, instructor section, pricing, original source link
     - Wire favorite toggle button to FavoritesCubit
     - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-  - [ ] 9.3 Update course detail route to pass course ID
+  - [x] 9.3 Update course detail route to pass course ID
     - Modify GoRouter route for `/courses/detail` to accept an `id` parameter
     - _Requirements: 14.1_
 
