@@ -22,7 +22,9 @@ tags:
   - name: Workflow - Events
     description: Single-event and batch event processing (dancee_workflow)
   - name: Workflow - Listing
-    description: Querying stored events (dancee_workflow)
+    description: Querying stored events and courses (dancee_workflow)
+  - name: Workflow - Favorites
+    description: User favorites management (dancee_workflow)
   - name: CMS - Events
     description: Event CRUD via Directus REST API (dancee_cms)
   - name: CMS - Venues
@@ -31,6 +33,16 @@ tags:
     description: Facebook group sources (dancee_cms)
   - name: CMS - Health
     description: CMS health check (dancee_cms)
+  - name: CMS - Courses
+    description: Course CRUD via Directus REST API (dancee_cms)
+  - name: CMS - Courses Translations
+    description: Course translation CRUD via Directus REST API (dancee_cms)
+  - name: CMS - Dance Styles
+    description: Dance style catalogue via Directus REST API (dancee_cms)
+  - name: CMS - Dance Styles Translations
+    description: Dance style translation CRUD via Directus REST API (dancee_cms)
+  - name: CMS - Favorites
+    description: User-saved events and courses via Directus REST API (dancee_cms)
 
 # =============================================================================
 # WORKFLOW API (dancee_workflow — port 8080 via Restate ingress)
@@ -48,11 +60,16 @@ paths:
         The workflow:
         1. Scrapes the event
         2. Checks for duplicates
-        3. Classifies event type (party, workshop, festival, holiday — unsupported types are skipped)
-        4. Extracts structured parts and info via LLM
+        3. Classifies event type:
+           - party, workshop, festival, holiday → stored in the events collection
+           - course, lesson → extracted with the course extraction prompt and stored in the courses collection
+           - other → skipped and recorded in skipped_events
+        4. For events: extracts structured parts and info (including dresscode) via LLM
         5. Resolves venue via Nominatim geocoding
         6. Translates content to CS, EN, ES
-        7. Stores in Directus CMS
+        7. Validates dance style codes against the dance_styles collection
+        8. Processes cover image (download from Facebook → reuse expired AI image → generate via AI)
+        9. Stores in Directus CMS with image, image_source, and event_type fields
 
         The workflow key is deterministic (derived from the normalised URL), so
         repeated calls with the same URL return the existing result.
@@ -248,6 +265,151 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DirectusEvent'
+
+  /api/courses/list:
+    post:
+      tags:
+        - Workflow - Listing
+      summary: List published courses
+      description: |
+        Returns published courses from Directus with expanded translations and venue.
+
+        Use request headers to control the response:
+        - `x-dancee-filter`: JSON-encoded Directus filter (allowed fields: dances, start_date, end_date, venue, level, translation_status)
+        - `x-dancee-lang`: Language code (cs, en, es) — flattens the matching translation onto each course
+      operationId: listCourses
+      parameters:
+        - name: x-dancee-filter
+          in: header
+          required: false
+          description: JSON-encoded Directus filter. Allowed fields: dances, start_date, end_date, venue, level, translation_status.
+          schema:
+            type: string
+          example: '{"dances":{"_contains":"salsa"}}'
+        - name: x-dancee-lang
+          in: header
+          required: false
+          description: Language code. Flattens matching translation onto each course and removes the translations array.
+          schema:
+            type: string
+            enum: [cs, en, es]
+          example: cs
+      responses:
+        '200':
+          description: List of published courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusCourse'
+
+  /api/favorites:
+    post:
+      tags:
+        - Workflow - Favorites
+      summary: Create a favorite
+      description: |
+        Saves an event or course as a favorite for a user.
+        Validates that the referenced event or course exists before creating the favorite.
+        The combination of (user_id, item_type, item_id) must be unique.
+      operationId: createFavorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusFavorite'
+            example:
+              user_id: "user-123"
+              item_type: "event"
+              item_id: 42
+      responses:
+        '200':
+          description: Created favorite
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusFavorite'
+        '400':
+          description: Duplicate favorite, missing fields, or invalid item reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
+
+  /api/favorites/delete:
+    post:
+      tags:
+        - Workflow - Favorites
+      summary: Delete a favorite
+      description: Removes a saved favorite by user_id, item_type, and item_id.
+      operationId: deleteFavorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - item_type
+                - item_id
+              properties:
+                user_id:
+                  type: string
+                  example: "user-123"
+                item_type:
+                  type: string
+                  enum: [event, course]
+                  example: "event"
+                item_id:
+                  type: integer
+                  example: 42
+      responses:
+        '200':
+          description: Favorite deleted successfully
+        '404':
+          description: Favorite not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
+
+  /api/favorites/list:
+    post:
+      tags:
+        - Workflow - Favorites
+      summary: List favorites for a user
+      description: Returns all saved items (events and courses) for the specified user.
+      operationId: listFavorites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  example: "user-123"
+      responses:
+        '200':
+          description: List of favorites for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusFavorite'
+        '400':
+          description: Missing user_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowErrorResponse'
 
 # =============================================================================
 # CMS API (dancee_cms — Directus on port 8055)
@@ -461,6 +623,273 @@ paths:
               schema:
                 $ref: '#/components/schemas/DirectusSingleResponse'
 
+  /items/courses:
+    get:
+      tags:
+        - CMS - Courses
+      summary: List courses
+      description: Supports standard Directus query parameters — `filter`, `sort`, `limit`, `offset`, `fields`.
+      operationId: cmsListCourses
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusOffset'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusListResponse'
+    post:
+      tags:
+        - CMS - Courses
+      summary: Create course
+      operationId: cmsCreateCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourse'
+      responses:
+        '200':
+          description: Created course
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+
+  /items/courses/{id}:
+    get:
+      tags:
+        - CMS - Courses
+      summary: Get course by ID
+      operationId: cmsGetCourse
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: Course record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+        '404':
+          description: Not found
+    patch:
+      tags:
+        - CMS - Courses
+      summary: Update course
+      operationId: cmsUpdateCourse
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourse'
+      responses:
+        '200':
+          description: Updated course
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+    delete:
+      tags:
+        - CMS - Courses
+      summary: Delete course
+      operationId: cmsDeleteCourse
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      responses:
+        '204':
+          description: Deleted
+
+  /items/courses_translations:
+    get:
+      tags:
+        - CMS - Courses Translations
+      summary: List course translations
+      operationId: cmsListCourseTranslations
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of course translations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusListResponse'
+    post:
+      tags:
+        - CMS - Courses Translations
+      summary: Create course translation
+      operationId: cmsCreateCourseTranslation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourseTranslation'
+      responses:
+        '200':
+          description: Created translation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+
+  /items/courses_translations/{id}:
+    patch:
+      tags:
+        - CMS - Courses Translations
+      summary: Update course translation
+      operationId: cmsUpdateCourseTranslation
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourseTranslation'
+      responses:
+        '200':
+          description: Updated translation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+
+  /items/dance_styles:
+    get:
+      tags:
+        - CMS - Dance Styles
+      summary: List dance styles
+      description: Returns the hierarchical catalogue of dance styles used for event/course tagging and filtering.
+      operationId: cmsListDanceStyles
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusSort'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of dance styles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusListResponse'
+
+  /items/dance_styles/{code}:
+    get:
+      tags:
+        - CMS - Dance Styles
+      summary: Get dance style by code
+      operationId: cmsGetDanceStyle
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "salsa"
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: Dance style record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+        '404':
+          description: Not found
+
+  /items/dance_styles_translations:
+    get:
+      tags:
+        - CMS - Dance Styles Translations
+      summary: List dance style translations
+      operationId: cmsListDanceStyleTranslations
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of dance style translations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusListResponse'
+
+  /items/favorites:
+    get:
+      tags:
+        - CMS - Favorites
+      summary: List favorites
+      description: Filter by `user_id` to retrieve a specific user's saved items.
+      operationId: cmsListFavorites
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusListResponse'
+    post:
+      tags:
+        - CMS - Favorites
+      summary: Create favorite
+      description: |
+        Saves an event or course as a favorite for a user.
+        The combination of (user_id, item_type, item_id) must be unique — duplicates return 400.
+      operationId: cmsCreateFavorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusFavorite'
+            example:
+              user_id: "user-123"
+              item_type: "event"
+              item_id: 42
+      responses:
+        '200':
+          description: Created favorite
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusSingleResponse'
+        '400':
+          description: Duplicate favorite or invalid item reference
+
+  /items/favorites/{id}:
+    delete:
+      tags:
+        - CMS - Favorites
+      summary: Delete favorite
+      operationId: cmsDeleteFavorite
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      responses:
+        '204':
+          description: Deleted
+
 components:
   parameters:
     DirectusId:
@@ -668,6 +1097,25 @@ components:
           type: string
           enum: [published, draft, archived]
           example: "published"
+        image:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Directus file ID of the event cover image (stored in Directus Files / S3)
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        image_source:
+          type: string
+          enum: [facebook, ai_generated]
+          nullable: true
+          description: Origin of the cover image — "facebook" (downloaded from Facebook) or "ai_generated"
+          example: "facebook"
+        event_type:
+          type: string
+          enum: [party, workshop, festival, holiday, other]
+          nullable: true
+          description: Classified event type
+          example: "party"
         translation_status:
           type: string
           enum: [complete, partial, missing]
@@ -731,7 +1179,7 @@ components:
       properties:
         type:
           type: string
-          enum: [url, price]
+          enum: [url, price, dresscode]
           example: "price"
         key:
           type: string
@@ -853,3 +1301,214 @@ components:
       properties:
         data:
           type: object
+
+    DirectusCourse:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        title:
+          type: string
+          example: "Salsa On1 — Beginner Course"
+        description:
+          type: string
+        instructor_name:
+          type: string
+          nullable: true
+          example: "Maria García"
+        instructor_bio:
+          type: string
+          nullable: true
+        instructor_avatar_url:
+          type: string
+          nullable: true
+        venue:
+          oneOf:
+            - type: integer
+            - type: string
+            - $ref: '#/components/schemas/DirectusVenue'
+            - type: 'null'
+          description: Venue ID or expanded venue object
+        start_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-03-05"
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-05-28"
+        schedule_day:
+          type: string
+          nullable: true
+          example: "Tuesday"
+        schedule_time:
+          type: string
+          nullable: true
+          example: "19:00 - 20:30"
+        lesson_count:
+          type: integer
+          nullable: true
+          example: 12
+        lesson_duration_minutes:
+          type: integer
+          nullable: true
+          example: 90
+        max_participants:
+          type: integer
+          nullable: true
+          example: 20
+        current_participants:
+          type: integer
+          default: 0
+          example: 8
+        price:
+          type: string
+          nullable: true
+          example: "3 600 Kč"
+        price_note:
+          type: string
+          nullable: true
+          example: "Includes all 12 lessons"
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, all_levels]
+          nullable: true
+          example: "beginner"
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["salsa-on1", "salsa"]
+        image:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Directus file ID of the course cover image
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        image_source:
+          type: string
+          enum: [facebook, ai_generated]
+          nullable: true
+          description: Origin of the cover image
+          example: "facebook"
+        original_url:
+          type: string
+          nullable: true
+          example: "https://www.facebook.com/events/1234567890"
+        original_description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [published, draft, archived]
+          example: "published"
+        translation_status:
+          type: string
+          enum: [complete, partial, missing]
+          nullable: true
+          example: "complete"
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusCourseTranslation'
+
+    DirectusCourseTranslation:
+      type: object
+      properties:
+        id:
+          type: integer
+        courses_id:
+          oneOf:
+            - type: integer
+            - type: string
+        languages_code:
+          type: string
+          example: "en"
+        title:
+          type: string
+          example: "Salsa On1 — Beginner Course"
+        description:
+          type: string
+        learning_items:
+          type: array
+          items:
+            type: string
+          example: ["Basic salsa footwork", "Partner leading and following", "Turns and spins"]
+
+    DirectusDanceStyle:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Unique identifier and primary key (e.g. "salsa", "bachata-sensual")
+          example: "salsa"
+        name:
+          type: string
+          description: English display name
+          example: "Salsa"
+        parent_code:
+          type: string
+          nullable: true
+          description: Code of the parent dance style (null for top-level styles)
+          example: null
+        sort_order:
+          type: integer
+          description: Display ordering
+          example: 1
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusDanceStyleTranslation'
+
+    DirectusDanceStyleTranslation:
+      type: object
+      properties:
+        id:
+          type: integer
+        dance_styles_code:
+          type: string
+          description: Code of the parent dance style
+          example: "salsa"
+        languages_code:
+          type: string
+          example: "cs"
+        name:
+          type: string
+          example: "Salsa"
+
+    DirectusFavorite:
+      type: object
+      required:
+        - user_id
+        - item_type
+        - item_id
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        user_id:
+          type: string
+          description: User identifier (indexed)
+          example: "user-123"
+        item_type:
+          type: string
+          enum: [event, course]
+          description: Type of the saved item
+          example: "event"
+        item_id:
+          type: integer
+          description: ID of the saved event or course
+          example: 42
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the favorite was created (auto-set)
+          example: "2024-02-15T20:00:00.000Z"

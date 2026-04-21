@@ -29,6 +29,16 @@ tags:
     description: Processing error log
   - name: Skipped Events
     description: Skipped event log
+  - name: Courses
+    description: Course CRUD
+  - name: Courses Translations
+    description: Course translation CRUD
+  - name: Dance Styles
+    description: Dance style catalogue
+  - name: Dance Styles Translations
+    description: Dance style translation CRUD
+  - name: Favorites
+    description: User-saved events and courses
 
 paths:
   /server/health:
@@ -317,6 +327,319 @@ paths:
                     items:
                       $ref: '#/components/schemas/DirectusSkippedEvent'
 
+  /items/courses:
+    get:
+      tags:
+        - Courses
+      summary: List courses
+      description: Supports standard Directus query parameters — `filter`, `sort`, `limit`, `offset`, `fields`.
+      operationId: cmsListCourses
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusOffset'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusCourse'
+    post:
+      tags:
+        - Courses
+      summary: Create course
+      operationId: cmsCreateCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourse'
+      responses:
+        '200':
+          description: Created course
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusCourse'
+
+  /items/courses/{id}:
+    get:
+      tags:
+        - Courses
+      summary: Get course by ID
+      operationId: cmsGetCourse
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: Course record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusCourse'
+        '404':
+          description: Not found
+    patch:
+      tags:
+        - Courses
+      summary: Update course
+      operationId: cmsUpdateCourse
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourse'
+      responses:
+        '200':
+          description: Updated course
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusCourse'
+    delete:
+      tags:
+        - Courses
+      summary: Delete course
+      operationId: cmsDeleteCourse
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      responses:
+        '204':
+          description: Deleted
+
+  /items/courses_translations:
+    get:
+      tags:
+        - Courses Translations
+      summary: List course translations
+      operationId: cmsListCourseTranslations
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of course translations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusCourseTranslation'
+    post:
+      tags:
+        - Courses Translations
+      summary: Create course translation
+      operationId: cmsCreateCourseTranslation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourseTranslation'
+      responses:
+        '200':
+          description: Created translation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusCourseTranslation'
+
+  /items/courses_translations/{id}:
+    patch:
+      tags:
+        - Courses Translations
+      summary: Update course translation
+      operationId: cmsUpdateCourseTranslation
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusCourseTranslation'
+      responses:
+        '200':
+          description: Updated translation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusCourseTranslation'
+
+  /items/dance_styles:
+    get:
+      tags:
+        - Dance Styles
+      summary: List dance styles
+      description: Returns the hierarchical catalogue of dance styles used for event/course tagging and filtering.
+      operationId: cmsListDanceStyles
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusSort'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of dance styles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusDanceStyle'
+
+  /items/dance_styles/{code}:
+    get:
+      tags:
+        - Dance Styles
+      summary: Get dance style by code
+      operationId: cmsGetDanceStyle
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "salsa"
+        - $ref: '#/components/parameters/DirectusFields'
+      responses:
+        '200':
+          description: Dance style record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusDanceStyle'
+        '404':
+          description: Not found
+
+  /items/dance_styles_translations:
+    get:
+      tags:
+        - Dance Styles Translations
+      summary: List dance style translations
+      operationId: cmsListDanceStyleTranslations
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+      responses:
+        '200':
+          description: List of dance style translations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusDanceStyleTranslation'
+
+  /items/favorites:
+    get:
+      tags:
+        - Favorites
+      summary: List favorites
+      description: Filter by `user_id` to retrieve a specific user's saved items.
+      operationId: cmsListFavorites
+      parameters:
+        - $ref: '#/components/parameters/DirectusFilter'
+        - $ref: '#/components/parameters/DirectusFields'
+        - $ref: '#/components/parameters/DirectusLimit'
+        - $ref: '#/components/parameters/DirectusSort'
+      responses:
+        '200':
+          description: List of favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectusFavorite'
+    post:
+      tags:
+        - Favorites
+      summary: Create favorite
+      description: |
+        Saves an event or course as a favorite for a user.
+        The combination of (user_id, item_type, item_id) must be unique — duplicates return 400.
+      operationId: cmsCreateFavorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusFavorite'
+            example:
+              user_id: "user-123"
+              item_type: "event"
+              item_id: 42
+      responses:
+        '200':
+          description: Created favorite
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DirectusFavorite'
+        '400':
+          description: Duplicate favorite or invalid item reference
+
+  /items/favorites/{id}:
+    delete:
+      tags:
+        - Favorites
+      summary: Delete favorite
+      operationId: cmsDeleteFavorite
+      parameters:
+        - $ref: '#/components/parameters/DirectusId'
+      responses:
+        '204':
+          description: Deleted
+
 components:
   parameters:
     DirectusId:
@@ -429,6 +752,25 @@ components:
           type: string
           enum: [published, draft, archived]
           example: "published"
+        image:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Directus file ID of the event cover image (stored in Directus Files / S3)
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        image_source:
+          type: string
+          enum: [facebook, ai_generated]
+          nullable: true
+          description: Origin of the cover image — "facebook" (downloaded from Facebook) or "ai_generated"
+          example: "facebook"
+        event_type:
+          type: string
+          enum: [party, workshop, festival, holiday, other]
+          nullable: true
+          description: Classified event type
+          example: "party"
         translation_status:
           type: string
           enum: [complete, partial, missing]
@@ -482,7 +824,7 @@ components:
       properties:
         type:
           type: string
-          enum: [url, price]
+          enum: [url, price, dresscode]
           example: "price"
         key:
           type: string
@@ -626,3 +968,213 @@ components:
         datetime:
           type: string
           format: date-time
+
+    DirectusCourse:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        title:
+          type: string
+          example: "Salsa On1 — Beginner Course"
+        description:
+          type: string
+        instructor_name:
+          type: string
+          nullable: true
+          example: "Maria García"
+        instructor_bio:
+          type: string
+          nullable: true
+        instructor_avatar_url:
+          type: string
+          nullable: true
+        venue:
+          oneOf:
+            - type: integer
+            - type: string
+            - $ref: '#/components/schemas/DirectusVenue'
+            - type: 'null'
+        start_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-03-05"
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-05-28"
+        schedule_day:
+          type: string
+          nullable: true
+          example: "Tuesday"
+        schedule_time:
+          type: string
+          nullable: true
+          example: "19:00 - 20:30"
+        lesson_count:
+          type: integer
+          nullable: true
+          example: 12
+        lesson_duration_minutes:
+          type: integer
+          nullable: true
+          example: 90
+        max_participants:
+          type: integer
+          nullable: true
+          example: 20
+        current_participants:
+          type: integer
+          default: 0
+          example: 8
+        price:
+          type: string
+          nullable: true
+          example: "3 600 Kč"
+        price_note:
+          type: string
+          nullable: true
+          example: "Includes all 12 lessons"
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, all_levels]
+          nullable: true
+          example: "beginner"
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["salsa-on1", "salsa"]
+        image:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Directus file ID of the course cover image
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        image_source:
+          type: string
+          enum: [facebook, ai_generated]
+          nullable: true
+          description: Origin of the cover image
+          example: "facebook"
+        original_url:
+          type: string
+          nullable: true
+          example: "https://www.facebook.com/events/1234567890"
+        original_description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [published, draft, archived]
+          example: "published"
+        translation_status:
+          type: string
+          enum: [complete, partial, missing]
+          nullable: true
+          example: "complete"
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusCourseTranslation'
+
+    DirectusCourseTranslation:
+      type: object
+      properties:
+        id:
+          type: integer
+        courses_id:
+          oneOf:
+            - type: integer
+            - type: string
+        languages_code:
+          type: string
+          example: "en"
+        title:
+          type: string
+          example: "Salsa On1 — Beginner Course"
+        description:
+          type: string
+        learning_items:
+          type: array
+          items:
+            type: string
+          example: ["Basic salsa footwork", "Partner leading and following", "Turns and spins"]
+
+    DirectusDanceStyle:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Unique identifier and primary key (e.g. "salsa", "bachata-sensual")
+          example: "salsa"
+        name:
+          type: string
+          description: English display name
+          example: "Salsa"
+        parent_code:
+          type: string
+          nullable: true
+          description: Code of the parent dance style (null for top-level styles)
+          example: null
+        sort_order:
+          type: integer
+          description: Display ordering
+          example: 1
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusDanceStyleTranslation'
+
+    DirectusDanceStyleTranslation:
+      type: object
+      properties:
+        id:
+          type: integer
+        dance_styles_code:
+          type: string
+          description: Code of the parent dance style
+          example: "salsa"
+        languages_code:
+          type: string
+          example: "cs"
+        name:
+          type: string
+          example: "Salsa"
+
+    DirectusFavorite:
+      type: object
+      required:
+        - user_id
+        - item_type
+        - item_id
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        user_id:
+          type: string
+          description: User identifier (indexed)
+          example: "user-123"
+        item_type:
+          type: string
+          enum: [event, course]
+          description: Type of the saved item
+          example: "event"
+        item_id:
+          type: integer
+          description: ID of the saved event or course
+          example: 42
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the favorite was created (auto-set)
+          example: "2024-02-15T20:00:00.000Z"

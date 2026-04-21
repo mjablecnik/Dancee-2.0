@@ -23,7 +23,9 @@ tags:
   - name: Events
     description: Single-event and batch event processing
   - name: Listing
-    description: Querying stored events
+    description: Querying stored events and courses
+  - name: Favorites
+    description: User favorites management
 
 paths:
   /api/event:
@@ -242,6 +244,151 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DirectusEvent'
+
+  /api/courses/list:
+    post:
+      tags:
+        - Listing
+      summary: List published courses
+      description: |
+        Returns published courses from Directus with expanded translations and venue.
+
+        Use request headers to control the response:
+        - `x-dancee-filter`: JSON-encoded Directus filter (allowed fields: dances, start_date, end_date, venue, level, translation_status)
+        - `x-dancee-lang`: Language code (cs, en, es) — flattens the matching translation onto each course
+      operationId: listCourses
+      parameters:
+        - name: x-dancee-filter
+          in: header
+          required: false
+          description: JSON-encoded Directus filter. Allowed fields: dances, start_date, end_date, venue, level, translation_status.
+          schema:
+            type: string
+          example: '{"dances":{"_contains":"salsa"}}'
+        - name: x-dancee-lang
+          in: header
+          required: false
+          description: Language code. Flattens matching translation onto each course and removes the translations array.
+          schema:
+            type: string
+            enum: [cs, en, es]
+          example: cs
+      responses:
+        '200':
+          description: List of published courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusCourse'
+
+  /api/favorites:
+    post:
+      tags:
+        - Favorites
+      summary: Create a favorite
+      description: |
+        Saves an event or course as a favorite for a user.
+        Validates that the referenced event or course exists before creating the favorite.
+        The combination of (user_id, item_type, item_id) must be unique.
+      operationId: createFavorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectusFavorite'
+            example:
+              user_id: "user-123"
+              item_type: "event"
+              item_id: 42
+      responses:
+        '200':
+          description: Created favorite
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectusFavorite'
+        '400':
+          description: Duplicate favorite, missing fields, or invalid item reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/favorites/delete:
+    post:
+      tags:
+        - Favorites
+      summary: Delete a favorite
+      description: Removes a saved favorite by user_id, item_type, and item_id.
+      operationId: deleteFavorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - item_type
+                - item_id
+              properties:
+                user_id:
+                  type: string
+                  example: "user-123"
+                item_type:
+                  type: string
+                  enum: [event, course]
+                  example: "event"
+                item_id:
+                  type: integer
+                  example: 42
+      responses:
+        '200':
+          description: Favorite deleted successfully
+        '404':
+          description: Favorite not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/favorites/list:
+    post:
+      tags:
+        - Favorites
+      summary: List favorites for a user
+      description: Returns all saved items (events and courses) for the specified user.
+      operationId: listFavorites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  example: "user-123"
+      responses:
+        '200':
+          description: List of favorites for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusFavorite'
+        '400':
+          description: Missing user_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -543,3 +690,194 @@ components:
           type: number
           nullable: true
           example: 14.4258
+
+    DirectusCourse:
+      type: object
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        title:
+          type: string
+          example: "Salsa On1 — Beginner Course"
+        description:
+          type: string
+        instructor_name:
+          type: string
+          nullable: true
+          example: "Maria García"
+        instructor_bio:
+          type: string
+          nullable: true
+        instructor_avatar_url:
+          type: string
+          nullable: true
+        venue:
+          oneOf:
+            - type: integer
+            - type: string
+            - $ref: '#/components/schemas/DirectusVenue'
+            - type: 'null'
+          description: Venue ID or expanded venue object
+        start_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-03-05"
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-05-28"
+        schedule_day:
+          type: string
+          nullable: true
+          example: "Tuesday"
+        schedule_time:
+          type: string
+          nullable: true
+          example: "19:00 - 20:30"
+        lesson_count:
+          type: integer
+          nullable: true
+          example: 12
+        lesson_duration_minutes:
+          type: integer
+          nullable: true
+          example: 90
+        max_participants:
+          type: integer
+          nullable: true
+          example: 20
+        current_participants:
+          type: integer
+          default: 0
+          example: 8
+        price:
+          type: string
+          nullable: true
+          example: "3 600 Kč"
+        price_note:
+          type: string
+          nullable: true
+          example: "Includes all 12 lessons"
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, all_levels]
+          nullable: true
+          example: "beginner"
+        dances:
+          type: array
+          items:
+            type: string
+          example: ["salsa-on1", "salsa"]
+        image:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Directus file ID of the course cover image
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        image_source:
+          type: string
+          enum: [facebook, ai_generated]
+          nullable: true
+          description: Origin of the cover image
+          example: "facebook"
+        original_url:
+          type: string
+          nullable: true
+          example: "https://www.facebook.com/events/1234567890"
+        original_description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [published, draft, archived]
+          example: "published"
+        translation_status:
+          type: string
+          enum: [complete, partial, missing]
+          nullable: true
+          example: "complete"
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectusCourseTranslation'
+
+    DirectusCourseTranslation:
+      type: object
+      properties:
+        id:
+          type: integer
+        courses_id:
+          oneOf:
+            - type: integer
+            - type: string
+        languages_code:
+          type: string
+          example: "en"
+        title:
+          type: string
+          example: "Salsa On1 — Beginner Course"
+        description:
+          type: string
+        learning_items:
+          type: array
+          items:
+            type: string
+          example: ["Basic salsa footwork", "Partner leading and following", "Turns and spins"]
+
+    DirectusDanceStyle:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Unique identifier and primary key (e.g. "salsa", "bachata-sensual")
+          example: "salsa"
+        name:
+          type: string
+          description: English display name
+          example: "Salsa"
+        parent_code:
+          type: string
+          nullable: true
+          description: Code of the parent dance style (null for top-level styles)
+          example: null
+        sort_order:
+          type: integer
+          description: Display ordering
+          example: 1
+
+    DirectusFavorite:
+      type: object
+      required:
+        - user_id
+        - item_type
+        - item_id
+      properties:
+        id:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        user_id:
+          type: string
+          description: User identifier (indexed)
+          example: "user-123"
+        item_type:
+          type: string
+          enum: [event, course]
+          description: Type of the saved item
+          example: "event"
+        item_id:
+          type: integer
+          description: ID of the saved event or course
+          example: 42
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the favorite was created (auto-set)
+          example: "2024-02-15T20:00:00.000Z"

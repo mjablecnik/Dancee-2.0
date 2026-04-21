@@ -1,18 +1,17 @@
-# Tasks: CMS Data Completeness
+# Tasks — CMS Data Completeness
 
-Derived from [CODE_REVIEW.md](CODE_REVIEW.md).
+Derived from [CODE_REVIEW.md](./CODE_REVIEW.md).
 
-- [x] 1. [CRITICAL] Pass `danceStyleCodes` to `getCourseExtractionPrompt` in `extractCourseData` and update `runCourseWorkflow` call site
-- [x] 2. [CRITICAL] Pass `danceStyleCodes` to `extractEventParts` and add `validateDanceCodes` after `computeDances` in `reprocessEvent`
-- [x] 3. [HIGH] Add `IMAGE_GENERATION_MODEL=black-forest-labs/flux-schnell` to `.env.example`
-- [x] 4. [HIGH] Create `src/__tests__/services/image-processor.test.ts` with tests for the full fallback chain
-- [x] 5. [HIGH] Add unit tests for `translateCourseContent` in `event-translator.test.ts`
-- [x] 6. [HIGH] Update `workflow.openapi.yaml` with new event fields (image, image_source, event_type, dresscode) and course/lesson routing
-- [x] 7. [HIGH] Add duplicate check in `createFavorite` before inserting to enforce unique (user_id, item_type, item_id)
-- [x] 8. [HIGH] Add item_id existence validation in `createFavorite` (verify referenced event/course exists)
-- [x] 9. [MEDIUM] Add property-based test (fast-check) for Property 3: info_translations length matches info array length
-- [x] 10. [MEDIUM] Fix mislabeled Property 8 test and add actual Property 8 test for parent dance style filtering
-- [x] 11. [MEDIUM] Add API endpoints for listing courses and managing favorites, or document that these use Directus directly
-- [ ] 12. [LOW] Add "image" as a valid reprocess step in `reprocessEvent`
-- [ ] 13. [LOW] Document that `instructor_bio` and `instructor_avatar_url` are reserved for future use
-- [ ] 14. [LOW] Verify dance style seed data count matches design document exactly
+- [x] 1. [CRITICAL] Add courses, favorites, and dance_styles endpoints to all three OpenAPI specs (`workflow.openapi.yaml`, `cms.openapi.yaml`, `combined.openapi.yaml`) with corresponding schemas
+- [x] 2. [CRITICAL] Update `EventInfo.type` enum to `[url, price, dresscode]` in `cms.openapi.yaml` and `combined.openapi.yaml`
+- [x] 3. [CRITICAL] Add `image`, `image_source`, and `event_type` fields to `DirectusEvent` schema in `cms.openapi.yaml` and `combined.openapi.yaml`
+- [x] 4. [HIGH] Delete or fully update the deprecated local `backend/dancee_workflow/workflow.openapi.yaml` to match the canonical spec
+- [x] 5. [HIGH] Update `combined.openapi.yaml` to include all missing workflow endpoints (`/api/event/reprocess`, `/api/events/group`, courses, favorites) and update `processEvent` description to mention course/lesson routing
+- [ ] 6. [MEDIUM] Add `findCourseByOriginalUrl` duplicate check in `batch.ts` (`processAll` and `processSingle`) before scheduling workflows
+- [ ] 7. [MEDIUM] Document `_contains` JSON substring matching limitation in `findExpiredEventWithImage` or store primary dance as a separate indexed field
+- [ ] 8. [MEDIUM] Add property-based test (fast-check) for translation info_translations length preservation (Design Property 3)
+- [ ] 9. [MEDIUM] Add property-based test (fast-check) for parent dance style filtering includes child codes (Design Property 8)
+- [ ] 10. [LOW] Remove "Course" and "Lesson" from `event_type` dropdown choices in `setupEventsCollection` (these types route to courses collection)
+- [ ] 11. [LOW] Fix route path mismatch: change `/api/events/process-group` in `index.ts` to `/api/events/group` to match the OpenAPI spec
+- [ ] 12. [LOW] Seed `dance_styles_translations` with translated names for all 35 styles in cs, en, es languages
+- [ ] 13. [LOW] Add `{ value: "incomplete", text: "Incomplete" }` to the events status field choices in `setupEventsCollection`
