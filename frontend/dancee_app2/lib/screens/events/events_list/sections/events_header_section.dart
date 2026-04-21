@@ -31,8 +31,6 @@ class EventsHeaderSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildLocationRow(context),
-          const SizedBox(height: AppSpacing.xl),
-          _buildQuickFilters(),
         ],
       ),
     );
