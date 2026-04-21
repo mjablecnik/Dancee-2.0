@@ -6,6 +6,7 @@ dotenv.config();
 export const config = {
   openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
   openRouterModel: process.env.OPENROUTER_MODEL ?? "google/gemini-2.0-flash-001",
+  imageGenerationModel: process.env.IMAGE_GENERATION_MODEL ?? "black-forest-labs/flux-schnell",
   directusBaseUrl: process.env.DIRECTUS_BASE_URL ?? "",
   directusAccessToken: process.env.DIRECTUS_ACCESS_TOKEN ?? "",
   nominatimBaseUrl: process.env.NOMINATIM_BASE_URL ?? "https://nominatim.openstreetmap.org",
