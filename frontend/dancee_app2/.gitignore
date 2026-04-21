@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Sensitive app configuration (copy config.example.dart to config.dart)
+lib/config.dart
