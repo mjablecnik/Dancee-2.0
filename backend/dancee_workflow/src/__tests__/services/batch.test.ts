@@ -38,6 +38,7 @@ vi.mock("../../clients/scraper-client", () => ({
 }));
 
 import { batchService } from "../../services/batch";
+import { clearDanceStyleCodesCache } from "../../clients/directus-client";
 
 // Access the raw handler (works because we mocked restate.service)
 const batchDef = batchService as unknown as {
@@ -258,6 +259,15 @@ describe("BatchService.processAll: group timestamp update", () => {
 
     expect(result).toEqual({ groups: 2, eventsScheduled: 0, schedulingErrors: 0 });
     expect(mockUpdateGroupTimestamp).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("BatchService.processAll: cache invalidation", () => {
+  it("clears dance style codes cache at batch start", async () => {
+    mockGetGroups.mockResolvedValue([]);
+    const ctx = makeMockCtx();
+    await processAll(ctx);
+    expect(clearDanceStyleCodesCache).toHaveBeenCalled();
   });
 });
 

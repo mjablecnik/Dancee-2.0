@@ -377,12 +377,11 @@ export async function getDanceStyleCodes(): Promise<string[]> {
  * Finds the most recently expired event with an AI-generated image that matches
  * the given primary dance style and event type, for reuse in the image fallback chain.
  *
- * Known limitation: Directus `_contains` on a JSON array field performs substring
- * matching on the serialized JSON string, not exact element membership. For example,
- * filtering by "salsa" will also match events tagged with "salsa-on1" or "salsa-cubana"
- * because those strings contain "salsa" as a substring. This could result in reusing
- * an image from a slightly mismatched dance style. Storing the primary dance style as a
- * separate indexed field would enable more precise matching, but is not yet implemented.
+ * The Directus query uses `_contains` on the JSON `dances` field as a broad pre-filter,
+ * since Directus performs substring matching on the serialized JSON string rather than
+ * exact array element membership. To avoid false positives (e.g. "salsa" matching
+ * "salsa-on1"), results are post-filtered in application code to verify that
+ * `primaryDance` is an exact element of the `dances` array.
  */
 export async function findExpiredEventWithImage(
   primaryDance: string,
@@ -399,14 +398,24 @@ export async function findExpiredEventWithImage(
     ],
   };
   const encoded = encodeURIComponent(JSON.stringify(filter));
+  // Fetch a small batch so we can post-filter for exact array membership.
   const data = await directusGet(
-    `/items/events?filter=${encoded}&fields=image&sort[]=-end_time&limit=1`,
+    `/items/events?filter=${encoded}&fields=image,dances&sort[]=-end_time&limit=10`,
   );
-  const items = extractDirectusData(data, "findExpiredEventWithImage") as { image?: string | number | null }[];
+  const items = extractDirectusData(data, "findExpiredEventWithImage") as { image?: string | number | null; dances?: unknown }[];
   if (!items || items.length === 0) return null;
-  const fileId = items[0].image;
-  if (fileId === null || fileId === undefined) return null;
-  return String(fileId);
+
+  // Post-filter: verify primaryDance is an exact element of the dances array,
+  // guarding against substring false positives from the Directus _contains filter.
+  for (const item of items) {
+    const dances = Array.isArray(item.dances) ? item.dances as unknown[] : [];
+    if (dances.includes(primaryDance)) {
+      const fileId = item.image;
+      if (fileId === null || fileId === undefined) continue;
+      return String(fileId);
+    }
+  }
+  return null;
 }
 
 // ---- Favorites ----

@@ -753,6 +753,163 @@ async function seedDanceStyles(): Promise<void> {
   }
 }
 
+// Translation data for dance styles.
+// Most names are the same across cs, en, and es; only divergent names are listed.
+const DANCE_STYLE_TRANSLATIONS: Array<{ dance_styles_code: string; languages_code: string; name: string }> = [
+  // English translations
+  ...([
+    { code: "salsa", name: "Salsa" },
+    { code: "salsa-on1", name: "Salsa On1" },
+    { code: "salsa-on2", name: "Salsa On2" },
+    { code: "salsa-cubana", name: "Salsa Cubana" },
+    { code: "bachata", name: "Bachata" },
+    { code: "bachata-sensual", name: "Bachata Sensual" },
+    { code: "bachata-dominicana", name: "Bachata Dominicana" },
+    { code: "kizomba", name: "Kizomba" },
+    { code: "urban-kiz", name: "Urban Kiz" },
+    { code: "semba", name: "Semba" },
+    { code: "zouk", name: "Zouk" },
+    { code: "lambada", name: "Lambada" },
+    { code: "tango", name: "Tango" },
+    { code: "swing", name: "Swing" },
+    { code: "lindy-hop", name: "Lindy Hop" },
+    { code: "west-coast-swing", name: "West Coast Swing" },
+    { code: "boogie-woogie", name: "Boogie Woogie" },
+    { code: "charleston", name: "Charleston" },
+    { code: "reggaeton", name: "Reggaeton" },
+    { code: "afro", name: "Afro" },
+    { code: "forro", name: "Forró" },
+    { code: "ballroom", name: "Standard" },
+    { code: "waltz", name: "Waltz" },
+    { code: "viennese-waltz", name: "Viennese Waltz" },
+    { code: "quickstep", name: "Quickstep" },
+    { code: "slowfox", name: "Slowfox" },
+    { code: "latin", name: "Latin" },
+    { code: "cha-cha", name: "Cha-Cha" },
+    { code: "rumba", name: "Rumba" },
+    { code: "samba", name: "Samba" },
+    { code: "paso-doble", name: "Paso Doble" },
+    { code: "jive", name: "Jive" },
+    { code: "dancehall", name: "Dancehall" },
+    { code: "hip-hop", name: "Hip-Hop" },
+    { code: "contemporary", name: "Contemporary" },
+    { code: "ecstatic-dance", name: "Ecstatic Dance" },
+  ] as Array<{ code: string; name: string }>).map((s) => ({ dance_styles_code: s.code, languages_code: "en", name: s.name })),
+  // Czech translations
+  ...([
+    { code: "salsa", name: "Salsa" },
+    { code: "salsa-on1", name: "Salsa On1" },
+    { code: "salsa-on2", name: "Salsa On2" },
+    { code: "salsa-cubana", name: "Salsa Cubana" },
+    { code: "bachata", name: "Bachata" },
+    { code: "bachata-sensual", name: "Bachata Sensual" },
+    { code: "bachata-dominicana", name: "Bachata Dominicana" },
+    { code: "kizomba", name: "Kizomba" },
+    { code: "urban-kiz", name: "Urban Kiz" },
+    { code: "semba", name: "Semba" },
+    { code: "zouk", name: "Zouk" },
+    { code: "lambada", name: "Lambada" },
+    { code: "tango", name: "Tango" },
+    { code: "swing", name: "Swing" },
+    { code: "lindy-hop", name: "Lindy Hop" },
+    { code: "west-coast-swing", name: "West Coast Swing" },
+    { code: "boogie-woogie", name: "Boogie Woogie" },
+    { code: "charleston", name: "Charleston" },
+    { code: "reggaeton", name: "Reggaeton" },
+    { code: "afro", name: "Afro" },
+    { code: "forro", name: "Forró" },
+    { code: "ballroom", name: "Standardní" },
+    { code: "waltz", name: "Valčík" },
+    { code: "viennese-waltz", name: "Vídeňský valčík" },
+    { code: "quickstep", name: "Quickstep" },
+    { code: "slowfox", name: "Slowfox" },
+    { code: "latin", name: "Latinsko-americké" },
+    { code: "cha-cha", name: "Cha-Cha" },
+    { code: "rumba", name: "Rumba" },
+    { code: "samba", name: "Samba" },
+    { code: "paso-doble", name: "Paso Doble" },
+    { code: "jive", name: "Jive" },
+    { code: "dancehall", name: "Dancehall" },
+    { code: "hip-hop", name: "Hip-Hop" },
+    { code: "contemporary", name: "Současný tanec" },
+    { code: "ecstatic-dance", name: "Ekstatický tanec" },
+  ] as Array<{ code: string; name: string }>).map((s) => ({ dance_styles_code: s.code, languages_code: "cs", name: s.name })),
+  // Spanish translations
+  ...([
+    { code: "salsa", name: "Salsa" },
+    { code: "salsa-on1", name: "Salsa On1" },
+    { code: "salsa-on2", name: "Salsa On2" },
+    { code: "salsa-cubana", name: "Salsa Cubana" },
+    { code: "bachata", name: "Bachata" },
+    { code: "bachata-sensual", name: "Bachata Sensual" },
+    { code: "bachata-dominicana", name: "Bachata Dominicana" },
+    { code: "kizomba", name: "Kizomba" },
+    { code: "urban-kiz", name: "Urban Kiz" },
+    { code: "semba", name: "Semba" },
+    { code: "zouk", name: "Zouk" },
+    { code: "lambada", name: "Lambada" },
+    { code: "tango", name: "Tango" },
+    { code: "swing", name: "Swing" },
+    { code: "lindy-hop", name: "Lindy Hop" },
+    { code: "west-coast-swing", name: "West Coast Swing" },
+    { code: "boogie-woogie", name: "Boogie Woogie" },
+    { code: "charleston", name: "Charleston" },
+    { code: "reggaeton", name: "Reggaeton" },
+    { code: "afro", name: "Afro" },
+    { code: "forro", name: "Forró" },
+    { code: "ballroom", name: "Estándar" },
+    { code: "waltz", name: "Vals" },
+    { code: "viennese-waltz", name: "Vals vienés" },
+    { code: "quickstep", name: "Quickstep" },
+    { code: "slowfox", name: "Slowfox" },
+    { code: "latin", name: "Latinoamericano" },
+    { code: "cha-cha", name: "Cha-Cha" },
+    { code: "rumba", name: "Rumba" },
+    { code: "samba", name: "Samba" },
+    { code: "paso-doble", name: "Paso Doble" },
+    { code: "jive", name: "Jive" },
+    { code: "dancehall", name: "Dancehall" },
+    { code: "hip-hop", name: "Hip-Hop" },
+    { code: "contemporary", name: "Danza contemporánea" },
+    { code: "ecstatic-dance", name: "Danza extática" },
+  ] as Array<{ code: string; name: string }>).map((s) => ({ dance_styles_code: s.code, languages_code: "es", name: s.name })),
+];
+
+async function seedDanceStyleTranslations(): Promise<void> {
+  for (const translation of DANCE_STYLE_TRANSLATIONS) {
+    const filter = encodeURIComponent(
+      JSON.stringify({
+        _and: [
+          { dance_styles_code: { _eq: translation.dance_styles_code } },
+          { languages_code: { _eq: translation.languages_code } },
+        ],
+      }),
+    );
+    try {
+      const existing = await directusGet(
+        `/items/dance_styles_translations?filter=${filter}&fields=id&limit=1`,
+      ) as { data?: unknown[] };
+      if (existing?.data && existing.data.length > 0) {
+        console.log(`Translation "${translation.dance_styles_code}" (${translation.languages_code}) already exists, skipping.`);
+        continue;
+      }
+    } catch {
+      // Not found, create it
+    }
+    try {
+      await directusPost("/items/dance_styles_translations", translation);
+      console.log(`Seeded translation "${translation.dance_styles_code}" (${translation.languages_code}: ${translation.name}).`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("already exists") || msg.includes("409") || msg.includes("unique")) {
+        console.log(`Translation "${translation.dance_styles_code}" (${translation.languages_code}) already exists, skipping.`);
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
 async function setupCoursesCollection(): Promise<void> {
   await createCollectionIfNotExists("courses", { singleton: false });
 
@@ -1149,6 +1306,7 @@ async function main(): Promise<void> {
   await setupDanceStylesTranslationsRelation();
   await setupDanceStylesParentRelation();
   await seedDanceStyles();
+  await seedDanceStyleTranslations();
   await setupCoursesCollection();
   await setupCoursesTranslationsCollection();
   await setupCoursesTranslationsRelation();

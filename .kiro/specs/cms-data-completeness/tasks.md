@@ -55,7 +55,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Create `dance_styles` collection with `code` as custom string PK, `name`, `parent_code` (self-referencing M2O), `sort_order`
     - Create `dance_styles_translations` collection with `dance_styles_code`, `languages_code`, `name`
     - Configure translations relation between `dance_styles` and `dance_styles_translations`
-    - Seed all 35 dance styles from the design document (15 parents + 20 sub-styles)
+    - Seed all 36 dance styles from the design document (15 parents + 21 sub-styles)
     - Must be idempotent — skip existing records
     - _Requirements: 8.1, 8.2, 8.3, 10.3_
 

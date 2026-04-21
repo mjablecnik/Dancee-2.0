@@ -41,7 +41,7 @@ const eventPartArb = fc.record({
 });
 
 const eventInfoArb = fc.record({
-  type: fc.constantFrom("url", "price" as const),
+  type: fc.constantFrom("url", "price", "dresscode" as const),
   key: fc.string({ minLength: 1, maxLength: 30 }),
   value: fc.string({ minLength: 1, maxLength: 100 }),
 });

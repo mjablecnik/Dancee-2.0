@@ -139,11 +139,15 @@ flowchart TD
 
 #### `.env` / `.env.example`
 
-No new environment variables required. Image generation uses the existing `OPENROUTER_API_KEY` — OpenRouter supports image generation models (e.g. FLUX, Gemini image models) through the same OpenAI-compatible API used for text LLM calls.
+One new environment variable is added:
+
+- `IMAGE_GENERATION_MODEL` — the OpenRouter model ID used for AI image generation (e.g. `black-forest-labs/flux-schnell`). This is a non-sensitive configuration value and is set in `fly.toml [env]`, not as a Fly secret. It defaults to `black-forest-labs/flux-schnell` if not set.
+
+Image generation uses the existing `OPENROUTER_API_KEY` — OpenRouter supports image generation models (e.g. FLUX, Gemini image models) through the same OpenAI-compatible API used for text LLM calls.
 
 #### `src/core/config.ts`
 
-- Add `imageGenerationModel` config option (default: a suitable OpenRouter image model, e.g. a FLUX model)
+- Add `imageGenerationModel` config option reading `IMAGE_GENERATION_MODEL` env var (default: `black-forest-labs/flux-schnell`)
 - Image generation uses the existing `openrouterApiKey` and OpenRouter base URL — no separate API key needed
 
 ## Data Models
