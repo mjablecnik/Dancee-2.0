@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../shared/components/app_cached_image.dart';
 
 class CourseTag {
   final String label;
@@ -91,8 +92,8 @@ class CourseListCard extends StatelessWidget {
         const SizedBox(width: AppSpacing.md),
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          child: Image.network(
-            imageUrl,
+          child: AppCachedImage(
+            imageUrl: imageUrl,
             width: 64,
             height: 64,
             fit: BoxFit.cover,

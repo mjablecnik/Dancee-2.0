@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/colors.dart';
+import '../components/app_cached_image.dart';
 import '../../core/theme.dart';
 
 class HeroImageSection extends StatelessWidget {
@@ -20,8 +21,8 @@ class HeroImageSection extends StatelessWidget {
       height: 256,
       child: Stack(
         children: [
-          Image.network(
-            imageUrl,
+          AppCachedImage(
+            imageUrl: imageUrl,
             height: 256,
             width: double.infinity,
             fit: BoxFit.cover,

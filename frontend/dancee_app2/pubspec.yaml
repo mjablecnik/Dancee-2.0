@@ -17,6 +17,7 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   slang_flutter: ^3.31.0
   shared_preferences: ^2.3.0
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

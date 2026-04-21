@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../shared/components/app_cached_image.dart';
 
 class InstructorStat {
   final String value;
@@ -37,8 +38,8 @@ class InstructorCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(32),
-            child: Image.network(
-              avatarUrl,
+            child: AppCachedImage(
+              imageUrl: avatarUrl,
               width: 64,
               height: 64,
               fit: BoxFit.cover,

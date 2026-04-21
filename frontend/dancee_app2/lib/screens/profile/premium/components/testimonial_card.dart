@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../shared/components/app_cached_image.dart';
 
 class TestimonialCard extends StatelessWidget {
   final String avatarUrl;
@@ -31,8 +32,8 @@ class TestimonialCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.round),
-                child: Image.network(
-                  avatarUrl,
+                child: AppCachedImage(
+                  imageUrl: avatarUrl,
                   width: 40,
                   height: 40,
                   fit: BoxFit.cover,

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../data/event_repository.dart';
+import '../../../../shared/components/app_cached_image.dart';
 
 class UpcomingEventCard extends StatelessWidget {
   final String imageUrl;
@@ -46,8 +47,8 @@ class UpcomingEventCard extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(AppRadius.lg),
-                        child: Image.network(
-                          imageUrl,
+                        child: AppCachedImage(
+                          imageUrl: imageUrl,
                           width: 96,
                           height: 96,
                           fit: BoxFit.cover,

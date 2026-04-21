@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../shared/components/app_cached_image.dart';
 import '../components/dance_tag.dart';
 
 class ProfileCardSection extends StatelessWidget {
@@ -37,7 +38,7 @@ class ProfileCardSection extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(32),
-              child: Image.network(avatarUrl, fit: BoxFit.cover),
+              child: AppCachedImage(imageUrl: avatarUrl, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(width: AppSpacing.lg),

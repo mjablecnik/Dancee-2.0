@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
+import '../../../../shared/components/app_cached_image.dart';
 
 class ProfilePhotoSection extends StatelessWidget {
   final String avatarUrl;
@@ -32,7 +33,7 @@ class ProfilePhotoSection extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(48),
-                    child: Image.network(avatarUrl, fit: BoxFit.cover),
+                    child: AppCachedImage(imageUrl: avatarUrl, fit: BoxFit.cover),
                   ),
                 ),
                 Positioned(

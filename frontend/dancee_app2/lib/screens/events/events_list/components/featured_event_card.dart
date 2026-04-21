@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../shared/components/app_cached_image.dart';
 
 class EventTagData {
   final String label;
@@ -61,8 +62,8 @@ class FeaturedEventCard extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.round)),
-          child: Image.network(
-            imageUrl,
+          child: AppCachedImage(
+            imageUrl: imageUrl,
             height: 160,
             width: 280,
             fit: BoxFit.cover,
