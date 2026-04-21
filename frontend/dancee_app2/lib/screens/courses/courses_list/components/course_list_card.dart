@@ -18,7 +18,9 @@ class CourseListCard extends StatelessWidget {
   final String dateRange;
   final List<CourseTag> tags;
   final String price;
+  final bool isFavorited;
   final VoidCallback? onTap;
+  final VoidCallback? onFavoriteTap;
 
   const CourseListCard({
     super.key,
@@ -28,7 +30,9 @@ class CourseListCard extends StatelessWidget {
     required this.dateRange,
     required this.tags,
     required this.price,
+    this.isFavorited = false,
     this.onTap,
+    this.onFavoriteTap,
   });
 
   @override
@@ -120,38 +124,55 @@ class CourseListCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: tags
-              .map((tag) => Padding(
-                    padding: const EdgeInsets.only(right: AppSpacing.xs),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: appCard,
-                        borderRadius: BorderRadius.circular(AppRadius.xs),
-                      ),
-                      child: Text(
-                        tag.label,
-                        style: TextStyle(
-                          color: tag.color,
-                          fontSize: AppTypography.fontSizeXs,
-                          fontWeight: AppTypography.fontWeightSemiBold,
+        Expanded(
+          child: Row(
+            children: tags
+                .map((tag) => Padding(
+                      padding: const EdgeInsets.only(right: AppSpacing.xs),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
+                        decoration: BoxDecoration(
+                          color: appCard,
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
+                        ),
+                        child: Text(
+                          tag.label,
+                          style: TextStyle(
+                            color: tag.color,
+                            fontSize: AppTypography.fontSizeXs,
+                            fontWeight: AppTypography.fontWeightSemiBold,
+                          ),
                         ),
                       ),
-                    ),
-                  ))
-              .toList(),
-        ),
-        Text(
-          price,
-          style: const TextStyle(
-            color: appText,
-            fontSize: AppTypography.fontSizeMd,
-            fontWeight: FontWeight.bold,
+                    ))
+                .toList(),
           ),
+        ),
+        Row(
+          children: [
+            Text(
+              price,
+              style: const TextStyle(
+                color: appText,
+                fontSize: AppTypography.fontSizeMd,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            GestureDetector(
+              onTap: onFavoriteTap,
+              child: FaIcon(
+                isFavorited
+                    ? FontAwesomeIcons.solidHeart
+                    : FontAwesomeIcons.heart,
+                size: 16,
+                color: isFavorited ? Colors.red : appMuted,
+              ),
+            ),
+          ],
         ),
       ],
     );

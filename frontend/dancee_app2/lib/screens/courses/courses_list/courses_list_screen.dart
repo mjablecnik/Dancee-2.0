@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
-import '../../../data/event_repository.dart';
+import '../../../core/theme.dart';
+import '../../../data/entities/course.dart';
+import '../../../i18n/strings.g.dart';
+import '../../../logic/cubits/course_cubit.dart';
+import '../../../logic/cubits/favorites_cubit.dart';
+import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
-import 'sections/all_courses_section.dart';
+import 'components/course_list_card.dart';
 import 'sections/courses_header_section.dart';
-import 'sections/featured_courses_section.dart';
 
-class CoursesListScreen extends StatefulWidget {
+class CoursesListScreen extends StatelessWidget {
   const CoursesListScreen({super.key});
 
-  @override
-  State<CoursesListScreen> createState() => _CoursesListScreenState();
-}
-
-class _CoursesListScreenState extends State<CoursesListScreen> {
-  int _selectedStyleIndex = 0;
-  List<String> _styles = [];
-
-  @override
-  void initState() {
-    super.initState();
-    const EventRepository().getCourseStyleFilters().then((styles) {
-      if (mounted) setState(() => _styles = styles);
-    });
+  String _formatDateRange(String? startDate, String? endDate) {
+    if (startDate == null) return '';
+    final start = DateTime.tryParse(startDate);
+    if (start == null) return startDate;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final startStr = '${start.day} ${months[start.month - 1]}';
+    if (endDate != null) {
+      final end = DateTime.tryParse(endDate);
+      if (end != null) {
+        return '$startStr – ${end.day} ${months[end.month - 1]} ${end.year}';
+      }
+    }
+    return '$startStr ${start.year}';
   }
 
   @override
@@ -32,33 +37,169 @@ class _CoursesListScreenState extends State<CoursesListScreen> {
       color: appBg,
       child: Column(
         children: [
-          CoursesHeaderSection(onFilterTap: () {}),
+          CoursesHeaderSection(
+            onFilterTap: () => context.push('/events/filter-dance'),
+          ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 16, top: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DanceStylesFilterSection(
-                    styles: _styles,
-                    selectedIndex: _selectedStyleIndex,
-                    onSelected: (index) =>
-                        setState(() => _selectedStyleIndex = index),
+            child: BlocBuilder<CourseCubit, CourseState>(
+              builder: (context, state) {
+                return state.map(
+                  initial: (_) => const SizedBox.shrink(),
+                  loading: (_) => const Center(
+                    child: CircularProgressIndicator(color: appPrimary),
                   ),
-                  const SizedBox(height: 24),
-                  FeaturedCoursesSection(
-                    onCourseTap: (_) => context.push('/courses/detail'),
+                  loaded: (loaded) => SingleChildScrollView(
+                    padding: const EdgeInsets.only(
+                        bottom: 16, top: AppSpacing.xxl),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DanceStylesFilterSection(
+                          styles: loaded.allCourses
+                              .expand((c) => c.dances)
+                              .toSet()
+                              .toList(),
+                          selectedIndex: 0,
+                          onSelected: (_) {},
+                          onShowAll: () =>
+                              context.push('/events/filter-dance'),
+                        ),
+                        const SizedBox(height: AppSpacing.xxxl),
+                        _AllCoursesSection(
+                          courses: loaded.filteredCourses,
+                          formatDateRange: _formatDateRange,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 24),
-                  AllCoursesSection(
-                    onCourseTap: (_) => context.push('/courses/detail'),
+                  error: (err) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          err.message,
+                          style: const TextStyle(color: appMuted),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        TextButton(
+                          onPressed: () =>
+                              context.read<CourseCubit>().loadCourses('en'),
+                          child: const Text('Retry',
+                              style: TextStyle(color: appPrimary)),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AllCoursesSection extends StatelessWidget {
+  final List<Course> courses;
+  final String Function(String?, String?) formatDateRange;
+
+  const _AllCoursesSection({
+    required this.courses,
+    required this.formatDateRange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                t.courses.allCourses,
+                style: const TextStyle(
+                  color: appText,
+                  fontSize: AppTypography.fontSize3xl,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm - 2,
+                ),
+                decoration: BoxDecoration(
+                  color: appSurface,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.sort, size: 14, color: appText),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      t.common.date,
+                      style: const TextStyle(
+                          color: appText,
+                          fontSize: AppTypography.fontSizeMd),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        if (courses.isEmpty)
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+            child: const Text(
+              'No courses found',
+              style: TextStyle(color: appMuted),
+            ),
+          )
+        else
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+            child: Column(
+              children: courses.asMap().entries.map((entry) {
+                final index = entry.key;
+                final course = entry.value;
+                return Column(
+                  children: [
+                    if (index > 0) const SizedBox(height: AppSpacing.md),
+                    CourseListCard(
+                      imageUrl: course.imageUrl ?? '',
+                      title: course.title,
+                      instructor: course.instructorName ?? '',
+                      dateRange:
+                          formatDateRange(course.startDate, course.endDate),
+                      tags: course.dances
+                          .map((d) => CourseTag(d, appPrimary))
+                          .toList(),
+                      price: course.price ?? '',
+                      isFavorited: course.isFavorited,
+                      onTap: () =>
+                          context.push('/courses/detail?id=${course.id}'),
+                      onFavoriteTap: () =>
+                          context.read<FavoritesCubit>().toggleFavorite(
+                                itemType: 'course',
+                                itemId: course.id,
+                              ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -116,7 +116,11 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/courses/detail',
-      builder: (context, state) => const CourseDetailScreen(),
+      builder: (context, state) {
+        final idStr = state.uri.queryParameters['id'] ?? '';
+        final id = int.tryParse(idStr) ?? 0;
+        return CourseDetailScreen(courseId: id);
+      },
     ),
     GoRoute(
       path: '/profile/edit',
