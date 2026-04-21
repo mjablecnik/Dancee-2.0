@@ -49,7 +49,7 @@ export async function generateAiImage(
     n: 1,
     size: "1024x1024",
   } as Parameters<typeof openai.images.generate>[0]);
-  const b64 = (response.data[0] as { b64_json?: string })?.b64_json;
+  const b64 = (response.data?.[0] as { b64_json?: string } | undefined)?.b64_json;
   if (!b64) {
     throw new Error("AI image generation returned no image data");
   }
