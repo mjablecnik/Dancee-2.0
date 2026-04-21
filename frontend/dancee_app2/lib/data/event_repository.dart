@@ -41,8 +41,7 @@ class UpcomingEventData {
   final String title;
   final String location;
   final String date;
-  final String style;
-  final Color styleColor;
+  final List<EventTagData> tags;
   final bool isFavorited;
 
   const UpcomingEventData({
@@ -51,8 +50,7 @@ class UpcomingEventData {
     required this.title,
     required this.location,
     required this.date,
-    required this.style,
-    required this.styleColor,
+    required this.tags,
     required this.isFavorited,
   });
 }
@@ -210,8 +208,10 @@ class EventRepository {
         title: 'Bachata Sensual Workshop s mezinárodními lektory',
         location: 'Dance Studio 1, Brno',
         date: '20. Říj, 14:00',
-        style: 'Bachata',
-        styleColor: appAccent,
+        tags: [
+          EventTagData(label: 'Bachata', color: appAccent),
+          EventTagData(label: 'Sensual', color: appPink),
+        ],
         isFavorited: false,
       ),
       UpcomingEventData(
@@ -220,8 +220,11 @@ class EventRepository {
         title: 'Havana Night - Živá kapela a animace',
         location: 'Klub Tres, Ostrava',
         date: '22. Říj, 20:00',
-        style: 'Salsa',
-        styleColor: appPrimary,
+        tags: [
+          EventTagData(label: 'Salsa', color: appPrimary),
+          EventTagData(label: 'Bachata', color: appAccent),
+          EventTagData(label: 'Kizomba', color: appLavender),
+        ],
         isFavorited: true,
       ),
       UpcomingEventData(
@@ -230,8 +233,10 @@ class EventRepository {
         title: 'Zouk Weekend Marathon 2025',
         location: 'Hotel Pyramida, Praha',
         date: '1. Lis - 3. Lis',
-        style: 'Zouk',
-        styleColor: appTeal,
+        tags: [
+          EventTagData(label: 'Zouk', color: appTeal),
+          EventTagData(label: 'Lambada', color: appEmerald),
+        ],
         isFavorited: false,
       ),
     ];
@@ -444,8 +449,10 @@ class EventRepository {
         title: 'Kizomba Open Air Social',
         location: 'Střelecký ostrov, Praha',
         date: 'Dnes, 18:00 - 23:00',
-        style: 'Kizomba',
-        styleColor: appLavender,
+        tags: [
+          EventTagData(label: 'Kizomba', color: appLavender),
+          EventTagData(label: 'Semba', color: appLightBlue),
+        ],
         isFavorited: true,
       ),
       UpcomingEventData(
@@ -454,8 +461,10 @@ class EventRepository {
         title: 'Havana Night - Živá kapela a animace',
         location: 'Klub Tres, Ostrava',
         date: '22. Říj, 20:00',
-        style: 'Salsa',
-        styleColor: appPrimary,
+        tags: [
+          EventTagData(label: 'Salsa', color: appPrimary),
+          EventTagData(label: 'Bachata', color: appAccent),
+        ],
         isFavorited: true,
       ),
       UpcomingEventData(
@@ -464,8 +473,10 @@ class EventRepository {
         title: 'Bachata Sensual Workshop s mezinárodními lektory',
         location: 'Dance Studio 1, Brno',
         date: '20. Říj, 14:00',
-        style: 'Bachata',
-        styleColor: appAccent,
+        tags: [
+          EventTagData(label: 'Bachata', color: appAccent),
+          EventTagData(label: 'Sensual', color: appPink),
+        ],
         isFavorited: true,
       ),
     ];

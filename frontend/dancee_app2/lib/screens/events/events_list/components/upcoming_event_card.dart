@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/event_repository.dart';
 
 class UpcomingEventCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String location;
   final String date;
-  final String style;
-  final Color styleColor;
+  final List<EventTagData> tags;
   final bool isFavorited;
   final VoidCallback? onTap;
 
@@ -19,8 +19,7 @@ class UpcomingEventCard extends StatelessWidget {
     required this.title,
     required this.location,
     required this.date,
-    required this.style,
-    required this.styleColor,
+    required this.tags,
     required this.isFavorited,
     this.onTap,
   });
@@ -41,6 +40,7 @@ class UpcomingEventCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Image — 96x96 rounded, matching design
                 ClipRRect(
                   borderRadius: BorderRadius.circular(AppRadius.lg),
                   child: Image.network(
@@ -51,12 +51,14 @@ class UpcomingEventCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.lg),
+                // Info column
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 32, top: 4),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Title
                         Text(
                           title,
                           maxLines: 2,
@@ -68,10 +70,12 @@ class UpcomingEventCard extends StatelessWidget {
                             height: 1.3,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.sm),
+                        const SizedBox(height: AppSpacing.xs),
+                        // Location
                         Row(
                           children: [
-                            const FaIcon(FontAwesomeIcons.locationDot, size: 12, color: appPrimary),
+                            const FaIcon(FontAwesomeIcons.locationDot,
+                                size: 12, color: appPrimary),
                             const SizedBox(width: AppSpacing.xs),
                             Expanded(
                               child: Text(
@@ -85,15 +89,20 @@ class UpcomingEventCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: AppSpacing.sm),
+                        // Date + tags row
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // Date badge
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: AppSpacing.xs,
+                              ),
                               decoration: BoxDecoration(
                                 color: appCard,
-                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.xs),
                               ),
                               child: Text(
                                 date,
@@ -104,23 +113,47 @@ class UpcomingEventCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Text(
-                              style.toUpperCase(),
-                              style: TextStyle(
-                                color: styleColor,
-                                fontSize: AppTypography.fontSizeXs,
-                                fontWeight: AppTypography.fontWeightBold,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
                           ],
                         ),
+                        // Dance style tags
+                        if (tags.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.xs,
+                            children: tags
+                                .map(
+                                  (tag) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: appCard,
+                                      borderRadius: BorderRadius.circular(
+                                          AppRadius.sm),
+                                    ),
+                                    child: Text(
+                                      tag.label,
+                                      style: TextStyle(
+                                        color: tag.color,
+                                        fontSize: AppTypography.fontSizeXs,
+                                        fontWeight:
+                                            AppTypography.fontWeightSemiBold,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
                       ],
                     ),
                   ),
                 ),
               ],
             ),
+            // Heart button — absolute top right
             Positioned(
               top: 0,
               right: 0,
@@ -133,7 +166,9 @@ class UpcomingEventCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: FaIcon(
-                    isFavorited ? FontAwesomeIcons.solidHeart : FontAwesomeIcons.heart,
+                    isFavorited
+                        ? FontAwesomeIcons.solidHeart
+                        : FontAwesomeIcons.heart,
                     size: 14,
                     color: isFavorited ? Colors.red : appMuted,
                   ),
