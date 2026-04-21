@@ -8,6 +8,7 @@ import {
   SUPPORTED_EVENT_TYPES,
   EventPartSchema,
   FacebookEventSchema,
+  EventInfoSchema,
 } from "../../core/schemas";
 
 describe("parseEventType", () => {
@@ -300,6 +301,69 @@ describe("FacebookEventSchema.endTimestamp: <= 0 transforms to null", () => {
         const result = FacebookEventSchema.parse(makeFbEventRaw({ endTimestamp: ts }));
         expect(result.endTimestamp).toBeNull();
       })
+    );
+  });
+});
+
+// Feature: cms-data-completeness, Property 2: EventInfoSchema validates type, key, and value constraints
+describe("EventInfoSchema", () => {
+  const validTypes = ["url", "price", "dresscode"] as const;
+
+  it("Property 2: accepts any valid type with non-empty key and value", () => {
+    fc.assert(
+      fc.property(
+        fc.constantFrom(...validTypes),
+        fc.string({ minLength: 1 }),
+        fc.string({ minLength: 1 }),
+        (type, key, value) => {
+          const result = EventInfoSchema.safeParse({ type, key, value });
+          expect(result.success).toBe(true);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 2: rejects any type not in [url, price, dresscode]", () => {
+    fc.assert(
+      fc.property(
+        fc.string().filter((s) => !validTypes.includes(s as (typeof validTypes)[number])),
+        fc.string({ minLength: 1 }),
+        fc.string({ minLength: 1 }),
+        (type, key, value) => {
+          const result = EventInfoSchema.safeParse({ type, key, value });
+          expect(result.success).toBe(false);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 2: rejects empty key", () => {
+    fc.assert(
+      fc.property(
+        fc.constantFrom(...validTypes),
+        fc.string({ minLength: 1 }),
+        (type, value) => {
+          const result = EventInfoSchema.safeParse({ type, key: "", value });
+          expect(result.success).toBe(false);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 2: rejects empty value", () => {
+    fc.assert(
+      fc.property(
+        fc.constantFrom(...validTypes),
+        fc.string({ minLength: 1 }),
+        (type, key) => {
+          const result = EventInfoSchema.safeParse({ type, key, value: "" });
+          expect(result.success).toBe(false);
+        }
+      ),
+      { numRuns: 100 }
     );
   });
 });

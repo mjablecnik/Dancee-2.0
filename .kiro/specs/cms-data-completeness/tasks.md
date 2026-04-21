@@ -26,7 +26,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - **Property 4: computeDances preserves first-seen order and caps at 6**
     - **Validates: Requirements 4.1, 4.2, 4.4, 4.5**
 
-  - [ ]* 1.5 Write property test: `EventInfoSchema` validates type, key, and value constraints
+  - [x]* 1.5 Write property test: `EventInfoSchema` validates type, key, and value constraints
     - **Property 2: EventInfoSchema validates type, key, and value constraints**
     - **Validates: Requirements 3.1, 3.6**
 
