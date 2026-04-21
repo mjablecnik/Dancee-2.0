@@ -9,6 +9,7 @@ import 'logic/cubits/course_cubit.dart';
 import 'logic/cubits/favorites_cubit.dart';
 import 'logic/cubits/filter_cubit.dart';
 import 'logic/cubits/settings_cubit.dart';
+import 'logic/states/favorites_state.dart';
 import 'logic/states/filter_state.dart';
 import 'logic/states/settings_state.dart';
 import 'shared/elements/navigation/app_bottom_nav_bar.dart';
@@ -218,6 +219,42 @@ class _AppListenersState extends State<_AppListeners> {
             final allStyles = context.read<FilterCubit>().allDanceStyles;
             context.read<EventCubit>().applyFilters(filterState, allStyles);
             context.read<CourseCubit>().applyFilters(filterState, allStyles);
+          },
+        ),
+        // 11.2 — Favorites change: sync isFavorited on EventCubit and CourseCubit
+        BlocListener<FavoritesCubit, FavoritesState>(
+          listenWhen: (prev, curr) =>
+              curr.maybeMap(loaded: (_) => true, orElse: () => false) && prev != curr,
+          listener: (context, state) {
+            state.maybeMap(
+              loaded: (s) {
+                final eventCubit = context.read<EventCubit>();
+                final courseCubit = context.read<CourseCubit>();
+                eventCubit.state.maybeMap(
+                  loaded: (es) {
+                    for (final event in es.allEvents) {
+                      final shouldBeFavorited = s.eventIds.contains(event.id);
+                      if (event.isFavorited != shouldBeFavorited) {
+                        eventCubit.updateFavoriteStatus(event.id, shouldBeFavorited);
+                      }
+                    }
+                  },
+                  orElse: () {},
+                );
+                courseCubit.state.maybeMap(
+                  loaded: (cs) {
+                    for (final course in cs.allCourses) {
+                      final shouldBeFavorited = s.courseIds.contains(course.id);
+                      if (course.isFavorited != shouldBeFavorited) {
+                        courseCubit.updateFavoriteStatus(course.id, shouldBeFavorited);
+                      }
+                    }
+                  },
+                  orElse: () {},
+                );
+              },
+              orElse: () {},
+            );
           },
         ),
       ],

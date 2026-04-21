@@ -247,8 +247,8 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - **Property 9: Region extraction from loaded data** — generate random events/courses with venues, verify region set equals union of all non-empty venue.region values with no duplicates
     - **Validates: Requirements 9.1**
 
-- [ ] 11. Update saved items and favorites UI
-  - [ ] 11.1 Update saved items screen
+- [x] 11. Update saved items and favorites UI
+  - [x] 11.1 Update saved items screen
     - Replace mock data with BlocBuilder on FavoritesCubit
     - Resolve favorites against EventCubit and CourseCubit loaded data
     - Display combined list sorted by createdAt descending (newest first)
@@ -256,7 +256,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Do NOT apply dance style or location filters to saved items
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6_
 
-  - [ ] 11.2 Ensure favorite status consistency across screens
+  - [x] 11.2 Ensure favorite status consistency across screens
     - When FavoritesCubit toggles a favorite, update isFavorited on the corresponding event/course in EventCubit and CourseCubit
     - Ensure favorite heart icon reflects current state on events list, courses list, event detail, course detail, and saved items
     - _Requirements: 12.6_
