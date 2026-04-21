@@ -7,14 +7,17 @@ import {
   filterEventInfo,
   parseJsonResponse,
   EventPartSchema,
+  CourseExtractionSchema,
   type EventType,
   type EventPart,
   type EventInfo,
+  type CourseExtraction,
 } from "../core/schemas";
 import {
   getEventTypeClassificationPrompt,
   getEventPartsExtractionPrompt,
   getEventInfoExtractionPrompt,
+  getCourseExtractionPrompt,
 } from "../core/prompts";
 import { z } from "zod";
 
@@ -124,6 +127,32 @@ function validatePartTimes(
 
     return { ...part, date_time_range: { start, end } };
   });
+}
+
+export async function extractCourseData(
+  description: string,
+  eventStartTime: string,
+  eventEndTime: string | null,
+): Promise<CourseExtraction> {
+  const prompt = getCourseExtractionPrompt("Czech", eventStartTime, eventEndTime);
+  return retryOnJsonError(async () => {
+    const response = await getOpenAI().chat.completions.create({
+      model: config.openRouterModel,
+      temperature: config.llmTemperature,
+      messages: [
+        { role: "system", content: prompt },
+        { role: "user", content: description },
+      ],
+    });
+    const raw = response.choices[0]?.message?.content ?? "";
+    const parsed = parseJsonResponse(raw);
+    return CourseExtractionSchema.parse(parsed);
+  });
+}
+
+export function validateDanceCodes(dances: string[], validCodes: string[]): string[] {
+  const validSet = new Set(validCodes);
+  return dances.filter((dance) => validSet.has(dance));
 }
 
 // NOTE: The retry logic below is not required by the spec (Requirement 5 does not
