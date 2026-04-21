@@ -22,7 +22,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Define all schemas as specified in the design document Data Models section
     - _Requirements: 5.1, 5.2, 7.2, 8.1, 9.1_
 
-  - [ ]* 1.4 Write property test: `computeDances` preserves first-seen order and caps at 6
+  - [x]* 1.4 Write property test: `computeDances` preserves first-seen order and caps at 6
     - **Property 4: computeDances preserves first-seen order and caps at 6**
     - **Validates: Requirements 4.1, 4.2, 4.4, 4.5**
 

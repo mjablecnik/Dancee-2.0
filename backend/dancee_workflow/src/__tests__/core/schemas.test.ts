@@ -143,6 +143,54 @@ describe("filterEventInfo", () => {
 });
 
 describe("computeDances", () => {
+  it("Property 4: preserves first-seen order across parts and caps at 6", () => {
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.record({
+            name: fc.string(),
+            description: fc.string(),
+            type: fc.constantFrom("party", "workshop", "openLesson" as const),
+            dances: fc.array(fc.string({ minLength: 1 }), { maxLength: 10 }),
+            date_time_range: fc.record({
+              start: fc.constant("2024-01-01T18:00:00Z"),
+              end: fc.constant("2024-01-01T22:00:00Z"),
+            }),
+            lectors: fc.array(fc.string()),
+            djs: fc.array(fc.string()),
+          }),
+          { maxLength: 5 }
+        ),
+        (parts) => {
+          const result = computeDances(parts);
+
+          // Compute expected first-seen order independently
+          const seen = new Set<string>();
+          const expected: string[] = [];
+          for (const part of parts) {
+            for (const dance of part.dances) {
+              if (!seen.has(dance)) {
+                seen.add(dance);
+                expected.push(dance);
+              }
+            }
+          }
+          const expectedCapped = expected.slice(0, 6);
+
+          // Result must match expected first-seen order, capped at 6
+          expect(result).toEqual(expectedCapped);
+
+          // No padding: if fewer than 6 unique dances, all are included
+          expect(result.length).toBeLessThanOrEqual(6);
+          if (expected.length < 6) {
+            expect(result.length).toBe(expected.length);
+          }
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
   it("Property 15: computed dances is the unique set from all parts, capped at 6", () => {
     fc.assert(
       fc.property(
