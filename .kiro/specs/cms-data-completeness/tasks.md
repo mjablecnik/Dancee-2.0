@@ -182,14 +182,14 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
 - [x] 9. Checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Update workflow routing and add course workflow in `src/services/workflow.ts`
-  - [ ] 10.1 Update `runWorkflow` to route `course`/`lesson` types to new `runCourseWorkflow`
+- [x] 10. Update workflow routing and add course workflow in `src/services/workflow.ts`
+  - [x] 10.1 Update `runWorkflow` to route `course`/`lesson` types to new `runCourseWorkflow`
     - After classification, check if `eventType` is `"course"` or `"lesson"` → call `runCourseWorkflow`
     - Existing event types (`party`, `workshop`, `festival`, `holiday`) continue to existing flow
     - `"other"` continues to create skipped_events record
     - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
-  - [ ] 10.2 Add image processing and dance style validation to existing event workflow branch
+  - [x] 10.2 Add image processing and dance style validation to existing event workflow branch
     - At batch start, call `clearDanceStyleCodesCache()` to ensure fresh codes
     - Fetch dance style codes via `getDanceStyleCodes()` (cached for the batch)
     - Pass codes to `extractEventParts` prompt and to `validateDanceCodes`
@@ -197,7 +197,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Add `image`, `image_source`, and `event_type` to the `newEvent` object
     - _Requirements: 1.2, 2.2, 8.6, 8.7, 12.1, 12.3_
 
-  - [ ] 10.3 Implement `runCourseWorkflow` function
+  - [x] 10.3 Implement `runCourseWorkflow` function
     - Extract course data via `extractCourseData`
     - Translate course content (cs → en, es) using a course translation prompt
     - Resolve venue using existing `resolveVenue`
@@ -216,12 +216,12 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Test `computeDances` edge cases: empty parts → empty result, single part with 10 dances → first 6, duplicates across parts → deduplicated
     - _Requirements: 4.1, 11.4_
 
-- [ ] 11. Add course translation support
-  - [ ] 11.1 Add `getTranslationPromptForCourse(targetLanguage)` to `src/core/prompts.ts`
+- [x] 11. Add course translation support
+  - [x] 11.1 Add `getTranslationPromptForCourse(targetLanguage)` to `src/core/prompts.ts`
     - Similar to existing `getTranslationPrompt` but for course structure (title, description, learning_items)
     - _Requirements: 6.3_
 
-  - [ ] 11.2 Add `translateCourseContent` function to `src/services/event-translator.ts` (or new file)
+  - [x] 11.2 Add `translateCourseContent` function to `src/services/event-translator.ts` (or new file)
     - Translate course title, description, and learning_items to target language
     - Use `retryOnJsonError` pattern
     - _Requirements: 6.3_
