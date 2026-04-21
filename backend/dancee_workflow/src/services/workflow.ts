@@ -456,6 +456,7 @@ async function runCourseWorkflow(
     image: imageResult.fileId,
     image_source: imageResult.source,
     original_url: originalUrl,
+    registration_url: courseData.registration_url,
     original_description: facebookEvent.description ?? "",
     status: "published",
     translation_status: translationStatus,

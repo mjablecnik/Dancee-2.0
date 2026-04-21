@@ -1014,6 +1014,10 @@ async function setupCoursesCollection(): Promise<void> {
     interface: "input",
   }, { is_nullable: true, max_length: 2048 });
 
+  await createFieldIfNotExists("courses", "registration_url", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 2048 });
+
   await createFieldIfNotExists("courses", "original_description", "text", {
     interface: "input-multiline",
     display: "raw",

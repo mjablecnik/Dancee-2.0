@@ -344,6 +344,7 @@ export const CourseExtractionSchema = z.object({
   price: z.string().nullable(),
   price_note: z.string().nullable(),
   learning_items: z.array(z.string()),
+  registration_url: z.string().nullable(),
   dances: z.array(z.string()),
 });
 
@@ -383,6 +384,7 @@ export const DirectusCourseSchema = z.object({
   image: z.union([z.number(), z.string()]).nullable().optional(),
   image_source: z.string().nullable().optional(),
   original_url: z.string().nullable().optional(),
+  registration_url: z.string().nullable().optional(),
   original_description: z.string().nullable().optional(),
   status: z.enum(["published", "draft", "archived"]).optional(),
   translation_status: z.enum(["complete", "partial", "missing"]).optional(),

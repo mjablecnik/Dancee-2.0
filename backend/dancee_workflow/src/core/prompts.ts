@@ -145,6 +145,7 @@ Extract the course data into a JSON object with the following structure:
   "price": "string or null - price of the course including currency",
   "price_note": "string or null - additional pricing notes (e.g. early bird, per lesson)",
   "learning_items": ["string - skill or topic taught in this course, in ${outputLanguage}"],
+  "registration_url": "string or null - URL for course registration/sign-up if found in the description",
   "dances": ["string - dance style codes ordered by relevance (most prominent first)"]
 }
 
