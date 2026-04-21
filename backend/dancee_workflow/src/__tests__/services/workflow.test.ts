@@ -655,6 +655,108 @@ describe("Error tracking: catch block logs failure via createError", () => {
   });
 });
 
+// ---- Property 5: Event type routing correctness ----
+
+describe("Property 5: Event type routing correctness", () => {
+  it("course and lesson types route to createCourse, never createEvent", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.constantFrom("course", "lesson"),
+        async (eventType) => {
+          vi.clearAllMocks();
+          mockFindEventByOriginalUrl.mockResolvedValue(null);
+          mockFindCourseByOriginalUrl.mockResolvedValue(null);
+          mockGetDanceStyleCodes.mockResolvedValue([]);
+          mockResolveVenue.mockResolvedValue({ id: 1, name: "Test Venue" });
+          mockCreateCourse.mockImplementation((c: unknown) => Promise.resolve({ ...(c as object), id: 99 }));
+          mockExtractCourseData.mockResolvedValue({
+            title: "Test Course",
+            description: "Course description",
+            instructor_name: null,
+            level: "all_levels",
+            schedule_day: null,
+            schedule_time: null,
+            lesson_count: null,
+            lesson_duration_minutes: null,
+            max_participants: null,
+            price: null,
+            price_note: null,
+            learning_items: [],
+            dances: [],
+          });
+          mockTranslateCourseContent.mockResolvedValue({
+            title: "Translated",
+            description: "Translated",
+            learning_items: [],
+          });
+          mockProcessEventImage.mockResolvedValue({ fileId: null, source: null });
+          mockValidateDanceCodes.mockImplementation((dances: string[]) => dances);
+
+          const ctx = makeMockCtx();
+          mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+          mockClassifyEventType.mockResolvedValue(eventType);
+
+          await runWorkflow(ctx, "https://facebook.com/events/123");
+
+          expect(mockCreateCourse).toHaveBeenCalledOnce();
+          expect(mockCreateEvent).not.toHaveBeenCalled();
+        }
+      )
+    );
+  });
+
+  it("party/workshop/festival/holiday types route to createEvent, never createCourse", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.constantFrom("party", "workshop", "festival", "holiday"),
+        async (eventType) => {
+          vi.clearAllMocks();
+          mockFindEventByOriginalUrl.mockResolvedValue(null);
+          mockGetDanceStyleCodes.mockResolvedValue([]);
+          mockResolveVenue.mockResolvedValue({ id: 1, name: "Test Venue" });
+          mockCreateEvent.mockImplementation((e: unknown) => Promise.resolve({ ...(e as object), id: 99 }));
+          mockProcessEventImage.mockResolvedValue({ fileId: null, source: null });
+          mockValidateDanceCodes.mockImplementation((dances: string[]) => dances);
+          mockExtractEventParts.mockResolvedValue({ title: "T", description: "D", parts: [] });
+          mockExtractEventInfo.mockResolvedValue([]);
+          mockTranslateEventContent.mockResolvedValue({
+            title: "EN",
+            description: "EN",
+            parts_translations: [],
+            info_translations: [],
+          });
+
+          const ctx = makeMockCtx();
+          mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+          mockClassifyEventType.mockResolvedValue(eventType);
+
+          await runWorkflow(ctx, "https://facebook.com/events/123");
+
+          expect(mockCreateEvent).toHaveBeenCalledOnce();
+          expect(mockCreateCourse).not.toHaveBeenCalled();
+        }
+      )
+    );
+  });
+
+  it("'other' type routes to createSkippedEvent, never createEvent or createCourse", async () => {
+    vi.clearAllMocks();
+    mockFindEventByOriginalUrl.mockResolvedValue(null);
+    mockCreateSkippedEvent.mockResolvedValue({ id: 1, original_url: "", reason: "" });
+
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+    mockClassifyEventType.mockResolvedValue("other");
+
+    const result = await runWorkflow(ctx, "https://facebook.com/events/123");
+
+    expect(mockCreateSkippedEvent).toHaveBeenCalledOnce();
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+    expect(mockCreateCourse).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ status: "skipped" });
+  });
+});
+
 // ---- computeTranslationStatus unit tests (Property 24: business rule per Requirement 24) ----
 
 describe("computeTranslationStatus: direct unit tests (Requirement 24)", () => {
