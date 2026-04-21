@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:dancee_app2/i18n/strings.g.dart';
 import 'package:dancee_app2/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const DanceeApp());
+  testWidgets('App smoke test - renders without crashing',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    LocaleSettings.setLocale(AppLocale.en);
 
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpWidget(TranslationProvider(child: const DanceeApp()));
     await tester.pump();
 
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }
