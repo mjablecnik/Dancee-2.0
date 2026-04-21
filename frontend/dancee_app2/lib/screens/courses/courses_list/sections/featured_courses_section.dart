@@ -3,6 +3,7 @@ import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../data/course_repository.dart';
 import '../../../../i18n/strings.g.dart';
+import '../../../../shared/components/snap_carousel.dart';
 import '../components/featured_course_card.dart';
 
 class FeaturedCoursesSection extends StatelessWidget {
@@ -50,32 +51,23 @@ class FeaturedCoursesSection extends StatelessWidget {
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const SizedBox.shrink();
             final courses = snapshot.data!;
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Row(
-                children: courses.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final course = entry.value;
-                  return Row(
-                    children: [
-                      if (index > 0) const SizedBox(width: AppSpacing.lg),
-                      FeaturedCourseCard(
-                        imageUrl: course.imageUrl,
-                        levelLabel: course.levelLabel,
-                        levelColor: course.levelColor,
-                        title: course.title,
-                        instructor: course.instructor,
-                        dateRange: course.dateRange,
-                        styleLabel: course.styleLabel,
-                        styleColor: course.styleColor,
-                        price: course.price,
-                        onTap: () => onCourseTap?.call(course.id),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
+            return SnapCarousel(
+              itemCount: courses.length,
+              itemBuilder: (context, index, scale) {
+                final course = courses[index];
+                return FeaturedCourseCard(
+                  imageUrl: course.imageUrl,
+                  levelLabel: course.levelLabel,
+                  levelColor: course.levelColor,
+                  title: course.title,
+                  instructor: course.instructor,
+                  dateRange: course.dateRange,
+                  styleLabel: course.styleLabel,
+                  styleColor: course.styleColor,
+                  price: course.price,
+                  onTap: () => onCourseTap?.call(course.id),
+                );
+              },
             );
           },
         ),

@@ -197,6 +197,47 @@ class EventRepository {
           EventTagData(label: 'Semba', color: appLightBlue),
         ],
       ),
+      FeaturedEventData(
+        id: 'zouk-congress-prague',
+        imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/858406cadf-a18221d3c2f7fc2a6f2a.png',
+        title: 'Zouk Congress Prague 2025',
+        date: '1. Lis - 3. Lis 2025',
+        location: 'Hotel Pyramida, Praha',
+        price: 'Od 500 Kč',
+        isFree: false,
+        isFavorited: false,
+        tags: [
+          EventTagData(label: 'Zouk', color: appTeal),
+          EventTagData(label: 'Lambada', color: appEmerald),
+        ],
+      ),
+      FeaturedEventData(
+        id: 'tango-milonga-night',
+        imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/a7414ef4de-19550fae1cabebe15c09.png',
+        title: 'Tango Milonga Night',
+        date: '25. Říj, 20:00',
+        location: 'Palác Akropolis, Praha',
+        price: '150 Kč',
+        isFree: false,
+        isFavorited: false,
+        tags: [
+          EventTagData(label: 'Tango', color: appGold),
+        ],
+      ),
+      FeaturedEventData(
+        id: 'swing-garden-party',
+        imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/9d038750ea-18e3a1b3f78567f6cc57.png',
+        title: 'Swing Garden Party - Live Band',
+        date: '28. Říj, 17:00',
+        location: 'Riegrovy sady, Praha',
+        price: 'Zdarma',
+        isFree: true,
+        isFavorited: false,
+        tags: [
+          EventTagData(label: 'Swing', color: appCyan),
+          EventTagData(label: 'Lindy Hop', color: appPrimary),
+        ],
+      ),
     ];
   }
 
