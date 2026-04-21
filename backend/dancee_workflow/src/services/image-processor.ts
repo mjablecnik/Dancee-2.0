@@ -33,7 +33,9 @@ export async function downloadImage(
 
 /**
  * Generates an AI image via OpenRouter using the configured image generation model.
- * Returns the image as a Buffer (JPEG).
+ * OpenRouter returns images in a non-standard `images` field on the message object
+ * (not in `content`), with structure: images[].image_url.url = "data:image/png;base64,..."
+ * Returns the image as a Buffer.
  */
 export async function generateAiImage(
   title: string,
@@ -42,18 +44,48 @@ export async function generateAiImage(
 ): Promise<Buffer> {
   const prompt = getImageGenerationPrompt(title, primaryDance, eventType);
   const openai = getOpenAI();
-  const response = await openai.images.generate({
+  const response = await openai.chat.completions.create({
     model: config.imageGenerationModel,
-    prompt,
-    response_format: "b64_json",
-    n: 1,
-    size: "1024x1024",
-  } as Parameters<typeof openai.images.generate>[0]);
-  const b64 = (response.data?.[0] as { b64_json?: string } | undefined)?.b64_json;
-  if (!b64) {
-    throw new Error("AI image generation returned no image data");
+    messages: [{ role: "user", content: prompt }],
+    // @ts-expect-error — OpenRouter extension: request image output modality
+    modalities: ["image"],
+  }) as any;
+
+  const message = response.choices?.[0]?.message;
+
+  // OpenRouter returns images in a separate `images` array on the message object
+  if (Array.isArray(message?.images)) {
+    for (const img of message.images) {
+      if (img?.type === "image_url" && img?.image_url?.url) {
+        const match = img.image_url.url.match(/data:image\/[^;]+;base64,(.+)/s);
+        if (match) {
+          return Buffer.from(match[1], "base64");
+        }
+      }
+    }
   }
-  return Buffer.from(b64, "base64");
+
+  // Fallback: check content as string (some models may use this)
+  if (typeof message?.content === "string" && message.content.length > 0) {
+    const match = message.content.match(/data:image\/[^;]+;base64,(.+)/s);
+    if (match) {
+      return Buffer.from(match[1], "base64");
+    }
+  }
+
+  // Fallback: check content as array
+  if (Array.isArray(message?.content)) {
+    for (const part of message.content) {
+      if (part?.type === "image_url" && part?.image_url?.url) {
+        const match = part.image_url.url.match(/data:image\/[^;]+;base64,(.+)/s);
+        if (match) {
+          return Buffer.from(match[1], "base64");
+        }
+      }
+    }
+  }
+
+  throw new Error("AI image generation returned no valid image data");
 }
 
 /**
@@ -76,12 +108,7 @@ export async function processEventImage(
       const fileId = await uploadFile(buffer, filename, mimeType);
       return { fileId, source: "facebook" };
     } catch (err) {
-      log({
-        level: "warn",
-        message: "Failed to download or upload Facebook image, falling back to reuse",
-        url: imageUrl,
-        reason: err instanceof Error ? err.message : String(err),
-      });
+      log({ level: "warn", message: "Failed to download Facebook image, falling back", reason: err instanceof Error ? err.message : String(err) });
     }
   }
 
@@ -92,24 +119,16 @@ export async function processEventImage(
       return { fileId: reusableFileId, source: "ai_generated" };
     }
   } catch (err) {
-    log({
-      level: "warn",
-      message: "Failed to find reusable expired event image, falling back to AI generation",
-      reason: err instanceof Error ? err.message : String(err),
-    });
+    log({ level: "warn", message: "Failed to find reusable image, falling back to AI generation", reason: err instanceof Error ? err.message : String(err) });
   }
 
   // Step 3: Generate a new AI image
   try {
     const buffer = await generateAiImage(title, primaryDance, eventType);
-    const fileId = await uploadFile(buffer, "ai-generated-event-image.jpg", "image/jpeg");
+    const fileId = await uploadFile(buffer, "ai-generated-event-image.png", "image/png");
     return { fileId, source: "ai_generated" };
   } catch (err) {
-    log({
-      level: "warn",
-      message: "Failed to generate AI image, storing null for image field",
-      reason: err instanceof Error ? err.message : String(err),
-    });
+    log({ level: "warn", message: "Failed to generate AI image, storing null", reason: err instanceof Error ? err.message : String(err) });
   }
 
   // Step 4: All fallbacks failed

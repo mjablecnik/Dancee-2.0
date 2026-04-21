@@ -383,6 +383,12 @@ export async function getDanceStyleCodes(): Promise<string[]> {
  * "salsa-on1"), results are post-filtered in application code to verify that
  * `primaryDance` is an exact element of the `dances` array.
  */
+/**
+ * Finds the most recently expired event with an AI-generated image that matches
+ * the given event type. Since Directus JSON fields don't support _contains filter,
+ * we fetch candidates filtered by event_type and image_source, then post-filter
+ * for dance style match in application code.
+ */
 export async function findExpiredEventWithImage(
   primaryDance: string,
   eventType: string,
@@ -393,20 +399,17 @@ export async function findExpiredEventWithImage(
       { end_time: { _lt: now } },
       { image: { _nnull: true } },
       { image_source: { _eq: "ai_generated" } },
-      { dances: { _contains: primaryDance } },
       { event_type: { _eq: eventType } },
     ],
   };
   const encoded = encodeURIComponent(JSON.stringify(filter));
-  // Fetch a small batch so we can post-filter for exact array membership.
   const data = await directusGet(
-    `/items/events?filter=${encoded}&fields=image,dances&sort[]=-end_time&limit=10`,
+    `/items/events?filter=${encoded}&fields=image,dances&sort[]=-end_time&limit=50`,
   );
   const items = extractDirectusData(data, "findExpiredEventWithImage") as { image?: string | number | null; dances?: unknown }[];
   if (!items || items.length === 0) return null;
 
-  // Post-filter: verify primaryDance is an exact element of the dances array,
-  // guarding against substring false positives from the Directus _contains filter.
+  // Post-filter: find first event where primaryDance is in the dances array
   for (const item of items) {
     const dances = Array.isArray(item.dances) ? item.dances as unknown[] : [];
     if (dances.includes(primaryDance)) {

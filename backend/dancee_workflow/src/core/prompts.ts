@@ -179,18 +179,17 @@ Important rules:
 }
 
 export function getImageGenerationPrompt(title: string, primaryDance: string, eventType: string): string {
-  return `Create a vibrant, professional cover image for a dance event.
+  return `Create a vibrant, professional photograph-style image for a dance event.
 
-Event details:
-- Title: ${title}
+Event context (for visual style reference only — do NOT include any text):
 - Primary dance style: ${primaryDance}
 - Event type: ${eventType}
 
 The image should:
-- Visually represent the ${primaryDance} dance style
-- Be appropriate for a ${eventType} event
+- Visually represent the ${primaryDance} dance style through dancers and movement
 - Be energetic, colorful, and appealing to dancers
-- Feature dancers or dance-related imagery
+- Feature dancers or dance-related imagery in action
 - Have a professional, modern aesthetic suitable for event promotion
-- Include movement, elegance, and the spirit of social dancing`;
+- ABSOLUTELY NO TEXT, NO WORDS, NO LETTERS, NO TITLES, NO CAPTIONS, NO WATERMARKS anywhere in the image
+- Pure visual content only — treat this as a background/hero image where text will be overlaid by the app`;
 }

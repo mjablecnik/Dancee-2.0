@@ -163,7 +163,7 @@ async function setupEventsCollection(): Promise<void> {
     },
   }, { is_nullable: true, max_length: 50 });
 
-  await createFieldIfNotExists("events", "image", "integer", {
+  await createFieldIfNotExists("events", "image", "uuid", {
     interface: "file-image",
   }, { is_nullable: true });
 
@@ -996,7 +996,7 @@ async function setupCoursesCollection(): Promise<void> {
     options: { language: "json" },
   }, { is_nullable: true });
 
-  await createFieldIfNotExists("courses", "image", "integer", {
+  await createFieldIfNotExists("courses", "image", "uuid", {
     interface: "file-image",
   }, { is_nullable: true });
 
