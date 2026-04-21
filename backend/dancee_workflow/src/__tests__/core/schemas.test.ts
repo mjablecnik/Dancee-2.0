@@ -9,6 +9,7 @@ import {
   EventPartSchema,
   FacebookEventSchema,
   EventInfoSchema,
+  CourseExtractionSchema,
 } from "../../core/schemas";
 
 describe("parseEventType", () => {
@@ -364,6 +365,163 @@ describe("EventInfoSchema", () => {
         }
       ),
       { numRuns: 100 }
+    );
+  });
+});
+
+// Feature: cms-data-completeness, Property 6: CourseExtractionSchema validates course data structure
+describe("CourseExtractionSchema", () => {
+  const validLevels = ["beginner", "intermediate", "advanced", "all_levels"] as const;
+
+  it("Property 6: accepts valid course data with all fields populated", () => {
+    fc.assert(
+      fc.property(
+        fc.string({ minLength: 1 }),
+        fc.string({ minLength: 1 }),
+        fc.constantFrom(...validLevels),
+        fc.array(fc.string({ minLength: 1 })),
+        fc.array(fc.string({ minLength: 1 })),
+        (title, description, level, learning_items, dances) => {
+          const result = CourseExtractionSchema.safeParse({
+            title,
+            description,
+            instructor_name: null,
+            level,
+            schedule_day: null,
+            schedule_time: null,
+            lesson_count: null,
+            lesson_duration_minutes: null,
+            max_participants: null,
+            price: null,
+            price_note: null,
+            learning_items,
+            dances,
+          });
+          expect(result.success).toBe(true);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 6: defaults level to 'all_levels' when level is absent", () => {
+    const result = CourseExtractionSchema.safeParse({
+      title: "Salsa course",
+      description: "Learn salsa",
+      instructor_name: null,
+      schedule_day: null,
+      schedule_time: null,
+      lesson_count: null,
+      lesson_duration_minutes: null,
+      max_participants: null,
+      price: null,
+      price_note: null,
+      learning_items: [],
+      dances: [],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.level).toBe("all_levels");
+    }
+  });
+
+  it("Property 6: rejects invalid level values", () => {
+    fc.assert(
+      fc.property(
+        fc.string().filter((s) => !validLevels.includes(s as (typeof validLevels)[number])),
+        (invalidLevel) => {
+          const result = CourseExtractionSchema.safeParse({
+            title: "A course",
+            description: "Some description",
+            instructor_name: null,
+            level: invalidLevel,
+            schedule_day: null,
+            schedule_time: null,
+            lesson_count: null,
+            lesson_duration_minutes: null,
+            max_participants: null,
+            price: null,
+            price_note: null,
+            learning_items: [],
+            dances: [],
+          });
+          expect(result.success).toBe(false);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 6: rejects non-positive integers for lesson_count and lesson_duration_minutes", () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ max: 0 }),
+        (nonPositive) => {
+          const withBadCount = CourseExtractionSchema.safeParse({
+            title: "A course",
+            description: "Some description",
+            instructor_name: null,
+            level: "all_levels",
+            schedule_day: null,
+            schedule_time: null,
+            lesson_count: nonPositive,
+            lesson_duration_minutes: null,
+            max_participants: null,
+            price: null,
+            price_note: null,
+            learning_items: [],
+            dances: [],
+          });
+          expect(withBadCount.success).toBe(false);
+
+          const withBadDuration = CourseExtractionSchema.safeParse({
+            title: "A course",
+            description: "Some description",
+            instructor_name: null,
+            level: "all_levels",
+            schedule_day: null,
+            schedule_time: null,
+            lesson_count: null,
+            lesson_duration_minutes: nonPositive,
+            max_participants: null,
+            price: null,
+            price_note: null,
+            learning_items: [],
+            dances: [],
+          });
+          expect(withBadDuration.success).toBe(false);
+        }
+      ),
+      { numRuns: 50 }
+    );
+  });
+
+  it("Property 6: accepts positive integers for numeric nullable fields", () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 1, max: 1000 }),
+        fc.integer({ min: 1, max: 300 }),
+        fc.integer({ min: 1, max: 500 }),
+        (lesson_count, lesson_duration_minutes, max_participants) => {
+          const result = CourseExtractionSchema.safeParse({
+            title: "A course",
+            description: "Some description",
+            instructor_name: null,
+            level: "all_levels",
+            schedule_day: null,
+            schedule_time: null,
+            lesson_count,
+            lesson_duration_minutes,
+            max_participants,
+            price: null,
+            price_note: null,
+            learning_items: [],
+            dances: [],
+          });
+          expect(result.success).toBe(true);
+        }
+      ),
+      { numRuns: 50 }
     );
   });
 });
