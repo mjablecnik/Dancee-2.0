@@ -1,9 +1,9 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError } from "../clients/directus-client";
+import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError, getDanceStyleCodes } from "../clients/directus-client";
 import { config, captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
-import { extractEventParts, extractEventInfo } from "./event-parser";
+import { extractEventParts, extractEventInfo, validateDanceCodes } from "./event-parser";
 import { translateEventContent } from "./event-translator";
 import { computeDances } from "../core/schemas";
 import { computeTranslationStatus } from "./workflow";
@@ -164,12 +164,15 @@ export const apiService = restate.service({
       const eventUrl = event.original_url ?? `event:${eventId}`;
       const patch: Record<string, unknown> = {};
 
+      // Fetch dance style codes for validation (used in parts and dances steps)
+      const danceStyleCodes = await ctx.run("getDanceStyleCodes", () => getDanceStyleCodes());
+
       // Re-extract parts
       let parts = event.parts;
       let title = event.title;
       if (steps.includes("parts")) {
         try {
-          const extracted = await ctx.run("extractParts", () => extractEventParts(description, event.start_time, event.end_time ?? null));
+          const extracted = await ctx.run("extractParts", () => extractEventParts(description, event.start_time, event.end_time ?? null, danceStyleCodes));
           parts = extracted.parts;
           title = extracted.title;
           patch.parts = extracted.parts;
@@ -201,9 +204,10 @@ export const apiService = restate.service({
         }
       }
 
-      // Recompute dances from parts
+      // Recompute dances from parts and validate against known dance style codes
       if (steps.includes("dances") || steps.includes("parts")) {
-        patch.dances = computeDances(parts);
+        const rawDances = computeDances(parts);
+        patch.dances = validateDanceCodes(rawDances, danceStyleCodes);
       }
 
       // Re-translate

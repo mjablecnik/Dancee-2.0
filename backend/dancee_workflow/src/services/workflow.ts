@@ -343,7 +343,7 @@ async function runCourseWorkflow(
 
   // Extract course data
   const courseData = await runStep(ctx, "extractCourse", eventUrl, () =>
-    extractCourseData(description, startTime, endTime)
+    extractCourseData(description, startTime, endTime, danceStyleCodes)
   );
 
   // Validate and limit dances (already ordered by LLM relevance)

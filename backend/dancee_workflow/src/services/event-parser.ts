@@ -134,8 +134,9 @@ export async function extractCourseData(
   description: string,
   eventStartTime: string,
   eventEndTime: string | null,
+  danceStyleCodes: string[] = [],
 ): Promise<CourseExtraction> {
-  const prompt = getCourseExtractionPrompt("Czech", eventStartTime, eventEndTime);
+  const prompt = getCourseExtractionPrompt("Czech", eventStartTime, eventEndTime, danceStyleCodes);
   return retryOnJsonError(async () => {
     const response = await getOpenAI().chat.completions.create({
       model: config.openRouterModel,
