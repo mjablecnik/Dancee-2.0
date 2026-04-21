@@ -1,0 +1,202 @@
+import 'package:equatable/equatable.dart';
+
+import 'venue.dart';
+
+class Course extends Equatable {
+  const Course({
+    required this.id,
+    this.imageUrl,
+    required this.title,
+    required this.description,
+    this.instructorName,
+    this.instructorBio,
+    this.instructorAvatarUrl,
+    this.venue,
+    this.startDate,
+    this.endDate,
+    this.scheduleDay,
+    this.scheduleTime,
+    this.lessonCount,
+    this.lessonDurationMinutes,
+    this.maxParticipants,
+    this.currentParticipants,
+    this.price,
+    this.priceNote,
+    this.level,
+    required this.dances,
+    required this.learningItems,
+    this.originalUrl,
+    this.registrationUrl,
+    required this.isFavorited,
+  });
+
+  final int id;
+  final String? imageUrl;
+  final String title;
+  final String description;
+  final String? instructorName;
+  final String? instructorBio;
+  final String? instructorAvatarUrl;
+  final Venue? venue;
+  final String? startDate;
+  final String? endDate;
+  final String? scheduleDay;
+  final String? scheduleTime;
+  final int? lessonCount;
+  final int? lessonDurationMinutes;
+  final int? maxParticipants;
+  final int? currentParticipants;
+  final String? price;
+  final String? priceNote;
+  final String? level;
+  final List<String> dances;
+  final List<String> learningItems;
+  final String? originalUrl;
+  final String? registrationUrl;
+  final bool isFavorited;
+
+  factory Course.fromDirectus(
+    Map<String, dynamic> json, {
+    required String languageCode,
+    required String directusBaseUrl,
+    Set<int> favoriteCourseIds = const {},
+  }) {
+    final translations = (json['translations'] as List<dynamic>?) ?? [];
+    final translation = _extractTranslation(translations, languageCode);
+
+    final title = (translation?['title'] as String?) ??
+        (json['title'] as String?) ??
+        '';
+    final description =
+        (translation?['description'] as String?) ?? '';
+    final learningItems =
+        (translation?['learning_items'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+
+    // Parse venue
+    final venueJson = json['venue'];
+    final venue = venueJson is Map<String, dynamic>
+        ? Venue.fromDirectus(venueJson)
+        : null;
+
+    // Construct image URL
+    final fileId = json['image'];
+    final imageUrl = fileId != null ? '$directusBaseUrl/assets/$fileId' : null;
+
+    // Parse dances
+    final dances = (json['dances'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+
+    final id = json['id'] as int;
+
+    return Course(
+      id: id,
+      imageUrl: imageUrl,
+      title: title,
+      description: description,
+      instructorName: json['instructor_name'] as String?,
+      instructorBio: json['instructor_bio'] as String?,
+      instructorAvatarUrl: json['instructor_avatar_url'] as String?,
+      venue: venue,
+      startDate: json['start_date'] as String?,
+      endDate: json['end_date'] as String?,
+      scheduleDay: json['schedule_day'] as String?,
+      scheduleTime: json['schedule_time'] as String?,
+      lessonCount: json['lesson_count'] as int?,
+      lessonDurationMinutes: json['lesson_duration_minutes'] as int?,
+      maxParticipants: json['max_participants'] as int?,
+      currentParticipants: json['current_participants'] as int?,
+      price: json['price'] as String?,
+      priceNote: json['price_note'] as String?,
+      level: json['level'] as String?,
+      dances: dances,
+      learningItems: learningItems,
+      originalUrl: json['original_url'] as String?,
+      registrationUrl: json['registration_url'] as String?,
+      isFavorited: favoriteCourseIds.contains(id),
+    );
+  }
+
+  Course copyWith({bool? isFavorited}) {
+    return Course(
+      id: id,
+      imageUrl: imageUrl,
+      title: title,
+      description: description,
+      instructorName: instructorName,
+      instructorBio: instructorBio,
+      instructorAvatarUrl: instructorAvatarUrl,
+      venue: venue,
+      startDate: startDate,
+      endDate: endDate,
+      scheduleDay: scheduleDay,
+      scheduleTime: scheduleTime,
+      lessonCount: lessonCount,
+      lessonDurationMinutes: lessonDurationMinutes,
+      maxParticipants: maxParticipants,
+      currentParticipants: currentParticipants,
+      price: price,
+      priceNote: priceNote,
+      level: level,
+      dances: dances,
+      learningItems: learningItems,
+      originalUrl: originalUrl,
+      registrationUrl: registrationUrl,
+      isFavorited: isFavorited ?? this.isFavorited,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        imageUrl,
+        title,
+        description,
+        instructorName,
+        instructorBio,
+        instructorAvatarUrl,
+        venue,
+        startDate,
+        endDate,
+        scheduleDay,
+        scheduleTime,
+        lessonCount,
+        lessonDurationMinutes,
+        maxParticipants,
+        currentParticipants,
+        price,
+        priceNote,
+        level,
+        dances,
+        learningItems,
+        originalUrl,
+        registrationUrl,
+        isFavorited,
+      ];
+}
+
+Map<String, dynamic>? _extractTranslation(
+  List<dynamic> translations,
+  String languageCode,
+) {
+  if (translations.isEmpty) return null;
+
+  // 1. Try exact language match
+  final match = translations.cast<Map<String, dynamic>>().where(
+        (t) => t['languages_code'] == languageCode,
+      );
+  if (match.isNotEmpty) return match.first;
+
+  // 2. Fallback to English
+  final enMatch = translations.cast<Map<String, dynamic>>().where(
+        (t) => t['languages_code'] == 'en',
+      );
+  if (enMatch.isNotEmpty) return enMatch.first;
+
+  // 3. Fallback to first available
+  return translations.first as Map<String, dynamic>;
+}
