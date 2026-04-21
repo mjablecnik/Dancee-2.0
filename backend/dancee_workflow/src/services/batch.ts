@@ -3,6 +3,7 @@ import {
   getGroupsOrderedByUpdatedAt,
   updateGroupTimestamp,
   findEventByOriginalUrl,
+  findCourseByOriginalUrl,
   findSkippedEventByUrl,
   createError,
   clearDanceStyleCodesCache,
@@ -59,6 +60,13 @@ export const batchService = restate.service({
             );
 
             if (existing) continue;
+
+            // Skip if the URL was already processed as a course
+            const existingCourse = await ctx.run(`checkCourse_${event.id}`, () =>
+              findCourseByOriginalUrl(eventUrl)
+            );
+
+            if (existingCourse) continue;
 
             // Skip events that were previously classified as unsupported
             const skipped = await ctx.run(`checkSkipped_${event.id}`, () =>
@@ -155,6 +163,13 @@ export const batchService = restate.service({
         }
 
         if (existing) continue;
+
+        // Skip if the URL was already processed as a course
+        const existingCourse = await ctx.run(`checkCourse_${event.id}`, () =>
+          findCourseByOriginalUrl(eventUrl)
+        );
+
+        if (existingCourse) continue;
 
         // Skip events that were previously classified as unsupported
         const skipped = await ctx.run(`checkSkipped_${event.id}`, () =>

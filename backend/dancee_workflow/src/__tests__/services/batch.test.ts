@@ -17,6 +17,7 @@ vi.mock("@restatedev/restate-sdk", () => ({
 const mockGetGroups = vi.fn();
 const mockUpdateGroupTimestamp = vi.fn();
 const mockFindEventByOriginalUrl = vi.fn();
+const mockFindCourseByOriginalUrl = vi.fn();
 const mockFindSkippedEventByUrl = vi.fn();
 const mockCreateError = vi.fn();
 const mockScrapeEventList = vi.fn();
@@ -25,6 +26,7 @@ vi.mock("../../clients/directus-client", () => ({
   getGroupsOrderedByUpdatedAt: (...args: unknown[]) => mockGetGroups(...args),
   updateGroupTimestamp: (...args: unknown[]) => mockUpdateGroupTimestamp(...args),
   findEventByOriginalUrl: (...args: unknown[]) => mockFindEventByOriginalUrl(...args),
+  findCourseByOriginalUrl: (...args: unknown[]) => mockFindCourseByOriginalUrl(...args),
   findSkippedEventByUrl: (...args: unknown[]) => mockFindSkippedEventByUrl(...args),
   createError: (...args: unknown[]) => mockCreateError(...args),
   clearDanceStyleCodesCache: vi.fn(),
@@ -80,6 +82,7 @@ beforeEach(() => {
   mockUpdateGroupTimestamp.mockResolvedValue({ id: 1, url: "https://facebook.com/groups/dance1", updated_at: new Date().toISOString() });
   mockCreateError.mockResolvedValue({ id: 99, url: "", message: "", datetime: new Date().toISOString() });
   mockFindSkippedEventByUrl.mockResolvedValue(null);
+  mockFindCourseByOriginalUrl.mockResolvedValue(null);
 });
 
 describe("BatchService.processAll: empty groups list", () => {

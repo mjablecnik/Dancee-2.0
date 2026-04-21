@@ -373,6 +373,17 @@ export async function getDanceStyleCodes(): Promise<string[]> {
 
 // ---- Image reuse ----
 
+/**
+ * Finds the most recently expired event with an AI-generated image that matches
+ * the given primary dance style and event type, for reuse in the image fallback chain.
+ *
+ * Known limitation: Directus `_contains` on a JSON array field performs substring
+ * matching on the serialized JSON string, not exact element membership. For example,
+ * filtering by "salsa" will also match events tagged with "salsa-on1" or "salsa-cubana"
+ * because those strings contain "salsa" as a substring. This could result in reusing
+ * an image from a slightly mismatched dance style. Storing the primary dance style as a
+ * separate indexed field would enable more precise matching, but is not yet implemented.
+ */
 export async function findExpiredEventWithImage(
   primaryDance: string,
   eventType: string,
