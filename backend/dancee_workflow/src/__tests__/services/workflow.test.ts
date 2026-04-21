@@ -32,11 +32,18 @@ const mockCreateEvent = vi.fn();
 const mockCreateSkippedEvent = vi.fn();
 const mockFindErrorByUrl = vi.fn();
 const mockCreateError = vi.fn();
+const mockGetDanceStyleCodes = vi.fn();
+const mockFindCourseByOriginalUrl = vi.fn();
+const mockCreateCourse = vi.fn();
 const mockClassifyEventType = vi.fn();
 const mockExtractEventParts = vi.fn();
 const mockExtractEventInfo = vi.fn();
+const mockExtractCourseData = vi.fn();
+const mockValidateDanceCodes = vi.fn();
 const mockTranslateEventContent = vi.fn();
+const mockTranslateCourseContent = vi.fn();
 const mockResolveVenue = vi.fn();
+const mockProcessEventImage = vi.fn();
 vi.mock("../../clients/scraper-client", () => ({
   scrapeEvent: (...args: unknown[]) => mockScrapeEvent(...args),
 }));
@@ -46,17 +53,26 @@ vi.mock("../../clients/directus-client", () => ({
   createSkippedEvent: (...args: unknown[]) => mockCreateSkippedEvent(...args),
   findErrorByUrl: (...args: unknown[]) => mockFindErrorByUrl(...args),
   createError: (...args: unknown[]) => mockCreateError(...args),
+  getDanceStyleCodes: (...args: unknown[]) => mockGetDanceStyleCodes(...args),
+  findCourseByOriginalUrl: (...args: unknown[]) => mockFindCourseByOriginalUrl(...args),
+  createCourse: (...args: unknown[]) => mockCreateCourse(...args),
 }));
 vi.mock("../../services/event-parser", () => ({
   classifyEventType: (...args: unknown[]) => mockClassifyEventType(...args),
   extractEventParts: (...args: unknown[]) => mockExtractEventParts(...args),
   extractEventInfo: (...args: unknown[]) => mockExtractEventInfo(...args),
+  extractCourseData: (...args: unknown[]) => mockExtractCourseData(...args),
+  validateDanceCodes: (...args: unknown[]) => mockValidateDanceCodes(...args),
 }));
 vi.mock("../../services/event-translator", () => ({
   translateEventContent: (...args: unknown[]) => mockTranslateEventContent(...args),
+  translateCourseContent: (...args: unknown[]) => mockTranslateCourseContent(...args),
 }));
 vi.mock("../../services/venue-resolver", () => ({
   resolveVenue: (...args: unknown[]) => mockResolveVenue(...args),
+}));
+vi.mock("../../services/image-processor", () => ({
+  processEventImage: (...args: unknown[]) => mockProcessEventImage(...args),
 }));
 // No mock for computeDances — it is a pure function with no side effects,
 // so the real implementation is used directly in workflow tests.
@@ -137,6 +153,35 @@ beforeEach(() => {
   mockCreateEvent.mockImplementation((event: unknown) =>
     Promise.resolve({ ...(event as object), id: 99 })
   );
+  // New mock defaults
+  mockGetDanceStyleCodes.mockResolvedValue([]);
+  mockFindCourseByOriginalUrl.mockResolvedValue(null);
+  mockCreateCourse.mockImplementation((course: unknown) =>
+    Promise.resolve({ ...(course as object), id: 99 })
+  );
+  mockExtractCourseData.mockResolvedValue({
+    title: "Test Course",
+    description: "Course description",
+    instructor_name: null,
+    level: "all_levels",
+    schedule_day: null,
+    schedule_time: null,
+    lesson_count: null,
+    lesson_duration_minutes: null,
+    max_participants: null,
+    price: null,
+    price_note: null,
+    learning_items: [],
+    dances: [],
+  });
+  mockTranslateCourseContent.mockResolvedValue({
+    title: "Translated Course",
+    description: "Translated Description",
+    learning_items: [],
+  });
+  mockProcessEventImage.mockResolvedValue({ fileId: null, source: null });
+  // validateDanceCodes: pass through by default (return all dances unchanged)
+  mockValidateDanceCodes.mockImplementation((dances: string[]) => dances);
 });
 
 // ---- Property 19: Czech extraction output maps to "cs" translation record ----

@@ -159,6 +159,25 @@ Important rules:
 - Respond with only valid JSON, no markdown fences or additional text`;
 }
 
+export function getTranslationPromptForCourse(targetLanguage: string): string {
+  return `You are a professional translator specializing in dance courses. Translate the provided course content into ${targetLanguage}.
+
+You will receive a JSON object with the following structure:
+{
+  "title": "string",
+  "description": "string",
+  "learning_items": ["string"]
+}
+
+Translate all text fields into ${targetLanguage} and return the same JSON structure.
+
+Important rules:
+- Translate: title, description, and all items in the learning_items array
+- Do NOT translate: dance names, instructor names, prices, dates, times, or URLs
+- Preserve the exact JSON structure including all field names
+- Respond with only valid JSON, no markdown fences or additional text`;
+}
+
 export function getImageGenerationPrompt(title: string, primaryDance: string, eventType: string): string {
   return `Create a vibrant, professional cover image for a dance event.
 

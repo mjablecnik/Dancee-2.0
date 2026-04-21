@@ -5,6 +5,7 @@ import {
   findEventByOriginalUrl,
   findSkippedEventByUrl,
   createError,
+  clearDanceStyleCodesCache,
 } from "../clients/directus-client";
 import { scrapeEventList, buildFacebookEventUrl } from "../clients/scraper-client";
 import { captureError } from "../core/config";
@@ -17,6 +18,10 @@ export const batchService = restate.service({
   name: "BatchService",
   handlers: {
     processAll: async (ctx: restate.Context) => {
+      // Clear the dance style codes cache at batch start to ensure fresh codes
+      // are fetched from the CMS for each workflow run in this batch.
+      clearDanceStyleCodesCache();
+
       const groups = await ctx.run("getGroups", () => getGroupsOrderedByUpdatedAt());
 
       let eventsScheduled = 0;

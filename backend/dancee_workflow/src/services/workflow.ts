@@ -1,15 +1,36 @@
 import * as restate from "@restatedev/restate-sdk";
 import { scrapeEvent } from "../clients/scraper-client";
-import { findEventByOriginalUrl, createEvent, createError, createSkippedEvent } from "../clients/directus-client";
-import { classifyEventType, extractEventParts, extractEventInfo } from "./event-parser";
-import { translateEventContent } from "./event-translator";
+import {
+  findEventByOriginalUrl,
+  createEvent,
+  createError,
+  createSkippedEvent,
+  getDanceStyleCodes,
+  findCourseByOriginalUrl,
+  createCourse,
+} from "../clients/directus-client";
+import {
+  classifyEventType,
+  extractEventParts,
+  extractEventInfo,
+  extractCourseData,
+  validateDanceCodes,
+} from "./event-parser";
+import { translateEventContent, translateCourseContent } from "./event-translator";
+import { processEventImage } from "./image-processor";
 import { resolveVenue } from "./venue-resolver";
 import { computeDances, SUPPORTED_EVENT_TYPES, toIsoOrNull } from "../core/schemas";
 import { convertToLocalTime } from "../core/timezone";
 import { captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
-import type { DirectusEvent, DirectusEventTranslation, ErrorType } from "../core/schemas";
+import type {
+  DirectusEvent,
+  DirectusEventTranslation,
+  DirectusCourse,
+  FacebookEvent,
+  ErrorType,
+} from "../core/schemas";
 
 /**
  * Determines the error type based on the workflow step name and error message.
@@ -145,6 +166,11 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         return { status: "skipped" as const, reason: skipReason };
       }
 
+      // Step 4: Route course/lesson types to course workflow
+      if (eventType === "course" || eventType === "lesson") {
+        return runCourseWorkflow(ctx, eventUrl, facebookEvent, originalUrl, eventType);
+      }
+
       // Compute event times early — needed by parts extraction for date context
       const startTimeUtc = toIsoOrNull(facebookEvent.startTimestamp) as string;
       const endTimeUtc = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
@@ -152,12 +178,17 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       const startTime = convertToLocalTime(startTimeUtc, eventTimezone);
       const endTime = endTimeUtc ? convertToLocalTime(endTimeUtc, eventTimezone) : null;
 
+      // Fetch dance style codes (cached per batch run) for prompt injection and validation
+      const danceStyleCodes = await ctx.run("getDanceStyleCodes", () => getDanceStyleCodes());
+
       // Step 4: Extract event parts (Czech output)
       // If extraction fails after retries, continue with empty parts and mark as incomplete.
       let extracted: { title: string; description: string; parts: import("../core/schemas").EventPart[] };
       let partsIncomplete = false;
       try {
-        extracted = await runStep(ctx, "extractParts", eventUrl, () => extractEventParts(description, startTime, endTime));
+        extracted = await runStep(ctx, "extractParts", eventUrl, () =>
+          extractEventParts(description, startTime, endTime, danceStyleCodes)
+        );
       } catch (err) {
         log({ level: "warn", message: "extractParts failed, continuing with empty parts", url: eventUrl, error: String(err) });
         extracted = { title: facebookEvent.name, description: description, parts: [] };
@@ -243,9 +274,16 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         }
       }
 
-      // Step 10: Compute dances and translation_status
-      const dances = computeDances(extracted.parts);
+      // Step 9: Compute dances, validate against dance style codes, compute translation_status
+      const rawDances = computeDances(extracted.parts);
+      const dances = validateDanceCodes(rawDances, danceStyleCodes);
       const translationStatus = computeTranslationStatus(translations);
+
+      // Step 10: Process image with fallback chain
+      const primaryDance = dances[0] ?? "";
+      const imageResult = await ctx.run("processImage", () =>
+        processEventImage(facebookEvent.imageUrl, primaryDance, eventType, extracted.title)
+      );
 
       // Step 11: Build and store event
       const newEvent: DirectusEvent = {
@@ -260,6 +298,9 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         parts: extracted.parts,
         info,
         dances,
+        image: imageResult.fileId,
+        image_source: imageResult.source,
+        event_type: eventType,
         status: isIncomplete ? "incomplete" : "published",
         translation_status: translationStatus,
         translations,
@@ -270,6 +311,162 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
       ctx.set("eventId", String(createdEvent.id ?? ""));
 
       return createdEvent;
+}
+
+async function runCourseWorkflow(
+  ctx: restate.WorkflowContext,
+  eventUrl: string,
+  facebookEvent: FacebookEvent,
+  originalUrl: string,
+  eventType: string,
+) {
+  // Duplicate check for courses
+  const existingCourse = await runStep(ctx, "checkCourseDuplicate", originalUrl, () =>
+    findCourseByOriginalUrl(originalUrl)
+  );
+  if (existingCourse) {
+    ctx.set("status", "duplicate");
+    log({ level: "info", message: "Course already exists, skipping", url: originalUrl });
+    return existingCourse;
+  }
+
+  const startTimeUtc = toIsoOrNull(facebookEvent.startTimestamp) as string;
+  const endTimeUtc = toIsoOrNull(facebookEvent.endTimestamp ?? undefined);
+  const eventTimezone = facebookEvent.timezone ?? "UTC";
+  const startTime = convertToLocalTime(startTimeUtc, eventTimezone);
+  const endTime = endTimeUtc ? convertToLocalTime(endTimeUtc, eventTimezone) : null;
+
+  const description = facebookEvent.description ?? facebookEvent.name;
+
+  // Fetch dance style codes (cached per batch run)
+  const danceStyleCodes = await ctx.run("getCourseStyleCodes", () => getDanceStyleCodes());
+
+  // Extract course data
+  const courseData = await runStep(ctx, "extractCourse", eventUrl, () =>
+    extractCourseData(description, startTime, endTime)
+  );
+
+  // Validate and limit dances (already ordered by LLM relevance)
+  const rawDances = courseData.dances.slice(0, 6);
+  const dances = validateDanceCodes(rawDances, danceStyleCodes);
+
+  // Resolve venue
+  let venue = null;
+  if (facebookEvent.location) {
+    venue = await runStep(ctx, "resolveCourseVenue", eventUrl, () =>
+      resolveVenue(facebookEvent.location!)
+    );
+    if (venue !== null && venue.id === undefined) {
+      log({
+        level: "warn",
+        message: "resolveVenue returned a venue without an id for course — venue association will be stored as null.",
+        url: eventUrl,
+      });
+    }
+  }
+
+  // Derive organizer (fallback for instructor name)
+  const organizer = facebookEvent.hosts?.[0]?.name ?? facebookEvent.name;
+
+  // Build course translations (source language: Czech)
+  const courseTranslations: Array<{
+    languages_code: string;
+    title: string;
+    description: string;
+    learning_items: string[];
+  }> = [
+    {
+      languages_code: "cs",
+      title: courseData.title,
+      description: courseData.description,
+      learning_items: courseData.learning_items,
+    },
+  ];
+
+  const translationLanguages = [
+    { code: "en", name: "English" },
+    { code: "es", name: "Spanish" },
+  ];
+
+  for (const lang of translationLanguages) {
+    try {
+      const translated = await ctx.run(`translateCourse_${lang.code}`, () =>
+        translateCourseContent(
+          {
+            title: courseData.title,
+            description: courseData.description,
+            learning_items: courseData.learning_items,
+          },
+          lang.name,
+        )
+      );
+      courseTranslations.push({
+        languages_code: lang.code,
+        title: translated.title,
+        description: translated.description,
+        learning_items: translated.learning_items,
+      });
+    } catch (err) {
+      log({
+        level: "error",
+        message: `Course translation to ${lang.code} failed`,
+        url: originalUrl,
+        error: String(err),
+      });
+      captureError(err instanceof Error ? err : new Error(String(err)), {
+        workflowRunId: ctx.key,
+        eventUrl: originalUrl,
+        step: `translateCourse_${lang.code}`,
+      });
+    }
+  }
+
+  // Process image with fallback chain
+  const primaryDance = dances[0] ?? "";
+  const imageResult = await ctx.run("processCourseImage", () =>
+    processEventImage(facebookEvent.imageUrl, primaryDance, eventType, courseData.title)
+  );
+
+  // Compute translation status
+  const courseCodes = courseTranslations.map((t) => t.languages_code);
+  const hasCs = courseCodes.includes("cs");
+  const hasEn = courseCodes.includes("en");
+  const hasEs = courseCodes.includes("es");
+  const translationStatus: "complete" | "partial" | "missing" =
+    hasCs && hasEn && hasEs ? "complete" : hasCs || hasEn || hasEs ? "partial" : "missing";
+
+  // Build course object
+  const newCourse: DirectusCourse = {
+    title: courseData.title,
+    description: courseData.description,
+    instructor_name: courseData.instructor_name ?? organizer,
+    venue: venue?.id ?? null,
+    start_date: startTime ? startTime.split("T")[0] : null,
+    end_date: endTime ? endTime.split("T")[0] : null,
+    schedule_day: courseData.schedule_day,
+    schedule_time: courseData.schedule_time,
+    lesson_count: courseData.lesson_count,
+    lesson_duration_minutes: courseData.lesson_duration_minutes,
+    max_participants: courseData.max_participants,
+    current_participants: 0,
+    price: courseData.price,
+    price_note: courseData.price_note,
+    level: courseData.level,
+    dances,
+    image: imageResult.fileId,
+    image_source: imageResult.source,
+    original_url: originalUrl,
+    original_description: facebookEvent.description ?? "",
+    status: "published",
+    translation_status: translationStatus,
+    translations: courseTranslations,
+  };
+
+  const createdCourse = await runStep(ctx, "createCourse", originalUrl, () => createCourse(newCourse));
+  ctx.set("status", "completed");
+  ctx.set("courseId", String(createdCourse.id ?? ""));
+
+  return createdCourse;
 }
 
 export type EventWorkflow = typeof eventWorkflow;

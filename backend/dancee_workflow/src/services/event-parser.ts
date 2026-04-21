@@ -63,8 +63,9 @@ export async function extractEventParts(
   description: string,
   eventStartTime: string,
   eventEndTime: string | null,
+  danceStyleCodes: string[] = [],
 ): Promise<{ title: string; description: string; parts: EventPart[] }> {
-  const prompt = getEventPartsExtractionPrompt("Czech", eventStartTime, eventEndTime);
+  const prompt = getEventPartsExtractionPrompt("Czech", eventStartTime, eventEndTime, danceStyleCodes);
   return retryOnJsonError(async () => {
     const response = await getOpenAI().chat.completions.create({
       model: config.openRouterModel,

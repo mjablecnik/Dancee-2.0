@@ -1,7 +1,7 @@
 import { config } from "../core/config";
 import { getOpenAI } from "../core/openai";
 import { parseJsonResponse } from "../core/schemas";
-import { getTranslationPrompt } from "../core/prompts";
+import { getTranslationPrompt, getTranslationPromptForCourse } from "../core/prompts";
 import { retryOnJsonError } from "./event-parser";
 import { z } from "zod";
 import type { EventPart, EventInfo } from "../core/schemas";
@@ -29,6 +29,45 @@ export interface EventContentInput {
   description: string;
   parts: EventPart[];
   info: EventInfo[];
+}
+
+const TranslatedCourseContentSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  learning_items: z.array(z.string()),
+});
+
+export type TranslatedCourseContent = z.infer<typeof TranslatedCourseContentSchema>;
+
+export interface CourseContentInput {
+  title: string;
+  description: string;
+  learning_items: string[];
+}
+
+export async function translateCourseContent(
+  content: CourseContentInput,
+  targetLanguage: string,
+): Promise<TranslatedCourseContent> {
+  const input = {
+    title: content.title,
+    description: content.description,
+    learning_items: content.learning_items,
+  };
+
+  return retryOnJsonError(async () => {
+    const response = await getOpenAI().chat.completions.create({
+      model: config.openRouterModel,
+      temperature: config.llmTemperature,
+      messages: [
+        { role: "system", content: getTranslationPromptForCourse(targetLanguage) },
+        { role: "user", content: JSON.stringify(input) },
+      ],
+    });
+    const raw = response.choices[0]?.message?.content ?? "";
+    const parsed = parseJsonResponse(raw);
+    return TranslatedCourseContentSchema.parse(parsed);
+  });
 }
 
 export async function translateEventContent(

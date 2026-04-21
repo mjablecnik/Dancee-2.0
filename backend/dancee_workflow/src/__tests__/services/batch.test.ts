@@ -27,6 +27,7 @@ vi.mock("../../clients/directus-client", () => ({
   findEventByOriginalUrl: (...args: unknown[]) => mockFindEventByOriginalUrl(...args),
   findSkippedEventByUrl: (...args: unknown[]) => mockFindSkippedEventByUrl(...args),
   createError: (...args: unknown[]) => mockCreateError(...args),
+  clearDanceStyleCodesCache: vi.fn(),
 }));
 
 vi.mock("../../clients/scraper-client", () => ({
