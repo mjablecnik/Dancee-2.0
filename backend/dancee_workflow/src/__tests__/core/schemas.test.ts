@@ -5,6 +5,7 @@ import {
   parseJsonResponse,
   filterEventInfo,
   computeDances,
+  getChildStyleCodes,
   SUPPORTED_EVENT_TYPES,
   EventPartSchema,
   FacebookEventSchema,
@@ -135,7 +136,7 @@ describe("filterEventInfo", () => {
     warnSpy.mockRestore();
   });
 
-  it("Property 8: filters out entries with empty or null values", () => {
+  it("filters out entries with empty or null values", () => {
     const items = [
       { type: "url", key: "Registration", value: "https://example.com" },
       { type: "price", key: "Price", value: "" },
@@ -609,6 +610,80 @@ describe("CourseExtractionSchema", () => {
         }
       ),
       { numRuns: 50 }
+    );
+  });
+});
+
+// Feature: cms-data-completeness, Property 8: Parent dance style filtering includes child codes
+describe("getChildStyleCodes", () => {
+  it("Property 8: returns parent code plus all direct child codes", () => {
+    const styles = [
+      { code: "salsa", parent_code: null },
+      { code: "salsa-on1", parent_code: "salsa" },
+      { code: "salsa-on2", parent_code: "salsa" },
+      { code: "salsa-cubana", parent_code: "salsa" },
+      { code: "bachata", parent_code: null },
+      { code: "bachata-sensual", parent_code: "bachata" },
+    ];
+
+    const result = getChildStyleCodes("salsa", styles);
+    expect(result).toContain("salsa");
+    expect(result).toContain("salsa-on1");
+    expect(result).toContain("salsa-on2");
+    expect(result).toContain("salsa-cubana");
+    // Must not include unrelated styles
+    expect(result).not.toContain("bachata");
+    expect(result).not.toContain("bachata-sensual");
+  });
+
+  it("Property 8: returns only the parent code when it has no children", () => {
+    const styles = [
+      { code: "kizomba", parent_code: null },
+      { code: "salsa", parent_code: null },
+    ];
+    const result = getChildStyleCodes("kizomba", styles);
+    expect(result).toEqual(["kizomba"]);
+  });
+
+  it("Property 8: property-based — filtered events include parent and child-tagged items", () => {
+    fc.assert(
+      fc.property(
+        // Generate a hierarchical dance styles dataset
+        fc.array(
+          fc.record({
+            code: fc.string({ minLength: 1, maxLength: 20 }),
+            parent_code: fc.option(fc.string({ minLength: 1, maxLength: 20 }), { nil: null }),
+          }),
+          { minLength: 1, maxLength: 20 }
+        ),
+        // Pick any parent code from the dataset
+        fc.nat({ max: 19 }),
+        (styles, idx) => {
+          const parentStyle = styles[idx % styles.length];
+          const parentCode = parentStyle.code;
+
+          const childCodes = getChildStyleCodes(parentCode, styles);
+
+          // Parent code is always included
+          expect(childCodes).toContain(parentCode);
+
+          // All direct children are included
+          for (const style of styles) {
+            if (style.parent_code === parentCode) {
+              expect(childCodes).toContain(style.code);
+            }
+          }
+
+          // No non-children (other than parent) are included
+          for (const code of childCodes) {
+            if (code !== parentCode) {
+              const matchingStyle = styles.find((s) => s.code === code);
+              expect(matchingStyle?.parent_code).toBe(parentCode);
+            }
+          }
+        }
+      ),
+      { numRuns: 100 }
     );
   });
 });

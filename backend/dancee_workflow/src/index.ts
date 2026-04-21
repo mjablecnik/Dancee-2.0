@@ -63,6 +63,10 @@ const apiRoutes: Record<string, string> = {
   "/api/events/process": "/ApiService/processBatch",
   "/api/events/process-group": "/ApiService/processGroup",
   "/api/events/list": "/ApiService/listEvents",
+  "/api/courses/list": "/ApiService/listCourses",
+  "/api/favorites": "/ApiService/createFavorite",
+  "/api/favorites/delete": "/ApiService/deleteFavorite",
+  "/api/favorites/list": "/ApiService/listFavorites",
 };
 
 // Restate server ingress port (HTTP/1.1 compatible)
@@ -135,8 +139,8 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // Forward filter from query string as header for listEvents
-  if (pathname === "/api/events/list" && queryString) {
+  // Forward filter from query string as header for list endpoints
+  if ((pathname === "/api/events/list" || pathname === "/api/courses/list") && queryString) {
     const params = new URLSearchParams(queryString);
     const filterParam = params.get("filter");
     if (filterParam) {

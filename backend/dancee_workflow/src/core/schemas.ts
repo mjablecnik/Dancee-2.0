@@ -414,6 +414,23 @@ export const DirectusFavoriteSchema = z.object({
 
 export type DirectusFavorite = z.infer<typeof DirectusFavoriteSchema>;
 
+/**
+ * Returns all dance style codes that match the given parent code:
+ * the parent code itself plus any direct child codes.
+ *
+ * Used to implement Requirement 8.5: filtering events/courses by a parent
+ * dance style should include items tagged with the parent OR any of its children.
+ */
+export function getChildStyleCodes(
+  parentCode: string,
+  styles: { code: string; parent_code?: string | null }[],
+): string[] {
+  const childCodes = styles
+    .filter((s) => s.parent_code === parentCode)
+    .map((s) => s.code);
+  return [parentCode, ...childCodes];
+}
+
 // ---- JSON parsing ----
 
 export function parseJsonResponse(raw: string): unknown {

@@ -366,6 +366,93 @@ describe("translateCourseContent: retry on JSON error", () => {
   });
 });
 
+// Feature: cms-data-completeness, Property 3: Translation info_translations length matches info array length
+describe("Property 3: info_translations length matches info array length", () => {
+  it("Property 3: for any N info items, translated output contains exactly N info_translations", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(
+          fc.record({
+            type: fc.constantFrom("url", "price", "dresscode" as const),
+            key: fc.string({ minLength: 1, maxLength: 30 }),
+            value: fc.string({ minLength: 1, maxLength: 100 }),
+          }),
+          { maxLength: 8 }
+        ),
+        async (info) => {
+          const content: EventContentInput = {
+            title: "Event",
+            description: "Description",
+            parts: [],
+            info,
+          };
+
+          // Mock LLM to return matching info_translations count
+          const mockResponse = {
+            choices: [{
+              message: {
+                content: JSON.stringify({
+                  title: "Translated title",
+                  description: "Translated description",
+                  parts_translations: [],
+                  info_translations: info.map((i) => ({ key: `Translated: ${i.key}` })),
+                }),
+              },
+            }],
+          };
+          mockCreate.mockResolvedValue(mockResponse);
+
+          const result = await translateEventContent(content, "en");
+          expect(result.info_translations.length).toBe(info.length);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 3: throws validation error when LLM returns mismatched info_translations count", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.integer({ min: 2, max: 6 }),
+        async (n) => {
+          const info = Array.from({ length: n }, (_, i) => ({
+            type: "price" as const,
+            key: `Key ${i}`,
+            value: `Value ${i}`,
+          }));
+
+          const content: EventContentInput = {
+            title: "Event",
+            description: "Description",
+            parts: [],
+            info,
+          };
+
+          // LLM returns one fewer info_translation than expected
+          const mismatchedResponse = {
+            choices: [{
+              message: {
+                content: JSON.stringify({
+                  title: "Translated title",
+                  description: "Translated description",
+                  parts_translations: [],
+                  info_translations: info.slice(0, n - 1).map((i) => ({ key: `Translated: ${i.key}` })),
+                }),
+              },
+            }],
+          };
+          mockCreate.mockResolvedValue(mismatchedResponse);
+
+          await expect(translateEventContent(content, "en")).rejects.toThrow(
+            "info_translations length mismatch"
+          );
+        }
+      ),
+      { numRuns: 50 }
+    );
+  });
+});
+
 describe("translateCourseContent: response structure validation", () => {
   it("validates that title is a non-empty string", async () => {
     mockCreate.mockResolvedValue(

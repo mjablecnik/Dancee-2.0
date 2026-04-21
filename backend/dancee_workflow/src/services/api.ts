@@ -1,5 +1,5 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError, getDanceStyleCodes } from "../clients/directus-client";
+import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError, getDanceStyleCodes, listPublishedCourses, createFavorite, deleteFavorite, listFavorites } from "../clients/directus-client";
 import { config, captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
@@ -7,7 +7,7 @@ import { extractEventParts, extractEventInfo, validateDanceCodes } from "./event
 import { translateEventContent } from "./event-translator";
 import { computeDances } from "../core/schemas";
 import { computeTranslationStatus } from "./workflow";
-import type { DirectusEventTranslation } from "../core/schemas";
+import type { DirectusEventTranslation, DirectusFavorite } from "../core/schemas";
 import type { EventWorkflow } from "./workflow";
 import type { BatchService } from "./batch";
 
@@ -22,6 +22,15 @@ const ALLOWED_FILTER_FIELDS = new Set([
   "end_time",
   "venue",
   "organizer",
+  "translation_status",
+]);
+
+const ALLOWED_COURSE_FILTER_FIELDS = new Set([
+  "dances",
+  "start_date",
+  "end_date",
+  "venue",
+  "level",
   "translation_status",
 ]);
 
@@ -287,6 +296,116 @@ export const apiService = restate.service({
 
       const updated = await ctx.run("updateEvent", () => updateEvent(eventId!, patch));
       return updated;
+    },
+
+    listCourses: async (ctx: restate.Context) => {
+      const filterHeader = ctx.request().headers.get("x-dancee-filter");
+      let extraFilter: Record<string, unknown> | undefined;
+      if (filterHeader) {
+        try {
+          const parsed = JSON.parse(filterHeader) as Record<string, unknown>;
+          // Sanitize using course-specific allowed fields
+          const sanitized: Record<string, unknown> = {};
+          for (const key of Object.keys(parsed)) {
+            if (ALLOWED_COURSE_FILTER_FIELDS.has(key)) {
+              sanitized[key] = parsed[key];
+            } else {
+              log({ level: "warn", message: `listCourses: dropping disallowed filter field "${key}"` });
+            }
+          }
+          extraFilter = Object.keys(sanitized).length > 0 ? sanitized : undefined;
+        } catch {
+          log({ level: "warn", message: "listCourses: x-dancee-filter header contains invalid JSON, ignoring filter", header: filterHeader });
+        }
+      }
+
+      const lang = ctx.request().headers.get("x-dancee-lang");
+
+      const courses = await listPublishedCourses(extraFilter);
+
+      return courses.map((course) => {
+        const { translations, ...rest } = course;
+
+        let translatedFields: Record<string, unknown> = {};
+        if (lang && Array.isArray(translations)) {
+          const match = translations.find(
+            (t) => typeof t === "object" && t !== null && "languages_code" in t && t.languages_code === lang,
+          );
+          if (match && typeof match === "object" && "title" in match) {
+            const { languages_code, courses_id, id: _tid, ...fields } = match as Record<string, unknown>;
+            translatedFields = fields;
+          }
+        }
+
+        return {
+          ...rest,
+          ...translatedFields,
+          ...(lang ? {} : { translations }),
+        };
+      });
+    },
+
+    createFavorite: async (
+      ctx: restate.Context,
+      request: { user_id?: string; item_type?: string; item_id?: number },
+    ) => {
+      if (!request?.user_id || !request?.item_type || request?.item_id === undefined) {
+        throw new restate.TerminalError(
+          "Missing required fields: 'user_id', 'item_type', 'item_id'",
+          { errorCode: 400 },
+        );
+      }
+      if (request.item_type !== "event" && request.item_type !== "course") {
+        throw new restate.TerminalError(
+          "Invalid item_type: must be 'event' or 'course'",
+          { errorCode: 400 },
+        );
+      }
+
+      const favorite: DirectusFavorite = {
+        user_id: request.user_id,
+        item_type: request.item_type as "event" | "course",
+        item_id: request.item_id,
+      };
+
+      return ctx.run("createFavorite", () => createFavorite(favorite));
+    },
+
+    deleteFavorite: async (
+      ctx: restate.Context,
+      request: { user_id?: string; item_type?: string; item_id?: number },
+    ) => {
+      if (!request?.user_id || !request?.item_type || request?.item_id === undefined) {
+        throw new restate.TerminalError(
+          "Missing required fields: 'user_id', 'item_type', 'item_id'",
+          { errorCode: 400 },
+        );
+      }
+      if (request.item_type !== "event" && request.item_type !== "course") {
+        throw new restate.TerminalError(
+          "Invalid item_type: must be 'event' or 'course'",
+          { errorCode: 400 },
+        );
+      }
+
+      await ctx.run("deleteFavorite", () =>
+        deleteFavorite(request.user_id!, request.item_type as "event" | "course", request.item_id!)
+      );
+      return { success: true };
+    },
+
+    listFavorites: async (
+      ctx: restate.Context,
+      request: { user_id?: string },
+    ) => {
+      if (!request?.user_id) {
+        throw new restate.TerminalError(
+          "Missing required field: 'user_id'",
+          { errorCode: 400 },
+        );
+      }
+
+      return ctx.run("listFavorites", () => listFavorites(request.user_id!));
     },
 
     listEvents: async (ctx: restate.Context) => {

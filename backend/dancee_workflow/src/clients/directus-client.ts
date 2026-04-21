@@ -333,6 +333,25 @@ export async function findCourseByOriginalUrl(originalUrl: string): Promise<Dire
   return DirectusCourseSchema.parse(items[0]);
 }
 
+export async function listPublishedCourses(extraFilter?: Record<string, unknown>): Promise<DirectusCourse[]> {
+  const publishedFilter = { status: { _eq: "published" } };
+  const effectiveFilter = extraFilter
+    ? { _and: [publishedFilter, extraFilter] }
+    : publishedFilter;
+  const encoded = encodeURIComponent(JSON.stringify(effectiveFilter));
+  const data = await directusGet(`/items/courses?filter=${encoded}&fields=*,translations.*,venue.*`);
+  const items = extractDirectusData(data, "listPublishedCourses") as unknown[];
+  return z.array(DirectusCourseSchema).parse(items);
+}
+
+export async function listFavorites(userId: string): Promise<DirectusFavorite[]> {
+  const filter = { user_id: { _eq: userId } };
+  const encoded = encodeURIComponent(JSON.stringify(filter));
+  const data = await directusGet(`/items/favorites?filter=${encoded}&sort[]=-created_at`);
+  const items = extractDirectusData(data, "listFavorites") as unknown[];
+  return z.array(DirectusFavoriteSchema).parse(items);
+}
+
 // ---- Dance Styles ----
 
 let danceStyleCodesCache: string[] | null = null;
