@@ -21,6 +21,7 @@ class FeaturedEventCard extends StatelessWidget {
   final bool isFavorited;
   final List<EventTagData> tags;
   final VoidCallback? onTap;
+  final VoidCallback? onFavoriteTap;
 
   const FeaturedEventCard({
     super.key,
@@ -33,6 +34,7 @@ class FeaturedEventCard extends StatelessWidget {
     required this.isFavorited,
     required this.tags,
     this.onTap,
+    this.onFavoriteTap,
   });
 
   @override
@@ -88,18 +90,21 @@ class FeaturedEventCard extends StatelessWidget {
         Positioned(
           top: AppSpacing.md,
           right: AppSpacing.md,
-          child: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-            ),
-            child: Center(
-              child: FaIcon(
-                isFavorited ? FontAwesomeIcons.solidHeart : FontAwesomeIcons.heart,
-                size: 14,
-                color: isFavorited ? Colors.red : Colors.white,
+          child: GestureDetector(
+            onTap: onFavoriteTap,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
+              ),
+              child: Center(
+                child: FaIcon(
+                  isFavorited ? FontAwesomeIcons.solidHeart : FontAwesomeIcons.heart,
+                  size: 14,
+                  color: isFavorited ? Colors.red : Colors.white,
+                ),
               ),
             ),
           ),

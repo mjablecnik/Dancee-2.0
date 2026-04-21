@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
-import '../../../../data/event_repository.dart';
+import '../../../../data/entities/event.dart';
 import '../../../../i18n/strings.g.dart';
+import '../../../../logic/cubits/favorites_cubit.dart';
+import '../components/featured_event_card.dart' show EventTagData;
 import '../components/upcoming_event_card.dart';
 
 class UpcomingEventsSection extends StatelessWidget {
-  final VoidCallback? onEventTap;
+  final List<Event> events;
+  final void Function(int eventId)? onEventTap;
 
   const UpcomingEventsSection({
     super.key,
+    required this.events,
     this.onEventTap,
   });
+
+  String _formatDate(DateTime dt) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,35 +65,34 @@ class UpcomingEventsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        FutureBuilder<List<UpcomingEventData>>(
-          future: const EventRepository().getUpcomingEvents(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const SizedBox.shrink();
-            final events = snapshot.data!;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Column(
-                children: events.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final event = entry.value;
-                  return Column(
-                    children: [
-                      if (index > 0) const SizedBox(height: AppSpacing.lg),
-                      UpcomingEventCard(
-                        imageUrl: event.imageUrl,
-                        title: event.title,
-                        location: event.location,
-                        date: event.date,
-                        tags: event.tags,
-                        isFavorited: event.isFavorited,
-                        onTap: onEventTap,
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-            );
-          },
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Column(
+            children: events.asMap().entries.map((entry) {
+              final index = entry.key;
+              final event = entry.value;
+              return Column(
+                children: [
+                  if (index > 0) const SizedBox(height: AppSpacing.lg),
+                  UpcomingEventCard(
+                    imageUrl: event.imageUrl ?? '',
+                    title: event.title,
+                    location: event.venue?.town ?? event.venue?.name ?? '',
+                    date: _formatDate(event.startTime),
+                    tags: event.dances
+                        .map((d) => EventTagData(d, appPrimary))
+                        .toList(),
+                    isFavorited: event.isFavorited,
+                    onTap: () => onEventTap?.call(event.id),
+                    onFavoriteTap: () => context.read<FavoritesCubit>().toggleFavorite(
+                          itemType: 'event',
+                          itemId: event.id,
+                        ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
         ),
       ],
     );

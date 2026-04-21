@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
-import '../../../../data/event_repository.dart';
 import '../../../../shared/components/app_cached_image.dart';
+import 'featured_event_card.dart' show EventTagData;
 
 class UpcomingEventCard extends StatelessWidget {
   final String imageUrl;
@@ -13,6 +13,7 @@ class UpcomingEventCard extends StatelessWidget {
   final List<EventTagData> tags;
   final bool isFavorited;
   final VoidCallback? onTap;
+  final VoidCallback? onFavoriteTap;
 
   const UpcomingEventCard({
     super.key,
@@ -23,6 +24,7 @@ class UpcomingEventCard extends StatelessWidget {
     required this.tags,
     required this.isFavorited,
     this.onTap,
+    this.onFavoriteTap,
   });
 
   @override
@@ -158,20 +160,23 @@ class UpcomingEventCard extends StatelessWidget {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                  ),
-                  child: Center(
-                    child: FaIcon(
-                      isFavorited
-                          ? FontAwesomeIcons.solidHeart
-                          : FontAwesomeIcons.heart,
-                      size: 14,
-                      color: isFavorited ? Colors.red : appMuted,
+                child: GestureDetector(
+                  onTap: onFavoriteTap,
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                    ),
+                    child: Center(
+                      child: FaIcon(
+                        isFavorited
+                            ? FontAwesomeIcons.solidHeart
+                            : FontAwesomeIcons.heart,
+                        size: 14,
+                        color: isFavorited ? Colors.red : appMuted,
+                      ),
                     ),
                   ),
                 ),

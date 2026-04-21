@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
-import '../../../../data/event_repository.dart' as repo;
+import '../../../../data/entities/event.dart';
 import '../../../../i18n/strings.g.dart';
+import '../../../../logic/cubits/favorites_cubit.dart';
 import '../../../../shared/components/snap_carousel.dart';
 import '../components/featured_event_card.dart';
 
 class FeaturedEventsSection extends StatelessWidget {
-  final VoidCallback? onEventTap;
+  final List<Event> events;
+  final void Function(int eventId)? onEventTap;
 
   const FeaturedEventsSection({
     super.key,
+    required this.events,
     this.onEventTap,
   });
 
+  String _formatDate(DateTime dt) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (events.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,29 +43,32 @@ class FeaturedEventsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        FutureBuilder<List<repo.FeaturedEventData>>(
-          future: const repo.EventRepository().getFeaturedEvents(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const SizedBox.shrink();
-            final events = snapshot.data!;
-            return SnapCarousel(
-              itemCount: events.length,
-              itemBuilder: (context, index, scale) {
-                final event = events[index];
-                return FeaturedEventCard(
-                  imageUrl: event.imageUrl,
-                  title: event.title,
-                  date: event.date,
-                  location: event.location,
-                  price: event.price,
-                  isFree: event.isFree,
-                  isFavorited: event.isFavorited,
-                  tags: event.tags
-                      .map((tag) => EventTagData(tag.label, tag.color))
-                      .toList(),
-                  onTap: onEventTap,
-                );
-              },
+        SnapCarousel(
+          itemCount: events.length,
+          itemBuilder: (context, index, scale) {
+            final event = events[index];
+            final priceInfo = event.info
+                .where((i) => i.type.name == 'price')
+                .firstOrNull;
+            final price = priceInfo?.value ?? '';
+            final isFree = price.toLowerCase() == 'free' || price == '0';
+
+            return FeaturedEventCard(
+              imageUrl: event.imageUrl ?? '',
+              title: event.title,
+              date: _formatDate(event.startTime),
+              location: event.venue?.town ?? event.venue?.name ?? '',
+              price: price.isEmpty ? t.events.detail.admission : price,
+              isFree: isFree,
+              isFavorited: event.isFavorited,
+              tags: event.dances
+                  .map((d) => EventTagData(d, appPrimary))
+                  .toList(),
+              onTap: () => onEventTap?.call(event.id),
+              onFavoriteTap: () => context.read<FavoritesCubit>().toggleFavorite(
+                    itemType: 'event',
+                    itemId: event.id,
+                  ),
             );
           },
         ),

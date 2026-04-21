@@ -1,31 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
-import '../../../data/event_repository.dart';
+import '../../../logic/cubits/event_cubit.dart';
+import '../../../logic/states/event_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import 'sections/events_header_section.dart';
 import 'sections/featured_events_section.dart';
 import 'sections/upcoming_events_section.dart';
 
-class EventsListScreen extends StatefulWidget {
+class EventsListScreen extends StatelessWidget {
   const EventsListScreen({super.key});
-
-  @override
-  State<EventsListScreen> createState() => _EventsListScreenState();
-}
-
-class _EventsListScreenState extends State<EventsListScreen> {
-  int _selectedStyleIndex = 0;
-  List<String> _styles = [];
-
-  @override
-  void initState() {
-    super.initState();
-    const EventRepository().getDanceStyleFilters().then((styles) {
-      if (mounted) setState(() => _styles = styles);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,27 +24,63 @@ class _EventsListScreenState extends State<EventsListScreen> {
             onLocationTap: () => context.push('/events/filter-location'),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 16, top: AppSpacing.xxl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DanceStylesFilterSection(
-                    styles: _styles,
-                    selectedIndex: _selectedStyleIndex,
-                    onSelected: (i) => setState(() => _selectedStyleIndex = i),
-                    onShowAll: () => context.push('/events/filter-dance'),
+            child: BlocBuilder<EventCubit, EventState>(
+              builder: (context, state) {
+                return state.map(
+                  initial: (_) => const SizedBox.shrink(),
+                  loading: (_) => const Center(
+                    child: CircularProgressIndicator(color: appPrimary),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  FeaturedEventsSection(
-                    onEventTap: () => context.push('/events/detail'),
+                  loaded: (loaded) => SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 16, top: AppSpacing.xxl),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DanceStylesFilterSection(
+                          styles: loaded.allEvents
+                              .expand((e) => e.dances)
+                              .toSet()
+                              .toList(),
+                          selectedIndex: 0,
+                          onSelected: (_) {},
+                          onShowAll: () => context.push('/events/filter-dance'),
+                        ),
+                        const SizedBox(height: AppSpacing.xxxl),
+                        FeaturedEventsSection(
+                          events: loaded.featuredEvents,
+                          onEventTap: (id) => context.push('/events/detail?id=$id'),
+                        ),
+                        if (loaded.featuredEvents.isNotEmpty)
+                          const SizedBox(height: AppSpacing.xxxl),
+                        UpcomingEventsSection(
+                          events: loaded.filteredEvents,
+                          onEventTap: (id) => context.push('/events/detail?id=$id'),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  UpcomingEventsSection(
-                    onEventTap: () => context.push('/events/detail'),
+                  error: (err) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          err.message,
+                          style: const TextStyle(color: appMuted),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        TextButton(
+                          onPressed: () {
+                            final cubit = context.read<EventCubit>();
+                            cubit.loadEvents('en');
+                          },
+                          child: const Text('Retry', style: TextStyle(color: appPrimary)),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],

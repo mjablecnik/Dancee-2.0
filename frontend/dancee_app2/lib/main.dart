@@ -100,7 +100,11 @@ final _router = GoRouter(
     // Sub-pages — no bottom nav bar
     GoRoute(
       path: '/events/detail',
-      builder: (context, state) => const EventDetailScreen(),
+      builder: (context, state) {
+        final idStr = state.uri.queryParameters['id'] ?? '';
+        final id = int.tryParse(idStr) ?? 0;
+        return EventDetailScreen(eventId: id);
+      },
     ),
     GoRoute(
       path: '/events/filter-dance',

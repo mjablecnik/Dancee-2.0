@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
-import '../../../data/event_repository.dart';
+import '../../../data/event_repository.dart' hide EventTagData;
 import '../../../i18n/strings.g.dart';
+import '../../events/events_list/components/featured_event_card.dart' show EventTagData;
 import '../../events/events_list/components/upcoming_event_card.dart';
 
 class SavedEventsListSection extends StatelessWidget {
@@ -64,7 +65,9 @@ class SavedEventsListSection extends StatelessWidget {
                   title: events[i].title,
                   location: events[i].location,
                   date: events[i].date,
-                  tags: events[i].tags,
+                  tags: events[i].tags
+                      .map((tag) => EventTagData(tag.label, tag.color))
+                      .toList(),
                   isFavorited: events[i].isFavorited,
                 ),
               ],
