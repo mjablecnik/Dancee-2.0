@@ -162,6 +162,35 @@ async function setupEventsCollection(): Promise<void> {
       ],
     },
   }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("events", "image", "integer", {
+    interface: "file-image",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("events", "image_source", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { value: "facebook", text: "Facebook" },
+        { value: "ai_generated", text: "AI Generated" },
+      ],
+    },
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("events", "event_type", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { value: "party", text: "Party" },
+        { value: "workshop", text: "Workshop" },
+        { value: "festival", text: "Festival" },
+        { value: "holiday", text: "Holiday" },
+        { value: "course", text: "Course" },
+        { value: "lesson", text: "Lesson" },
+        { value: "other", text: "Other" },
+      ],
+    },
+  }, { is_nullable: true, max_length: 50 });
 }
 
 async function setupVenuesCollection(): Promise<void> {
@@ -451,6 +480,621 @@ async function setupVenueRelation(): Promise<void> {
 }
 
 
+async function setupEventImageRelation(): Promise<void> {
+  try {
+    const data = await directusGet("/relations/events/image") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "events.image" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "events",
+      field: "image",
+      related_collection: "directus_files",
+      meta: {
+        one_collection: "directus_files",
+        many_collection: "events",
+        many_field: "image",
+        one_field: null,
+      },
+      schema: {
+        on_delete: "SET NULL",
+      },
+    });
+    console.log(`Created relation events.image -> directus_files.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation events.image -> directus_files already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function setupDanceStylesCollection(): Promise<void> {
+  if (await collectionExists("dance_styles")) {
+    console.log(`Collection "dance_styles" already exists, skipping.`);
+    return;
+  }
+  await directusPost("/collections", {
+    collection: "dance_styles",
+    meta: { singleton: false },
+    schema: {},
+    fields: [
+      {
+        field: "code",
+        type: "string",
+        schema: { is_primary_key: true, max_length: 50, is_nullable: false },
+        meta: { interface: "input", required: true },
+      },
+      {
+        field: "name",
+        type: "string",
+        schema: { max_length: 100, is_nullable: false },
+        meta: { interface: "input" },
+      },
+    ],
+  });
+  console.log(`Created collection "dance_styles" with code (PK) and name fields.`);
+
+  await createFieldIfNotExists("dance_styles", "parent_code", "string", {
+    interface: "select-dropdown-m2o",
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("dance_styles", "sort_order", "integer", {
+    interface: "input",
+  }, { is_nullable: false, default_value: 0 });
+}
+
+async function setupDanceStylesTranslationsCollection(): Promise<void> {
+  await createCollectionIfNotExists("dance_styles_translations", { singleton: false });
+
+  await createFieldIfNotExists("dance_styles_translations", "dance_styles_code", "string", {
+    interface: "select-dropdown-m2o",
+    hidden: true,
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("dance_styles_translations", "languages_code", "string", {
+    interface: "select-dropdown-m2o",
+    hidden: true,
+  }, { is_nullable: true, max_length: 10 });
+
+  await createFieldIfNotExists("dance_styles_translations", "name", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 100 });
+}
+
+async function setupDanceStylesTranslationsRelation(): Promise<void> {
+  try {
+    const data = await directusGet("/relations/dance_styles/translations") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "dance_styles.translations" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  await createFieldIfNotExists("dance_styles", "translations", "alias", {
+    interface: "list-o2m",
+    options: {
+      template: "{{languages_code}} — {{name}}",
+      enableCreate: false,
+      enableSelect: false,
+    },
+    display: "related-values",
+    display_options: {
+      template: "{{languages_code}} — {{name}}",
+    },
+    special: ["translations"],
+  }, null);
+
+  try {
+    await directusPost("/relations", {
+      collection: "dance_styles_translations",
+      field: "dance_styles_code",
+      related_collection: "dance_styles",
+      meta: {
+        one_collection: "dance_styles",
+        many_collection: "dance_styles_translations",
+        many_field: "dance_styles_code",
+        one_field: "translations",
+        one_collection_field: null,
+        one_allowed_collections: null,
+        junction_field: "languages_code",
+        sort_field: null,
+      },
+      schema: {
+        on_delete: "CASCADE",
+      },
+    });
+    console.log(`Created relation dance_styles <-> dance_styles_translations.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation dance_styles <-> dance_styles_translations already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "dance_styles_translations",
+      field: "languages_code",
+      related_collection: "languages",
+      meta: {
+        one_collection: "languages",
+        many_collection: "dance_styles_translations",
+        many_field: "languages_code",
+        one_field: null,
+      },
+      schema: {},
+    });
+    console.log(`Created relation dance_styles_translations <-> languages.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation dance_styles_translations <-> languages already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function setupDanceStylesParentRelation(): Promise<void> {
+  try {
+    const data = await directusGet("/relations/dance_styles/parent_code") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "dance_styles.parent_code" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "dance_styles",
+      field: "parent_code",
+      related_collection: "dance_styles",
+      meta: {
+        one_collection: "dance_styles",
+        many_collection: "dance_styles",
+        many_field: "parent_code",
+        one_field: null,
+      },
+      schema: {
+        on_delete: "SET NULL",
+      },
+    });
+    console.log(`Created self-referencing relation dance_styles.parent_code.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation dance_styles.parent_code already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+const DANCE_STYLES_SEED = [
+  { code: "salsa", name: "Salsa", parent_code: null, sort_order: 1 },
+  { code: "salsa-on1", name: "Salsa On1", parent_code: "salsa", sort_order: 2 },
+  { code: "salsa-on2", name: "Salsa On2", parent_code: "salsa", sort_order: 3 },
+  { code: "salsa-cubana", name: "Salsa Cubana", parent_code: "salsa", sort_order: 4 },
+  { code: "bachata", name: "Bachata", parent_code: null, sort_order: 10 },
+  { code: "bachata-sensual", name: "Bachata Sensual", parent_code: "bachata", sort_order: 11 },
+  { code: "bachata-dominicana", name: "Bachata Dominicana", parent_code: "bachata", sort_order: 12 },
+  { code: "kizomba", name: "Kizomba", parent_code: null, sort_order: 20 },
+  { code: "urban-kiz", name: "Urban Kiz", parent_code: "kizomba", sort_order: 21 },
+  { code: "semba", name: "Semba", parent_code: "kizomba", sort_order: 22 },
+  { code: "zouk", name: "Zouk", parent_code: null, sort_order: 30 },
+  { code: "lambada", name: "Lambada", parent_code: "zouk", sort_order: 31 },
+  { code: "tango", name: "Tango", parent_code: null, sort_order: 40 },
+  { code: "swing", name: "Swing", parent_code: null, sort_order: 50 },
+  { code: "lindy-hop", name: "Lindy Hop", parent_code: "swing", sort_order: 51 },
+  { code: "west-coast-swing", name: "West Coast Swing", parent_code: "swing", sort_order: 52 },
+  { code: "boogie-woogie", name: "Boogie Woogie", parent_code: "swing", sort_order: 53 },
+  { code: "charleston", name: "Charleston", parent_code: "swing", sort_order: 54 },
+  { code: "reggaeton", name: "Reggaeton", parent_code: null, sort_order: 60 },
+  { code: "afro", name: "Afro", parent_code: null, sort_order: 70 },
+  { code: "forro", name: "Forró", parent_code: null, sort_order: 80 },
+  { code: "ballroom", name: "Standard", parent_code: null, sort_order: 90 },
+  { code: "waltz", name: "Waltz", parent_code: "ballroom", sort_order: 91 },
+  { code: "viennese-waltz", name: "Viennese Waltz", parent_code: "ballroom", sort_order: 92 },
+  { code: "quickstep", name: "Quickstep", parent_code: "ballroom", sort_order: 93 },
+  { code: "slowfox", name: "Slowfox", parent_code: "ballroom", sort_order: 94 },
+  { code: "latin", name: "Latin", parent_code: null, sort_order: 100 },
+  { code: "cha-cha", name: "Cha-Cha", parent_code: "latin", sort_order: 101 },
+  { code: "rumba", name: "Rumba", parent_code: "latin", sort_order: 102 },
+  { code: "samba", name: "Samba", parent_code: "latin", sort_order: 103 },
+  { code: "paso-doble", name: "Paso Doble", parent_code: "latin", sort_order: 104 },
+  { code: "jive", name: "Jive", parent_code: "latin", sort_order: 105 },
+  { code: "dancehall", name: "Dancehall", parent_code: null, sort_order: 110 },
+  { code: "hip-hop", name: "Hip-Hop", parent_code: null, sort_order: 120 },
+  { code: "contemporary", name: "Contemporary", parent_code: null, sort_order: 130 },
+  { code: "ecstatic-dance", name: "Ecstatic Dance", parent_code: null, sort_order: 140 },
+];
+
+async function seedDanceStyles(): Promise<void> {
+  // Seed parent styles first, then children
+  const parents = DANCE_STYLES_SEED.filter((s) => s.parent_code === null);
+  const children = DANCE_STYLES_SEED.filter((s) => s.parent_code !== null);
+
+  for (const style of [...parents, ...children]) {
+    try {
+      const existing = await directusGet(`/items/dance_styles/${style.code}`) as { data?: unknown };
+      if (existing?.data) {
+        console.log(`Dance style "${style.code}" already exists, skipping.`);
+        continue;
+      }
+    } catch {
+      // Not found, create it
+    }
+    try {
+      await directusPost("/items/dance_styles", style);
+      console.log(`Seeded dance style "${style.code}" (${style.name}).`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("already exists") || msg.includes("409") || msg.includes("unique")) {
+        console.log(`Dance style "${style.code}" already exists, skipping.`);
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+async function setupCoursesCollection(): Promise<void> {
+  await createCollectionIfNotExists("courses", { singleton: false });
+
+  await createFieldIfNotExists("courses", "title", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 512 });
+
+  await createFieldIfNotExists("courses", "description", "text", {
+    interface: "input-multiline",
+    display: "raw",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "instructor_name", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 255 });
+
+  await createFieldIfNotExists("courses", "instructor_bio", "text", {
+    interface: "input-multiline",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "instructor_avatar_url", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 2048 });
+
+  await createFieldIfNotExists("courses", "venue", "integer", {
+    interface: "select-dropdown-m2o",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "start_date", "date", {
+    interface: "datetime",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "end_date", "date", {
+    interface: "datetime",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "schedule_day", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("courses", "schedule_time", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("courses", "lesson_count", "integer", {
+    interface: "input",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "lesson_duration_minutes", "integer", {
+    interface: "input",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "max_participants", "integer", {
+    interface: "input",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "current_participants", "integer", {
+    interface: "input",
+    default_value: 0,
+  }, { is_nullable: false, default_value: 0 });
+
+  await createFieldIfNotExists("courses", "price", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 255 });
+
+  await createFieldIfNotExists("courses", "price_note", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 512 });
+
+  await createFieldIfNotExists("courses", "level", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { value: "beginner", text: "Beginner" },
+        { value: "intermediate", text: "Intermediate" },
+        { value: "advanced", text: "Advanced" },
+        { value: "all_levels", text: "All Levels" },
+      ],
+    },
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("courses", "dances", "json", {
+    interface: "input-code",
+    options: { language: "json" },
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "image", "integer", {
+    interface: "file-image",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "image_source", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { value: "facebook", text: "Facebook" },
+        { value: "ai_generated", text: "AI Generated" },
+      ],
+    },
+  }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("courses", "original_url", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 2048 });
+
+  await createFieldIfNotExists("courses", "original_description", "text", {
+    interface: "input-multiline",
+    display: "raw",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses", "status", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { value: "published", text: "Published" },
+        { value: "draft", text: "Draft" },
+        { value: "archived", text: "Archived" },
+      ],
+    },
+    default_value: "published",
+  }, { is_nullable: false, max_length: 50, default_value: "published" });
+
+  await createFieldIfNotExists("courses", "translation_status", "string", {
+    interface: "select-dropdown",
+    options: {
+      choices: [
+        { value: "complete", text: "Complete" },
+        { value: "partial", text: "Partial" },
+        { value: "missing", text: "Missing" },
+      ],
+    },
+  }, { is_nullable: true, max_length: 50 });
+}
+
+async function setupCoursesTranslationsCollection(): Promise<void> {
+  await createCollectionIfNotExists("courses_translations", { singleton: false });
+
+  await createFieldIfNotExists("courses_translations", "courses_id", "integer", {
+    interface: "select-dropdown-m2o",
+    hidden: true,
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses_translations", "languages_code", "string", {
+    interface: "select-dropdown-m2o",
+    hidden: true,
+  }, { is_nullable: true, max_length: 10 });
+
+  await createFieldIfNotExists("courses_translations", "title", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 512 });
+
+  await createFieldIfNotExists("courses_translations", "description", "text", {
+    interface: "input-multiline",
+  }, { is_nullable: true });
+
+  await createFieldIfNotExists("courses_translations", "learning_items", "json", {
+    interface: "input-code",
+    options: { language: "json" },
+  }, { is_nullable: true });
+}
+
+async function setupCoursesTranslationsRelation(): Promise<void> {
+  try {
+    const data = await directusGet("/relations/courses/translations") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "courses.translations" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  await createFieldIfNotExists("courses", "translations", "alias", {
+    interface: "list-o2m",
+    options: {
+      template: "{{languages_code}} — {{title}}",
+      enableCreate: false,
+      enableSelect: false,
+    },
+    display: "related-values",
+    display_options: {
+      template: "{{languages_code}} — {{title}}",
+    },
+    special: ["translations"],
+  }, null);
+
+  try {
+    await directusPost("/relations", {
+      collection: "courses_translations",
+      field: "courses_id",
+      related_collection: "courses",
+      meta: {
+        one_collection: "courses",
+        many_collection: "courses_translations",
+        many_field: "courses_id",
+        one_field: "translations",
+        one_collection_field: null,
+        one_allowed_collections: null,
+        junction_field: "languages_code",
+        sort_field: null,
+      },
+      schema: {
+        on_delete: "CASCADE",
+      },
+    });
+    console.log(`Created relation courses <-> courses_translations.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation courses <-> courses_translations already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "courses_translations",
+      field: "languages_code",
+      related_collection: "languages",
+      meta: {
+        one_collection: "languages",
+        many_collection: "courses_translations",
+        many_field: "languages_code",
+        one_field: null,
+      },
+      schema: {},
+    });
+    console.log(`Created relation courses_translations <-> languages.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation courses_translations <-> languages already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function setupCoursesVenueRelation(): Promise<void> {
+  try {
+    const data = await directusGet("/relations/courses/venue") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "courses.venue" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "courses",
+      field: "venue",
+      related_collection: "venues",
+      meta: {
+        one_collection: "venues",
+        many_collection: "courses",
+        many_field: "venue",
+        one_field: null,
+      },
+      schema: {
+        on_delete: "SET NULL",
+      },
+    });
+    console.log(`Created relation courses.venue -> venues.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation courses.venue -> venues already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function setupCoursesImageRelation(): Promise<void> {
+  try {
+    const data = await directusGet("/relations/courses/image") as { data?: unknown };
+    if (data?.data) {
+      console.log(`Relation "courses.image" already exists, skipping.`);
+      return;
+    }
+  } catch {
+    // Not found, proceed to create
+  }
+
+  try {
+    await directusPost("/relations", {
+      collection: "courses",
+      field: "image",
+      related_collection: "directus_files",
+      meta: {
+        one_collection: "directus_files",
+        many_collection: "courses",
+        many_field: "image",
+        one_field: null,
+      },
+      schema: {
+        on_delete: "SET NULL",
+      },
+    });
+    console.log(`Created relation courses.image -> directus_files.`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
+      console.log(`Relation courses.image -> directus_files already exists, skipping.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function setupFavoritesCollection(): Promise<void> {
+  await createCollectionIfNotExists("favorites", { singleton: false });
+
+  await createFieldIfNotExists("favorites", "user_id", "string", {
+    interface: "input",
+    required: true,
+  }, { is_nullable: false, max_length: 255 });
+
+  await createFieldIfNotExists("favorites", "item_type", "string", {
+    interface: "select-dropdown",
+    required: true,
+    options: {
+      choices: [
+        { value: "event", text: "Event" },
+        { value: "course", text: "Course" },
+      ],
+    },
+  }, { is_nullable: false, max_length: 50 });
+
+  await createFieldIfNotExists("favorites", "item_id", "integer", {
+    interface: "input",
+    required: true,
+  }, { is_nullable: false });
+
+  await createFieldIfNotExists("favorites", "created_at", "dateTime", {
+    interface: "datetime",
+    default_value: "$NOW",
+  }, { is_nullable: false });
+}
+
 async function seedLanguages(): Promise<void> {
   const languages = [
     { code: "cs", name: "Čeština" },
@@ -498,7 +1142,19 @@ async function main(): Promise<void> {
   await setupEventsTranslationsCollection();
   await setupTranslationsRelation();
   await setupVenueRelation();
+  await setupEventImageRelation();
   await seedLanguages();
+  await setupDanceStylesCollection();
+  await setupDanceStylesTranslationsCollection();
+  await setupDanceStylesTranslationsRelation();
+  await setupDanceStylesParentRelation();
+  await seedDanceStyles();
+  await setupCoursesCollection();
+  await setupCoursesTranslationsCollection();
+  await setupCoursesTranslationsRelation();
+  await setupCoursesVenueRelation();
+  await setupCoursesImageRelation();
+  await setupFavoritesCollection();
 
   console.log("\nDirectus setup complete.");
 }
