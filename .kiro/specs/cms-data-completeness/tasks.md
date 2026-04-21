@@ -79,74 +79,74 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
 - [x] 4. Checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Add new Directus client functions in `src/clients/directus-client.ts`
-  - [ ] 5.1 Add `uploadFile(buffer, filename, mimeType)` function
+- [x] 5. Add new Directus client functions in `src/clients/directus-client.ts`
+  - [x] 5.1 Add `uploadFile(buffer, filename, mimeType)` function
     - Upload binary data to Directus Files API (`/files`) using multipart/form-data
     - Return the file ID from the response
     - Use existing `authHeaders` pattern but with `multipart/form-data` content type
     - _Requirements: 1.2, 12.3_
 
-  - [ ] 5.2 Add course CRUD functions: `createCourse`, `findCourseByOriginalUrl`
+  - [x] 5.2 Add course CRUD functions: `createCourse`, `findCourseByOriginalUrl`
     - `createCourse(course)` — POST to `/items/courses`, validate with `DirectusCourseSchema`
     - `findCourseByOriginalUrl(url)` — GET with filter, for duplicate detection
     - _Requirements: 6.2, 6.7_
 
-  - [ ] 5.3 Add `getDanceStyleCodes()` function with per-batch caching
+  - [x] 5.3 Add `getDanceStyleCodes()` function with per-batch caching
     - Fetch all dance_style codes from `/items/dance_styles?fields=code`
     - Cache result in module-level variable; add `clearDanceStyleCodesCache()` for invalidation at batch start
     - Return as `string[]` for both prompt injection and validation
     - _Requirements: 8.6, 8.7_
 
-  - [ ] 5.4 Add `findExpiredEventWithImage(primaryDance, eventType)` function
+  - [x] 5.4 Add `findExpiredEventWithImage(primaryDance, eventType)` function
     - Query events where `end_time < now`, `image IS NOT NULL`, `image_source = "ai_generated"`, matching `dances` contains `primaryDance` and `event_type` matches
     - Sort by `end_time` descending, limit 1
     - Return the `image` file ID or null
     - _Requirements: 12.4_
 
-  - [ ] 5.5 Add favorites functions: `createFavorite`, `deleteFavorite`
+  - [x] 5.5 Add favorites functions: `createFavorite`, `deleteFavorite`
     - `createFavorite(favorite)` — POST to `/items/favorites`
     - `deleteFavorite(userId, itemType, itemId)` — find by filter then DELETE
     - _Requirements: 9.1, 9.2_
 
-- [ ] 6. Update LLM prompts in `src/core/prompts.ts`
-  - [ ] 6.1 Update `getEventInfoExtractionPrompt` to include dresscode extraction
+- [x] 6. Update LLM prompts in `src/core/prompts.ts`
+  - [x] 6.1 Update `getEventInfoExtractionPrompt` to include dresscode extraction
     - Add `"dresscode"` to the type enum in the prompt JSON structure
     - Add instruction to extract dresscode information from event descriptions
     - Add example: `{ "type": "dresscode", "key": "Dresscode", "value": "Elegant / semi-formal" }`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - [ ] 6.2 Update `getEventPartsExtractionPrompt` to accept dynamic dance style codes and order by relevance
+  - [x] 6.2 Update `getEventPartsExtractionPrompt` to accept dynamic dance style codes and order by relevance
     - Add `danceStyleCodes: string[]` parameter to the prompt function
     - Inject the codes list dynamically into the prompt (fetched from CMS, cached per batch)
     - Add instruction: "Order dances by relevance (most prominent first)"
     - Add instruction: "Use only dance style codes from this list: {codes}"
     - _Requirements: 4.3, 8.6_
 
-  - [ ] 6.3 Add `getCourseExtractionPrompt(outputLanguage, eventStartTime, eventEndTime, danceStyleCodes)` for course data extraction
+  - [x] 6.3 Add `getCourseExtractionPrompt(outputLanguage, eventStartTime, eventEndTime, danceStyleCodes)` for course data extraction
     - Create dedicated prompt instructing LLM to extract: title, description, instructor_name, level, schedule_day, schedule_time, lesson_count, lesson_duration_minutes, max_participants, price, price_note, learning_items, dances
     - Prompt must be in English, instruct LLM to output translatable text in Czech
     - Accept `danceStyleCodes: string[]` parameter and inject codes dynamically
     - _Requirements: 7.1, 7.4_
 
-  - [ ] 6.4 Add `getImageGenerationPrompt(title, primaryDance, eventType)` for AI image generation
+  - [x] 6.4 Add `getImageGenerationPrompt(title, primaryDance, eventType)` for AI image generation
     - Create prompt that produces a relevant dance event cover image
     - Include event title, primary dance style, and event type for context
     - _Requirements: 12.6_
 
-  - [ ]* 6.5 Write unit tests for prompt content
+  - [x]* 6.5 Write unit tests for prompt content
     - Verify `getEventInfoExtractionPrompt()` mentions "dresscode"
     - Verify `getEventPartsExtractionPrompt()` mentions relevance ordering and dance style codes
     - Verify `getCourseExtractionPrompt()` is in English and mentions Czech output
     - Verify `getImageGenerationPrompt()` includes title, dance, and type parameters
     - _Requirements: 3.3, 4.3, 7.4, 12.6_
 
-- [ ] 7. Add course extraction to `src/services/event-parser.ts`
-  - [ ] 7.1 Add `extractCourseData(description, eventStartTime, eventEndTime)` function
+- [x] 7. Add course extraction to `src/services/event-parser.ts`
+  - [x] 7.1 Add `extractCourseData(description, eventStartTime, eventEndTime)` function
     - Call LLM with `getCourseExtractionPrompt`, validate response against `CourseExtractionSchema`
     - Use existing `retryOnJsonError` pattern (3 retries, TerminalError on exhaustion)
     - _Requirements: 7.1, 7.2, 7.3_
 
-  - [ ] 7.2 Add `validateDanceCodes(dances, validCodes)` utility function
+  - [x] 7.2 Add `validateDanceCodes(dances, validCodes)` utility function
     - Filter dance style tags against valid codes set, preserve order, discard unrecognized
     - Can be placed in `schemas.ts` or `event-parser.ts`
     - _Requirements: 8.7_
@@ -155,31 +155,31 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - **Property 7: Dance style tag validation discards unrecognized codes**
     - **Validates: Requirements 8.7**
 
-- [ ] 8. Create image processor service `src/services/image-processor.ts`
-  - [ ] 8.1 Implement `processEventImage(imageUrl, primaryDance, eventType, title)` with fallback chain
+- [x] 8. Create image processor service `src/services/image-processor.ts`
+  - [x] 8.1 Implement `processEventImage(imageUrl, primaryDance, eventType, title)` with fallback chain
     - Step 1: If `imageUrl` provided, download and upload to Directus → return `{ fileId, source: "facebook" }`
     - Step 2: If download fails or no URL, call `findExpiredEventWithImage` → return `{ fileId, source: "ai_generated" }` (reuse)
     - Step 3: If no reusable image, generate via AI (OpenRouter image model), upload → return `{ fileId, source: "ai_generated" }`
     - Step 4: If all fail, return `{ fileId: null, source: null }` and log warning
     - _Requirements: 12.1, 12.3, 12.4, 12.5, 12.7_
 
-  - [ ] 8.2 Implement `downloadImage(url)` helper
+  - [x] 8.2 Implement `downloadImage(url)` helper
     - Download image from URL, return `{ buffer: Buffer, mimeType: string, filename: string }`
     - Handle HTTP errors and timeouts gracefully
     - _Requirements: 12.1, 12.3_
 
-  - [ ] 8.3 Implement `generateAiImage(title, primaryDance, eventType)` helper
+  - [x] 8.3 Implement `generateAiImage(title, primaryDance, eventType)` helper
     - Call OpenRouter API with image generation model (configured in `config.ts` as `imageGenerationModel`)
     - Use `getImageGenerationPrompt` for the prompt
     - Parse base64 image from response, return buffer
     - _Requirements: 12.5, 12.6_
 
-  - [ ] 8.4 Add `imageGenerationModel` to `src/core/config.ts`
+  - [x] 8.4 Add `imageGenerationModel` to `src/core/config.ts`
     - Add config option with sensible default (e.g. a FLUX model on OpenRouter)
     - Uses existing `OPENROUTER_API_KEY` — no new env vars
     - _Requirements: 12.5_
 
-- [ ] 9. Checkpoint — Ensure all tests pass
+- [x] 9. Checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Update workflow routing and add course workflow in `src/services/workflow.ts`
