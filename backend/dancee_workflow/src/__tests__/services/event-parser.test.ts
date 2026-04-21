@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import fc from "fast-check";
 import { ZodError } from "zod";
 
 // Mock config before importing the parser
@@ -41,6 +42,7 @@ import {
   extractEventInfo,
   retryOnJsonError,
   isJsonOrValidationError,
+  validateDanceCodes,
 } from "../../services/event-parser";
 
 function makeOpenAIResponse(content: string) {
@@ -255,5 +257,69 @@ describe("extractEventInfo", () => {
     mockCreate.mockRejectedValue(new Error("Rate limit"));
     await expect(extractEventInfo("Description")).rejects.toThrow("Rate limit");
     expect(mockCreate).toHaveBeenCalledOnce();
+  });
+});
+
+// Feature: cms-data-completeness, Property 7: Dance style tag validation discards unrecognized codes
+describe("validateDanceCodes", () => {
+  it("Property 7: discards codes not in the valid set", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.string({ minLength: 1 })),
+        fc.array(fc.string({ minLength: 1 })),
+        (dances, validCodes) => {
+          const result = validateDanceCodes(dances, validCodes);
+          const validSet = new Set(validCodes);
+          expect(result.every((d) => validSet.has(d))).toBe(true);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 7: preserves all valid codes that appear in the input", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.string({ minLength: 1 })),
+        fc.array(fc.string({ minLength: 1 })),
+        (dances, validCodes) => {
+          const result = validateDanceCodes(dances, validCodes);
+          const validSet = new Set(validCodes);
+          const expectedValid = dances.filter((d) => validSet.has(d));
+          expect(result).toEqual(expectedValid);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 7: preserves the order of recognized codes", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.string({ minLength: 1 })),
+        fc.array(fc.string({ minLength: 1 })),
+        (dances, validCodes) => {
+          const result = validateDanceCodes(dances, validCodes);
+          const validSet = new Set(validCodes);
+          const indices = result.map((d) => dances.indexOf(d));
+          for (let i = 1; i < indices.length; i++) {
+            expect(indices[i]).toBeGreaterThan(indices[i - 1]);
+          }
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("returns empty array when no dances match valid codes", () => {
+    expect(validateDanceCodes(["salsa", "bachata"], ["tango"])).toEqual([]);
+  });
+
+  it("returns all dances when all match valid codes", () => {
+    expect(validateDanceCodes(["salsa", "bachata"], ["salsa", "bachata", "tango"])).toEqual(["salsa", "bachata"]);
+  });
+
+  it("returns empty array when input dances are empty", () => {
+    expect(validateDanceCodes([], ["salsa", "bachata"])).toEqual([]);
   });
 });

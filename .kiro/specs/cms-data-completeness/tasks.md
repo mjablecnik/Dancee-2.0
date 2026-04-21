@@ -151,7 +151,7 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Can be placed in `schemas.ts` or `event-parser.ts`
     - _Requirements: 8.7_
 
-  - [ ]* 7.3 Write property test: dance style tag validation discards unrecognized codes
+  - [x]* 7.3 Write property test: dance style tag validation discards unrecognized codes
     - **Property 7: Dance style tag validation discards unrecognized codes**
     - **Validates: Requirements 8.7**
 
