@@ -6,7 +6,7 @@
 /// Locales: 2
 /// Strings: 446 (223 per locale)
 ///
-/// Built on 2026-04-21 at 12:50 UTC
+/// Built on 2026-04-21 at 22:38 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -724,7 +724,7 @@ class _StringsProfileEditProfileNotificationSubtitlesEn {
 }
 
 // Path: <root>
-class _StringsCs extends Translations {
+class _StringsCs implements Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	_StringsCs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
@@ -734,9 +734,7 @@ class _StringsCs extends Translations {
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ),
-		  super.build(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
+		  ) {
 		$meta.setFlatMapFunction(_flatMapFunction);
 	}
 
@@ -744,7 +742,7 @@ class _StringsCs extends Translations {
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => $meta.getTranslation(key);
 
 	@override late final _StringsCs _root = this; // ignore: unused_field
 
@@ -762,8 +760,8 @@ class _StringsCs extends Translations {
 }
 
 // Path: common
-class _StringsCommonCs extends _StringsCommonEn {
-	_StringsCommonCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCommonCs implements _StringsCommonEn {
+	_StringsCommonCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -788,8 +786,8 @@ class _StringsCommonCs extends _StringsCommonEn {
 }
 
 // Path: nav
-class _StringsNavCs extends _StringsNavEn {
-	_StringsNavCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsNavCs implements _StringsNavEn {
+	_StringsNavCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -801,8 +799,8 @@ class _StringsNavCs extends _StringsNavEn {
 }
 
 // Path: auth
-class _StringsAuthCs extends _StringsAuthEn {
-	_StringsAuthCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthCs implements _StringsAuthEn {
+	_StringsAuthCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -824,8 +822,8 @@ class _StringsAuthCs extends _StringsAuthEn {
 }
 
 // Path: onboarding
-class _StringsOnboardingCs extends _StringsOnboardingEn {
-	_StringsOnboardingCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingCs implements _StringsOnboardingEn {
+	_StringsOnboardingCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -836,8 +834,8 @@ class _StringsOnboardingCs extends _StringsOnboardingEn {
 }
 
 // Path: events
-class _StringsEventsCs extends _StringsEventsEn {
-	_StringsEventsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsCs implements _StringsEventsEn {
+	_StringsEventsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -853,8 +851,8 @@ class _StringsEventsCs extends _StringsEventsEn {
 }
 
 // Path: courses
-class _StringsCoursesCs extends _StringsCoursesEn {
-	_StringsCoursesCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesCs implements _StringsCoursesEn {
+	_StringsCoursesCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -867,8 +865,8 @@ class _StringsCoursesCs extends _StringsCoursesEn {
 }
 
 // Path: profile
-class _StringsProfileCs extends _StringsProfileEn {
-	_StringsProfileCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileCs implements _StringsProfileEn {
+	_StringsProfileCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -885,8 +883,8 @@ class _StringsProfileCs extends _StringsProfileEn {
 }
 
 // Path: premium
-class _StringsPremiumCs extends _StringsPremiumEn {
-	_StringsPremiumCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsPremiumCs implements _StringsPremiumEn {
+	_StringsPremiumCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -905,8 +903,8 @@ class _StringsPremiumCs extends _StringsPremiumEn {
 }
 
 // Path: saved
-class _StringsSavedCs extends _StringsSavedEn {
-	_StringsSavedCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsSavedCs implements _StringsSavedEn {
+	_StringsSavedCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -918,8 +916,8 @@ class _StringsSavedCs extends _StringsSavedEn {
 }
 
 // Path: contact
-class _StringsContactCs extends _StringsContactEn {
-	_StringsContactCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsContactCs implements _StringsContactEn {
+	_StringsContactCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -936,8 +934,8 @@ class _StringsContactCs extends _StringsContactEn {
 }
 
 // Path: common.form
-class _StringsCommonFormCs extends _StringsCommonFormEn {
-	_StringsCommonFormCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCommonFormCs implements _StringsCommonFormEn {
+	_StringsCommonFormCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -957,8 +955,8 @@ class _StringsCommonFormCs extends _StringsCommonFormEn {
 }
 
 // Path: auth.login
-class _StringsAuthLoginCs extends _StringsAuthLoginEn {
-	_StringsAuthLoginCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthLoginCs implements _StringsAuthLoginEn {
+	_StringsAuthLoginCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -973,8 +971,8 @@ class _StringsAuthLoginCs extends _StringsAuthLoginEn {
 }
 
 // Path: auth.register
-class _StringsAuthRegisterCs extends _StringsAuthRegisterEn {
-	_StringsAuthRegisterCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthRegisterCs implements _StringsAuthRegisterEn {
+	_StringsAuthRegisterCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -990,8 +988,8 @@ class _StringsAuthRegisterCs extends _StringsAuthRegisterEn {
 }
 
 // Path: auth.forgotPassword
-class _StringsAuthForgotPasswordCs extends _StringsAuthForgotPasswordEn {
-	_StringsAuthForgotPasswordCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthForgotPasswordCs implements _StringsAuthForgotPasswordEn {
+	_StringsAuthForgotPasswordCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1007,8 +1005,8 @@ class _StringsAuthForgotPasswordCs extends _StringsAuthForgotPasswordEn {
 }
 
 // Path: auth.passwordStrength
-class _StringsAuthPasswordStrengthCs extends _StringsAuthPasswordStrengthEn {
-	_StringsAuthPasswordStrengthCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthPasswordStrengthCs implements _StringsAuthPasswordStrengthEn {
+	_StringsAuthPasswordStrengthCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1021,8 +1019,8 @@ class _StringsAuthPasswordStrengthCs extends _StringsAuthPasswordStrengthEn {
 }
 
 // Path: onboarding.step1
-class _StringsOnboardingStep1Cs extends _StringsOnboardingStep1En {
-	_StringsOnboardingStep1Cs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingStep1Cs implements _StringsOnboardingStep1En {
+	_StringsOnboardingStep1Cs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1032,8 +1030,8 @@ class _StringsOnboardingStep1Cs extends _StringsOnboardingStep1En {
 }
 
 // Path: onboarding.step2
-class _StringsOnboardingStep2Cs extends _StringsOnboardingStep2En {
-	_StringsOnboardingStep2Cs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingStep2Cs implements _StringsOnboardingStep2En {
+	_StringsOnboardingStep2Cs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1043,8 +1041,8 @@ class _StringsOnboardingStep2Cs extends _StringsOnboardingStep2En {
 }
 
 // Path: onboarding.step3
-class _StringsOnboardingStep3Cs extends _StringsOnboardingStep3En {
-	_StringsOnboardingStep3Cs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingStep3Cs implements _StringsOnboardingStep3En {
+	_StringsOnboardingStep3Cs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1061,8 +1059,8 @@ class _StringsOnboardingStep3Cs extends _StringsOnboardingStep3En {
 }
 
 // Path: events.detail
-class _StringsEventsDetailCs extends _StringsEventsDetailEn {
-	_StringsEventsDetailCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsDetailCs implements _StringsEventsDetailEn {
+	_StringsEventsDetailCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1078,8 +1076,8 @@ class _StringsEventsDetailCs extends _StringsEventsDetailEn {
 }
 
 // Path: events.filter
-class _StringsEventsFilterCs extends _StringsEventsFilterEn {
-	_StringsEventsFilterCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsFilterCs implements _StringsEventsFilterEn {
+	_StringsEventsFilterCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1097,8 +1095,8 @@ class _StringsEventsFilterCs extends _StringsEventsFilterEn {
 }
 
 // Path: events.filters
-class _StringsEventsFiltersCs extends _StringsEventsFiltersEn {
-	_StringsEventsFiltersCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsFiltersCs implements _StringsEventsFiltersEn {
+	_StringsEventsFiltersCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1110,8 +1108,8 @@ class _StringsEventsFiltersCs extends _StringsEventsFiltersEn {
 }
 
 // Path: courses.detail
-class _StringsCoursesDetailCs extends _StringsCoursesDetailEn {
-	_StringsCoursesDetailCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesDetailCs implements _StringsCoursesDetailEn {
+	_StringsCoursesDetailCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1128,8 +1126,8 @@ class _StringsCoursesDetailCs extends _StringsCoursesDetailEn {
 }
 
 // Path: profile.sections
-class _StringsProfileSectionsCs extends _StringsProfileSectionsEn {
-	_StringsProfileSectionsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileSectionsCs implements _StringsProfileSectionsEn {
+	_StringsProfileSectionsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1142,8 +1140,8 @@ class _StringsProfileSectionsCs extends _StringsProfileSectionsEn {
 }
 
 // Path: profile.account
-class _StringsProfileAccountCs extends _StringsProfileAccountEn {
-	_StringsProfileAccountCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileAccountCs implements _StringsProfileAccountEn {
+	_StringsProfileAccountCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1153,8 +1151,8 @@ class _StringsProfileAccountCs extends _StringsProfileAccountEn {
 }
 
 // Path: profile.settings
-class _StringsProfileSettingsCs extends _StringsProfileSettingsEn {
-	_StringsProfileSettingsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileSettingsCs implements _StringsProfileSettingsEn {
+	_StringsProfileSettingsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1166,8 +1164,8 @@ class _StringsProfileSettingsCs extends _StringsProfileSettingsEn {
 }
 
 // Path: profile.support
-class _StringsProfileSupportCs extends _StringsProfileSupportEn {
-	_StringsProfileSupportCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileSupportCs implements _StringsProfileSupportEn {
+	_StringsProfileSupportCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1177,8 +1175,8 @@ class _StringsProfileSupportCs extends _StringsProfileSupportEn {
 }
 
 // Path: profile.appInfo
-class _StringsProfileAppInfoCs extends _StringsProfileAppInfoEn {
-	_StringsProfileAppInfoCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileAppInfoCs implements _StringsProfileAppInfoEn {
+	_StringsProfileAppInfoCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1189,8 +1187,8 @@ class _StringsProfileAppInfoCs extends _StringsProfileAppInfoEn {
 }
 
 // Path: profile.danger
-class _StringsProfileDangerCs extends _StringsProfileDangerEn {
-	_StringsProfileDangerCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileDangerCs implements _StringsProfileDangerEn {
+	_StringsProfileDangerCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1200,8 +1198,8 @@ class _StringsProfileDangerCs extends _StringsProfileDangerEn {
 }
 
 // Path: profile.changePassword
-class _StringsProfileChangePasswordCs extends _StringsProfileChangePasswordEn {
-	_StringsProfileChangePasswordCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileChangePasswordCs implements _StringsProfileChangePasswordEn {
+	_StringsProfileChangePasswordCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1230,8 +1228,8 @@ class _StringsProfileChangePasswordCs extends _StringsProfileChangePasswordEn {
 }
 
 // Path: profile.editProfile
-class _StringsProfileEditProfileCs extends _StringsProfileEditProfileEn {
-	_StringsProfileEditProfileCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileCs implements _StringsProfileEditProfileEn {
+	_StringsProfileEditProfileCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1252,8 +1250,8 @@ class _StringsProfileEditProfileCs extends _StringsProfileEditProfileEn {
 }
 
 // Path: contact.form
-class _StringsContactFormCs extends _StringsContactFormEn {
-	_StringsContactFormCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsContactFormCs implements _StringsContactFormEn {
+	_StringsContactFormCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1274,8 +1272,8 @@ class _StringsContactFormCs extends _StringsContactFormEn {
 }
 
 // Path: contact.deviceInfoLabels
-class _StringsContactDeviceInfoLabelsCs extends _StringsContactDeviceInfoLabelsEn {
-	_StringsContactDeviceInfoLabelsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsContactDeviceInfoLabelsCs implements _StringsContactDeviceInfoLabelsEn {
+	_StringsContactDeviceInfoLabelsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1286,8 +1284,8 @@ class _StringsContactDeviceInfoLabelsCs extends _StringsContactDeviceInfoLabelsE
 }
 
 // Path: profile.editProfile.sections
-class _StringsProfileEditProfileSectionsCs extends _StringsProfileEditProfileSectionsEn {
-	_StringsProfileEditProfileSectionsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileSectionsCs implements _StringsProfileEditProfileSectionsEn {
+	_StringsProfileEditProfileSectionsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1301,8 +1299,8 @@ class _StringsProfileEditProfileSectionsCs extends _StringsProfileEditProfileSec
 }
 
 // Path: profile.editProfile.notifications
-class _StringsProfileEditProfileNotificationsCs extends _StringsProfileEditProfileNotificationsEn {
-	_StringsProfileEditProfileNotificationsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileNotificationsCs implements _StringsProfileEditProfileNotificationsEn {
+	_StringsProfileEditProfileNotificationsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1313,8 +1311,8 @@ class _StringsProfileEditProfileNotificationsCs extends _StringsProfileEditProfi
 }
 
 // Path: profile.editProfile.notificationSubtitles
-class _StringsProfileEditProfileNotificationSubtitlesCs extends _StringsProfileEditProfileNotificationSubtitlesEn {
-	_StringsProfileEditProfileNotificationSubtitlesCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileNotificationSubtitlesCs implements _StringsProfileEditProfileNotificationSubtitlesEn {
+	_StringsProfileEditProfileNotificationSubtitlesCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 

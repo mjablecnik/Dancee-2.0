@@ -166,7 +166,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - **Property 15: Revert on failure** — mock failing API, toggle, verify state reverts
     - **Validates: Requirements 11.2, 11.3, 11.4, 12.3, 12.4, 12.5**
 
-- [ ] 6. Checkpoint — Verify logic layer
+- [x] 6. Checkpoint — Verify logic layer
   - Ensure all cubits and state classes compile. Run `task build-runner` for freezed generation. Run `task test` if property tests were written. Ask the user if questions arise.
 
 - [ ] 7. Set up dependency injection and app wiring
