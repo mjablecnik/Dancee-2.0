@@ -369,6 +369,45 @@ describe("EventInfoSchema", () => {
   });
 });
 
+// Feature: cms-data-completeness, Property 9: FacebookEventSchema accepts optional imageUrl
+describe("FacebookEventSchema imageUrl", () => {
+  it("Property 9: accepts a string imageUrl", () => {
+    fc.assert(
+      fc.property(fc.webUrl(), (imageUrl) => {
+        const result = FacebookEventSchema.safeParse(makeFbEventRaw({ imageUrl }));
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.imageUrl).toBe(imageUrl);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("Property 9: accepts null imageUrl", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw({ imageUrl: null }));
+    expect(result.imageUrl).toBeNull();
+  });
+
+  it("Property 9: accepts absent imageUrl (undefined)", () => {
+    const result = FacebookEventSchema.parse(makeFbEventRaw());
+    expect(result.imageUrl).toBeUndefined();
+  });
+
+  it("Property 9: rejects non-string, non-null imageUrl values", () => {
+    fc.assert(
+      fc.property(
+        fc.oneof(fc.integer(), fc.boolean(), fc.float()),
+        (badValue) => {
+          const result = FacebookEventSchema.safeParse(makeFbEventRaw({ imageUrl: badValue }));
+          expect(result.success).toBe(false);
+        }
+      ),
+      { numRuns: 50 }
+    );
+  });
+});
+
 // Feature: cms-data-completeness, Property 6: CourseExtractionSchema validates course data structure
 describe("CourseExtractionSchema", () => {
   const validLevels = ["beginner", "intermediate", "advanced", "all_levels"] as const;

@@ -30,11 +30,11 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - **Property 2: EventInfoSchema validates type, key, and value constraints**
     - **Validates: Requirements 3.1, 3.6**
 
-  - [ ]* 1.6 Write property test: `CourseExtractionSchema` validates course data structure
+  - [x]* 1.6 Write property test: `CourseExtractionSchema` validates course data structure
     - **Property 6: CourseExtractionSchema validates course data structure**
     - **Validates: Requirements 7.2**
 
-  - [ ]* 1.7 Write property test: `FacebookEventSchema` accepts optional imageUrl
+  - [x]* 1.7 Write property test: `FacebookEventSchema` accepts optional imageUrl
     - **Property 9: FacebookEventSchema accepts optional imageUrl**
     - **Validates: Requirements 12.2**
 
