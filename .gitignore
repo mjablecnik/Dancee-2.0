@@ -1,6 +1,7 @@
 .vscode/
 .idea/
 .env
+.vite/
 
 REVIEW.md
 CODE_REVIEW.md
