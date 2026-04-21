@@ -37,11 +37,16 @@ paths:
         The workflow:
         1. Scrapes the event
         2. Checks for duplicates
-        3. Classifies event type (party, workshop, festival, holiday — unsupported types are skipped)
-        4. Extracts structured parts and info via LLM
+        3. Classifies event type:
+           - party, workshop, festival, holiday → stored in the events collection
+           - course, lesson → extracted with the course extraction prompt and stored in the courses collection
+           - other → skipped and recorded in skipped_events
+        4. For events: extracts structured parts and info (including dresscode) via LLM
         5. Resolves venue via Nominatim geocoding
         6. Translates content to CS, EN, ES
-        7. Stores in Directus CMS
+        7. Validates dance style codes against the dance_styles collection
+        8. Processes cover image (download from Facebook → reuse expired AI image → generate via AI)
+        9. Stores in Directus CMS with image, image_source, and event_type fields
 
         The workflow key is deterministic (derived from the normalised URL), so
         repeated calls with the same URL return the existing result.
@@ -384,6 +389,25 @@ components:
           type: string
           enum: [published, draft, archived]
           example: "published"
+        image:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: 'null'
+          description: Directus file ID of the event cover image (stored in Directus Files / S3)
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        image_source:
+          type: string
+          enum: [facebook, ai_generated]
+          nullable: true
+          description: Origin of the cover image — "facebook" (downloaded from Facebook) or "ai_generated"
+          example: "facebook"
+        event_type:
+          type: string
+          enum: [party, workshop, festival, holiday, other]
+          nullable: true
+          description: Classified event type
+          example: "party"
         translation_status:
           type: string
           enum: [complete, partial, missing]
@@ -437,7 +461,7 @@ components:
       properties:
         type:
           type: string
-          enum: [url, price]
+          enum: [url, price, dresscode]
           example: "price"
         key:
           type: string

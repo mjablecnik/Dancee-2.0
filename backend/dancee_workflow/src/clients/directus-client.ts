@@ -382,6 +382,33 @@ export async function findExpiredEventWithImage(
 // ---- Favorites ----
 
 export async function createFavorite(favorite: DirectusFavorite): Promise<DirectusFavorite> {
+  // Validate that the referenced item exists
+  const collection = favorite.item_type === "event" ? "events" : "courses";
+  const itemData = await directusGet(`/items/${collection}/${favorite.item_id}?fields=id`).catch(() => null);
+  if (!itemData) {
+    throw new Error(
+      `Cannot create favorite: ${favorite.item_type} with id ${favorite.item_id} does not exist`,
+    );
+  }
+
+  // Check for duplicate (user_id, item_type, item_id)
+  const dupFilter = encodeURIComponent(
+    JSON.stringify({
+      _and: [
+        { user_id: { _eq: favorite.user_id } },
+        { item_type: { _eq: favorite.item_type } },
+        { item_id: { _eq: favorite.item_id } },
+      ],
+    }),
+  );
+  const existing = await directusGet(`/items/favorites?filter=${dupFilter}&fields=id&limit=1`);
+  const existingItems = extractDirectusData(existing, "createFavorite:dupCheck") as { id: number | string }[];
+  if (existingItems && existingItems.length > 0) {
+    // Return the existing record to preserve idempotency
+    const existingData = await directusGet(`/items/favorites/${existingItems[0].id}`);
+    return DirectusFavoriteSchema.parse(extractDirectusData(existingData, "createFavorite:existing"));
+  }
+
   const data = await directusPost("/items/favorites", favorite);
   return DirectusFavoriteSchema.parse(extractDirectusData(data, "createFavorite"));
 }

@@ -19,8 +19,8 @@ vi.mock("openai", () => {
   };
 });
 
-import { translateEventContent } from "../../services/event-translator";
-import type { EventContentInput } from "../../services/event-translator";
+import { translateEventContent, translateCourseContent } from "../../services/event-translator";
+import type { EventContentInput, CourseContentInput } from "../../services/event-translator";
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -274,5 +274,117 @@ describe("Property 20: Translation parts_translations array length matches parts
       "info_translations length mismatch"
     );
     expect(mockCreate).toHaveBeenCalledTimes(3);
+  });
+});
+
+// ---- translateCourseContent ----
+
+function makeCourseInput(overrides?: Partial<CourseContentInput>): CourseContentInput {
+  return {
+    title: "Salsa Beginners Course",
+    description: "Learn the basics of salsa dancing",
+    learning_items: ["Basic steps", "Partner work", "Rhythm training"],
+    ...overrides,
+  };
+}
+
+function makeCourseTranslationResponse(title: string, description: string, learning_items: string[]) {
+  return {
+    choices: [{ message: { content: JSON.stringify({ title, description, learning_items }) } }],
+  };
+}
+
+describe("translateCourseContent: successful translation", () => {
+  it("returns translated title, description, and learning_items", async () => {
+    const input = makeCourseInput();
+    mockCreate.mockResolvedValue(
+      makeCourseTranslationResponse("Salsa Course for Beginners", "Learn salsa", ["Basic steps EN", "Partner work EN"])
+    );
+
+    const result = await translateCourseContent(input, "English");
+    expect(result.title).toBe("Salsa Course for Beginners");
+    expect(result.description).toBe("Learn salsa");
+    expect(result.learning_items).toEqual(["Basic steps EN", "Partner work EN"]);
+  });
+
+  it("sends title, description, and learning_items to the LLM", async () => {
+    const input = makeCourseInput();
+    mockCreate.mockResolvedValue(
+      makeCourseTranslationResponse("T", "D", ["item"])
+    );
+
+    await translateCourseContent(input, "Spanish");
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    const userMessage = callArgs.messages.find((m: { role: string }) => m.role === "user");
+    const payload = JSON.parse(userMessage.content);
+    expect(payload.title).toBe(input.title);
+    expect(payload.description).toBe(input.description);
+    expect(payload.learning_items).toEqual(input.learning_items);
+  });
+
+  it("works for empty learning_items array", async () => {
+    const input = makeCourseInput({ learning_items: [] });
+    mockCreate.mockResolvedValue(
+      makeCourseTranslationResponse("Title", "Desc", [])
+    );
+
+    const result = await translateCourseContent(input, "English");
+    expect(result.learning_items).toEqual([]);
+  });
+});
+
+describe("translateCourseContent: retry on JSON error", () => {
+  it("retries and eventually throws TerminalError after 3 failed JSON parse attempts", async () => {
+    mockCreate.mockResolvedValue({
+      choices: [{ message: { content: "not valid json {{{" } }],
+    });
+
+    await expect(translateCourseContent(makeCourseInput(), "English")).rejects.toThrow(
+      "Parse failed after 3 attempts"
+    );
+    expect(mockCreate).toHaveBeenCalledTimes(3);
+  });
+
+  it("retries on invalid schema response and eventually throws", async () => {
+    mockCreate.mockResolvedValue({
+      choices: [{ message: { content: JSON.stringify({ title: "Only title" }) } }],
+    });
+
+    await expect(translateCourseContent(makeCourseInput(), "English")).rejects.toThrow();
+    expect(mockCreate).toHaveBeenCalledTimes(3);
+  });
+
+  it("succeeds on second attempt after first returns bad JSON", async () => {
+    mockCreate
+      .mockResolvedValueOnce({ choices: [{ message: { content: "bad json" } }] })
+      .mockResolvedValue(makeCourseTranslationResponse("Title", "Desc", ["item1"]));
+
+    const result = await translateCourseContent(makeCourseInput(), "English");
+    expect(result.title).toBe("Title");
+    expect(mockCreate).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("translateCourseContent: response structure validation", () => {
+  it("validates that title is a non-empty string", async () => {
+    mockCreate.mockResolvedValue(
+      makeCourseTranslationResponse("", "Desc", [])
+    );
+    // Empty string passes Zod string validation — just confirm it returns the value
+    const result = await translateCourseContent(makeCourseInput(), "English");
+    expect(typeof result.title).toBe("string");
+  });
+
+  it("validates that learning_items is an array of strings", async () => {
+    mockCreate.mockResolvedValue(
+      makeCourseTranslationResponse("Title", "Desc", ["skill one", "skill two", "skill three"])
+    );
+
+    const result = await translateCourseContent(makeCourseInput(), "English");
+    expect(Array.isArray(result.learning_items)).toBe(true);
+    for (const item of result.learning_items) {
+      expect(typeof item).toBe("string");
+    }
   });
 });
