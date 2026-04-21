@@ -169,31 +169,31 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
 - [x] 6. Checkpoint — Verify logic layer
   - Ensure all cubits and state classes compile. Run `task build-runner` for freezed generation. Run `task test` if property tests were written. Ask the user if questions arise.
 
-- [ ] 7. Set up dependency injection and app wiring
-  - [ ] 7.1 Create service locator
+- [x] 7. Set up dependency injection and app wiring
+  - [x] 7.1 Create service locator
     - Create `lib/core/service_locator.dart` using get_it
     - Register DirectusClient, all repositories, and all cubits
     - Inject repository dependencies into cubits
     - _Requirements: 1.6, 18.4_
 
-  - [ ] 7.2 Wire cubits into the widget tree
+  - [x] 7.2 Wire cubits into the widget tree
     - Update `lib/main.dart` to initialize service locator, wrap MaterialApp with MultiBlocProvider providing all cubits (SettingsCubit, FilterCubit, FavoritesCubit, EventCubit, CourseCubit)
     - Initialize SettingsCubit on app start (read persisted language) before data fetch
     - Trigger initial data load (events, courses, dance styles, favorites) after language is resolved
     - _Requirements: 7.4, 16.4, 16.6_
 
-  - [ ] 7.3 Set up language change listener
+  - [x] 7.3 Set up language change listener
     - When SettingsCubit emits a new language, trigger re-fetch on EventCubit, CourseCubit, and FilterCubit (dance styles)
     - Use BlocListener on SettingsCubit to coordinate re-fetches
     - _Requirements: 15.3, 15.4, 15.5, 16.6_
 
-  - [ ] 7.4 Set up filter change listener
+  - [x] 7.4 Set up filter change listener
     - When FilterCubit emits new FilterState, call `applyFilters()` on both EventCubit and CourseCubit
     - Use BlocListener on FilterCubit to coordinate filter application
     - _Requirements: 7.2, 7.3, 10.4_
 
-- [ ] 8. Update events UI screens
-  - [ ] 8.1 Update events list screen
+- [x] 8. Update events UI screens
+  - [x] 8.1 Update events list screen
     - Replace mock data usage with BlocBuilder on EventCubit
     - Display loading indicator, error with retry, or loaded state
     - Show "Featured events" section (horizontal scroll) with festivals only, hide when empty
@@ -202,13 +202,13 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Wire favorite button to FavoritesCubit.toggleFavorite
     - _Requirements: 4.1, 4.2, 4.4, 4.5, 4.6, 5.1, 5.3, 5.4, 12.6_
 
-  - [ ] 8.2 Update event detail screen
+  - [x] 8.2 Update event detail screen
     - Accept event ID via route parameter, look up event from EventCubit's loaded state
     - Display: hero image, title, dance style chips, key info (date/time, location, organizer, price), description paragraphs, additional info (price range, dresscode, registration URL), program (multi-day slots), original source link
     - Wire favorite toggle button to FavoritesCubit
     - _Requirements: 13.1, 13.2, 13.3, 13.4_
 
-  - [ ] 8.3 Update event detail route to pass event ID
+  - [x] 8.3 Update event detail route to pass event ID
     - Modify GoRouter route for `/events/detail` to accept an `id` parameter (path or query param)
     - _Requirements: 13.1_
 
