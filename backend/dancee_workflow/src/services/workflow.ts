@@ -301,6 +301,7 @@ async function runWorkflow(ctx: restate.WorkflowContext, eventUrl: string) {
         image: imageResult.fileId,
         image_source: imageResult.source,
         event_type: eventType,
+        registration_url: info.find((i) => i.type === "url")?.value ?? null,
         status: isIncomplete ? "incomplete" : "published",
         translation_status: translationStatus,
         translations,

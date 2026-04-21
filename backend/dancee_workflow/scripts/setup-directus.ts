@@ -62,7 +62,7 @@ async function createCollectionIfNotExists(
   schema: Record<string, unknown> | null = {},
 ): Promise<void> {
   if (await collectionExists(name)) {
-    console.log(`Collection "${name}" already exists, skipping.`);
+    // already exists, skip silently
     return;
   }
   await directusPost("/collections", { collection: name, meta, schema });
@@ -191,6 +191,10 @@ async function setupEventsCollection(): Promise<void> {
       ],
     },
   }, { is_nullable: true, max_length: 50 });
+
+  await createFieldIfNotExists("events", "registration_url", "string", {
+    interface: "input",
+  }, { is_nullable: true, max_length: 2048 });
 }
 
 async function setupVenuesCollection(): Promise<void> {
@@ -301,7 +305,7 @@ async function setupSkippedEventsCollection(): Promise<void> {
 
 async function setupLanguagesCollection(): Promise<void> {
   if (await collectionExists("languages")) {
-    console.log(`Collection "languages" already exists, skipping.`);
+    // already exists, skip silently
     return;
   }
   // Create languages with a custom primary key (code)
@@ -364,7 +368,7 @@ async function setupTranslationsRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/events/translations") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "events.translations" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -410,7 +414,7 @@ async function setupTranslationsRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation events <-> events_translations already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -434,7 +438,7 @@ async function setupTranslationsRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation events_translations <-> languages already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -446,7 +450,7 @@ async function setupVenueRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/events/venue") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "events.venue" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -472,7 +476,7 @@ async function setupVenueRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation events.venue -> venues already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -484,7 +488,7 @@ async function setupEventImageRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/events/image") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "events.image" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -510,7 +514,7 @@ async function setupEventImageRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation events.image -> directus_files already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -519,7 +523,7 @@ async function setupEventImageRelation(): Promise<void> {
 
 async function setupDanceStylesCollection(): Promise<void> {
   if (await collectionExists("dance_styles")) {
-    console.log(`Collection "dance_styles" already exists, skipping.`);
+    // already exists, skip silently
     return;
   }
   await directusPost("/collections", {
@@ -574,7 +578,7 @@ async function setupDanceStylesTranslationsRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/dance_styles/translations") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "dance_styles.translations" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -618,7 +622,7 @@ async function setupDanceStylesTranslationsRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation dance_styles <-> dance_styles_translations already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -641,7 +645,7 @@ async function setupDanceStylesTranslationsRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation dance_styles_translations <-> languages already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -652,7 +656,7 @@ async function setupDanceStylesParentRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/dance_styles/parent_code") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "dance_styles.parent_code" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -678,7 +682,7 @@ async function setupDanceStylesParentRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation dance_styles.parent_code already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -733,7 +737,7 @@ async function seedDanceStyles(): Promise<void> {
     try {
       const existing = await directusGet(`/items/dance_styles/${style.code}`) as { data?: unknown };
       if (existing?.data) {
-        console.log(`Dance style "${style.code}" already exists, skipping.`);
+        // already exists, skip silently
         continue;
       }
     } catch {
@@ -745,7 +749,7 @@ async function seedDanceStyles(): Promise<void> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("already exists") || msg.includes("409") || msg.includes("unique")) {
-        console.log(`Dance style "${style.code}" already exists, skipping.`);
+        // already exists, skip silently
       } else {
         throw err;
       }
@@ -890,7 +894,7 @@ async function seedDanceStyleTranslations(): Promise<void> {
         `/items/dance_styles_translations?filter=${filter}&fields=id&limit=1`,
       ) as { data?: unknown[] };
       if (existing?.data && existing.data.length > 0) {
-        console.log(`Translation "${translation.dance_styles_code}" (${translation.languages_code}) already exists, skipping.`);
+        // already exists, skip silently
         continue;
       }
     } catch {
@@ -902,7 +906,7 @@ async function seedDanceStyleTranslations(): Promise<void> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("already exists") || msg.includes("409") || msg.includes("unique")) {
-        console.log(`Translation "${translation.dance_styles_code}" (${translation.languages_code}) already exists, skipping.`);
+        // already exists, skip silently
       } else {
         throw err;
       }
@@ -1078,7 +1082,7 @@ async function setupCoursesTranslationsRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/courses/translations") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "courses.translations" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -1122,7 +1126,7 @@ async function setupCoursesTranslationsRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation courses <-> courses_translations already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -1145,7 +1149,7 @@ async function setupCoursesTranslationsRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation courses_translations <-> languages already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -1156,7 +1160,7 @@ async function setupCoursesVenueRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/courses/venue") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "courses.venue" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -1182,7 +1186,7 @@ async function setupCoursesVenueRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation courses.venue -> venues already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -1193,7 +1197,7 @@ async function setupCoursesImageRelation(): Promise<void> {
   try {
     const data = await directusGet("/relations/courses/image") as { data?: unknown };
     if (data?.data) {
-      console.log(`Relation "courses.image" already exists, skipping.`);
+      // already exists, skip silently
       return;
     }
   } catch {
@@ -1219,7 +1223,7 @@ async function setupCoursesImageRelation(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("already exists") || msg.includes("409") || msg.includes("already has an associated relationship")) {
-      console.log(`Relation courses.image -> directus_files already exists, skipping.`);
+      // already exists, skip silently
     } else {
       throw err;
     }
@@ -1267,7 +1271,7 @@ async function seedLanguages(): Promise<void> {
     try {
       const existing = await directusGet(`/items/languages/${lang.code}`) as { data?: unknown };
       if (existing?.data) {
-        console.log(`Language "${lang.code}" already exists, skipping.`);
+        // already exists, skip silently
         continue;
       }
     } catch {
@@ -1279,7 +1283,7 @@ async function seedLanguages(): Promise<void> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("already exists") || msg.includes("409") || msg.includes("unique")) {
-        console.log(`Language "${lang.code}" already exists, skipping.`);
+        // already exists, skip silently
       } else {
         throw err;
       }

@@ -78,8 +78,16 @@ const FacebookEventObjectSchema = z.object({
     )
     .optional(),
   url: z.string(),
+  // The scraper returns the cover image in `photo.imageUri`, not as a top-level `imageUrl`.
+  // Accept both formats: direct `imageUrl` string or nested `photo.imageUri`.
   imageUrl: z.string().nullable().optional(),
-});
+  photo: z.object({
+    imageUri: z.string().nullable().optional(),
+  }).nullable().optional(),
+}).transform((event) => ({
+  ...event,
+  imageUrl: event.imageUrl ?? event.photo?.imageUri ?? null,
+}));
 
 // The scraper API wraps the event in a `{ payload: ... }` envelope.
 // Accept both the wrapped and unwrapped formats for resilience.
@@ -224,6 +232,7 @@ export const DirectusEventSchema = z.object({
   image: z.union([z.number(), z.string()]).nullable().optional(),
   image_source: z.string().nullable().optional(),
   event_type: z.string().nullable().optional(),
+  registration_url: z.string().nullable().optional(),
   status: z.enum(["published", "draft", "archived", "incomplete"]).optional(),
   translation_status: z.enum(["complete", "partial", "missing"]).optional(),
   // Directus returns translations as full objects when expanded (?fields=*.*),
