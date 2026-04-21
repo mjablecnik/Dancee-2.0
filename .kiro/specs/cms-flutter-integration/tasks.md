@@ -102,8 +102,8 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
 - [x] 4. Checkpoint — Verify data layer
   - Ensure all entity classes and repositories compile correctly. Run `task build-runner` for any generated code. Ask the user if questions arise.
 
-- [ ] 5. Implement state classes and cubits
-  - [ ] 5.1 Create freezed state classes
+- [x] 5. Implement state classes and cubits
+  - [x] 5.1 Create freezed state classes
     - Create `lib/logic/states/event_state.dart` — `EventState` with initial, loading, loaded (allEvents, filteredEvents, featuredEvents), error variants
     - Create `lib/logic/states/course_state.dart` — `CourseState` with initial, loading, loaded (allCourses, filteredCourses), error variants
     - Create `lib/logic/states/favorites_state.dart` — `FavoritesState` with initial, loading, loaded (eventIds, courseIds), error variants
@@ -111,7 +111,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Run `task build-runner` to generate freezed code
     - _Requirements: 4.1, 6.1, 11.1, 16.1_
 
-  - [ ] 5.2 Implement SettingsCubit
+  - [x] 5.2 Implement SettingsCubit
     - Create `lib/logic/cubits/settings_cubit.dart`
     - Implement `init()` — read persisted language from SharedPreferences, set locale via slang LocaleSettings
     - Implement `setLanguage(languageCode)` — persist to SharedPreferences, update slang locale, emit new state
@@ -122,14 +122,14 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - **Property 16: Language persistence round-trip** — for any valid language code (en, cs, es), persist and read back, verify equality
     - **Validates: Requirements 16.3, 16.4**
 
-  - [ ] 5.4 Implement FilterCubit
+  - [x] 5.4 Implement FilterCubit
     - Create `lib/logic/cubits/filter_cubit.dart` using `FilterState` from `logic/states/filter_state.dart`
     - Implement `setDanceStyles(codes)`, `setLocations(regions)`, `clearAll()`
     - Implement `loadDanceStyles(languageCode)` to fetch dance styles from DanceStyleRepository
     - Expose loaded dance styles for filter UI and for parent/child expansion
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 8.1, 15.5_
 
-  - [ ] 5.5 Implement EventCubit
+  - [x] 5.5 Implement EventCubit
     - Create `lib/logic/cubits/event_cubit.dart`
     - Implement `loadEvents(languageCode)` — fetch from EventRepository, apply filters, compute featured (festivals only), emit loaded state
     - Implement `applyFilters(FilterState)` — client-side AND filtering with parent/child dance style expansion, update filteredEvents and featuredEvents
@@ -142,14 +142,14 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - **Property 8: Parent/child dance style expansion** — generate random dance style trees, verify expansion includes parent + all children
     - **Validates: Requirements 4.2, 5.1, 5.2, 8.3, 8.4, 8.5, 9.3, 9.4, 10.1, 10.2**
 
-  - [ ] 5.7 Implement CourseCubit
+  - [x] 5.7 Implement CourseCubit
     - Create `lib/logic/cubits/course_cubit.dart`
     - Implement `loadCourses(languageCode)` — fetch from CourseRepository, apply filters, emit loaded state
     - Implement `applyFilters(FilterState)` — same AND filtering logic as EventCubit (no featured section for courses)
     - Implement `updateFavoriteStatus(courseId, isFavorited)`
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 10.2, 10.3, 10.4, 15.4_
 
-  - [ ] 5.8 Implement FavoritesCubit
+  - [x] 5.8 Implement FavoritesCubit
     - Create `lib/logic/cubits/favorites_cubit.dart`
     - Implement `loadFavorites()` — fetch from FavoritesRepository using defaultUserId, emit loaded state with eventIds and courseIds sets
     - Implement `toggleFavorite(itemType, itemId)` — optimistic update, call CMS, revert on failure
