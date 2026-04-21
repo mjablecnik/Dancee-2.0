@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // --- Mock all side-effectful dependencies before importing index.ts ---
 
@@ -12,25 +12,35 @@ vi.mock("../core/config", () => ({
   captureError: vi.fn(),
 }));
 
-// Capture the HTTP request handler from http2.createServer
+// Capture the HTTP request handler from http.createServer
 let capturedHandler: (
   req: Record<string, unknown>,
   res: Record<string, unknown>
 ) => void;
 
-vi.mock("http2", () => ({
+// Track http.request calls to verify proxy routing
+const mockProxyReq = {
+  on: vi.fn().mockReturnThis(),
+  setHeader: vi.fn(),
+  end: vi.fn(),
+  pipe: vi.fn(),
+};
+
+const mockHttpRequest = vi.fn(() => mockProxyReq);
+
+vi.mock("http", () => ({
   createServer: vi.fn((handler) => {
     capturedHandler = handler;
     return { listen: vi.fn() };
   }),
+  request: (...args: unknown[]) => mockHttpRequest(...args),
 }));
 
-// Mock Restate SDK — just need a stub that returns a handler function
-const mockRestateHandler = vi.fn();
+// Mock Restate SDK — just need a stub that exposes listen
 vi.mock("@restatedev/restate-sdk", () => ({
   endpoint: vi.fn(() => ({
     bind: vi.fn().mockReturnThis(),
-    http2Handler: vi.fn(() => mockRestateHandler),
+    listen: vi.fn().mockResolvedValue(undefined),
   })),
   workflow: (def: unknown) => def,
   service: (def: unknown) => def,
@@ -68,41 +78,54 @@ function makeMockReqRes(overrides: {
     method,
     url,
     headers,
+    pipe: vi.fn(),
   };
 
   return { req, res };
 }
 
+beforeEach(() => {
+  vi.clearAllMocks();
+  // Reset mockProxyReq mock state
+  mockProxyReq.on.mockReturnThis();
+});
+
 describe("index.ts: route mapping", () => {
-  it("maps /api/event to /ApiService/processEvent", () => {
+  it("maps /api/event to /ApiService/processEvent via proxy to port 8080", () => {
     const { req, res } = makeMockReqRes({ method: "POST", url: "/api/event" });
     capturedHandler(req, res);
-    expect(req.url).toBe("/ApiService/processEvent");
-    expect(mockRestateHandler).toHaveBeenCalledWith(req, res);
+    const firstCall = mockHttpRequest.mock.calls[0];
+    expect(firstCall[0]).toContain("/ApiService/processEvent");
+    expect(firstCall[0]).toContain("localhost:8080");
   });
 
   it("maps /api/events/process to /ApiService/processBatch", () => {
     const { req, res } = makeMockReqRes({ url: "/api/events/process" });
     capturedHandler(req, res);
-    expect(req.url).toBe("/ApiService/processBatch");
+    const firstCall = mockHttpRequest.mock.calls[0];
+    expect(firstCall[0]).toContain("/ApiService/processBatch");
   });
 
   it("maps /api/events/list to /ApiService/listEvents", () => {
     const { req, res } = makeMockReqRes({ url: "/api/events/list" });
     capturedHandler(req, res);
-    expect(req.url).toBe("/ApiService/listEvents");
+    const firstCall = mockHttpRequest.mock.calls[0];
+    expect(firstCall[0]).toContain("/ApiService/listEvents");
   });
 
-  it("passes unmapped paths through to restateHandler unchanged", () => {
+  it("passes unmapped paths through to port 9070 unchanged", () => {
     const { req, res } = makeMockReqRes({ url: "/restate/health" });
     capturedHandler(req, res);
-    expect(req.url).toBe("/restate/health");
+    const firstCall = mockHttpRequest.mock.calls[0];
+    expect(firstCall[0]).toContain("/restate/health");
+    expect(firstCall[0]).toContain("localhost:9070");
   });
 
   it("preserves query string when mapping routes", () => {
     const { req, res } = makeMockReqRes({ url: "/api/events/list?filter=%7B%7D" });
     capturedHandler(req, res);
-    expect(req.url).toBe("/ApiService/listEvents?filter=%7B%7D");
+    const firstCall = mockHttpRequest.mock.calls[0];
+    expect(firstCall[0]).toContain("/ApiService/listEvents?filter=%7B%7D");
   });
 });
 
@@ -140,27 +163,30 @@ describe("index.ts: CORS headers", () => {
 });
 
 describe("index.ts: OPTIONS preflight handling", () => {
-  it("responds with 204 and does not call restateHandler for OPTIONS requests", () => {
+  it("responds with 204 and does not proxy for OPTIONS requests", () => {
     const { req, res } = makeMockReqRes({ method: "OPTIONS", url: "/api/event" });
-    const restateCallsBefore = mockRestateHandler.mock.calls.length;
+    const requestCallsBefore = mockHttpRequest.mock.calls.length;
     capturedHandler(req, res);
     expect(res.writeHead).toHaveBeenCalledWith(204);
     expect(res.end).toHaveBeenCalled();
-    // restateHandler must NOT be called for preflight
-    expect(mockRestateHandler.mock.calls.length).toBe(restateCallsBefore);
+    // http.request must NOT be called for preflight
+    expect(mockHttpRequest.mock.calls.length).toBe(requestCallsBefore);
   });
 });
 
 describe("index.ts: filter query parameter forwarding", () => {
-  it("forwards filter query param as x-dancee-filter header for /api/events/list", () => {
+  it("forwards filter query param as x-dancee-filter header on the proxy request for /api/events/list", () => {
     const filter = JSON.stringify({ category: { _eq: "dance" } });
     const encoded = encodeURIComponent(filter);
     const { req, res } = makeMockReqRes({
       url: `/api/events/list?filter=${encoded}`,
     });
     capturedHandler(req, res);
-    // URLSearchParams.get() decodes the value, so the header contains the decoded JSON string
-    expect((req.headers as Record<string, string>)["x-dancee-filter"]).toBe(filter);
+    // x-dancee-filter is set on the proxy request (proxyReq), not on req
+    const setHeaderCalls = mockProxyReq.setHeader.mock.calls as [string, string][];
+    const filterHeader = setHeaderCalls.find(([name]) => name === "x-dancee-filter");
+    expect(filterHeader).toBeDefined();
+    expect(filterHeader![1]).toBe(filter);
   });
 
   it("does not set x-dancee-filter for non-list routes", () => {
@@ -168,12 +194,16 @@ describe("index.ts: filter query parameter forwarding", () => {
       url: "/api/events/process?filter=something",
     });
     capturedHandler(req, res);
-    expect((req.headers as Record<string, string>)["x-dancee-filter"]).toBeUndefined();
+    const setHeaderCalls = mockProxyReq.setHeader.mock.calls as [string, string][];
+    const filterHeader = setHeaderCalls.find(([name]) => name === "x-dancee-filter");
+    expect(filterHeader).toBeUndefined();
   });
 
   it("does not set x-dancee-filter when no filter param is present", () => {
     const { req, res } = makeMockReqRes({ url: "/api/events/list" });
     capturedHandler(req, res);
-    expect((req.headers as Record<string, string>)["x-dancee-filter"]).toBeUndefined();
+    const setHeaderCalls = mockProxyReq.setHeader.mock.calls as [string, string][];
+    const filterHeader = setHeaderCalls.find(([name]) => name === "x-dancee-filter");
+    expect(filterHeader).toBeUndefined();
   });
 });

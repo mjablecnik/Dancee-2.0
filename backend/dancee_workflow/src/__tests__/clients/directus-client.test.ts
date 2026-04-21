@@ -316,26 +316,38 @@ describe("Property 12: Error deduplication by URL", () => {
 });
 
 describe("createError: internal deduplication", () => {
-  it("returns existing error without posting when URL already exists", async () => {
+  it("updates existing error record via PATCH without creating a new one", async () => {
     const existingError = {
       id: 99,
       url: "https://facebook.com/events/dup",
       message: "already logged",
       datetime: "2025-01-01T00:00:00Z",
     };
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ data: [existingError] }),
-    });
+    const updatedError = { ...existingError, message: "new message" };
+    const fetchMock = vi.fn()
+      // First call: GET (findErrorByUrl) → returns existing
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ data: [existingError] }),
+      })
+      // Second call: PATCH (update existing record)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ data: updatedError }),
+      });
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await createError({ url: existingError.url, message: "new message" });
 
     expect(result.id).toBe(existingError.id);
-    // Only the GET (findErrorByUrl) should have been called — no POST
+    // Expect a GET then a PATCH — no POST should be called
     const calls = fetchMock.mock.calls as [string, RequestInit?][];
-    expect(calls.every(([, init]) => !init?.method || init.method === "GET")).toBe(true);
+    const methods = calls.map(([, init]) => init?.method ?? "GET");
+    expect(methods).toContain("GET");
+    expect(methods).not.toContain("POST");
+    expect(methods).toContain("PATCH");
   });
 
   it("creates a new error when URL does not exist yet", async () => {

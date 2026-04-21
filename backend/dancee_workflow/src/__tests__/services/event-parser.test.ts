@@ -9,6 +9,19 @@ vi.mock("../../core/config", () => ({
   },
 }));
 
+vi.mock("@restatedev/restate-sdk", () => ({
+  TerminalError: class TerminalError extends Error {
+    errorCode?: number;
+    constructor(msg: string, opts?: { errorCode?: number }) {
+      super(msg);
+      this.name = "TerminalError";
+      this.errorCode = opts?.errorCode;
+    }
+  },
+}));
+
+import { TerminalError } from "@restatedev/restate-sdk";
+
 // Use vi.hoisted so mockCreate is available inside the hoisted vi.mock factory
 const { mockCreate } = vi.hoisted(() => ({ mockCreate: vi.fn() }));
 
@@ -76,18 +89,18 @@ describe("retryOnJsonError", () => {
     expect(fn).toHaveBeenCalledOnce();
   });
 
-  it("retries up to maxAttempts on SyntaxError and eventually throws", async () => {
+  it("retries up to maxAttempts on SyntaxError and eventually throws TerminalError", async () => {
     const fn = vi.fn().mockRejectedValue(new SyntaxError("bad json"));
-    await expect(retryOnJsonError(fn, 3)).rejects.toThrow(SyntaxError);
+    await expect(retryOnJsonError(fn, 3)).rejects.toThrow(TerminalError);
     expect(fn).toHaveBeenCalledTimes(3);
   });
 
-  it("retries up to maxAttempts on ZodError and eventually throws", async () => {
+  it("retries up to maxAttempts on ZodError and eventually throws TerminalError", async () => {
     const { z } = await import("zod");
     let zodErr: ZodError | undefined;
     try { z.string().parse(123); } catch (e) { zodErr = e as ZodError; }
     const fn = vi.fn().mockRejectedValue(zodErr!);
-    await expect(retryOnJsonError(fn, 3)).rejects.toThrow(ZodError);
+    await expect(retryOnJsonError(fn, 3)).rejects.toThrow(TerminalError);
     expect(fn).toHaveBeenCalledTimes(3);
   });
 
@@ -110,7 +123,7 @@ describe("retryOnJsonError", () => {
 
   it("uses default maxAttempts of 3", async () => {
     const fn = vi.fn().mockRejectedValue(new SyntaxError("bad json"));
-    await expect(retryOnJsonError(fn)).rejects.toThrow(SyntaxError);
+    await expect(retryOnJsonError(fn)).rejects.toThrow(TerminalError);
     expect(fn).toHaveBeenCalledTimes(3);
   });
 });
@@ -176,9 +189,9 @@ describe("extractEventParts", () => {
     expect(result.title).toBe("Salsa Workshop");
   });
 
-  it("retries 3 times on invalid JSON and throws SyntaxError (Requirement 4.3)", async () => {
+  it("retries 3 times on invalid JSON and throws TerminalError (Requirement 4.3)", async () => {
     mockCreate.mockResolvedValue(makeOpenAIResponse("not valid json at all"));
-    await expect(extractEventParts("Description")).rejects.toThrow(SyntaxError);
+    await expect(extractEventParts("Description")).rejects.toThrow(TerminalError);
     // 3 attempts total (1 initial + 2 retries)
     expect(mockCreate).toHaveBeenCalledTimes(3);
   });
@@ -234,7 +247,7 @@ describe("extractEventInfo", () => {
 
   it("retries on invalid JSON and throws after 3 attempts", async () => {
     mockCreate.mockResolvedValue(makeOpenAIResponse("not json"));
-    await expect(extractEventInfo("Description")).rejects.toThrow(SyntaxError);
+    await expect(extractEventInfo("Description")).rejects.toThrow(TerminalError);
     expect(mockCreate).toHaveBeenCalledTimes(3);
   });
 

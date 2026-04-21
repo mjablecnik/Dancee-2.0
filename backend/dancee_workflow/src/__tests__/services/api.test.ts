@@ -16,6 +16,7 @@ vi.mock("../../core/config", () => ({
 // Mock restate SDK
 vi.mock("@restatedev/restate-sdk", () => ({
   service: (def: { name: string; handlers: Record<string, unknown> }) => def,
+  workflow: (def: unknown) => def,
   TerminalError: class TerminalError extends Error {
     errorCode?: number;
     constructor(msg: string, opts?: { errorCode?: number }) {

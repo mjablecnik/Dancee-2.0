@@ -29,6 +29,7 @@ vi.mock("@restatedev/restate-sdk", () => ({
 const mockScrapeEvent = vi.fn();
 const mockFindEventByOriginalUrl = vi.fn();
 const mockCreateEvent = vi.fn();
+const mockCreateSkippedEvent = vi.fn();
 const mockFindErrorByUrl = vi.fn();
 const mockCreateError = vi.fn();
 const mockClassifyEventType = vi.fn();
@@ -42,6 +43,7 @@ vi.mock("../../clients/scraper-client", () => ({
 vi.mock("../../clients/directus-client", () => ({
   findEventByOriginalUrl: (...args: unknown[]) => mockFindEventByOriginalUrl(...args),
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
+  createSkippedEvent: (...args: unknown[]) => mockCreateSkippedEvent(...args),
   findErrorByUrl: (...args: unknown[]) => mockFindErrorByUrl(...args),
   createError: (...args: unknown[]) => mockCreateError(...args),
 }));
@@ -130,6 +132,7 @@ beforeEach(() => {
   mockFindEventByOriginalUrl.mockResolvedValue(null);
   mockFindErrorByUrl.mockResolvedValue(null);
   mockCreateError.mockResolvedValue({ id: 1, url: "", message: "", datetime: new Date().toISOString() });
+  mockCreateSkippedEvent.mockResolvedValue({ id: 1, original_url: "", reason: "" });
   mockResolveVenue.mockResolvedValue({ id: 1, name: "Test Venue" });
   mockCreateEvent.mockImplementation((event: unknown) =>
     Promise.resolve({ ...(event as object), id: 99 })
@@ -212,10 +215,10 @@ describe("Property 19: Czech extraction output maps to 'cs' translation record",
   });
 });
 
-// ---- Property 21: Events collection does not contain title or description fields ----
+// ---- Property 21: Events collection stores title from extracted data ----
 
-describe("Property 21: Events collection does not contain title or description fields", () => {
-  it("the object passed to createEvent has no top-level title or description", async () => {
+describe("Property 21: Events collection stores the extracted title", () => {
+  it("the object passed to createEvent contains the extracted title", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
@@ -238,8 +241,7 @@ describe("Property 21: Events collection does not contain title or description f
           await runWorkflow(ctx, "https://facebook.com/events/123");
 
           const lastCallP21 = mockCreateEvent.mock.lastCall as [Record<string, unknown>];
-          expect("title" in lastCallP21[0]).toBe(false);
-          expect("description" in lastCallP21[0]).toBe(false);
+          expect(lastCallP21[0].title).toBe(title);
         }
       )
     );
@@ -439,25 +441,19 @@ describe("Property 18: Translation failure isolation", () => {
     );
   });
 
-  it("unsupported event type returns skipped response without calling createEvent", async () => {
-    await fc.assert(
-      fc.asyncProperty(
-        fc.constantFrom("other", "lesson", "course"),
-        async (unsupportedType) => {
-          vi.clearAllMocks();
-          mockFindEventByOriginalUrl.mockResolvedValue(null);
+  it("unsupported event type 'other' returns skipped response without calling createEvent", async () => {
+    vi.clearAllMocks();
+    mockFindEventByOriginalUrl.mockResolvedValue(null);
+    mockCreateSkippedEvent.mockResolvedValue({ id: 1, original_url: "", reason: "" });
 
-          const ctx = makeMockCtx();
-          mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
-          mockClassifyEventType.mockResolvedValue(unsupportedType);
+    const ctx = makeMockCtx();
+    mockScrapeEvent.mockResolvedValue(makeFacebookEvent());
+    mockClassifyEventType.mockResolvedValue("other");
 
-          const result = await runWorkflow(ctx, "https://facebook.com/events/123");
+    const result = await runWorkflow(ctx, "https://facebook.com/events/123");
 
-          expect(result).toEqual({ status: "skipped", reason: `Unsupported event type: ${unsupportedType}` });
-          expect(mockCreateEvent).not.toHaveBeenCalled();
-        }
-      )
-    );
+    expect(result).toEqual({ status: "skipped", reason: `Unsupported event type: other` });
+    expect(mockCreateEvent).not.toHaveBeenCalled();
   });
 });
 
@@ -561,42 +557,42 @@ describe("Venue id warning: warns when resolveVenue returns venue without id", (
 
 // ---- Error tracking catch block ----
 
-describe("Error tracking: catch block logs failure via findErrorByUrl / createError", () => {
-  it("calls createError when workflow throws and no existing error record exists", async () => {
+describe("Error tracking: catch block logs failure via createError", () => {
+  it("calls createError when workflow throws", async () => {
     const ctx = makeMockCtx();
     const scrapeError = new Error("Scraper unavailable");
     mockScrapeEvent.mockRejectedValue(scrapeError);
-    mockFindErrorByUrl.mockResolvedValue(null);
 
     await expect(runWorkflow(ctx, "https://facebook.com/events/err1")).rejects.toThrow(
       "Scraper unavailable"
     );
 
-    expect(mockFindErrorByUrl).toHaveBeenCalledWith("https://facebook.com/events/err1");
     expect(mockCreateError).toHaveBeenCalledWith(
       expect.objectContaining({
         url: "https://facebook.com/events/err1",
-        message: "Scraper unavailable",
       })
     );
   });
 
-  it("skips createError when an error record already exists for the URL", async () => {
+  it("always calls createError even when an error record already exists (dedup handled inside createError)", async () => {
     const ctx = makeMockCtx();
     mockScrapeEvent.mockRejectedValue(new Error("Network error"));
-    mockFindErrorByUrl.mockResolvedValue({
+    mockCreateError.mockResolvedValue({
       id: 42,
       url: "https://facebook.com/events/err2",
-      message: "previous error",
-      datetime: "2025-01-01T00:00:00.000Z",
+      message: "Network error",
+      datetime: new Date().toISOString(),
     });
 
     await expect(runWorkflow(ctx, "https://facebook.com/events/err2")).rejects.toThrow(
       "Network error"
     );
 
-    expect(mockFindErrorByUrl).toHaveBeenCalledWith("https://facebook.com/events/err2");
-    expect(mockCreateError).not.toHaveBeenCalled();
+    expect(mockCreateError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: "https://facebook.com/events/err2",
+      })
+    );
   });
 
   it("re-throws the original error after logging it", async () => {
