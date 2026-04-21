@@ -252,6 +252,24 @@ describe("computeDances", () => {
     expect(computeDances([])).toEqual([]);
   });
 
+  it("Task 10.5: single part with 10 dances returns first 6 only", () => {
+    const dances = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    const parts = [
+      {
+        name: "Workshop",
+        description: "",
+        type: "workshop" as const,
+        dances,
+        date_time_range: { start: "2024-01-01T18:00:00Z", end: "2024-01-01T20:00:00Z" },
+        lectors: [],
+        djs: [],
+      },
+    ];
+    const result = computeDances(parts);
+    expect(result).toHaveLength(6);
+    expect(result).toEqual(["A", "B", "C", "D", "E", "F"]);
+  });
+
   it("deduplicates dances across parts", () => {
     const parts = [
       {
@@ -325,6 +343,14 @@ describe("FacebookEventSchema.endTimestamp: <= 0 transforms to null", () => {
         expect(result.endTimestamp).toBeNull();
       })
     );
+  });
+});
+
+// Task 10.5: SUPPORTED_EVENT_TYPES includes "course" and "lesson"
+describe("SUPPORTED_EVENT_TYPES", () => {
+  it("Task 10.5: includes 'course' and 'lesson'", () => {
+    expect(SUPPORTED_EVENT_TYPES).toContain("course");
+    expect(SUPPORTED_EVENT_TYPES).toContain("lesson");
   });
 });
 

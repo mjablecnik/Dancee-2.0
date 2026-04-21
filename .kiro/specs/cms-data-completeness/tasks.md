@@ -207,11 +207,11 @@ Extend the dancee_cms schema and dancee_workflow pipeline to support courses, ev
     - Handle duplicate check via `findCourseByOriginalUrl`
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
 
-  - [ ]* 10.4 Write property test: event type routing correctness
+  - [x]* 10.4 Write property test: event type routing correctness
     - **Property 5: Event type routing correctness**
     - **Validates: Requirements 6.2, 11.1, 11.2, 11.3**
 
-  - [ ]* 10.5 Write unit tests for workflow integration
+  - [x]* 10.5 Write unit tests for workflow integration
     - Test that `SUPPORTED_EVENT_TYPES` includes "course" and "lesson"
     - Test `computeDances` edge cases: empty parts → empty result, single part with 10 dances → first 6, duplicates across parts → deduplicated
     - _Requirements: 4.1, 11.4_
