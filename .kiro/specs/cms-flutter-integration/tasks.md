@@ -261,8 +261,8 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Ensure favorite heart icon reflects current state on events list, courses list, event detail, course detail, and saved items
     - _Requirements: 12.6_
 
-- [ ] 12. Update settings screen for language selection
-  - [ ] 12.1 Implement language selection UI on settings/profile screen
+- [x] 12. Update settings screen for language selection
+  - [x] 12.1 Implement language selection UI on settings/profile screen
     - Display language picker with Czech, English, Spanish options
     - Show currently selected language
     - On selection, call SettingsCubit.setLanguage() which persists and triggers re-fetch of all data

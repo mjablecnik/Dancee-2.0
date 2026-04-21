@@ -3,10 +3,10 @@
 /// Original: lib/i18n
 /// To regenerate, run: `dart run slang`
 ///
-/// Locales: 2
-/// Strings: 446 (223 per locale)
+/// Locales: 3
+/// Strings: 678 (226 per locale)
 ///
-/// Built on 2026-04-21 at 22:38 UTC
+/// Built on 2026-04-21 at 23:47 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -26,7 +26,8 @@ const AppLocale _baseLocale = AppLocale.en;
 /// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
 enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	en(languageCode: 'en', build: Translations.build),
-	cs(languageCode: 'cs', build: _StringsCs.build);
+	cs(languageCode: 'cs', build: _StringsCs.build),
+	es(languageCode: 'es', build: _StringsEs.build);
 
 	const AppLocale({required this.languageCode, this.scriptCode, this.countryCode, required this.build}); // ignore: unused_element
 
@@ -564,6 +565,7 @@ class _StringsProfileSettingsEn {
 	String get czech => 'Czech';
 	String get notifications => 'Notifications';
 	String get english => 'English';
+	String get spanish => 'Spanish';
 }
 
 // Path: profile.support
@@ -1165,6 +1167,7 @@ class _StringsProfileSettingsCs implements _StringsProfileSettingsEn {
 	@override String get czech => 'Čeština';
 	@override String get notifications => 'Oznámení';
 	@override String get english => 'Angličtina';
+	@override String get spanish => 'Španělština';
 }
 
 // Path: profile.support
@@ -1326,6 +1329,608 @@ class _StringsProfileEditProfileNotificationSubtitlesCs implements _StringsProfi
 	@override String get marketing => 'Propagační zprávy a nabídky';
 }
 
+// Path: <root>
+class _StringsEs implements Translations {
+	/// You can call this constructor and build your own translation instance of this locale.
+	/// Constructing via the enum [AppLocale.build] is preferred.
+	_StringsEs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
+		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
+		  $meta = TranslationMetadata(
+		    locale: AppLocale.es,
+		    overrides: overrides ?? {},
+		    cardinalResolver: cardinalResolver,
+		    ordinalResolver: ordinalResolver,
+		  ) {
+		$meta.setFlatMapFunction(_flatMapFunction);
+	}
+
+	/// Metadata for the translations of <es>.
+	@override final TranslationMetadata<AppLocale, Translations> $meta;
+
+	/// Access flat map
+	@override dynamic operator[](String key) => $meta.getTranslation(key);
+
+	@override late final _StringsEs _root = this; // ignore: unused_field
+
+	// Translations
+	@override late final _StringsCommonEs common = _StringsCommonEs._(_root);
+	@override late final _StringsNavEs nav = _StringsNavEs._(_root);
+	@override late final _StringsAuthEs auth = _StringsAuthEs._(_root);
+	@override late final _StringsOnboardingEs onboarding = _StringsOnboardingEs._(_root);
+	@override late final _StringsEventsEs events = _StringsEventsEs._(_root);
+	@override late final _StringsCoursesEs courses = _StringsCoursesEs._(_root);
+	@override late final _StringsProfileEs profile = _StringsProfileEs._(_root);
+	@override late final _StringsPremiumEs premium = _StringsPremiumEs._(_root);
+	@override late final _StringsSavedEs saved = _StringsSavedEs._(_root);
+	@override late final _StringsContactEs contact = _StringsContactEs._(_root);
+}
+
+// Path: common
+class _StringsCommonEs implements _StringsCommonEn {
+	_StringsCommonEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get appName => 'Dancee';
+	@override String get showAll => 'Ver todo';
+	@override String get date => 'Fecha';
+	@override String get save => 'Guardar';
+	@override String get share => 'Compartir';
+	@override String get map => 'Mapa';
+	@override String get skip => 'Omitir';
+	@override String get continue_ => 'Continuar';
+	@override String get back => 'Volver';
+	@override String get finish => 'Finalizar';
+	@override String get cancel => 'Cancelar';
+	@override String get support => 'Soporte';
+	@override String get faq => 'FAQ';
+	@override String get clear => 'Limpiar';
+	@override String get current => 'Actual';
+	@override String get saveChanges => 'Guardar cambios';
+	@override late final _StringsCommonFormEs form = _StringsCommonFormEs._(_root);
+}
+
+// Path: nav
+class _StringsNavEs implements _StringsNavEn {
+	_StringsNavEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get events => 'Eventos';
+	@override String get courses => 'Cursos';
+	@override String get saved => 'Guardados';
+	@override String get profile => 'Perfil';
+}
+
+// Path: auth
+class _StringsAuthEs implements _StringsAuthEn {
+	_StringsAuthEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get tagline => 'Descubre el mundo del baile';
+	@override String get orContinueWith => 'o continúa con';
+	@override String get continueWithGoogle => 'Continuar con Google';
+	@override String get continueWithApple => 'Continuar con Apple';
+	@override String get termsPrefix => 'Al continuar aceptas nuestros ';
+	@override String get termsOfUse => 'Términos de uso';
+	@override String get and => ' y ';
+	@override String get privacyPolicy => 'Política de privacidad';
+	@override String get agreeWith => 'Acepto ';
+	@override String get orRegisterWith => 'o regístrate con';
+	@override late final _StringsAuthLoginEs login = _StringsAuthLoginEs._(_root);
+	@override late final _StringsAuthRegisterEs register = _StringsAuthRegisterEs._(_root);
+	@override late final _StringsAuthForgotPasswordEs forgotPassword = _StringsAuthForgotPasswordEs._(_root);
+	@override late final _StringsAuthPasswordStrengthEs passwordStrength = _StringsAuthPasswordStrengthEs._(_root);
+}
+
+// Path: onboarding
+class _StringsOnboardingEs implements _StringsOnboardingEn {
+	_StringsOnboardingEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final _StringsOnboardingStep1Es step1 = _StringsOnboardingStep1Es._(_root);
+	@override late final _StringsOnboardingStep2Es step2 = _StringsOnboardingStep2Es._(_root);
+	@override late final _StringsOnboardingStep3Es step3 = _StringsOnboardingStep3Es._(_root);
+}
+
+// Path: events
+class _StringsEventsEs implements _StringsEventsEn {
+	_StringsEventsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get featuredEvents => 'Eventos destacados';
+	@override String get upcomingEvents => 'Próximos eventos';
+	@override String get danceStyles => 'Estilos de baile';
+	@override String get danceStylesLabel => 'ESTILOS DE BAILE';
+	@override String get location => 'Ubicación';
+	@override late final _StringsEventsDetailEs detail = _StringsEventsDetailEs._(_root);
+	@override late final _StringsEventsFilterEs filter = _StringsEventsFilterEs._(_root);
+	@override late final _StringsEventsFiltersEs filters = _StringsEventsFiltersEs._(_root);
+}
+
+// Path: courses
+class _StringsCoursesEs implements _StringsCoursesEn {
+	_StringsCoursesEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cursos de baile';
+	@override String get subtitle => 'Encuentra tu curso';
+	@override String get featuredCourses => 'Cursos destacados';
+	@override String get allCourses => 'Todos los cursos';
+	@override late final _StringsCoursesDetailEs detail = _StringsCoursesDetailEs._(_root);
+}
+
+// Path: profile
+class _StringsProfileEs implements _StringsProfileEn {
+	_StringsProfileEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Perfil';
+	@override late final _StringsProfileSectionsEs sections = _StringsProfileSectionsEs._(_root);
+	@override late final _StringsProfileAccountEs account = _StringsProfileAccountEs._(_root);
+	@override late final _StringsProfileSettingsEs settings = _StringsProfileSettingsEs._(_root);
+	@override late final _StringsProfileSupportEs support = _StringsProfileSupportEs._(_root);
+	@override late final _StringsProfileAppInfoEs appInfo = _StringsProfileAppInfoEs._(_root);
+	@override late final _StringsProfileDangerEs danger = _StringsProfileDangerEs._(_root);
+	@override late final _StringsProfileChangePasswordEs changePassword = _StringsProfileChangePasswordEs._(_root);
+	@override late final _StringsProfileEditProfileEs editProfile = _StringsProfileEditProfileEs._(_root);
+}
+
+// Path: premium
+class _StringsPremiumEs implements _StringsPremiumEn {
+	_StringsPremiumEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Dancee Premium';
+	@override String get bannerSubtitle => 'Desbloquea todas las funciones';
+	@override String get heroTitle => 'Desbloquea todo el potencial';
+	@override String get heroSubtitle => 'Obtén acceso a todas las funciones premium y mejora tus experiencias de baile';
+	@override String get featuresTitle => 'Qué obtienes con Premium';
+	@override String get testimonialsTitle => 'Qué dicen nuestros usuarios';
+	@override String get faqTitle => 'Preguntas frecuentes';
+	@override String get ctaTitle => '¿Listo para empezar?';
+	@override String get ctaSubtitle => 'Únete a miles de bailarines satisfechos';
+	@override String get ctaButton => 'Obtener Premium ahora';
+	@override String get ctaNote => '7 días gratis · Cancela cuando quieras';
+}
+
+// Path: saved
+class _StringsSavedEs implements _StringsSavedEn {
+	_StringsSavedEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Eventos guardados';
+	@override String get subtitle => 'Tus eventos favoritos';
+	@override String get emptyTitle => 'Sin eventos guardados';
+	@override String get emptySubtitle => 'Los eventos que guardes aparecerán aquí';
+}
+
+// Path: contact
+class _StringsContactEs implements _StringsContactEn {
+	_StringsContactEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get teamName => 'Equipo Dancee';
+	@override String get email => 'hello@dancee.app';
+	@override String get description => 'Nos encantaría leer tus comentarios...';
+	@override String get responseTime => 'Tiempo de respuesta';
+	@override String get responseTimeDetail => 'Normalmente respondemos en 24 horas en días laborables. ¡Gracias por tu paciencia!';
+	@override String get deviceInfo => 'Información del dispositivo';
+	@override String get autoAttached => 'Adjuntado automáticamente';
+	@override late final _StringsContactFormEs form = _StringsContactFormEs._(_root);
+	@override late final _StringsContactDeviceInfoLabelsEs deviceInfoLabels = _StringsContactDeviceInfoLabelsEs._(_root);
+}
+
+// Path: common.form
+class _StringsCommonFormEs implements _StringsCommonFormEn {
+	_StringsCommonFormEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get email => 'E-mail';
+	@override String get emailHint => 'tu@email.com';
+	@override String get password => 'Contraseña';
+	@override String get passwordPlaceholder => '••••••••';
+	@override String get confirmPassword => 'Confirmar contraseña';
+	@override String get firstName => 'Nombre';
+	@override String get firstNameHint => 'Tu nombre';
+	@override String get lastName => 'Apellido';
+	@override String get lastNameHint => 'Tu apellido';
+	@override String get city => 'Ciudad';
+	@override String get phone => 'Teléfono';
+	@override String get fullName => 'Nombre completo';
+}
+
+// Path: auth.login
+class _StringsAuthLoginEs implements _StringsAuthLoginEn {
+	_StringsAuthLoginEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¡Bienvenido de vuelta!';
+	@override String get subtitle => 'Inicia sesión y continúa explorando eventos de baile';
+	@override String get stayLoggedIn => 'Mantener sesión iniciada';
+	@override String get forgotPassword => '¿Olvidaste tu contraseña?';
+	@override String get submit => 'Iniciar sesión';
+	@override String get noAccount => '¿No tienes cuenta?';
+	@override String get register => 'Regístrate';
+}
+
+// Path: auth.register
+class _StringsAuthRegisterEs implements _StringsAuthRegisterEn {
+	_StringsAuthRegisterEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Crear una cuenta';
+	@override String get subtitle => 'Regístrate y empieza a explorar eventos de baile';
+	@override String get passwordsMatch => 'Las contraseñas coinciden';
+	@override String get passwordsMismatch => 'Las contraseñas no coinciden';
+	@override String get newsletter => 'Quiero recibir noticias sobre eventos de baile';
+	@override String get submit => 'Crear cuenta';
+	@override String get hasAccount => '¿Ya tienes cuenta?';
+	@override String get login => 'Iniciar sesión';
+}
+
+// Path: auth.forgotPassword
+class _StringsAuthForgotPasswordEs implements _StringsAuthForgotPasswordEn {
+	_StringsAuthForgotPasswordEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¿Olvidaste tu contraseña?';
+	@override String get subtitle => 'Ingresa tu e-mail y te enviaremos un enlace para restablecer tu contraseña';
+	@override String get submit => 'Enviar enlace';
+	@override String get checkInbox => 'Revisa tu bandeja de entrada';
+	@override String get checkInboxDetail => 'Después de enviar recibirás un e-mail con un enlace para restablecer tu contraseña. El enlace es válido por 24 horas.';
+	@override String get rememberPassword => '¿Recordaste tu contraseña?';
+	@override String get login => 'Iniciar sesión';
+	@override String get needHelp => '¿Necesitas ayuda?';
+}
+
+// Path: auth.passwordStrength
+class _StringsAuthPasswordStrengthEs implements _StringsAuthPasswordStrengthEn {
+	_StringsAuthPasswordStrengthEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get weak => 'Contraseña débil';
+	@override String get medium => 'Media';
+	@override String get strong => 'Contraseña fuerte';
+	@override String get veryStrong => 'Muy fuerte';
+	@override String get hint => 'Al menos 8 caracteres';
+}
+
+// Path: onboarding.step1
+class _StringsOnboardingStep1Es implements _StringsOnboardingStep1En {
+	_StringsOnboardingStep1Es._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¿Qué bailes te gustan?';
+	@override String get subtitle => 'Elige tus estilos de baile favoritos para ofrecerte eventos relevantes';
+}
+
+// Path: onboarding.step2
+class _StringsOnboardingStep2Es implements _StringsOnboardingStep2En {
+	_StringsOnboardingStep2Es._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¿Cuál es tu nivel?';
+	@override String get subtitle => 'Nos ayudará a recomendarte eventos y cursos adecuados';
+}
+
+// Path: onboarding.step3
+class _StringsOnboardingStep3Es implements _StringsOnboardingStep3En {
+	_StringsOnboardingStep3Es._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¿Dónde te encuentras?';
+	@override String get subtitle => 'Encontraremos los eventos de baile más cercanos en tu zona';
+	@override String get radius10km => '10 km';
+	@override String get radius25km => '25 km';
+	@override String get radius50km => '50 km';
+	@override String get radiusAll => 'Todo el país';
+	@override String get cityHint => 'Ej. Madrid, Barcelona...';
+	@override String get searchRadius => 'Buscar eventos en un radio de';
+	@override String get useCurrentLocation => 'Usar ubicación actual';
+}
+
+// Path: events.detail
+class _StringsEventsDetailEs implements _StringsEventsDetailEn {
+	_StringsEventsDetailEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get header => 'Detalle del evento';
+	@override String get description => 'Descripción del evento';
+	@override String get additionalInfo => 'Información adicional';
+	@override String get admission => 'Entrada';
+	@override String get dresscode => 'Código de vestimenta';
+	@override String get buyTickets => 'Comprar entradas';
+	@override String get originalSource => 'Fuente original';
+	@override String get program => 'Programa del evento';
+}
+
+// Path: events.filter
+class _StringsEventsFilterEs implements _StringsEventsFilterEn {
+	_StringsEventsFilterEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String selectedCount({required Object count}) => '${count} seleccionados';
+	@override String get selectedStyles => 'ESTILOS SELECCIONADOS';
+	@override String get apply => 'Aplicar filtro';
+	@override String applyCount({required Object count}) => 'Aplicar filtro (${count})';
+	@override String get selectLocation => 'Seleccionar ubicación';
+	@override String get searchCityHint => 'Buscar ciudad o área...';
+	@override String get useMyLocation => 'Usar mi ubicación';
+	@override String get useMyLocationSubtitle => 'Encuentra automáticamente eventos cerca de ti';
+	@override String get popularCities => 'Ciudades populares';
+	@override String get allCities => 'Todas las ciudades';
+	@override String get selectedRegions => 'REGIONES SELECCIONADAS';
+	@override String get noResults => 'Sin resultados';
+}
+
+// Path: events.filters
+class _StringsEventsFiltersEs implements _StringsEventsFiltersEn {
+	_StringsEventsFiltersEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get today => 'Hoy';
+	@override String get thisWeek => 'Esta semana';
+	@override String get thisMonth => 'Este mes';
+	@override String get thisWeekend => 'Este fin de semana';
+}
+
+// Path: courses.detail
+class _StringsCoursesDetailEs implements _StringsCoursesDetailEn {
+	_StringsCoursesDetailEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get header => 'Detalle del curso';
+	@override String get description => 'Descripción del curso';
+	@override String get details => 'Detalles del curso';
+	@override String get whatYouLearn => 'Qué aprenderás';
+	@override String get aboutInstructor => 'Sobre el instructor';
+	@override String get shareCourse => 'Compartir curso';
+	@override String get coursePrice => 'Precio del curso';
+	@override String get availableSpots => 'Plazas disponibles';
+	@override String get register => 'Inscribirse al curso';
+}
+
+// Path: profile.sections
+class _StringsProfileSectionsEs implements _StringsProfileSectionsEn {
+	_StringsProfileSectionsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get account => 'Cuenta';
+	@override String get settings => 'Ajustes';
+	@override String get support => 'Soporte';
+	@override String get appInfo => 'Sobre la app';
+	@override String get dangerZone => 'Zona de peligro';
+}
+
+// Path: profile.account
+class _StringsProfileAccountEs implements _StringsProfileAccountEn {
+	_StringsProfileAccountEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get editProfile => 'Editar perfil';
+	@override String get changePassword => 'Cambiar contraseña';
+}
+
+// Path: profile.settings
+class _StringsProfileSettingsEs implements _StringsProfileSettingsEn {
+	_StringsProfileSettingsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get language => 'Idioma';
+	@override String get czech => 'Checo';
+	@override String get notifications => 'Notificaciones';
+	@override String get english => 'Inglés';
+	@override String get spanish => 'Español';
+}
+
+// Path: profile.support
+class _StringsProfileSupportEs implements _StringsProfileSupportEn {
+	_StringsProfileSupportEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get contactAuthor => 'Contactar al autor';
+	@override String get rateApp => 'Valorar app';
+}
+
+// Path: profile.appInfo
+class _StringsProfileAppInfoEs implements _StringsProfileAppInfoEn {
+	_StringsProfileAppInfoEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get version => 'Versión de la app';
+	@override String get termsOfUse => 'Términos de uso';
+	@override String get privacy => 'Privacidad';
+}
+
+// Path: profile.danger
+class _StringsProfileDangerEs implements _StringsProfileDangerEn {
+	_StringsProfileDangerEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get logout => 'Cerrar sesión';
+	@override String get deleteAccount => 'Eliminar cuenta';
+}
+
+// Path: profile.changePassword
+class _StringsProfileChangePasswordEs implements _StringsProfileChangePasswordEn {
+	_StringsProfileChangePasswordEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cambiar contraseña';
+	@override String get secureAccount => 'Asegura tu cuenta';
+	@override String get secureAccountDetail => 'Una contraseña segura debe contener al menos 8 caracteres, letras mayúsculas y minúsculas, números y caracteres especiales.';
+	@override String get currentPassword => 'Contraseña actual';
+	@override String get currentPasswordHint => 'Ingresa la contraseña actual';
+	@override String get newPassword => 'Nueva contraseña';
+	@override String get newPasswordHint => 'Ingresa la nueva contraseña';
+	@override String get confirmPassword => 'Confirmar nueva contraseña';
+	@override String get confirmPasswordHint => 'Ingresa la nueva contraseña de nuevo';
+	@override String get save => 'Guardar nueva contraseña';
+	@override String get requirements => 'REQUISITOS DE CONTRASEÑA';
+	@override String get req8chars => 'Mínimo 8 caracteres';
+	@override String get reqUppercase => 'Al menos una letra mayúscula (A-Z)';
+	@override String get reqLowercase => 'Al menos una letra minúscula (a-z)';
+	@override String get reqNumber => 'Al menos un número (0-9)';
+	@override String get reqSpecial => 'Al menos un carácter especial (!@#\$%^&*)';
+	@override String get forgotPassword => '¿Olvidaste tu contraseña?';
+	@override String get strengthVeryWeak => 'Seguridad de contraseña: Muy débil';
+	@override String get strengthWeak => 'Seguridad de contraseña: Débil';
+	@override String get strengthMedium => 'Seguridad de contraseña: Media';
+	@override String get strengthStrong => 'Seguridad de contraseña: Fuerte';
+}
+
+// Path: profile.editProfile
+class _StringsProfileEditProfileEs implements _StringsProfileEditProfileEn {
+	_StringsProfileEditProfileEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Editar perfil';
+	@override late final _StringsProfileEditProfileSectionsEs sections = _StringsProfileEditProfileSectionsEs._(_root);
+	@override String get changePhoto => 'Cambiar foto';
+	@override String get bio => 'Descripción';
+	@override String get bioHint => 'Escribe algo sobre ti...';
+	@override String get selectDanceStyles => 'Selecciona tus estilos de baile favoritos';
+	@override String get yourLevel => 'Tu nivel de baile';
+	@override String get instagram => 'Instagram';
+	@override String get instagramHint => '@tu_usuario';
+	@override String get facebook => 'Facebook';
+	@override String get facebookHint => 'facebook.com/tu.nombre';
+	@override late final _StringsProfileEditProfileNotificationsEs notifications = _StringsProfileEditProfileNotificationsEs._(_root);
+	@override late final _StringsProfileEditProfileNotificationSubtitlesEs notificationSubtitles = _StringsProfileEditProfileNotificationSubtitlesEs._(_root);
+}
+
+// Path: contact.form
+class _StringsContactFormEs implements _StringsContactFormEn {
+	_StringsContactFormEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get subject => 'Asunto del mensaje';
+	@override String get feedback => 'Comentario';
+	@override String get reportBug => 'Reportar error';
+	@override String get featureRequest => 'Sugerencia de mejora';
+	@override String get other => 'Otro';
+	@override String get title => 'Título del mensaje';
+	@override String get titleHint => 'Describe brevemente tu problema o sugerencia';
+	@override String get message => 'Mensaje';
+	@override String get messageHint => 'Describe tu problema en detalle...';
+	@override String get replyEmail => 'Tu e-mail de respuesta';
+	@override String get sending => 'Enviando...';
+	@override String get sent => '¡Enviado!';
+	@override String get submit => 'Enviar mensaje';
+}
+
+// Path: contact.deviceInfoLabels
+class _StringsContactDeviceInfoLabelsEs implements _StringsContactDeviceInfoLabelsEn {
+	_StringsContactDeviceInfoLabelsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get app => 'App:';
+	@override String get device => 'Dispositivo:';
+	@override String get os => 'Sistema:';
+}
+
+// Path: profile.editProfile.sections
+class _StringsProfileEditProfileSectionsEs implements _StringsProfileEditProfileSectionsEn {
+	_StringsProfileEditProfileSectionsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get personalInfo => 'Información personal';
+	@override String get aboutMe => 'Sobre mí';
+	@override String get favoriteDances => 'Bailes favoritos';
+	@override String get level => 'Nivel';
+	@override String get socialNetworks => 'Redes sociales';
+	@override String get notifications => 'Notificaciones';
+}
+
+// Path: profile.editProfile.notifications
+class _StringsProfileEditProfileNotificationsEs implements _StringsProfileEditProfileNotificationsEn {
+	_StringsProfileEditProfileNotificationsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEvents => 'Nuevos eventos';
+	@override String get eventReminders => 'Recordatorios de eventos';
+	@override String get marketing => 'Mensajes de marketing';
+}
+
+// Path: profile.editProfile.notificationSubtitles
+class _StringsProfileEditProfileNotificationSubtitlesEs implements _StringsProfileEditProfileNotificationSubtitlesEn {
+	_StringsProfileEditProfileNotificationSubtitlesEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEvents => 'Recibe notificaciones sobre nuevos eventos en tu zona';
+	@override String get eventReminders => 'Recordatorios antes de tus eventos guardados';
+	@override String get marketing => 'Mensajes promocionales y ofertas';
+}
+
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
@@ -1469,6 +2074,7 @@ extension on Translations {
 			case 'profile.settings.czech': return 'Czech';
 			case 'profile.settings.notifications': return 'Notifications';
 			case 'profile.settings.english': return 'English';
+			case 'profile.settings.spanish': return 'Spanish';
 			case 'profile.support.contactAuthor': return 'Contact author';
 			case 'profile.support.rateApp': return 'Rate app';
 			case 'profile.appInfo.version': return 'App version';
@@ -1702,6 +2308,7 @@ extension on _StringsCs {
 			case 'profile.settings.czech': return 'Čeština';
 			case 'profile.settings.notifications': return 'Oznámení';
 			case 'profile.settings.english': return 'Angličtina';
+			case 'profile.settings.spanish': return 'Španělština';
 			case 'profile.support.contactAuthor': return 'Napsat autorovi';
 			case 'profile.support.rateApp': return 'Ohodnotit aplikaci';
 			case 'profile.appInfo.version': return 'Verze aplikace';
@@ -1790,6 +2397,240 @@ extension on _StringsCs {
 			case 'contact.deviceInfoLabels.app': return 'Aplikace:';
 			case 'contact.deviceInfoLabels.device': return 'Zařízení:';
 			case 'contact.deviceInfoLabels.os': return 'Systém:';
+			default: return null;
+		}
+	}
+}
+
+extension on _StringsEs {
+	dynamic _flatMapFunction(String path) {
+		switch (path) {
+			case 'common.appName': return 'Dancee';
+			case 'common.showAll': return 'Ver todo';
+			case 'common.date': return 'Fecha';
+			case 'common.save': return 'Guardar';
+			case 'common.share': return 'Compartir';
+			case 'common.map': return 'Mapa';
+			case 'common.skip': return 'Omitir';
+			case 'common.continue_': return 'Continuar';
+			case 'common.back': return 'Volver';
+			case 'common.finish': return 'Finalizar';
+			case 'common.cancel': return 'Cancelar';
+			case 'common.support': return 'Soporte';
+			case 'common.faq': return 'FAQ';
+			case 'common.clear': return 'Limpiar';
+			case 'common.current': return 'Actual';
+			case 'common.saveChanges': return 'Guardar cambios';
+			case 'common.form.email': return 'E-mail';
+			case 'common.form.emailHint': return 'tu@email.com';
+			case 'common.form.password': return 'Contraseña';
+			case 'common.form.passwordPlaceholder': return '••••••••';
+			case 'common.form.confirmPassword': return 'Confirmar contraseña';
+			case 'common.form.firstName': return 'Nombre';
+			case 'common.form.firstNameHint': return 'Tu nombre';
+			case 'common.form.lastName': return 'Apellido';
+			case 'common.form.lastNameHint': return 'Tu apellido';
+			case 'common.form.city': return 'Ciudad';
+			case 'common.form.phone': return 'Teléfono';
+			case 'common.form.fullName': return 'Nombre completo';
+			case 'nav.events': return 'Eventos';
+			case 'nav.courses': return 'Cursos';
+			case 'nav.saved': return 'Guardados';
+			case 'nav.profile': return 'Perfil';
+			case 'auth.tagline': return 'Descubre el mundo del baile';
+			case 'auth.orContinueWith': return 'o continúa con';
+			case 'auth.continueWithGoogle': return 'Continuar con Google';
+			case 'auth.continueWithApple': return 'Continuar con Apple';
+			case 'auth.termsPrefix': return 'Al continuar aceptas nuestros ';
+			case 'auth.termsOfUse': return 'Términos de uso';
+			case 'auth.and': return ' y ';
+			case 'auth.privacyPolicy': return 'Política de privacidad';
+			case 'auth.agreeWith': return 'Acepto ';
+			case 'auth.orRegisterWith': return 'o regístrate con';
+			case 'auth.login.title': return '¡Bienvenido de vuelta!';
+			case 'auth.login.subtitle': return 'Inicia sesión y continúa explorando eventos de baile';
+			case 'auth.login.stayLoggedIn': return 'Mantener sesión iniciada';
+			case 'auth.login.forgotPassword': return '¿Olvidaste tu contraseña?';
+			case 'auth.login.submit': return 'Iniciar sesión';
+			case 'auth.login.noAccount': return '¿No tienes cuenta?';
+			case 'auth.login.register': return 'Regístrate';
+			case 'auth.register.title': return 'Crear una cuenta';
+			case 'auth.register.subtitle': return 'Regístrate y empieza a explorar eventos de baile';
+			case 'auth.register.passwordsMatch': return 'Las contraseñas coinciden';
+			case 'auth.register.passwordsMismatch': return 'Las contraseñas no coinciden';
+			case 'auth.register.newsletter': return 'Quiero recibir noticias sobre eventos de baile';
+			case 'auth.register.submit': return 'Crear cuenta';
+			case 'auth.register.hasAccount': return '¿Ya tienes cuenta?';
+			case 'auth.register.login': return 'Iniciar sesión';
+			case 'auth.forgotPassword.title': return '¿Olvidaste tu contraseña?';
+			case 'auth.forgotPassword.subtitle': return 'Ingresa tu e-mail y te enviaremos un enlace para restablecer tu contraseña';
+			case 'auth.forgotPassword.submit': return 'Enviar enlace';
+			case 'auth.forgotPassword.checkInbox': return 'Revisa tu bandeja de entrada';
+			case 'auth.forgotPassword.checkInboxDetail': return 'Después de enviar recibirás un e-mail con un enlace para restablecer tu contraseña. El enlace es válido por 24 horas.';
+			case 'auth.forgotPassword.rememberPassword': return '¿Recordaste tu contraseña?';
+			case 'auth.forgotPassword.login': return 'Iniciar sesión';
+			case 'auth.forgotPassword.needHelp': return '¿Necesitas ayuda?';
+			case 'auth.passwordStrength.weak': return 'Contraseña débil';
+			case 'auth.passwordStrength.medium': return 'Media';
+			case 'auth.passwordStrength.strong': return 'Contraseña fuerte';
+			case 'auth.passwordStrength.veryStrong': return 'Muy fuerte';
+			case 'auth.passwordStrength.hint': return 'Al menos 8 caracteres';
+			case 'onboarding.step1.title': return '¿Qué bailes te gustan?';
+			case 'onboarding.step1.subtitle': return 'Elige tus estilos de baile favoritos para ofrecerte eventos relevantes';
+			case 'onboarding.step2.title': return '¿Cuál es tu nivel?';
+			case 'onboarding.step2.subtitle': return 'Nos ayudará a recomendarte eventos y cursos adecuados';
+			case 'onboarding.step3.title': return '¿Dónde te encuentras?';
+			case 'onboarding.step3.subtitle': return 'Encontraremos los eventos de baile más cercanos en tu zona';
+			case 'onboarding.step3.radius10km': return '10 km';
+			case 'onboarding.step3.radius25km': return '25 km';
+			case 'onboarding.step3.radius50km': return '50 km';
+			case 'onboarding.step3.radiusAll': return 'Todo el país';
+			case 'onboarding.step3.cityHint': return 'Ej. Madrid, Barcelona...';
+			case 'onboarding.step3.searchRadius': return 'Buscar eventos en un radio de';
+			case 'onboarding.step3.useCurrentLocation': return 'Usar ubicación actual';
+			case 'events.featuredEvents': return 'Eventos destacados';
+			case 'events.upcomingEvents': return 'Próximos eventos';
+			case 'events.danceStyles': return 'Estilos de baile';
+			case 'events.danceStylesLabel': return 'ESTILOS DE BAILE';
+			case 'events.location': return 'Ubicación';
+			case 'events.detail.header': return 'Detalle del evento';
+			case 'events.detail.description': return 'Descripción del evento';
+			case 'events.detail.additionalInfo': return 'Información adicional';
+			case 'events.detail.admission': return 'Entrada';
+			case 'events.detail.dresscode': return 'Código de vestimenta';
+			case 'events.detail.buyTickets': return 'Comprar entradas';
+			case 'events.detail.originalSource': return 'Fuente original';
+			case 'events.detail.program': return 'Programa del evento';
+			case 'events.filter.selectedCount': return ({required Object count}) => '${count} seleccionados';
+			case 'events.filter.selectedStyles': return 'ESTILOS SELECCIONADOS';
+			case 'events.filter.apply': return 'Aplicar filtro';
+			case 'events.filter.applyCount': return ({required Object count}) => 'Aplicar filtro (${count})';
+			case 'events.filter.selectLocation': return 'Seleccionar ubicación';
+			case 'events.filter.searchCityHint': return 'Buscar ciudad o área...';
+			case 'events.filter.useMyLocation': return 'Usar mi ubicación';
+			case 'events.filter.useMyLocationSubtitle': return 'Encuentra automáticamente eventos cerca de ti';
+			case 'events.filter.popularCities': return 'Ciudades populares';
+			case 'events.filter.allCities': return 'Todas las ciudades';
+			case 'events.filter.selectedRegions': return 'REGIONES SELECCIONADAS';
+			case 'events.filter.noResults': return 'Sin resultados';
+			case 'events.filters.today': return 'Hoy';
+			case 'events.filters.thisWeek': return 'Esta semana';
+			case 'events.filters.thisMonth': return 'Este mes';
+			case 'events.filters.thisWeekend': return 'Este fin de semana';
+			case 'courses.title': return 'Cursos de baile';
+			case 'courses.subtitle': return 'Encuentra tu curso';
+			case 'courses.featuredCourses': return 'Cursos destacados';
+			case 'courses.allCourses': return 'Todos los cursos';
+			case 'courses.detail.header': return 'Detalle del curso';
+			case 'courses.detail.description': return 'Descripción del curso';
+			case 'courses.detail.details': return 'Detalles del curso';
+			case 'courses.detail.whatYouLearn': return 'Qué aprenderás';
+			case 'courses.detail.aboutInstructor': return 'Sobre el instructor';
+			case 'courses.detail.shareCourse': return 'Compartir curso';
+			case 'courses.detail.coursePrice': return 'Precio del curso';
+			case 'courses.detail.availableSpots': return 'Plazas disponibles';
+			case 'courses.detail.register': return 'Inscribirse al curso';
+			case 'profile.title': return 'Perfil';
+			case 'profile.sections.account': return 'Cuenta';
+			case 'profile.sections.settings': return 'Ajustes';
+			case 'profile.sections.support': return 'Soporte';
+			case 'profile.sections.appInfo': return 'Sobre la app';
+			case 'profile.sections.dangerZone': return 'Zona de peligro';
+			case 'profile.account.editProfile': return 'Editar perfil';
+			case 'profile.account.changePassword': return 'Cambiar contraseña';
+			case 'profile.settings.language': return 'Idioma';
+			case 'profile.settings.czech': return 'Checo';
+			case 'profile.settings.notifications': return 'Notificaciones';
+			case 'profile.settings.english': return 'Inglés';
+			case 'profile.settings.spanish': return 'Español';
+			case 'profile.support.contactAuthor': return 'Contactar al autor';
+			case 'profile.support.rateApp': return 'Valorar app';
+			case 'profile.appInfo.version': return 'Versión de la app';
+			case 'profile.appInfo.termsOfUse': return 'Términos de uso';
+			case 'profile.appInfo.privacy': return 'Privacidad';
+			case 'profile.danger.logout': return 'Cerrar sesión';
+			case 'profile.danger.deleteAccount': return 'Eliminar cuenta';
+			case 'profile.changePassword.title': return 'Cambiar contraseña';
+			case 'profile.changePassword.secureAccount': return 'Asegura tu cuenta';
+			case 'profile.changePassword.secureAccountDetail': return 'Una contraseña segura debe contener al menos 8 caracteres, letras mayúsculas y minúsculas, números y caracteres especiales.';
+			case 'profile.changePassword.currentPassword': return 'Contraseña actual';
+			case 'profile.changePassword.currentPasswordHint': return 'Ingresa la contraseña actual';
+			case 'profile.changePassword.newPassword': return 'Nueva contraseña';
+			case 'profile.changePassword.newPasswordHint': return 'Ingresa la nueva contraseña';
+			case 'profile.changePassword.confirmPassword': return 'Confirmar nueva contraseña';
+			case 'profile.changePassword.confirmPasswordHint': return 'Ingresa la nueva contraseña de nuevo';
+			case 'profile.changePassword.save': return 'Guardar nueva contraseña';
+			case 'profile.changePassword.requirements': return 'REQUISITOS DE CONTRASEÑA';
+			case 'profile.changePassword.req8chars': return 'Mínimo 8 caracteres';
+			case 'profile.changePassword.reqUppercase': return 'Al menos una letra mayúscula (A-Z)';
+			case 'profile.changePassword.reqLowercase': return 'Al menos una letra minúscula (a-z)';
+			case 'profile.changePassword.reqNumber': return 'Al menos un número (0-9)';
+			case 'profile.changePassword.reqSpecial': return 'Al menos un carácter especial (!@#\$%^&*)';
+			case 'profile.changePassword.forgotPassword': return '¿Olvidaste tu contraseña?';
+			case 'profile.changePassword.strengthVeryWeak': return 'Seguridad de contraseña: Muy débil';
+			case 'profile.changePassword.strengthWeak': return 'Seguridad de contraseña: Débil';
+			case 'profile.changePassword.strengthMedium': return 'Seguridad de contraseña: Media';
+			case 'profile.changePassword.strengthStrong': return 'Seguridad de contraseña: Fuerte';
+			case 'profile.editProfile.title': return 'Editar perfil';
+			case 'profile.editProfile.sections.personalInfo': return 'Información personal';
+			case 'profile.editProfile.sections.aboutMe': return 'Sobre mí';
+			case 'profile.editProfile.sections.favoriteDances': return 'Bailes favoritos';
+			case 'profile.editProfile.sections.level': return 'Nivel';
+			case 'profile.editProfile.sections.socialNetworks': return 'Redes sociales';
+			case 'profile.editProfile.sections.notifications': return 'Notificaciones';
+			case 'profile.editProfile.changePhoto': return 'Cambiar foto';
+			case 'profile.editProfile.bio': return 'Descripción';
+			case 'profile.editProfile.bioHint': return 'Escribe algo sobre ti...';
+			case 'profile.editProfile.selectDanceStyles': return 'Selecciona tus estilos de baile favoritos';
+			case 'profile.editProfile.yourLevel': return 'Tu nivel de baile';
+			case 'profile.editProfile.instagram': return 'Instagram';
+			case 'profile.editProfile.instagramHint': return '@tu_usuario';
+			case 'profile.editProfile.facebook': return 'Facebook';
+			case 'profile.editProfile.facebookHint': return 'facebook.com/tu.nombre';
+			case 'profile.editProfile.notifications.newEvents': return 'Nuevos eventos';
+			case 'profile.editProfile.notifications.eventReminders': return 'Recordatorios de eventos';
+			case 'profile.editProfile.notifications.marketing': return 'Mensajes de marketing';
+			case 'profile.editProfile.notificationSubtitles.newEvents': return 'Recibe notificaciones sobre nuevos eventos en tu zona';
+			case 'profile.editProfile.notificationSubtitles.eventReminders': return 'Recordatorios antes de tus eventos guardados';
+			case 'profile.editProfile.notificationSubtitles.marketing': return 'Mensajes promocionales y ofertas';
+			case 'premium.title': return 'Dancee Premium';
+			case 'premium.bannerSubtitle': return 'Desbloquea todas las funciones';
+			case 'premium.heroTitle': return 'Desbloquea todo el potencial';
+			case 'premium.heroSubtitle': return 'Obtén acceso a todas las funciones premium y mejora tus experiencias de baile';
+			case 'premium.featuresTitle': return 'Qué obtienes con Premium';
+			case 'premium.testimonialsTitle': return 'Qué dicen nuestros usuarios';
+			case 'premium.faqTitle': return 'Preguntas frecuentes';
+			case 'premium.ctaTitle': return '¿Listo para empezar?';
+			case 'premium.ctaSubtitle': return 'Únete a miles de bailarines satisfechos';
+			case 'premium.ctaButton': return 'Obtener Premium ahora';
+			case 'premium.ctaNote': return '7 días gratis · Cancela cuando quieras';
+			case 'saved.title': return 'Eventos guardados';
+			case 'saved.subtitle': return 'Tus eventos favoritos';
+			case 'saved.emptyTitle': return 'Sin eventos guardados';
+			case 'saved.emptySubtitle': return 'Los eventos que guardes aparecerán aquí';
+			case 'contact.teamName': return 'Equipo Dancee';
+			case 'contact.email': return 'hello@dancee.app';
+			case 'contact.description': return 'Nos encantaría leer tus comentarios...';
+			case 'contact.responseTime': return 'Tiempo de respuesta';
+			case 'contact.responseTimeDetail': return 'Normalmente respondemos en 24 horas en días laborables. ¡Gracias por tu paciencia!';
+			case 'contact.deviceInfo': return 'Información del dispositivo';
+			case 'contact.autoAttached': return 'Adjuntado automáticamente';
+			case 'contact.form.subject': return 'Asunto del mensaje';
+			case 'contact.form.feedback': return 'Comentario';
+			case 'contact.form.reportBug': return 'Reportar error';
+			case 'contact.form.featureRequest': return 'Sugerencia de mejora';
+			case 'contact.form.other': return 'Otro';
+			case 'contact.form.title': return 'Título del mensaje';
+			case 'contact.form.titleHint': return 'Describe brevemente tu problema o sugerencia';
+			case 'contact.form.message': return 'Mensaje';
+			case 'contact.form.messageHint': return 'Describe tu problema en detalle...';
+			case 'contact.form.replyEmail': return 'Tu e-mail de respuesta';
+			case 'contact.form.sending': return 'Enviando...';
+			case 'contact.form.sent': return '¡Enviado!';
+			case 'contact.form.submit': return 'Enviar mensaje';
+			case 'contact.deviceInfoLabels.app': return 'App:';
+			case 'contact.deviceInfoLabels.device': return 'Dispositivo:';
+			case 'contact.deviceInfoLabels.os': return 'Sistema:';
 			default: return null;
 		}
 	}

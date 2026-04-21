@@ -1,0 +1,298 @@
+{
+  "common": {
+    "appName": "Dancee",
+    "showAll": "Ver todo",
+    "date": "Fecha",
+    "save": "Guardar",
+    "share": "Compartir",
+    "map": "Mapa",
+    "skip": "Omitir",
+    "continue_": "Continuar",
+    "back": "Volver",
+    "finish": "Finalizar",
+    "cancel": "Cancelar",
+    "support": "Soporte",
+    "faq": "FAQ",
+    "clear": "Limpiar",
+    "current": "Actual",
+    "saveChanges": "Guardar cambios",
+    "form": {
+      "email": "E-mail",
+      "emailHint": "tu@email.com",
+      "password": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "Confirmar contraseña",
+      "firstName": "Nombre",
+      "firstNameHint": "Tu nombre",
+      "lastName": "Apellido",
+      "lastNameHint": "Tu apellido",
+      "city": "Ciudad",
+      "phone": "Teléfono",
+      "fullName": "Nombre completo"
+    }
+  },
+  "nav": {
+    "events": "Eventos",
+    "courses": "Cursos",
+    "saved": "Guardados",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "tagline": "Descubre el mundo del baile",
+    "orContinueWith": "o continúa con",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithApple": "Continuar con Apple",
+    "termsPrefix": "Al continuar aceptas nuestros ",
+    "termsOfUse": "Términos de uso",
+    "and": " y ",
+    "privacyPolicy": "Política de privacidad",
+    "agreeWith": "Acepto ",
+    "orRegisterWith": "o regístrate con",
+    "login": {
+      "title": "¡Bienvenido de vuelta!",
+      "subtitle": "Inicia sesión y continúa explorando eventos de baile",
+      "stayLoggedIn": "Mantener sesión iniciada",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿No tienes cuenta?",
+      "register": "Regístrate"
+    },
+    "register": {
+      "title": "Crear una cuenta",
+      "subtitle": "Regístrate y empieza a explorar eventos de baile",
+      "passwordsMatch": "Las contraseñas coinciden",
+      "passwordsMismatch": "Las contraseñas no coinciden",
+      "newsletter": "Quiero recibir noticias sobre eventos de baile",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "login": "Iniciar sesión"
+    },
+    "forgotPassword": {
+      "title": "¿Olvidaste tu contraseña?",
+      "subtitle": "Ingresa tu e-mail y te enviaremos un enlace para restablecer tu contraseña",
+      "submit": "Enviar enlace",
+      "checkInbox": "Revisa tu bandeja de entrada",
+      "checkInboxDetail": "Después de enviar recibirás un e-mail con un enlace para restablecer tu contraseña. El enlace es válido por 24 horas.",
+      "rememberPassword": "¿Recordaste tu contraseña?",
+      "login": "Iniciar sesión",
+      "needHelp": "¿Necesitas ayuda?"
+    },
+    "passwordStrength": {
+      "weak": "Contraseña débil",
+      "medium": "Media",
+      "strong": "Contraseña fuerte",
+      "veryStrong": "Muy fuerte",
+      "hint": "Al menos 8 caracteres"
+    }
+  },
+  "onboarding": {
+    "step1": {
+      "title": "¿Qué bailes te gustan?",
+      "subtitle": "Elige tus estilos de baile favoritos para ofrecerte eventos relevantes"
+    },
+    "step2": {
+      "title": "¿Cuál es tu nivel?",
+      "subtitle": "Nos ayudará a recomendarte eventos y cursos adecuados"
+    },
+    "step3": {
+      "title": "¿Dónde te encuentras?",
+      "subtitle": "Encontraremos los eventos de baile más cercanos en tu zona",
+      "radius10km": "10 km",
+      "radius25km": "25 km",
+      "radius50km": "50 km",
+      "radiusAll": "Todo el país",
+      "cityHint": "Ej. Madrid, Barcelona...",
+      "searchRadius": "Buscar eventos en un radio de",
+      "useCurrentLocation": "Usar ubicación actual"
+    }
+  },
+  "events": {
+    "featuredEvents": "Eventos destacados",
+    "upcomingEvents": "Próximos eventos",
+    "danceStyles": "Estilos de baile",
+    "danceStylesLabel": "ESTILOS DE BAILE",
+    "location": "Ubicación",
+    "detail": {
+      "header": "Detalle del evento",
+      "description": "Descripción del evento",
+      "additionalInfo": "Información adicional",
+      "admission": "Entrada",
+      "dresscode": "Código de vestimenta",
+      "buyTickets": "Comprar entradas",
+      "originalSource": "Fuente original",
+      "program": "Programa del evento"
+    },
+    "filter": {
+      "selectedCount": "${count} seleccionados",
+      "selectedStyles": "ESTILOS SELECCIONADOS",
+      "apply": "Aplicar filtro",
+      "applyCount": "Aplicar filtro (${count})",
+      "selectLocation": "Seleccionar ubicación",
+      "searchCityHint": "Buscar ciudad o área...",
+      "useMyLocation": "Usar mi ubicación",
+      "useMyLocationSubtitle": "Encuentra automáticamente eventos cerca de ti",
+      "popularCities": "Ciudades populares",
+      "allCities": "Todas las ciudades",
+      "selectedRegions": "REGIONES SELECCIONADAS",
+      "noResults": "Sin resultados"
+    },
+    "filters": {
+      "today": "Hoy",
+      "thisWeek": "Esta semana",
+      "thisMonth": "Este mes",
+      "thisWeekend": "Este fin de semana"
+    }
+  },
+  "courses": {
+    "title": "Cursos de baile",
+    "subtitle": "Encuentra tu curso",
+    "featuredCourses": "Cursos destacados",
+    "allCourses": "Todos los cursos",
+    "detail": {
+      "header": "Detalle del curso",
+      "description": "Descripción del curso",
+      "details": "Detalles del curso",
+      "whatYouLearn": "Qué aprenderás",
+      "aboutInstructor": "Sobre el instructor",
+      "shareCourse": "Compartir curso",
+      "coursePrice": "Precio del curso",
+      "availableSpots": "Plazas disponibles",
+      "register": "Inscribirse al curso"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "sections": {
+      "account": "Cuenta",
+      "settings": "Ajustes",
+      "support": "Soporte",
+      "appInfo": "Sobre la app",
+      "dangerZone": "Zona de peligro"
+    },
+    "account": {
+      "editProfile": "Editar perfil",
+      "changePassword": "Cambiar contraseña"
+    },
+    "settings": {
+      "language": "Idioma",
+      "czech": "Checo",
+      "notifications": "Notificaciones",
+      "english": "Inglés",
+      "spanish": "Español"
+    },
+    "support": {
+      "contactAuthor": "Contactar al autor",
+      "rateApp": "Valorar app"
+    },
+    "appInfo": {
+      "version": "Versión de la app",
+      "termsOfUse": "Términos de uso",
+      "privacy": "Privacidad"
+    },
+    "danger": {
+      "logout": "Cerrar sesión",
+      "deleteAccount": "Eliminar cuenta"
+    },
+    "changePassword": {
+      "title": "Cambiar contraseña",
+      "secureAccount": "Asegura tu cuenta",
+      "secureAccountDetail": "Una contraseña segura debe contener al menos 8 caracteres, letras mayúsculas y minúsculas, números y caracteres especiales.",
+      "currentPassword": "Contraseña actual",
+      "currentPasswordHint": "Ingresa la contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "newPasswordHint": "Ingresa la nueva contraseña",
+      "confirmPassword": "Confirmar nueva contraseña",
+      "confirmPasswordHint": "Ingresa la nueva contraseña de nuevo",
+      "save": "Guardar nueva contraseña",
+      "requirements": "REQUISITOS DE CONTRASEÑA",
+      "req8chars": "Mínimo 8 caracteres",
+      "reqUppercase": "Al menos una letra mayúscula (A-Z)",
+      "reqLowercase": "Al menos una letra minúscula (a-z)",
+      "reqNumber": "Al menos un número (0-9)",
+      "reqSpecial": "Al menos un carácter especial (!@#\\$%^&*)",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "strengthVeryWeak": "Seguridad de contraseña: Muy débil",
+      "strengthWeak": "Seguridad de contraseña: Débil",
+      "strengthMedium": "Seguridad de contraseña: Media",
+      "strengthStrong": "Seguridad de contraseña: Fuerte"
+    },
+    "editProfile": {
+      "title": "Editar perfil",
+      "sections": {
+        "personalInfo": "Información personal",
+        "aboutMe": "Sobre mí",
+        "favoriteDances": "Bailes favoritos",
+        "level": "Nivel",
+        "socialNetworks": "Redes sociales",
+        "notifications": "Notificaciones"
+      },
+      "changePhoto": "Cambiar foto",
+      "bio": "Descripción",
+      "bioHint": "Escribe algo sobre ti...",
+      "selectDanceStyles": "Selecciona tus estilos de baile favoritos",
+      "yourLevel": "Tu nivel de baile",
+      "instagram": "Instagram",
+      "instagramHint": "@tu_usuario",
+      "facebook": "Facebook",
+      "facebookHint": "facebook.com/tu.nombre",
+      "notifications": {
+        "newEvents": "Nuevos eventos",
+        "eventReminders": "Recordatorios de eventos",
+        "marketing": "Mensajes de marketing"
+      },
+      "notificationSubtitles": {
+        "newEvents": "Recibe notificaciones sobre nuevos eventos en tu zona",
+        "eventReminders": "Recordatorios antes de tus eventos guardados",
+        "marketing": "Mensajes promocionales y ofertas"
+      }
+    }
+  },
+  "premium": {
+    "title": "Dancee Premium",
+    "bannerSubtitle": "Desbloquea todas las funciones",
+    "heroTitle": "Desbloquea todo el potencial",
+    "heroSubtitle": "Obtén acceso a todas las funciones premium y mejora tus experiencias de baile",
+    "featuresTitle": "Qué obtienes con Premium",
+    "testimonialsTitle": "Qué dicen nuestros usuarios",
+    "faqTitle": "Preguntas frecuentes",
+    "ctaTitle": "¿Listo para empezar?",
+    "ctaSubtitle": "Únete a miles de bailarines satisfechos",
+    "ctaButton": "Obtener Premium ahora",
+    "ctaNote": "7 días gratis · Cancela cuando quieras"
+  },
+  "saved": {
+    "title": "Eventos guardados",
+    "subtitle": "Tus eventos favoritos",
+    "emptyTitle": "Sin eventos guardados",
+    "emptySubtitle": "Los eventos que guardes aparecerán aquí"
+  },
+  "contact": {
+    "teamName": "Equipo Dancee",
+    "email": "hello@dancee.app",
+    "description": "Nos encantaría leer tus comentarios...",
+    "responseTime": "Tiempo de respuesta",
+    "responseTimeDetail": "Normalmente respondemos en 24 horas en días laborables. ¡Gracias por tu paciencia!",
+    "deviceInfo": "Información del dispositivo",
+    "autoAttached": "Adjuntado automáticamente",
+    "form": {
+      "subject": "Asunto del mensaje",
+      "feedback": "Comentario",
+      "reportBug": "Reportar error",
+      "featureRequest": "Sugerencia de mejora",
+      "other": "Otro",
+      "title": "Título del mensaje",
+      "titleHint": "Describe brevemente tu problema o sugerencia",
+      "message": "Mensaje",
+      "messageHint": "Describe tu problema en detalle...",
+      "replyEmail": "Tu e-mail de respuesta",
+      "sending": "Enviando...",
+      "sent": "¡Enviado!",
+      "submit": "Enviar mensaje"
+    },
+    "deviceInfoLabels": {
+      "app": "App:",
+      "device": "Dispositivo:",
+      "os": "Sistema:"
+    }
+  }
+}

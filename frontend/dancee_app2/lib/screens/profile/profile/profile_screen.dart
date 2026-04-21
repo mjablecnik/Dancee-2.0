@@ -23,8 +23,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _notificationsEnabled = true;
-
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
@@ -83,10 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: AppSpacing.xxl),
                       SectionLabel(title: t.profile.sections.settings),
                       const SizedBox(height: AppSpacing.md),
-                      SettingsSection(
-                        notificationsEnabled: _notificationsEnabled,
-                        onNotificationsChanged: (val) => setState(() => _notificationsEnabled = val),
-                      ),
+                      const SettingsSection(),
                       const SizedBox(height: AppSpacing.xxl),
                       PremiumBanner(onTap: () => context.push('/profile/premium')),
                       const SizedBox(height: AppSpacing.xxl),
