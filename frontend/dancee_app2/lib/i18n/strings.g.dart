@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 438 (219 per locale)
+/// Strings: 446 (223 per locale)
 ///
-/// Built on 2026-04-21 at 10:20 UTC
+/// Built on 2026-04-21 at 11:41 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -156,6 +156,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsCoursesEn courses = _StringsCoursesEn._(_root);
 	late final _StringsProfileEn profile = _StringsProfileEn._(_root);
 	late final _StringsPremiumEn premium = _StringsPremiumEn._(_root);
+	late final _StringsSavedEn saved = _StringsSavedEn._(_root);
 	late final _StringsContactEn contact = _StringsContactEn._(_root);
 }
 
@@ -300,6 +301,19 @@ class _StringsPremiumEn {
 	String get ctaSubtitle => 'Join thousands of satisfied dancers';
 	String get ctaButton => 'Get Premium now';
 	String get ctaNote => '7 days free · Cancel anytime';
+}
+
+// Path: saved
+class _StringsSavedEn {
+	_StringsSavedEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Saved events';
+	String get subtitle => 'Your favorite events';
+	String get emptyTitle => 'No saved events';
+	String get emptySubtitle => 'Events you save will appear here';
 }
 
 // Path: contact
@@ -743,6 +757,7 @@ class _StringsCs extends Translations {
 	@override late final _StringsCoursesCs courses = _StringsCoursesCs._(_root);
 	@override late final _StringsProfileCs profile = _StringsProfileCs._(_root);
 	@override late final _StringsPremiumCs premium = _StringsPremiumCs._(_root);
+	@override late final _StringsSavedCs saved = _StringsSavedCs._(_root);
 	@override late final _StringsContactCs contact = _StringsContactCs._(_root);
 }
 
@@ -887,6 +902,19 @@ class _StringsPremiumCs extends _StringsPremiumEn {
 	@override String get ctaSubtitle => 'Připojte se k tisícům spokojených tanečníků';
 	@override String get ctaButton => 'Získat Premium nyní';
 	@override String get ctaNote => '7 dní zdarma · Zrušte kdykoliv';
+}
+
+// Path: saved
+class _StringsSavedCs extends _StringsSavedEn {
+	_StringsSavedCs._(_StringsCs root) : this._root = root, super._(root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Uložené akce';
+	@override String get subtitle => 'Tvoje oblíbené akce';
+	@override String get emptyTitle => 'Žádné uložené akce';
+	@override String get emptySubtitle => 'Akce, které si uložíš, se zobrazí zde';
 }
 
 // Path: contact
@@ -1498,6 +1526,10 @@ extension on Translations {
 			case 'premium.ctaSubtitle': return 'Join thousands of satisfied dancers';
 			case 'premium.ctaButton': return 'Get Premium now';
 			case 'premium.ctaNote': return '7 days free · Cancel anytime';
+			case 'saved.title': return 'Saved events';
+			case 'saved.subtitle': return 'Your favorite events';
+			case 'saved.emptyTitle': return 'No saved events';
+			case 'saved.emptySubtitle': return 'Events you save will appear here';
 			case 'contact.teamName': return 'Dancee Team';
 			case 'contact.email': return 'hello@dancee.app';
 			case 'contact.description': return 'We\'d love to read your feedback...';
@@ -1725,6 +1757,10 @@ extension on _StringsCs {
 			case 'premium.ctaSubtitle': return 'Připojte se k tisícům spokojených tanečníků';
 			case 'premium.ctaButton': return 'Získat Premium nyní';
 			case 'premium.ctaNote': return '7 dní zdarma · Zrušte kdykoliv';
+			case 'saved.title': return 'Uložené akce';
+			case 'saved.subtitle': return 'Tvoje oblíbené akce';
+			case 'saved.emptyTitle': return 'Žádné uložené akce';
+			case 'saved.emptySubtitle': return 'Akce, které si uložíš, se zobrazí zde';
 			case 'contact.teamName': return 'Tým Dancee';
 			case 'contact.email': return 'hello@dancee.app';
 			case 'contact.description': return 'Rádi si přečteme vaše zpětné vazby...';

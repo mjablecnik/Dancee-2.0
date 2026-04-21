@@ -102,7 +102,7 @@ class AppBottomNavBar extends StatelessWidget {
       case NavTab.courses:
         context.go('/courses');
       case NavTab.saved:
-        break; // TODO: implement saved page
+        context.go('/saved');
       case NavTab.profile:
         context.go('/profile');
     }

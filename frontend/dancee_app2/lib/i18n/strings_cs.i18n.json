@@ -257,6 +257,12 @@
     "ctaButton": "Získat Premium nyní",
     "ctaNote": "7 dní zdarma · Zrušte kdykoliv"
   },
+  "saved": {
+    "title": "Uložené akce",
+    "subtitle": "Tvoje oblíbené akce",
+    "emptyTitle": "Žádné uložené akce",
+    "emptySubtitle": "Akce, které si uložíš, se zobrazí zde"
+  },
   "contact": {
     "teamName": "Tým Dancee",
     "email": "hello@dancee.app",

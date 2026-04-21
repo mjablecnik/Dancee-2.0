@@ -257,6 +257,12 @@
     "ctaButton": "Get Premium now",
     "ctaNote": "7 days free · Cancel anytime"
   },
+  "saved": {
+    "title": "Saved events",
+    "subtitle": "Your favorite events",
+    "emptyTitle": "No saved events",
+    "emptySubtitle": "Events you save will appear here"
+  },
   "contact": {
     "teamName": "Dancee Team",
     "email": "hello@dancee.app",

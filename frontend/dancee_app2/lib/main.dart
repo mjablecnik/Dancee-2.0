@@ -20,6 +20,7 @@ import 'screens/profile/profile_edit/profile_edit_screen.dart';
 import 'screens/profile/change_password/change_password_screen.dart';
 import 'screens/profile/premium/premium_screen.dart';
 import 'screens/profile/author_contact/author_contact_screen.dart';
+import 'screens/saved/saved_events_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +72,8 @@ final _router = GoRouter(
           currentTab = NavTab.courses;
         } else if (location.startsWith('/profile')) {
           currentTab = NavTab.profile;
+        } else if (location.startsWith('/saved')) {
+          currentTab = NavTab.saved;
         } else {
           currentTab = NavTab.events;
         }
@@ -88,6 +91,10 @@ final _router = GoRouter(
         GoRoute(
           path: '/profile',
           builder: (context, state) => const ProfileScreen(),
+        ),
+        GoRoute(
+          path: '/saved',
+          builder: (context, state) => const SavedEventsScreen(),
         ),
       ],
     ),

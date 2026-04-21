@@ -436,6 +436,41 @@ class EventRepository {
     return const ['Vše', 'Salsa', 'Bachata', 'Kizomba', 'Zouk', 'Swing'];
   }
 
+  Future<List<UpcomingEventData>> getSavedEvents() async {
+    return const [
+      UpcomingEventData(
+        id: 'kizomba-open-air',
+        imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/35e8621ce9-d463887a55ba17b5c416.png',
+        title: 'Kizomba Open Air Social',
+        location: 'Střelecký ostrov, Praha',
+        date: 'Dnes, 18:00 - 23:00',
+        style: 'Kizomba',
+        styleColor: appLavender,
+        isFavorited: true,
+      ),
+      UpcomingEventData(
+        id: 'havana-night',
+        imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/9d038750ea-18e3a1b3f78567f6cc57.png',
+        title: 'Havana Night - Živá kapela a animace',
+        location: 'Klub Tres, Ostrava',
+        date: '22. Říj, 20:00',
+        style: 'Salsa',
+        styleColor: appPrimary,
+        isFavorited: true,
+      ),
+      UpcomingEventData(
+        id: 'bachata-sensual-workshop',
+        imageUrl: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/a7414ef4de-19550fae1cabebe15c09.png',
+        title: 'Bachata Sensual Workshop s mezinárodními lektory',
+        location: 'Dance Studio 1, Brno',
+        date: '20. Říj, 14:00',
+        style: 'Bachata',
+        styleColor: appAccent,
+        isFavorited: true,
+      ),
+    ];
+  }
+
   Future<List<ExperienceLevelData>> getExperienceLevels() async {
     return const [
       ExperienceLevelData(
