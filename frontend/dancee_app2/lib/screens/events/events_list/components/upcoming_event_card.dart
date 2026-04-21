@@ -35,147 +35,148 @@ class UpcomingEventCard extends StatelessWidget {
           border: Border.all(color: appBorder),
           borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
-        child: Stack(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image — 96x96 rounded, matching design
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  child: Image.network(
-                    imageUrl,
-                    width: 96,
-                    height: 96,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.lg),
-                // Info column
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 32, top: 4),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title
-                        Text(
-                          title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+        child: IntrinsicHeight(
+          child: Stack(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Left side — image + date below
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        child: Image.network(
+                          imageUrl,
+                          width: 96,
+                          height: 96,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        width: 96,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
+                        decoration: BoxDecoration(
+                          color: appCard,
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
+                        ),
+                        child: Text(
+                          date,
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: appText,
-                            fontSize: AppTypography.fontSizeXl,
-                            fontWeight: AppTypography.fontWeightBold,
-                            height: 1.3,
+                            fontSize: AppTypography.fontSizeSm,
+                            fontWeight: AppTypography.fontWeightMedium,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        // Location
-                        Row(
-                          children: [
-                            const FaIcon(FontAwesomeIcons.locationDot,
-                                size: 12, color: appPrimary),
-                            const SizedBox(width: AppSpacing.xs),
-                            Expanded(
-                              child: Text(
-                                location,
-                                style: const TextStyle(
-                                  color: appMuted,
-                                  fontSize: AppTypography.fontSizeSm,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: AppSpacing.lg),
+                  // Info column
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 32, top: 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          Text(
+                            title,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: appText,
+                              fontSize: AppTypography.fontSizeXl,
+                              fontWeight: AppTypography.fontWeightBold,
+                              height: 1.3,
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        // Date + tags row
-                        Row(
-                          children: [
-                            // Date badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.sm,
-                                vertical: AppSpacing.xs,
-                              ),
-                              decoration: BoxDecoration(
-                                color: appCard,
-                                borderRadius:
-                                    BorderRadius.circular(AppRadius.xs),
-                              ),
-                              child: Text(
-                                date,
-                                style: const TextStyle(
-                                  color: appText,
-                                  fontSize: AppTypography.fontSizeSm,
-                                  fontWeight: AppTypography.fontWeightMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          // Location
+                          Row(
+                            children: [
+                              const FaIcon(FontAwesomeIcons.locationDot,
+                                  size: 12, color: appPrimary),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  location,
+                                  style: const TextStyle(
+                                    color: appMuted,
+                                    fontSize: AppTypography.fontSizeSm,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        // Dance style tags
-                        if (tags.isNotEmpty) ...[
-                          const SizedBox(height: AppSpacing.sm),
-                          Wrap(
-                            spacing: AppSpacing.sm,
-                            runSpacing: AppSpacing.xs,
-                            children: tags
-                                .map(
-                                  (tag) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.sm,
-                                      vertical: AppSpacing.xs,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: appCard,
-                                      borderRadius: BorderRadius.circular(
-                                          AppRadius.sm),
-                                    ),
-                                    child: Text(
-                                      tag.label,
-                                      style: TextStyle(
-                                        color: tag.color,
-                                        fontSize: AppTypography.fontSizeXs,
-                                        fontWeight:
-                                            AppTypography.fontWeightSemiBold,
+                            ],
+                          ),
+                          // Spacer pushes tags to bottom
+                          const Spacer(),
+                          // Dance style tags
+                          if (tags.isNotEmpty)
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.xs,
+                              children: tags
+                                  .map(
+                                    (tag) => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: AppSpacing.sm,
+                                        vertical: AppSpacing.xs,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: appCard,
+                                        borderRadius:
+                                            BorderRadius.circular(AppRadius.sm),
+                                      ),
+                                      child: Text(
+                                        tag.label,
+                                        style: TextStyle(
+                                          color: tag.color,
+                                          fontSize: AppTypography.fontSizeXs,
+                                          fontWeight:
+                                              AppTypography.fontWeightSemiBold,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
+                                  )
+                                  .toList(),
+                            ),
                         ],
-                      ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // Heart button — absolute top right
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                  ),
+                  child: Center(
+                    child: FaIcon(
+                      isFavorited
+                          ? FontAwesomeIcons.solidHeart
+                          : FontAwesomeIcons.heart,
+                      size: 14,
+                      color: isFavorited ? Colors.red : appMuted,
                     ),
                   ),
                 ),
-              ],
-            ),
-            // Heart button — absolute top right
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppRadius.xl),
-                ),
-                child: Center(
-                  child: FaIcon(
-                    isFavorited
-                        ? FontAwesomeIcons.solidHeart
-                        : FontAwesomeIcons.heart,
-                    size: 14,
-                    color: isFavorited ? Colors.red : appMuted,
-                  ),
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
