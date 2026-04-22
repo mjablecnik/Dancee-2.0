@@ -10,6 +10,7 @@ import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/event_state.dart';
 import '../../../logic/states/filter_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
+import '../../../shared/utils/region_label.dart';
 import 'sections/events_header_section.dart';
 import 'sections/featured_events_section.dart';
 import 'sections/upcoming_events_section.dart';
@@ -28,7 +29,7 @@ class EventsListScreen extends StatelessWidget {
               final regions = filterState.selectedRegions;
               final location = regions.isEmpty
                   ? t.events.filter.allCities
-                  : regions.join(', ');
+                  : regions.map(regionLabel).join(', ');
               return EventsHeaderSection(
                 location: location,
                 onLocationTap: () => context.push('/events/filter-location'),

@@ -14,6 +14,7 @@ import '../../../logic/states/filter_state.dart';
 import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import '../../../shared/utils/date_format.dart';
+import '../../../shared/utils/region_label.dart';
 import 'components/course_list_card.dart';
 
 class CoursesListScreen extends StatelessWidget {
@@ -30,7 +31,7 @@ class CoursesListScreen extends StatelessWidget {
               final regions = filterState.selectedRegions;
               final location = regions.isEmpty
                   ? t.events.filter.allCities
-                  : regions.join(', ');
+                  : regions.map(regionLabel).join(', ');
               return EventsHeaderSection(
                 location: location,
                 onLocationTap: () => context.push('/events/filter-location'),
