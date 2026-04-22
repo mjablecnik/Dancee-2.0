@@ -25,7 +25,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 - [x] 8. [HIGH] Modify `filterEvents()` in `lib/features/events/logic/event_filter.dart` so selecting a parent dance type also matches events tagged with any of its child styles
 - [x] 9. [HIGH] Modify `countEventsForDanceType()` in `lib/features/events/logic/event_filter.dart` to account for parent-child style aggregation
 - [x] 10. [HIGH] Update `EventFilterCubit` in `lib/features/events/logic/event_filter.dart` to load dance styles on init, store them in state, and expose them for UI consumption
-- [ ] 11. [MEDIUM] Update `DanceTypeFilterSection` in `lib/features/events/pages/event_filters/sections.dart` to display dance style display names (from `DanceStyle.name`) instead of raw codes
+- [x] 11. [MEDIUM] Update `DanceTypeFilterSection` in `lib/features/events/pages/event_filters/sections.dart` to display dance style display names (from `DanceStyle.name`) instead of raw codes
 - [ ] 12. [MEDIUM] Update `DanceTypeOption` in `lib/features/events/pages/event_filters/components.dart` to use dance style display names
 - [ ] 13. [HIGH] Wire dance styles loading in `lib/core/service_locator.dart` — ensure `EventFilterCubit` receives dance styles
 
