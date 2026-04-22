@@ -255,7 +255,7 @@ class CourseDetailScreen extends StatelessWidget {
                                   spotsAvailable: spotsAvailable,
                                   spotsTotal: spotsTotal,
                                   onRegister: course.registrationUrl != null
-                                      ? () {}
+                                      ? () => openUrl(course.registrationUrl!)
                                       : null,
                                   onShare: () {},
                                   onSource: course.originalUrl != null
