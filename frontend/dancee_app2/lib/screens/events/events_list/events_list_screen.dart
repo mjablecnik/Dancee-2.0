@@ -61,12 +61,14 @@ class EventsListScreen extends StatelessWidget {
                         const SizedBox(height: AppSpacing.xxxl),
                         FeaturedEventsSection(
                           events: loaded.featuredEvents,
+                          allDanceStyles: context.read<FilterCubit>().allDanceStyles,
                           onEventTap: (id) => context.push('/events/detail?id=$id'),
                         ),
                         if (loaded.featuredEvents.isNotEmpty)
                           const SizedBox(height: AppSpacing.xxxl),
                         UpcomingEventsSection(
                           events: loaded.filteredEvents,
+                          allDanceStyles: context.read<FilterCubit>().allDanceStyles,
                           hasActiveFilters: context.read<FilterCubit>().state.hasActiveFilters,
                           onClearFilters: () => context.read<FilterCubit>().clearAll(),
                           onEventTap: (id) => context.push('/events/detail?id=$id'),

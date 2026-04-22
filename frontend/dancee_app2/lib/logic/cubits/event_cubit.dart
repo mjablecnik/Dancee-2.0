@@ -92,13 +92,24 @@ class EventCubit extends Cubit<EventState> {
 
   void _recompute() {
     final filtered = _filterEvents(_allEvents, _currentFilters, _currentDanceStyles);
-    final featured = filtered.where((e) => e.eventType == 'festival').toList();
+    final deduped = _deduplicateEvents(filtered);
+    final featured = deduped.where((e) => e.eventType == 'festival').toList();
     emit(EventState.loaded(
       allEvents: _allEvents,
-      filteredEvents: filtered,
+      filteredEvents: deduped,
       featuredEvents: featured,
     ));
   }
+}
+
+/// Removes duplicate events that share the same title and start date.
+/// Keeps the first occurrence.
+List<Event> _deduplicateEvents(List<Event> events) {
+  final seen = <String>{};
+  return events.where((e) {
+    final key = '${e.title}|${e.startTime.toIso8601String().substring(0, 10)}';
+    return seen.add(key);
+  }).toList();
 }
 
 List<Event> _filterEvents(

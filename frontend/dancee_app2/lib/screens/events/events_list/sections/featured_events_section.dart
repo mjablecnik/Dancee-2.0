@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/entities/dance_style.dart';
 import '../../../../data/entities/event.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../../../logic/cubits/favorites_cubit.dart';
 import '../../../../shared/components/snap_carousel.dart';
 import '../../../../shared/utils/date_format.dart';
 import '../components/featured_event_card.dart';
+import 'upcoming_events_section.dart' show parentDanceNames;
 
 class FeaturedEventsSection extends StatelessWidget {
   final List<Event> events;
+  final List<DanceStyle> allDanceStyles;
   final void Function(int eventId)? onEventTap;
 
   const FeaturedEventsSection({
     super.key,
     required this.events,
+    this.allDanceStyles = const [],
     this.onEventTap,
   });
 
@@ -56,8 +60,8 @@ class FeaturedEventsSection extends StatelessWidget {
               price: price.isEmpty ? t.events.detail.admission : price,
               isFree: isFree,
               isFavorited: event.isFavorited,
-              tags: event.dances
-                  .map((d) => EventTagData(d, appPrimary))
+              tags: parentDanceNames(event.dances, allDanceStyles)
+                  .map((name) => EventTagData(name, appPrimary))
                   .toList(),
               onTap: () => onEventTap?.call(event.id),
               onFavoriteTap: () => context.read<FavoritesCubit>().toggleFavorite(

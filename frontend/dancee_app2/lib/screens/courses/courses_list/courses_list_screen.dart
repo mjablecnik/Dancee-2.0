@@ -15,6 +15,7 @@ import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import '../../../shared/utils/date_format.dart';
 import '../../../shared/utils/region_label.dart';
+import '../../events/events_list/sections/upcoming_events_section.dart' show parentDanceNames;
 import 'components/course_list_card.dart';
 
 class CoursesListScreen extends StatelessWidget {
@@ -214,8 +215,8 @@ class _AllCoursesSection extends StatelessWidget {
                       instructor: course.instructorName ?? '',
                       dateRange:
                           formatDateRange(course.startDate, course.endDate),
-                      tags: course.dances
-                          .map((d) => CourseTag(d, appPrimary))
+                      tags: parentDanceNames(course.dances, context.read<FilterCubit>().allDanceStyles)
+                          .map((name) => CourseTag(name, appPrimary))
                           .toList(),
                       price: course.price ?? '',
                       isFavorited: course.isFavorited,

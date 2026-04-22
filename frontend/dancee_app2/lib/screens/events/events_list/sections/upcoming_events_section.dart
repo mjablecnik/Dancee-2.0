@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
+import '../../../../data/entities/dance_style.dart';
 import '../../../../data/entities/event.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../../../logic/cubits/favorites_cubit.dart';
@@ -10,8 +11,42 @@ import '../../../../shared/utils/date_format.dart';
 import '../components/featured_event_card.dart' show EventTagData;
 import '../components/upcoming_event_card.dart';
 
+/// Max number of dance style tags shown per event card.
+const _kMaxDanceTags = 6;
+
+/// Resolves dance codes/names to unique parent display names, limited to [_kMaxDanceTags].
+///
+/// Each dance in [codes] is matched against [allStyles] by code or name.
+/// If a match has a parentCode, the parent's name is used instead.
+/// Unmatched codes are kept as-is.
+List<String> parentDanceNames(List<String> codes, List<DanceStyle> allStyles) {
+  final names = <String>[];
+  for (final code in codes) {
+    // Match by code first, then by name (case-insensitive)
+    final style = allStyles.where((s) => s.code == code).firstOrNull ??
+        allStyles.where((s) => s.name.toLowerCase() == code.toLowerCase()).firstOrNull;
+
+    String displayName;
+    if (style != null && style.parentCode != null) {
+      // Resolve to parent name
+      final parent = allStyles.where((s) => s.code == style.parentCode).firstOrNull;
+      displayName = parent?.name ?? code;
+    } else if (style != null) {
+      // Already a parent style
+      displayName = style.name;
+    } else {
+      displayName = code;
+    }
+
+    if (!names.contains(displayName)) names.add(displayName);
+    if (names.length >= _kMaxDanceTags) break;
+  }
+  return names;
+}
+
 class UpcomingEventsSection extends StatelessWidget {
   final List<Event> events;
+  final List<DanceStyle> allDanceStyles;
   final bool hasActiveFilters;
   final VoidCallback? onClearFilters;
   final void Function(int eventId)? onEventTap;
@@ -19,6 +54,7 @@ class UpcomingEventsSection extends StatelessWidget {
   const UpcomingEventsSection({
     super.key,
     required this.events,
+    this.allDanceStyles = const [],
     this.hasActiveFilters = false,
     this.onClearFilters,
     this.onEventTap,
@@ -106,8 +142,8 @@ class UpcomingEventsSection extends StatelessWidget {
                     title: event.title,
                     location: event.venue?.town ?? event.venue?.name ?? '',
                     date: formatDate(event.startTime),
-                    tags: event.dances
-                        .map((d) => EventTagData(d, appPrimary))
+                    tags: parentDanceNames(event.dances, allDanceStyles)
+                        .map((name) => EventTagData(name, appPrimary))
                         .toList(),
                     isFavorited: event.isFavorited,
                     onTap: () => onEventTap?.call(event.id),
