@@ -11,6 +11,7 @@ import '../../../logic/cubits/favorites_cubit.dart';
 import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/description_section.dart';
 import '../../../shared/utils/date_format.dart';
+import '../../../shared/utils/url_launcher.dart';
 import '../../../shared/sections/detail_header_section.dart';
 import '../../../shared/sections/hero_image_section.dart';
 import '../../../shared/sections/key_info_section.dart';
@@ -258,7 +259,7 @@ class CourseDetailScreen extends StatelessWidget {
                                       : null,
                                   onShare: () {},
                                   onSource: course.originalUrl != null
-                                      ? () {}
+                                      ? () => openUrl(course.originalUrl!)
                                       : null,
                                 ),
                                 const SizedBox(height: AppSpacing.lg),
