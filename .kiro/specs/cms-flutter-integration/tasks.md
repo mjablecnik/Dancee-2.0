@@ -43,7 +43,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Accept `favoriteEventIds` set to set `isFavorited`
     - _Requirements: 2.1, 2.3, 2.4, 2.5_
 
-  - [ ]* 2.4 Write property tests for Event entity parsing
+  - [x]* 2.4 Write property tests for Event entity parsing
     - **Property 3: Translation extraction from CMS JSON** — generate random CMS event JSON with translations, verify parsed entity has correct translated fields
     - **Property 4: Image URL construction** — generate random file IDs and base URLs, verify URL pattern `{baseUrl}/assets/{fileId}`, null when fileId is null
     - **Property 5: Translation fallback chain** — generate translation arrays with missing languages, verify fallback to en then first available
