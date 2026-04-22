@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/entities/course.dart';
@@ -85,6 +86,7 @@ class SavedEventsListSection extends StatelessWidget {
           itemType: 'event',
           itemId: event.id,
         ),
+        onTap: () => context.push('/events/detail?id=${event.id}'),
       );
     } else {
       final course = favItem.item as Course;
