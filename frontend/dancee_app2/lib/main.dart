@@ -12,6 +12,8 @@ import 'logic/cubits/course_cubit.dart';
 import 'logic/cubits/favorites_cubit.dart';
 import 'logic/cubits/filter_cubit.dart';
 import 'logic/cubits/settings_cubit.dart';
+import 'logic/states/course_state.dart';
+import 'logic/states/event_state.dart';
 import 'logic/states/favorites_state.dart';
 import 'logic/states/filter_state.dart';
 import 'logic/states/settings_state.dart';
@@ -272,6 +274,56 @@ class _AppListenersState extends State<_AppListeners> {
                 );
                 courseCubit.state.maybeMap(
                   loaded: (cs) {
+                    for (final course in cs.allCourses) {
+                      final shouldBeFavorited = s.courseIds.contains(course.id);
+                      if (course.isFavorited != shouldBeFavorited) {
+                        courseCubit.updateFavoriteStatus(course.id, shouldBeFavorited);
+                      }
+                    }
+                  },
+                  orElse: () {},
+                );
+              },
+              orElse: () {},
+            );
+          },
+        ),
+        // 11.3 — Events loaded: sync favorites in case FavoritesCubit loaded first
+        BlocListener<EventCubit, EventState>(
+          listenWhen: (prev, curr) =>
+              curr.maybeMap(loaded: (_) => true, orElse: () => false) &&
+              prev.maybeMap(loaded: (_) => false, orElse: () => true),
+          listener: (context, state) {
+            state.maybeMap(
+              loaded: (es) {
+                context.read<FavoritesCubit>().state.maybeMap(
+                  loaded: (s) {
+                    final eventCubit = context.read<EventCubit>();
+                    for (final event in es.allEvents) {
+                      final shouldBeFavorited = s.eventIds.contains(event.id);
+                      if (event.isFavorited != shouldBeFavorited) {
+                        eventCubit.updateFavoriteStatus(event.id, shouldBeFavorited);
+                      }
+                    }
+                  },
+                  orElse: () {},
+                );
+              },
+              orElse: () {},
+            );
+          },
+        ),
+        // 11.4 — Courses loaded: sync favorites in case FavoritesCubit loaded first
+        BlocListener<CourseCubit, CourseState>(
+          listenWhen: (prev, curr) =>
+              curr.maybeMap(loaded: (_) => true, orElse: () => false) &&
+              prev.maybeMap(loaded: (_) => false, orElse: () => true),
+          listener: (context, state) {
+            state.maybeMap(
+              loaded: (cs) {
+                context.read<FavoritesCubit>().state.maybeMap(
+                  loaded: (s) {
+                    final courseCubit = context.read<CourseCubit>();
                     for (final course in cs.allCourses) {
                       final shouldBeFavorited = s.courseIds.contains(course.id);
                       if (course.isFavorited != shouldBeFavorited) {
