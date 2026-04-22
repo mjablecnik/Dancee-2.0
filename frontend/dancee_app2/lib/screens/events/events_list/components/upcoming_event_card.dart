@@ -120,12 +120,15 @@ class UpcomingEventCard extends StatelessWidget {
                           ),
                           // Spacer pushes tags to bottom
                           const Spacer(),
-                          // Dance style tags
+                          // Dance style tags — clipped to 2 lines
                           if (tags.isNotEmpty)
-                            Wrap(
-                              spacing: AppSpacing.sm,
-                              runSpacing: AppSpacing.xs,
-                              children: tags
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxHeight: 52),
+                              child: ClipRect(
+                                child: Wrap(
+                                  spacing: AppSpacing.sm,
+                                  runSpacing: AppSpacing.xs,
+                                  children: tags
                                   .map(
                                     (tag) => Container(
                                       padding: const EdgeInsets.symmetric(
@@ -149,6 +152,8 @@ class UpcomingEventCard extends StatelessWidget {
                                     ),
                                   )
                                   .toList(),
+                                ),
+                              ),
                             ),
                         ],
                       ),
