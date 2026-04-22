@@ -50,9 +50,10 @@ class FeaturedEventCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
           children: [
             _buildImage(),
-            _buildInfo(),
+            Expanded(child: _buildInfo()),
           ],
         ),
       ),
@@ -160,26 +161,24 @@ class FeaturedEventCard extends StatelessWidget {
                 date,
                 style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
               ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs + 2),
-          Row(
-            children: [
+              const Spacer(),
               const FaIcon(FontAwesomeIcons.locationDot, size: 14, color: appPrimary),
               const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  location,
-                  style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Text(
+                location,
+                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: AppSpacing.sm,
-            children: tags
+          const Spacer(),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 52),
+            child: ClipRect(
+              child: Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xs,
+                children: tags
                 .map(
                   (tag) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
@@ -198,6 +197,8 @@ class FeaturedEventCard extends StatelessWidget {
                   ),
                 )
                 .toList(),
+              ),
+            ),
           ),
         ],
       ),
