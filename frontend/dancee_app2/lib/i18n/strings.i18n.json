@@ -203,6 +203,21 @@
       "lessons": "Lessons",
       "duration": "Duration",
       "level": "Level",
+      "levels": {
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced",
+        "allLevels": "All levels"
+      },
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
       "lessonsCount": "${count} lessons",
       "durationMin": "${count} min",
       "participantsCount": "${current} / ${max} participants",

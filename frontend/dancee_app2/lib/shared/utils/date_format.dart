@@ -56,13 +56,13 @@ String formatDateString(String? dateStr) {
 }
 
 /// Formats an optional date range from two CMS date strings.
-/// Returns "D Mon – D Mon YYYY" or "D Mon YYYY" for single date.
+/// Returns "D Mon – D Mon YYYY" for multi-day, or "D Mon YYYY" for single date/same dates.
 String formatDateRange(String? startDate, String? endDate) {
   if (startDate == null) return '';
   final start = DateTime.tryParse(startDate);
   if (start == null) return startDate;
   final startStr = '${start.day} ${_monthAbbrev(start.month)}';
-  if (endDate != null) {
+  if (endDate != null && endDate != startDate) {
     final end = DateTime.tryParse(endDate);
     if (end != null) {
       return '$startStr – ${end.day} ${_monthAbbrev(end.month)} ${end.year}';

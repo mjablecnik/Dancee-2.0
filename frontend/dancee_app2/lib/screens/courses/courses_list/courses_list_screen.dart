@@ -19,6 +19,17 @@ import '../../../shared/utils/region_label.dart';
 import '../../events/events_list/sections/upcoming_events_section.dart' show parentDanceNames;
 import 'components/course_list_card.dart';
 
+String _courseDisplayDate(Course course) {
+  final dateStr = formatDateRange(course.startDate, course.endDate);
+  final isSameDate = course.startDate != null &&
+      course.endDate != null &&
+      course.startDate == course.endDate;
+  if (isSameDate && course.scheduleTime != null && course.scheduleTime!.isNotEmpty) {
+    return '$dateStr · ${course.scheduleTime}';
+  }
+  return dateStr;
+}
+
 class CoursesListScreen extends StatelessWidget {
   const CoursesListScreen({super.key});
 
@@ -76,7 +87,6 @@ class CoursesListScreen extends StatelessWidget {
                           courses: loaded.filteredCourses,
                           hasActiveFilters: context.read<FilterCubit>().state.hasActiveFilters,
                           onClearFilters: () => context.read<FilterCubit>().clearAll(),
-                          formatDateRange: formatDateRange,
                         ),
                       ],
                     ),
@@ -116,11 +126,9 @@ class _AllCoursesSection extends StatelessWidget {
   final List<Course> courses;
   final bool hasActiveFilters;
   final VoidCallback? onClearFilters;
-  final String Function(String?, String?) formatDateRange;
 
   const _AllCoursesSection({
     required this.courses,
-    required this.formatDateRange,
     this.hasActiveFilters = false,
     this.onClearFilters,
   });
@@ -216,8 +224,7 @@ class _AllCoursesSection extends StatelessWidget {
                       imageUrl: course.imageUrl ?? '',
                       title: course.title,
                       instructor: course.instructorName ?? '',
-                      dateRange:
-                          formatDateRange(course.startDate, course.endDate),
+                      dateRange: _courseDisplayDate(course),
                       tags: parentDanceNames(
                               course.dances,
                               context.read<FilterCubit>().allDanceStyles,

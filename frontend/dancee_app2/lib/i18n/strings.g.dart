@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 813 (271 per locale)
+/// Strings: 846 (282 per locale)
 ///
-/// Built on 2026-04-22 at 21:49 UTC
+/// Built on 2026-04-22 at 22:26 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -588,6 +588,8 @@ class _StringsCoursesDetailEn {
 	String get lessons => 'Lessons';
 	String get duration => 'Duration';
 	String get level => 'Level';
+	late final _StringsCoursesDetailLevelsEn levels = _StringsCoursesDetailLevelsEn._(_root);
+	late final _StringsCoursesDetailDaysEn days = _StringsCoursesDetailDaysEn._(_root);
 	String lessonsCount({required Object count}) => '${count} lessons';
 	String durationMin({required Object count}) => '${count} min';
 	String participantsCount({required Object current, required Object max}) => '${current} / ${max} participants';
@@ -751,6 +753,35 @@ class _StringsContactDeviceInfoLabelsEn {
 	String get app => 'App:';
 	String get device => 'Device:';
 	String get os => 'System:';
+}
+
+// Path: courses.detail.levels
+class _StringsCoursesDetailLevelsEn {
+	_StringsCoursesDetailLevelsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get beginner => 'Beginner';
+	String get intermediate => 'Intermediate';
+	String get advanced => 'Advanced';
+	String get allLevels => 'All levels';
+}
+
+// Path: courses.detail.days
+class _StringsCoursesDetailDaysEn {
+	_StringsCoursesDetailDaysEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get monday => 'Monday';
+	String get tuesday => 'Tuesday';
+	String get wednesday => 'Wednesday';
+	String get thursday => 'Thursday';
+	String get friday => 'Friday';
+	String get saturday => 'Saturday';
+	String get sunday => 'Sunday';
 }
 
 // Path: profile.editProfile.sections
@@ -1257,6 +1288,8 @@ class _StringsCoursesDetailCs extends _StringsCoursesDetailEn {
 	@override String get lessons => 'Lekce';
 	@override String get duration => 'Délka';
 	@override String get level => 'Úroveň';
+	@override late final _StringsCoursesDetailLevelsCs levels = _StringsCoursesDetailLevelsCs._(_root);
+	@override late final _StringsCoursesDetailDaysCs days = _StringsCoursesDetailDaysCs._(_root);
 	@override String lessonsCount({required Object count}) => '${count} lekcí';
 	@override String durationMin({required Object count}) => '${count} min';
 	@override String participantsCount({required Object current, required Object max}) => '${current} / ${max} účastníků';
@@ -1420,6 +1453,35 @@ class _StringsContactDeviceInfoLabelsCs extends _StringsContactDeviceInfoLabelsE
 	@override String get app => 'Aplikace:';
 	@override String get device => 'Zařízení:';
 	@override String get os => 'Systém:';
+}
+
+// Path: courses.detail.levels
+class _StringsCoursesDetailLevelsCs extends _StringsCoursesDetailLevelsEn {
+	_StringsCoursesDetailLevelsCs._(_StringsCs root) : this._root = root, super._(root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get beginner => 'Začátečník';
+	@override String get intermediate => 'Mírně pokročilý';
+	@override String get advanced => 'Pokročilý';
+	@override String get allLevels => 'Všechny úrovně';
+}
+
+// Path: courses.detail.days
+class _StringsCoursesDetailDaysCs extends _StringsCoursesDetailDaysEn {
+	_StringsCoursesDetailDaysCs._(_StringsCs root) : this._root = root, super._(root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get monday => 'Pondělí';
+	@override String get tuesday => 'Úterý';
+	@override String get wednesday => 'Středa';
+	@override String get thursday => 'Čtvrtek';
+	@override String get friday => 'Pátek';
+	@override String get saturday => 'Sobota';
+	@override String get sunday => 'Neděle';
 }
 
 // Path: profile.editProfile.sections
@@ -1926,6 +1988,8 @@ class _StringsCoursesDetailEs extends _StringsCoursesDetailEn {
 	@override String get lessons => 'Lecciones';
 	@override String get duration => 'Duración';
 	@override String get level => 'Nivel';
+	@override late final _StringsCoursesDetailLevelsEs levels = _StringsCoursesDetailLevelsEs._(_root);
+	@override late final _StringsCoursesDetailDaysEs days = _StringsCoursesDetailDaysEs._(_root);
 	@override String lessonsCount({required Object count}) => '${count} lecciones';
 	@override String durationMin({required Object count}) => '${count} min';
 	@override String participantsCount({required Object current, required Object max}) => '${current} / ${max} participantes';
@@ -2089,6 +2153,35 @@ class _StringsContactDeviceInfoLabelsEs extends _StringsContactDeviceInfoLabelsE
 	@override String get app => 'App:';
 	@override String get device => 'Dispositivo:';
 	@override String get os => 'Sistema:';
+}
+
+// Path: courses.detail.levels
+class _StringsCoursesDetailLevelsEs extends _StringsCoursesDetailLevelsEn {
+	_StringsCoursesDetailLevelsEs._(_StringsEs root) : this._root = root, super._(root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get beginner => 'Principiante';
+	@override String get intermediate => 'Intermedio';
+	@override String get advanced => 'Avanzado';
+	@override String get allLevels => 'Todos los niveles';
+}
+
+// Path: courses.detail.days
+class _StringsCoursesDetailDaysEs extends _StringsCoursesDetailDaysEn {
+	_StringsCoursesDetailDaysEs._(_StringsEs root) : this._root = root, super._(root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get monday => 'Lunes';
+	@override String get tuesday => 'Martes';
+	@override String get wednesday => 'Miércoles';
+	@override String get thursday => 'Jueves';
+	@override String get friday => 'Viernes';
+	@override String get saturday => 'Sábado';
+	@override String get sunday => 'Domingo';
 }
 
 // Path: profile.editProfile.sections
@@ -2302,6 +2395,17 @@ extension on Translations {
 			case 'courses.detail.lessons': return 'Lessons';
 			case 'courses.detail.duration': return 'Duration';
 			case 'courses.detail.level': return 'Level';
+			case 'courses.detail.levels.beginner': return 'Beginner';
+			case 'courses.detail.levels.intermediate': return 'Intermediate';
+			case 'courses.detail.levels.advanced': return 'Advanced';
+			case 'courses.detail.levels.allLevels': return 'All levels';
+			case 'courses.detail.days.monday': return 'Monday';
+			case 'courses.detail.days.tuesday': return 'Tuesday';
+			case 'courses.detail.days.wednesday': return 'Wednesday';
+			case 'courses.detail.days.thursday': return 'Thursday';
+			case 'courses.detail.days.friday': return 'Friday';
+			case 'courses.detail.days.saturday': return 'Saturday';
+			case 'courses.detail.days.sunday': return 'Sunday';
 			case 'courses.detail.lessonsCount': return ({required Object count}) => '${count} lessons';
 			case 'courses.detail.durationMin': return ({required Object count}) => '${count} min';
 			case 'courses.detail.participantsCount': return ({required Object current, required Object max}) => '${current} / ${max} participants';
@@ -2581,6 +2685,17 @@ extension on _StringsCs {
 			case 'courses.detail.lessons': return 'Lekce';
 			case 'courses.detail.duration': return 'Délka';
 			case 'courses.detail.level': return 'Úroveň';
+			case 'courses.detail.levels.beginner': return 'Začátečník';
+			case 'courses.detail.levels.intermediate': return 'Mírně pokročilý';
+			case 'courses.detail.levels.advanced': return 'Pokročilý';
+			case 'courses.detail.levels.allLevels': return 'Všechny úrovně';
+			case 'courses.detail.days.monday': return 'Pondělí';
+			case 'courses.detail.days.tuesday': return 'Úterý';
+			case 'courses.detail.days.wednesday': return 'Středa';
+			case 'courses.detail.days.thursday': return 'Čtvrtek';
+			case 'courses.detail.days.friday': return 'Pátek';
+			case 'courses.detail.days.saturday': return 'Sobota';
+			case 'courses.detail.days.sunday': return 'Neděle';
 			case 'courses.detail.lessonsCount': return ({required Object count}) => '${count} lekcí';
 			case 'courses.detail.durationMin': return ({required Object count}) => '${count} min';
 			case 'courses.detail.participantsCount': return ({required Object current, required Object max}) => '${current} / ${max} účastníků';
@@ -2860,6 +2975,17 @@ extension on _StringsEs {
 			case 'courses.detail.lessons': return 'Lecciones';
 			case 'courses.detail.duration': return 'Duración';
 			case 'courses.detail.level': return 'Nivel';
+			case 'courses.detail.levels.beginner': return 'Principiante';
+			case 'courses.detail.levels.intermediate': return 'Intermedio';
+			case 'courses.detail.levels.advanced': return 'Avanzado';
+			case 'courses.detail.levels.allLevels': return 'Todos los niveles';
+			case 'courses.detail.days.monday': return 'Lunes';
+			case 'courses.detail.days.tuesday': return 'Martes';
+			case 'courses.detail.days.wednesday': return 'Miércoles';
+			case 'courses.detail.days.thursday': return 'Jueves';
+			case 'courses.detail.days.friday': return 'Viernes';
+			case 'courses.detail.days.saturday': return 'Sábado';
+			case 'courses.detail.days.sunday': return 'Domingo';
 			case 'courses.detail.lessonsCount': return ({required Object count}) => '${count} lecciones';
 			case 'courses.detail.durationMin': return ({required Object count}) => '${count} min';
 			case 'courses.detail.participantsCount': return ({required Object current, required Object max}) => '${current} / ${max} participantes';

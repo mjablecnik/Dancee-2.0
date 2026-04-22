@@ -12,6 +12,7 @@ import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/description_section.dart';
 import '../../../shared/utils/date_format.dart';
 import '../../../shared/utils/url_launcher.dart';
+import '../../../shared/utils/course_translations.dart';
 import '../../../shared/sections/detail_header_section.dart';
 import '../../../shared/sections/hero_image_section.dart';
 import '../../../shared/sections/key_info_section.dart';
@@ -30,14 +31,16 @@ class CourseDetailScreen extends StatelessWidget {
 
     // Date range
     if (course.startDate != null) {
+      final isSameDate = course.endDate != null && course.startDate == course.endDate;
       final startStr = formatDateString(course.startDate);
-      final endStr =
-          course.endDate != null ? ' – ${formatDateString(course.endDate)}' : '';
+      final endStr = (!isSameDate && course.endDate != null)
+          ? ' – ${formatDateString(course.endDate)}'
+          : '';
       items.add(KeyInfoItem(
         icon: FontAwesomeIcons.calendar,
         title: '$startStr$endStr',
         subtitle: [
-          if (course.scheduleDay != null) course.scheduleDay!,
+          if (course.scheduleDay != null) translateDay(course.scheduleDay!),
           if (course.scheduleTime != null) course.scheduleTime!,
         ].join(' '),
       ));
@@ -91,12 +94,13 @@ class CourseDetailScreen extends StatelessWidget {
     final details = <ScheduleDetail>[];
 
     if (course.startDate != null) {
+      final isSameDate = course.endDate != null && course.startDate == course.endDate;
       details.add(ScheduleDetail(
-        label: t.courses.detail.startDate,
+        label: isSameDate ? t.common.date : t.courses.detail.startDate,
         value: formatDateString(course.startDate),
       ));
     }
-    if (course.endDate != null) {
+    if (course.endDate != null && course.endDate != course.startDate) {
       details.add(ScheduleDetail(
         label: t.courses.detail.endDate,
         value: formatDateString(course.endDate),
@@ -105,7 +109,7 @@ class CourseDetailScreen extends StatelessWidget {
     if (course.scheduleDay != null) {
       details.add(ScheduleDetail(
         label: t.courses.detail.day,
-        value: course.scheduleDay!,
+        value: translateDay(course.scheduleDay!),
       ));
     }
     if (course.scheduleTime != null) {
@@ -129,7 +133,7 @@ class CourseDetailScreen extends StatelessWidget {
     if (course.level != null) {
       details.add(ScheduleDetail(
         label: t.courses.detail.level,
-        value: course.level!,
+        value: translateLevel(course.level!),
       ));
     }
 
@@ -189,7 +193,7 @@ class CourseDetailScreen extends StatelessWidget {
                           HeroImageSection(
                             imageUrl: course.imageUrl ?? '',
                             topLeft: course.level != null
-                                ? HeroLabelBadge(label: course.level!)
+                                ? HeroLabelBadge(label: translateLevel(course.level!))
                                 : null,
                             topRight: HeroFavoriteButton(
                               isFavorite: isFavorited,

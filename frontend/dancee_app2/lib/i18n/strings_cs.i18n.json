@@ -203,6 +203,21 @@
       "lessons": "Lekce",
       "duration": "Délka",
       "level": "Úroveň",
+      "levels": {
+        "beginner": "Začátečník",
+        "intermediate": "Mírně pokročilý",
+        "advanced": "Pokročilý",
+        "allLevels": "Všechny úrovně"
+      },
+      "days": {
+        "monday": "Pondělí",
+        "tuesday": "Úterý",
+        "wednesday": "Středa",
+        "thursday": "Čtvrtek",
+        "friday": "Pátek",
+        "saturday": "Sobota",
+        "sunday": "Neděle"
+      },
       "lessonsCount": "${count} lekcí",
       "durationMin": "${count} min",
       "participantsCount": "${current} / ${max} účastníků",
