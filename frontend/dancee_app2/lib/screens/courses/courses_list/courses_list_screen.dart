@@ -1,3 +1,4 @@
+import 'package:dancee_app2/screens/events/events_list/sections/events_header_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,6 @@ import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import '../../../shared/utils/date_format.dart';
 import 'components/course_list_card.dart';
-import 'sections/courses_header_section.dart';
 
 class CoursesListScreen extends StatelessWidget {
   const CoursesListScreen({super.key});
@@ -25,8 +25,17 @@ class CoursesListScreen extends StatelessWidget {
       color: appBg,
       child: Column(
         children: [
-          CoursesHeaderSection(
-            onFilterTap: () => context.push('/events/filter-dance'),
+          BlocBuilder<FilterCubit, FilterState>(
+            builder: (context, filterState) {
+              final regions = filterState.selectedRegions;
+              final location = regions.isEmpty
+                  ? t.events.filter.allCities
+                  : regions.join(', ');
+              return EventsHeaderSection(
+                location: location,
+                onLocationTap: () => context.push('/events/filter-location'),
+              );
+            },
           ),
           Expanded(
             child: BlocBuilder<CourseCubit, CourseState>(
