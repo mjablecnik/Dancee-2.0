@@ -14,11 +14,11 @@ Derived from [CODE_REVIEW.md](CODE_REVIEW.md). Sorted by severity.
 - [x] 10. [HIGH] Add MultiBlocProvider in main.dart wrapping MaterialApp.router to provide all cubits from getIt into the widget tree
 - [x] 11. [HIGH] Add BlocListener on SettingsCubit to trigger re-fetch of events, courses, and dance styles when language changes
 - [x] 12. [HIGH] Implement translation fallback chain in Event.fromDirectus(): requested language → English → first available → raw fields
-- [ ] 13. [MEDIUM] Fix EventInfoType enum (text → dresscode) and add translation support to EventInfo.fromDirectus() and EventPart.fromDirectus()
-- [ ] 14. [MEDIUM] Add id field to Venue entity and parse it from Directus JSON
-- [ ] 15. [MEDIUM] Ensure FilterState and FilterCubit are shared between EventCubit and CourseCubit when courses feature is implemented
-- [ ] 16. [MEDIUM] Simplify settings page to only show language selection (remove non-functional profile, account, app info placeholders)
-- [ ] 17. [MEDIUM] Update extractRegions() to derive available regions from both events and courses venue data
+- [x] 13. [MEDIUM] Fix EventInfoType enum (text → dresscode) and add translation support to EventInfo.fromDirectus() and EventPart.fromDirectus()
+- [x] 14. [MEDIUM] Add id field to Venue entity and parse it from Directus JSON
+- [x] 15. [MEDIUM] Ensure FilterState and FilterCubit are shared between EventCubit and CourseCubit when courses feature is implemented
+- [x] 16. [MEDIUM] Simplify settings page to only show language selection (remove non-functional profile, account, app info placeholders)
+- [x] 17. [MEDIUM] Update extractRegions() to derive available regions from both events and courses venue data
 - [ ] 18. [LOW] Align file structure with design document or document the deviation as intentional (current structure follows project steering)
 - [ ] 19. [LOW] Add missing property tests: translation extraction (P3), fallback (P5), favorite resolution (P10), sort order (P11), optimistic update (P14/P15), language persistence (P16)
 - [ ] 20. [LOW] Decide whether to keep FilterPersistenceService (contradicts Requirement 7.5 that filters reset on restart) or remove it
