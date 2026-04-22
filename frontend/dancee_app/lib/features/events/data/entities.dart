@@ -569,3 +569,54 @@ class Event extends Equatable {
         timezone,
       ];
 }
+
+// ============================================================================
+// DanceStyle
+// ============================================================================
+
+/// Represents a dance style from the backend `dance_styles` collection.
+///
+/// Parent styles have [parentCode] == null.
+/// Child styles have [parentCode] set to their parent's [code].
+class DanceStyle extends Equatable {
+  final String code;
+  final String name;
+  final String? parentCode;
+
+  const DanceStyle({
+    required this.code,
+    required this.name,
+    this.parentCode,
+  });
+
+  factory DanceStyle.fromJson(Map<String, dynamic> json) {
+    return DanceStyle(
+      code: json['code'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      parentCode: json['parent_code'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+      'name': name,
+      'parent_code': parentCode,
+    };
+  }
+
+  DanceStyle copyWith({
+    String? code,
+    String? name,
+    String? parentCode,
+  }) {
+    return DanceStyle(
+      code: code ?? this.code,
+      name: name ?? this.name,
+      parentCode: parentCode ?? this.parentCode,
+    );
+  }
+
+  @override
+  List<Object?> get props => [code, name, parentCode];
+}
