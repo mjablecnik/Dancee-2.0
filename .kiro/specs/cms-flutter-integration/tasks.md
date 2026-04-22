@@ -276,7 +276,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Run `task slang` to regenerate
     - _Requirements: 17.1, 17.2, 17.3, 17.4_
 
-- [ ] 14. Final checkpoint — Full integration verification
+- [x] 14. Final checkpoint — Full integration verification
   - Ensure all tests pass. Verify the app compiles with `flutter build web`. Ask the user if questions arise.
 
 ## Notes

@@ -8,17 +8,31 @@ import 'package:dancee_app2/logic/cubits/settings_cubit.dart';
 import 'package:dancee_app2/main.dart';
 
 void main() {
+  setUp(() {
+    if (!sl.isRegistered<SettingsCubit>()) {
+      setupServiceLocator();
+    }
+  });
+
+  tearDown(() async {
+    await sl.reset();
+  });
+
   testWidgets('App smoke test - renders without crashing',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     LocaleSettings.setLocale(AppLocale.en);
-    setupServiceLocator();
     final settingsCubit = sl<SettingsCubit>();
 
-    await tester.pumpWidget(
-      TranslationProvider(child: DanceeApp(settingsCubit: settingsCubit)),
-    );
-    await tester.pump();
+    // Use runAsync to step outside fakeAsync so Dio network timers (connect/
+    // receive timeouts) are treated as real async operations and do not leave
+    // "pending timers" at the end of the test.
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        TranslationProvider(child: DanceeApp(settingsCubit: settingsCubit)),
+      );
+      await tester.pump();
+    });
 
     expect(find.byType(MaterialApp), findsOneWidget);
   });
