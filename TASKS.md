@@ -1,7 +1,7 @@
 # TASKS: Fix Broken Buttons & Links in dancee_app2
 
 - [x] 1. [HIGH] Add `url_launcher` dependency to `pubspec.yaml` and run `task get-deps`
-- [ ] 2. [HIGH] Create `lib/shared/utils/url_launcher.dart` with `openUrl(String url)` and `openMap(double lat, double lng, String label)` utility functions
+- [x] 2. [HIGH] Create `lib/shared/utils/url_launcher.dart` with `openUrl(String url)` and `openMap(double lat, double lng, String label)` utility functions
 - [ ] 3. [HIGH] Wire `onSource` callback in `event_detail_screen.dart` to open `event.originalUrl` via `openUrl()`
 - [ ] 4. [HIGH] Wire `onBuyTickets` callback in `event_detail_screen.dart` to open `event.registrationUrl` via `openUrl()`
 - [ ] 5. [HIGH] Wire `onMap` callback in `event_detail_screen.dart` to open map with venue coordinates via `openMap()` (enable only when venue has non-zero lat/lng)
