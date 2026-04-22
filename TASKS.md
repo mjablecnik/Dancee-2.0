@@ -2,13 +2,13 @@
 
 Derived from [CODE_REVIEW.md](CODE_REVIEW.md).
 
-- [ ] 1. [CRITICAL] Delete old mock repositories (`lib/data/event_repository.dart`, `lib/data/course_repository.dart`, `lib/data/city_repository.dart`) and update all files that import them
-- [ ] 2. [CRITICAL] Fix hardcoded `'en'` language in retry handlers — read current language from `SettingsCubit` in `EventsListScreen` and `CoursesListScreen`
-- [ ] 3. [CRITICAL] Delete dead `featured_courses_section.dart` and `featured_course_card.dart` that use old mock `CourseRepository` (Req 6.2: no featured courses)
-- [ ] 4. [HIGH] Wire `DanceStylesFilterSection` on list screens to `FilterCubit` — display translated names, reflect active selection, handle `onSelected` callback
-- [ ] 5. [HIGH] Replace hardcoded `'Praha, CZ'` in `EventsHeaderSection` with dynamic location derived from `FilterCubit.state.selectedRegions`
-- [ ] 6. [HIGH] Add error feedback (snackbar/notification) when favorite toggle fails in `FavoritesCubit` (Req 12.5)
-- [ ] 7. [HIGH] Add missing property tests: P1 (deep language filter), P2 (error-to-ApiException mapping), P4 (image URL construction), P5 (translation fallback chain), and repository/DirectusClient unit tests
+- [x] 1. [CRITICAL] Delete old mock repositories (`lib/data/event_repository.dart`, `lib/data/course_repository.dart`, `lib/data/city_repository.dart`) and update all files that import them
+- [x] 2. [CRITICAL] Fix hardcoded `'en'` language in retry handlers — read current language from `SettingsCubit` in `EventsListScreen` and `CoursesListScreen`
+- [x] 3. [CRITICAL] Delete dead `featured_courses_section.dart` and `featured_course_card.dart` that use old mock `CourseRepository` (Req 6.2: no featured courses)
+- [x] 4. [HIGH] Wire `DanceStylesFilterSection` on list screens to `FilterCubit` — display translated names, reflect active selection, handle `onSelected` callback
+- [x] 5. [HIGH] Replace hardcoded `'Praha, CZ'` in `EventsHeaderSection` with dynamic location derived from `FilterCubit.state.selectedRegions`
+- [x] 6. [HIGH] Add error feedback (snackbar/notification) when favorite toggle fails in `FavoritesCubit` (Req 12.5)
+- [x] 7. [HIGH] Add missing property tests: P1 (deep language filter), P2 (error-to-ApiException mapping), P4 (image URL construction), P5 (translation fallback chain), and repository/DirectusClient unit tests
 - [ ] 8. [MEDIUM] Extract duplicated `_extractTranslation` helper from `event.dart`, `course.dart`, `dance_style.dart` into a shared utility
 - [ ] 9. [MEDIUM] Extract UI-defining `_build*` private methods into separate widget classes (`SavedEventsListSection`, `SettingsSection`, `EventsHeaderSection`)
 - [ ] 10. [MEDIUM] Extract duplicated `_formatDate`/`_formatTime` helpers into a shared utility and use localized month names instead of hardcoded English abbreviations
