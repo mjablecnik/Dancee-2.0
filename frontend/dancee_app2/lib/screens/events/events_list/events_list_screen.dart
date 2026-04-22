@@ -50,23 +50,7 @@ class EventsListScreen extends StatelessWidget {
                       children: [
                         BlocBuilder<FilterCubit, FilterState>(
                           builder: (context, filterState) {
-                            final filterCubit = context.read<FilterCubit>();
-                            final danceStyles = filterCubit.parentDanceStyles;
-                            final selectedCodes = filterState.selectedDanceStyles;
-                            final selectedIndex = danceStyles.indexWhere(
-                              (d) => selectedCodes.contains(d.code),
-                            );
                             return DanceStylesFilterSection(
-                              styles: danceStyles.map((d) => d.name).toList(),
-                              selectedIndex: selectedIndex,
-                              onSelected: (index) {
-                                final code = danceStyles[index].code;
-                                if (selectedCodes.contains(code)) {
-                                  filterCubit.setDanceStyles({});
-                                } else {
-                                  filterCubit.setDanceStyles({code});
-                                }
-                              },
                               onShowAll: () => context.push('/events/filter-dance'),
                             );
                           },

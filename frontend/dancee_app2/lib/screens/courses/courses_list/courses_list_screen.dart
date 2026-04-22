@@ -51,16 +51,6 @@ class CoursesListScreen extends StatelessWidget {
                               (d) => selectedCodes.contains(d.code),
                             );
                             return DanceStylesFilterSection(
-                              styles: danceStyles.map((d) => d.name).toList(),
-                              selectedIndex: selectedIndex,
-                              onSelected: (index) {
-                                final code = danceStyles[index].code;
-                                if (selectedCodes.contains(code)) {
-                                  filterCubit.setDanceStyles({});
-                                } else {
-                                  filterCubit.setDanceStyles({code});
-                                }
-                              },
                               onShowAll: () => context.push('/events/filter-dance'),
                             );
                           },

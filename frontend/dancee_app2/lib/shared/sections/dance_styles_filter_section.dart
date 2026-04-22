@@ -5,9 +5,6 @@ import '../../core/theme.dart';
 import '../../i18n/strings.g.dart';
 
 class DanceStylesFilterSection extends StatelessWidget {
-  final List<String> styles;
-  final int selectedIndex;
-  final ValueChanged<int> onSelected;
 
   /// When provided, shows a large bold heading with a "Zobrazit vše" link.
   /// When null, shows a compact uppercase muted label instead.
@@ -15,9 +12,6 @@ class DanceStylesFilterSection extends StatelessWidget {
 
   const DanceStylesFilterSection({
     super.key,
-    required this.styles,
-    required this.selectedIndex,
-    required this.onSelected,
     this.onShowAll,
   });
 
