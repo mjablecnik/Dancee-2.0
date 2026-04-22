@@ -37,8 +37,8 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 ## Frontend: CZ Regions + Abroad Location Filter (Spec §4)
 
-- [ ] 17. [HIGH] Add "abroad" translation key to `lib/i18n/strings.i18n.json` ("Abroad"), `strings_cs.i18n.json` ("Zahraničí"), `strings_es.i18n.json` ("Extranjero")
-- [ ] 18. [HIGH] Run `task slang` to regenerate translations
+- [x] 17. [HIGH] Add "abroad" translation key to `lib/i18n/strings.i18n.json` ("Abroad"), `strings_cs.i18n.json` ("Zahraničí"), `strings_es.i18n.json` ("Extranjero")
+- [x] 18. [HIGH] Run `task slang` to regenerate translations
 - [ ] 19. [HIGH] Modify `extractRegions()` in `lib/features/events/logic/event_filter.dart` to separate CZ regions from foreign events, returning CZ regions + a single "Abroad" entry
 - [ ] 20. [HIGH] Modify `filterEvents()` in `lib/features/events/logic/event_filter.dart` to handle the "Abroad" region key — when selected, include non-CZ events; when nothing selected, show all
 - [ ] 21. [HIGH] Modify `countEventsForRegion()` in `lib/features/events/logic/event_filter.dart` to count foreign events for the "Abroad" option

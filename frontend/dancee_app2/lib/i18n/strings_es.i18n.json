@@ -154,7 +154,8 @@
       "popularCities": "Ciudades populares",
       "allCities": "Todas las ciudades",
       "selectedRegions": "REGIONES SELECCIONADAS",
-      "noResults": "Sin resultados"
+      "noResults": "Sin resultados",
+      "abroad": "Extranjero"
     },
     "filters": {
       "today": "Hoy",

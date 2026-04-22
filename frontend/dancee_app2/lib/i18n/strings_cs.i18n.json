@@ -154,7 +154,8 @@
       "popularCities": "Oblíbená města",
       "allCities": "Všechna města",
       "selectedRegions": "VYBRANÉ OBLASTI",
-      "noResults": "Žádné výsledky"
+      "noResults": "Žádné výsledky",
+      "abroad": "Zahraničí"
     },
     "filters": {
       "today": "Dnes",
