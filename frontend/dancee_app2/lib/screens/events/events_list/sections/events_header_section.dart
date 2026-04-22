@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
+import '../components/dance_style_chips_row.dart';
 
 class EventsHeaderSection extends StatelessWidget {
   final String location;
@@ -17,12 +18,6 @@ class EventsHeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + AppSpacing.md,
-        left: AppSpacing.xl,
-        right: AppSpacing.xl,
-        bottom: AppSpacing.lg,
-      ),
       decoration: BoxDecoration(
         color: appBg.withValues(alpha: 0.9),
         border: const Border(bottom: BorderSide(color: appBorder)),
@@ -30,7 +25,17 @@ class EventsHeaderSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HeaderLocationRow(location: location, onLocationTap: onLocationTap),
+          Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + AppSpacing.md,
+              left: AppSpacing.xl,
+              right: AppSpacing.xl,
+              bottom: AppSpacing.lg,
+            ),
+            child: _HeaderLocationRow(location: location, onLocationTap: onLocationTap),
+          ),
+          const DanceStyleChipsRow(),
+          const SizedBox(height: AppSpacing.lg),
         ],
       ),
     );
