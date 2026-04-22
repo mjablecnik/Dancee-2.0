@@ -67,6 +67,8 @@ class EventsListScreen extends StatelessWidget {
                           const SizedBox(height: AppSpacing.xxxl),
                         UpcomingEventsSection(
                           events: loaded.filteredEvents,
+                          hasActiveFilters: context.read<FilterCubit>().state.hasActiveFilters,
+                          onClearFilters: () => context.read<FilterCubit>().clearAll(),
                           onEventTap: (id) => context.push('/events/detail?id=$id'),
                         ),
                       ],

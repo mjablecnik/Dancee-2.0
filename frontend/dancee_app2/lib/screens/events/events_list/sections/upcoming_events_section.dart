@@ -12,11 +12,15 @@ import '../components/upcoming_event_card.dart';
 
 class UpcomingEventsSection extends StatelessWidget {
   final List<Event> events;
+  final bool hasActiveFilters;
+  final VoidCallback? onClearFilters;
   final void Function(int eventId)? onEventTap;
 
   const UpcomingEventsSection({
     super.key,
     required this.events,
+    this.hasActiveFilters = false,
+    this.onClearFilters,
     this.onEventTap,
   });
 
@@ -60,6 +64,34 @@ class UpcomingEventsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
+        if (events.isEmpty && hasActiveFilters)
+          SizedBox(
+            height: 200,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      t.events.noEventsForFilter,
+                      style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    TextButton(
+                      onPressed: onClearFilters,
+                      child: Text(
+                        t.common.clearFilters,
+                        style: const TextStyle(color: appPrimary, fontSize: AppTypography.fontSizeMd),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Column(

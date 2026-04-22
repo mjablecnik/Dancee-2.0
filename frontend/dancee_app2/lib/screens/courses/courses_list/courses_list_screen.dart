@@ -70,6 +70,8 @@ class CoursesListScreen extends StatelessWidget {
                         const SizedBox(height: AppSpacing.xxxl),
                         _AllCoursesSection(
                           courses: loaded.filteredCourses,
+                          hasActiveFilters: context.read<FilterCubit>().state.hasActiveFilters,
+                          onClearFilters: () => context.read<FilterCubit>().clearAll(),
                           formatDateRange: formatDateRange,
                         ),
                       ],
@@ -108,11 +110,15 @@ class CoursesListScreen extends StatelessWidget {
 
 class _AllCoursesSection extends StatelessWidget {
   final List<Course> courses;
+  final bool hasActiveFilters;
+  final VoidCallback? onClearFilters;
   final String Function(String?, String?) formatDateRange;
 
   const _AllCoursesSection({
     required this.courses,
     required this.formatDateRange,
+    this.hasActiveFilters = false,
+    this.onClearFilters,
   });
 
   @override
@@ -161,12 +167,34 @@ class _AllCoursesSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         if (courses.isEmpty)
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Text(
-              t.courses.noCoursesFound,
-              style: const TextStyle(color: appMuted),
+          SizedBox(
+            height: 200,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      hasActiveFilters
+                          ? t.courses.noCoursesForFilter
+                          : t.courses.noCoursesFound,
+                      style: const TextStyle(color: appMuted),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (hasActiveFilters) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      TextButton(
+                        onPressed: onClearFilters,
+                        child: Text(
+                          t.common.clearFilters,
+                          style: const TextStyle(color: appPrimary, fontSize: AppTypography.fontSizeMd),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ),
           )
         else

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 780 (260 per locale)
+/// Strings: 789 (263 per locale)
 ///
-/// Built on 2026-04-22 at 14:32 UTC
+/// Built on 2026-04-22 at 14:47 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -183,6 +183,7 @@ class _StringsCommonEn {
 	String get support => 'Support';
 	String get faq => 'FAQ';
 	String get clear => 'Clear';
+	String get clearFilters => 'Clear filters';
 	String get current => 'Current';
 	String get saveChanges => 'Save changes';
 	String get loading => 'Loading...';
@@ -248,6 +249,7 @@ class _StringsEventsEn {
 	String get featuredEvents => 'Featured events';
 	String get upcomingEvents => 'Upcoming events';
 	String get noEventsFound => 'No events found';
+	String get noEventsForFilter => 'No events match your current filters. Try adjusting your selection or clear all filters.';
 	String get danceStyles => 'Dance styles';
 	String get danceStylesLabel => 'DANCE STYLES';
 	String get location => 'Location';
@@ -268,6 +270,7 @@ class _StringsCoursesEn {
 	String get featuredCourses => 'Featured courses';
 	String get allCourses => 'All courses';
 	String get noCoursesFound => 'No courses found';
+	String get noCoursesForFilter => 'No courses match your current filters. Try adjusting your selection or clear all filters.';
 	late final _StringsCoursesDetailEn detail = _StringsCoursesDetailEn._(_root);
 }
 
@@ -831,6 +834,7 @@ class _StringsCommonCs extends _StringsCommonEn {
 	@override String get support => 'Podpora';
 	@override String get faq => 'FAQ';
 	@override String get clear => 'Vymazat';
+	@override String get clearFilters => 'Vymazat filtry';
 	@override String get current => 'Aktuální';
 	@override String get saveChanges => 'Uložit změny';
 	@override String get loading => 'Načítání...';
@@ -896,6 +900,7 @@ class _StringsEventsCs extends _StringsEventsEn {
 	@override String get featuredEvents => 'Doporučené akce';
 	@override String get upcomingEvents => 'Nadcházející akce';
 	@override String get noEventsFound => 'Žádné akce nenalezeny';
+	@override String get noEventsForFilter => 'Pro zvolené filtry nebyly nalezeny žádné akce. Zkuste upravit výběr nebo vymazat filtry.';
 	@override String get danceStyles => 'Taneční styly';
 	@override String get danceStylesLabel => 'TANEČNÍ STYLY';
 	@override String get location => 'Lokalita';
@@ -916,6 +921,7 @@ class _StringsCoursesCs extends _StringsCoursesEn {
 	@override String get featuredCourses => 'Doporučené kurzy';
 	@override String get allCourses => 'Všechny kurzy';
 	@override String get noCoursesFound => 'Žádné kurzy nenalezeny';
+	@override String get noCoursesForFilter => 'Pro zvolené filtry nebyly nalezeny žádné kurzy. Zkuste upravit výběr nebo vymazat filtry.';
 	@override late final _StringsCoursesDetailCs detail = _StringsCoursesDetailCs._(_root);
 }
 
@@ -1479,6 +1485,7 @@ class _StringsCommonEs extends _StringsCommonEn {
 	@override String get support => 'Soporte';
 	@override String get faq => 'FAQ';
 	@override String get clear => 'Limpiar';
+	@override String get clearFilters => 'Borrar filtros';
 	@override String get current => 'Actual';
 	@override String get saveChanges => 'Guardar cambios';
 	@override String get loading => 'Cargando...';
@@ -1544,6 +1551,7 @@ class _StringsEventsEs extends _StringsEventsEn {
 	@override String get featuredEvents => 'Eventos destacados';
 	@override String get upcomingEvents => 'Próximos eventos';
 	@override String get noEventsFound => 'No se encontraron eventos';
+	@override String get noEventsForFilter => 'No hay eventos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.';
 	@override String get danceStyles => 'Estilos de baile';
 	@override String get danceStylesLabel => 'ESTILOS DE BAILE';
 	@override String get location => 'Ubicación';
@@ -1564,6 +1572,7 @@ class _StringsCoursesEs extends _StringsCoursesEn {
 	@override String get featuredCourses => 'Cursos destacados';
 	@override String get allCourses => 'Todos los cursos';
 	@override String get noCoursesFound => 'No se encontraron cursos';
+	@override String get noCoursesForFilter => 'No hay cursos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.';
 	@override late final _StringsCoursesDetailEs detail = _StringsCoursesDetailEs._(_root);
 }
 
@@ -2099,6 +2108,7 @@ extension on Translations {
 			case 'common.support': return 'Support';
 			case 'common.faq': return 'FAQ';
 			case 'common.clear': return 'Clear';
+			case 'common.clearFilters': return 'Clear filters';
 			case 'common.current': return 'Current';
 			case 'common.saveChanges': return 'Save changes';
 			case 'common.loading': return 'Loading...';
@@ -2173,6 +2183,7 @@ extension on Translations {
 			case 'events.featuredEvents': return 'Featured events';
 			case 'events.upcomingEvents': return 'Upcoming events';
 			case 'events.noEventsFound': return 'No events found';
+			case 'events.noEventsForFilter': return 'No events match your current filters. Try adjusting your selection or clear all filters.';
 			case 'events.danceStyles': return 'Dance styles';
 			case 'events.danceStylesLabel': return 'DANCE STYLES';
 			case 'events.location': return 'Location';
@@ -2210,6 +2221,7 @@ extension on Translations {
 			case 'courses.featuredCourses': return 'Featured courses';
 			case 'courses.allCourses': return 'All courses';
 			case 'courses.noCoursesFound': return 'No courses found';
+			case 'courses.noCoursesForFilter': return 'No courses match your current filters. Try adjusting your selection or clear all filters.';
 			case 'courses.detail.header': return 'Course detail';
 			case 'courses.detail.notFound': return 'Course not found';
 			case 'courses.detail.description': return 'Course description';
@@ -2367,6 +2379,7 @@ extension on _StringsCs {
 			case 'common.support': return 'Podpora';
 			case 'common.faq': return 'FAQ';
 			case 'common.clear': return 'Vymazat';
+			case 'common.clearFilters': return 'Vymazat filtry';
 			case 'common.current': return 'Aktuální';
 			case 'common.saveChanges': return 'Uložit změny';
 			case 'common.loading': return 'Načítání...';
@@ -2441,6 +2454,7 @@ extension on _StringsCs {
 			case 'events.featuredEvents': return 'Doporučené akce';
 			case 'events.upcomingEvents': return 'Nadcházející akce';
 			case 'events.noEventsFound': return 'Žádné akce nenalezeny';
+			case 'events.noEventsForFilter': return 'Pro zvolené filtry nebyly nalezeny žádné akce. Zkuste upravit výběr nebo vymazat filtry.';
 			case 'events.danceStyles': return 'Taneční styly';
 			case 'events.danceStylesLabel': return 'TANEČNÍ STYLY';
 			case 'events.location': return 'Lokalita';
@@ -2478,6 +2492,7 @@ extension on _StringsCs {
 			case 'courses.featuredCourses': return 'Doporučené kurzy';
 			case 'courses.allCourses': return 'Všechny kurzy';
 			case 'courses.noCoursesFound': return 'Žádné kurzy nenalezeny';
+			case 'courses.noCoursesForFilter': return 'Pro zvolené filtry nebyly nalezeny žádné kurzy. Zkuste upravit výběr nebo vymazat filtry.';
 			case 'courses.detail.header': return 'Detail kurzu';
 			case 'courses.detail.notFound': return 'Kurz nenalezen';
 			case 'courses.detail.description': return 'Popis kurzu';
@@ -2635,6 +2650,7 @@ extension on _StringsEs {
 			case 'common.support': return 'Soporte';
 			case 'common.faq': return 'FAQ';
 			case 'common.clear': return 'Limpiar';
+			case 'common.clearFilters': return 'Borrar filtros';
 			case 'common.current': return 'Actual';
 			case 'common.saveChanges': return 'Guardar cambios';
 			case 'common.loading': return 'Cargando...';
@@ -2709,6 +2725,7 @@ extension on _StringsEs {
 			case 'events.featuredEvents': return 'Eventos destacados';
 			case 'events.upcomingEvents': return 'Próximos eventos';
 			case 'events.noEventsFound': return 'No se encontraron eventos';
+			case 'events.noEventsForFilter': return 'No hay eventos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.';
 			case 'events.danceStyles': return 'Estilos de baile';
 			case 'events.danceStylesLabel': return 'ESTILOS DE BAILE';
 			case 'events.location': return 'Ubicación';
@@ -2746,6 +2763,7 @@ extension on _StringsEs {
 			case 'courses.featuredCourses': return 'Cursos destacados';
 			case 'courses.allCourses': return 'Todos los cursos';
 			case 'courses.noCoursesFound': return 'No se encontraron cursos';
+			case 'courses.noCoursesForFilter': return 'No hay cursos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.';
 			case 'courses.detail.header': return 'Detalle del curso';
 			case 'courses.detail.notFound': return 'Curso no encontrado';
 			case 'courses.detail.description': return 'Descripción del curso';

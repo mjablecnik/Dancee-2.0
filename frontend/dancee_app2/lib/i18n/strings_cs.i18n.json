@@ -28,6 +28,7 @@
     "support": "Podpora",
     "faq": "FAQ",
     "clear": "Vymazat",
+    "clearFilters": "Vymazat filtry",
     "current": "Aktuální",
     "saveChanges": "Uložit změny",
     "loading": "Načítání...",
@@ -126,6 +127,7 @@
     "featuredEvents": "Doporučené akce",
     "upcomingEvents": "Nadcházející akce",
     "noEventsFound": "Žádné akce nenalezeny",
+    "noEventsForFilter": "Pro zvolené filtry nebyly nalezeny žádné akce. Zkuste upravit výběr nebo vymazat filtry.",
     "danceStyles": "Taneční styly",
     "danceStylesLabel": "TANEČNÍ STYLY",
     "location": "Lokalita",
@@ -171,6 +173,7 @@
     "featuredCourses": "Doporučené kurzy",
     "allCourses": "Všechny kurzy",
     "noCoursesFound": "Žádné kurzy nenalezeny",
+    "noCoursesForFilter": "Pro zvolené filtry nebyly nalezeny žádné kurzy. Zkuste upravit výběr nebo vymazat filtry.",
     "detail": {
       "header": "Detail kurzu",
       "notFound": "Kurz nenalezen",

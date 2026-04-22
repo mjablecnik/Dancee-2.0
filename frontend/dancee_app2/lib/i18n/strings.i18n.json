@@ -28,6 +28,7 @@
     "support": "Support",
     "faq": "FAQ",
     "clear": "Clear",
+    "clearFilters": "Clear filters",
     "current": "Current",
     "saveChanges": "Save changes",
     "loading": "Loading...",
@@ -126,6 +127,7 @@
     "featuredEvents": "Featured events",
     "upcomingEvents": "Upcoming events",
     "noEventsFound": "No events found",
+    "noEventsForFilter": "No events match your current filters. Try adjusting your selection or clear all filters.",
     "danceStyles": "Dance styles",
     "danceStylesLabel": "DANCE STYLES",
     "location": "Location",
@@ -171,6 +173,7 @@
     "featuredCourses": "Featured courses",
     "allCourses": "All courses",
     "noCoursesFound": "No courses found",
+    "noCoursesForFilter": "No courses match your current filters. Try adjusting your selection or clear all filters.",
     "detail": {
       "header": "Course detail",
       "notFound": "Course not found",

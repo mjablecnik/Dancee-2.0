@@ -28,6 +28,7 @@
     "support": "Soporte",
     "faq": "FAQ",
     "clear": "Limpiar",
+    "clearFilters": "Borrar filtros",
     "current": "Actual",
     "saveChanges": "Guardar cambios",
     "loading": "Cargando...",
@@ -126,6 +127,7 @@
     "featuredEvents": "Eventos destacados",
     "upcomingEvents": "Próximos eventos",
     "noEventsFound": "No se encontraron eventos",
+    "noEventsForFilter": "No hay eventos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.",
     "danceStyles": "Estilos de baile",
     "danceStylesLabel": "ESTILOS DE BAILE",
     "location": "Ubicación",
@@ -171,6 +173,7 @@
     "featuredCourses": "Cursos destacados",
     "allCourses": "Todos los cursos",
     "noCoursesFound": "No se encontraron cursos",
+    "noCoursesForFilter": "No hay cursos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.",
     "detail": {
       "header": "Detalle del curso",
       "notFound": "Curso no encontrado",
