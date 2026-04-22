@@ -13,7 +13,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 ## Frontend: Data Layer
 
 - [x] 4. [HIGH] Add `DanceStyle` entity to `lib/features/events/data/entities.dart` with `code`, `name`, `parentCode` fields and `fromJson`/`toJson`
-- [ ] 5. [HIGH] Add `getDanceStyles()` method to `lib/features/events/data/event_repository.dart` that fetches dance styles from the API
+- [x] 5. [HIGH] Add `getDanceStyles()` method to `lib/features/events/data/event_repository.dart` that fetches dance styles from the API
 
 ## Frontend: Map Address Fix (Spec §1)
 
