@@ -16,6 +16,8 @@
     "clear": "Limpiar",
     "current": "Actual",
     "saveChanges": "Guardar cambios",
+    "loading": "Cargando...",
+    "retry": "Reintentar",
     "form": {
       "email": "E-mail",
       "emailHint": "tu@email.com",
@@ -109,6 +111,7 @@
   "events": {
     "featuredEvents": "Eventos destacados",
     "upcomingEvents": "Próximos eventos",
+    "noEventsFound": "No se encontraron eventos",
     "danceStyles": "Estilos de baile",
     "danceStylesLabel": "ESTILOS DE BAILE",
     "location": "Ubicación",
@@ -148,6 +151,7 @@
     "subtitle": "Encuentra tu curso",
     "featuredCourses": "Cursos destacados",
     "allCourses": "Todos los cursos",
+    "noCoursesFound": "No se encontraron cursos",
     "detail": {
       "header": "Detalle del curso",
       "description": "Descripción del curso",
@@ -157,7 +161,18 @@
       "shareCourse": "Compartir curso",
       "coursePrice": "Precio del curso",
       "availableSpots": "Plazas disponibles",
-      "register": "Inscribirse al curso"
+      "register": "Inscribirse al curso",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "day": "Día",
+      "time": "Hora",
+      "lessons": "Lecciones",
+      "duration": "Duración",
+      "level": "Nivel",
+      "lessonsCount": "${count} lecciones",
+      "durationMin": "${count} min",
+      "participantsCount": "${current} / ${max} participantes",
+      "spotsAvailable": "${count} plazas disponibles"
     }
   },
   "profile": {

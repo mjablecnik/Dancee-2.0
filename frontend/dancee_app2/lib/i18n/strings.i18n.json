@@ -16,6 +16,8 @@
     "clear": "Clear",
     "current": "Current",
     "saveChanges": "Save changes",
+    "loading": "Loading...",
+    "retry": "Retry",
     "form": {
       "email": "E-mail",
       "emailHint": "your@email.com",
@@ -109,6 +111,7 @@
   "events": {
     "featuredEvents": "Featured events",
     "upcomingEvents": "Upcoming events",
+    "noEventsFound": "No events found",
     "danceStyles": "Dance styles",
     "danceStylesLabel": "DANCE STYLES",
     "location": "Location",
@@ -148,6 +151,7 @@
     "subtitle": "Find your course",
     "featuredCourses": "Featured courses",
     "allCourses": "All courses",
+    "noCoursesFound": "No courses found",
     "detail": {
       "header": "Course detail",
       "description": "Course description",
@@ -157,7 +161,18 @@
       "shareCourse": "Share course",
       "coursePrice": "Course price",
       "availableSpots": "Available spots",
-      "register": "Register for course"
+      "register": "Register for course",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "day": "Day",
+      "time": "Time",
+      "lessons": "Lessons",
+      "duration": "Duration",
+      "level": "Level",
+      "lessonsCount": "${count} lessons",
+      "durationMin": "${count} min",
+      "participantsCount": "${current} / ${max} participants",
+      "spotsAvailable": "${count} spots available"
     }
   },
   "profile": {

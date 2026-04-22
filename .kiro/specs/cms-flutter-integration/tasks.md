@@ -269,8 +269,8 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Settings page only shows language option (auth, profile, premium out of scope)
     - _Requirements: 16.1, 16.2, 16.6, 16.7, 16.8_
 
-- [ ] 13. Add i18n translation keys
-  - [ ] 13.1 Add translation keys for new UI elements
+- [x] 13. Add i18n translation keys
+  - [x] 13.1 Add translation keys for new UI elements
     - Add keys for: loading states, error messages, retry button, empty states, filter labels, saved items labels, language names, settings labels
     - Add to all three files: `strings.i18n.json` (en), `strings_cs.i18n.json` (cs), create `strings_es.i18n.json` (es)
     - Run `task slang` to regenerate

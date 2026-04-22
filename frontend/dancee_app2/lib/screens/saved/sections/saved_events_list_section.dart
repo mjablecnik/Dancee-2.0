@@ -177,7 +177,7 @@ class SavedEventsListSection extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             ElevatedButton(
               onPressed: () => context.read<FavoritesCubit>().loadFavorites(),
-              child: const Text('Retry'),
+              child: Text(t.common.retry),
             ),
           ],
         ),

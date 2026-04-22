@@ -16,6 +16,8 @@
     "clear": "Vymazat",
     "current": "Aktuální",
     "saveChanges": "Uložit změny",
+    "loading": "Načítání...",
+    "retry": "Zkusit znovu",
     "form": {
       "email": "E-mail",
       "emailHint": "tvuj@email.cz",
@@ -109,6 +111,7 @@
   "events": {
     "featuredEvents": "Doporučené akce",
     "upcomingEvents": "Nadcházející akce",
+    "noEventsFound": "Žádné akce nenalezeny",
     "danceStyles": "Taneční styly",
     "danceStylesLabel": "TANEČNÍ STYLY",
     "location": "Lokalita",
@@ -148,6 +151,7 @@
     "subtitle": "Najdi svůj kurz",
     "featuredCourses": "Doporučené kurzy",
     "allCourses": "Všechny kurzy",
+    "noCoursesFound": "Žádné kurzy nenalezeny",
     "detail": {
       "header": "Detail kurzu",
       "description": "Popis kurzu",
@@ -157,7 +161,18 @@
       "shareCourse": "Sdílet kurz",
       "coursePrice": "Cena kurzu",
       "availableSpots": "Volná místa",
-      "register": "Registrovat se na kurz"
+      "register": "Registrovat se na kurz",
+      "startDate": "Datum začátku",
+      "endDate": "Datum konce",
+      "day": "Den",
+      "time": "Čas",
+      "lessons": "Lekce",
+      "duration": "Délka",
+      "level": "Úroveň",
+      "lessonsCount": "${count} lekcí",
+      "durationMin": "${count} min",
+      "participantsCount": "${current} / ${max} účastníků",
+      "spotsAvailable": "${count} volných míst"
     }
   },
   "profile": {

@@ -62,11 +62,11 @@ class CourseDetailScreen extends StatelessWidget {
     // Lesson count + duration
     if (course.lessonCount != null) {
       final durationStr = course.lessonDurationMinutes != null
-          ? ' × ${course.lessonDurationMinutes} min'
+          ? ' × ${t.courses.detail.durationMin(count: course.lessonDurationMinutes!)}'
           : '';
       items.add(KeyInfoItem(
         icon: FontAwesomeIcons.chalkboard,
-        title: '${course.lessonCount} lessons$durationStr',
+        title: '${t.courses.detail.lessonsCount(count: course.lessonCount!)}$durationStr',
         subtitle: '',
       ));
     }
@@ -77,8 +77,8 @@ class CourseDetailScreen extends StatelessWidget {
       final max = course.maxParticipants!;
       items.add(KeyInfoItem(
         icon: FontAwesomeIcons.users,
-        title: '$current / $max participants',
-        subtitle: '${max - current} spots available',
+        title: t.courses.detail.participantsCount(current: current, max: max),
+        subtitle: t.courses.detail.spotsAvailable(count: max - current),
       ));
     }
 
@@ -99,43 +99,43 @@ class CourseDetailScreen extends StatelessWidget {
 
     if (course.startDate != null) {
       details.add(ScheduleDetail(
-        label: 'Start date',
+        label: t.courses.detail.startDate,
         value: _formatDate(course.startDate),
       ));
     }
     if (course.endDate != null) {
       details.add(ScheduleDetail(
-        label: 'End date',
+        label: t.courses.detail.endDate,
         value: _formatDate(course.endDate),
       ));
     }
     if (course.scheduleDay != null) {
       details.add(ScheduleDetail(
-        label: 'Day',
+        label: t.courses.detail.day,
         value: course.scheduleDay!,
       ));
     }
     if (course.scheduleTime != null) {
       details.add(ScheduleDetail(
-        label: 'Time',
+        label: t.courses.detail.time,
         value: course.scheduleTime!,
       ));
     }
     if (course.lessonCount != null) {
       details.add(ScheduleDetail(
-        label: 'Lessons',
+        label: t.courses.detail.lessons,
         value: course.lessonCount.toString(),
       ));
     }
     if (course.lessonDurationMinutes != null) {
       details.add(ScheduleDetail(
-        label: 'Duration',
-        value: '${course.lessonDurationMinutes} min',
+        label: t.courses.detail.duration,
+        value: t.courses.detail.durationMin(count: course.lessonDurationMinutes!),
       ));
     }
     if (course.level != null) {
       details.add(ScheduleDetail(
-        label: 'Level',
+        label: t.courses.detail.level,
         value: course.level!,
       ));
     }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/states/event_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
@@ -74,7 +75,7 @@ class EventsListScreen extends StatelessWidget {
                             final cubit = context.read<EventCubit>();
                             cubit.loadEvents('en');
                           },
-                          child: const Text('Retry', style: TextStyle(color: appPrimary)),
+                          child: Text(t.common.retry, style: const TextStyle(color: appPrimary)),
                         ),
                       ],
                     ),

@@ -85,8 +85,8 @@ class CoursesListScreen extends StatelessWidget {
                         TextButton(
                           onPressed: () =>
                               context.read<CourseCubit>().loadCourses('en'),
-                          child: const Text('Retry',
-                              style: TextStyle(color: appPrimary)),
+                          child: Text(t.common.retry,
+                              style: const TextStyle(color: appPrimary)),
                         ),
                       ],
                     ),
@@ -159,9 +159,9 @@ class _AllCoursesSection extends StatelessWidget {
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: const Text(
-              'No courses found',
-              style: TextStyle(color: appMuted),
+            child: Text(
+              t.courses.noCoursesFound,
+              style: const TextStyle(color: appMuted),
             ),
           )
         else
