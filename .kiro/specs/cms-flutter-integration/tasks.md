@@ -118,7 +118,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Fall back to device locale or English if no persisted language
     - _Requirements: 16.2, 16.3, 16.4, 16.5_
 
-  - [ ]* 5.3 Write property test for SettingsCubit language persistence
+  - [x]* 5.3 Write property test for SettingsCubit language persistence
     - **Property 16: Language persistence round-trip** — for any valid language code (en, cs, es), persist and read back, verify equality
     - **Validates: Requirements 16.3, 16.4**
 
