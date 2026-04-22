@@ -243,7 +243,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Show currently selected regions as pre-checked
     - _Requirements: 9.1, 9.2, 9.5, 9.6_
 
-  - [ ]* 10.3 Write property test for region extraction
+  - [x]* 10.3 Write property test for region extraction
     - **Property 9: Region extraction from loaded data** — generate random events/courses with venues, verify region set equals union of all non-empty venue.region values with no duplicates
     - **Validates: Requirements 9.1**
 
