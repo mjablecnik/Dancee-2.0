@@ -41,3 +41,25 @@ export async function reverseGeocode(lat: number, lng: number): Promise<Nominati
   const data = await response.json();
   return NominatimResponseSchema.parse(data);
 }
+
+export async function forwardGeocode(query: string): Promise<NominatimResponse | null> {
+  await throttle();
+  const params = new URLSearchParams({
+    q: query,
+    format: "json",
+    addressdetails: "1",
+    limit: "1",
+  });
+  const url = `${config.nominatimBaseUrl}/search?${params.toString()}`;
+  const response = await fetch(url, {
+    headers: { "User-Agent": "dancee_workflow/1.0" },
+    signal: AbortSignal.timeout(config.nominatimTimeoutMs),
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Nominatim search API error ${response.status}: ${text}`);
+  }
+  const results = await response.json();
+  if (!Array.isArray(results) || results.length === 0) return null;
+  return NominatimResponseSchema.parse(results[0]);
+}

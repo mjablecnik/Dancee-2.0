@@ -1,4 +1,4 @@
-import { reverseGeocode } from "../clients/nominatim-client";
+import { reverseGeocode, forwardGeocode } from "../clients/nominatim-client";
 import {
   createVenue,
   findVenue,
@@ -49,10 +49,35 @@ export async function resolveVenue(location: FacebookLocation): Promise<Directus
       town = town || addr.city || addr.town || addr.village || addr.county || "";
       country = country || addr.country_code?.toUpperCase() || "";
       postalCode = addr.postcode;
-      region = addr.state ?? "Other";
+
+      const countryCode = (addr.country_code ?? country).toUpperCase();
+      region = addr.state
+        ?? addr.city
+        ?? addr.town
+        ?? "Other";
     } catch (err) {
       log({ level: "warn", message: `reverseGeocode failed for coordinates (${lat}, ${lng}), falling back to region "Other"`, error: String(err) });
       // region remains "Other" (already initialised above)
+    }
+  } else if (name || town) {
+    // No coordinates — try forward geocoding by venue name or town
+    try {
+      const query = town || name;
+      const geo = await forwardGeocode(query);
+      if (geo) {
+        const addr = geo.address ?? {};
+        town = town || addr.city || addr.town || addr.village || addr.county || "";
+        country = country || addr.country_code?.toUpperCase() || "";
+        postalCode = postalCode || addr.postcode;
+
+        const countryCode = (addr.country_code ?? country).toUpperCase();
+        region = addr.state
+          ?? addr.city
+          ?? addr.town
+          ?? "Other";
+      }
+    } catch (err) {
+      log({ level: "warn", message: `forwardGeocode failed for "${town || name}", falling back to region "Other"`, error: String(err) });
     }
   }
 
