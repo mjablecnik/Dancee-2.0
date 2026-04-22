@@ -15,6 +15,10 @@ class FilterCubit extends Cubit<FilterState> {
   /// All loaded dance styles — available for UI and filter expansion logic.
   List<DanceStyle> get allDanceStyles => _allDanceStyles;
 
+  /// Only parent dance styles (those with no parentCode) — for filter display.
+  List<DanceStyle> get parentDanceStyles =>
+      _allDanceStyles.where((s) => s.parentCode == null).toList();
+
   /// Fetches dance styles from CMS with [languageCode] translations.
   Future<void> loadDanceStyles(String languageCode) async {
     try {

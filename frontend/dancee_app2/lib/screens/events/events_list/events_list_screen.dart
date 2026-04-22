@@ -51,7 +51,7 @@ class EventsListScreen extends StatelessWidget {
                         BlocBuilder<FilterCubit, FilterState>(
                           builder: (context, filterState) {
                             final filterCubit = context.read<FilterCubit>();
-                            final danceStyles = filterCubit.allDanceStyles;
+                            final danceStyles = filterCubit.parentDanceStyles;
                             final selectedCodes = filterState.selectedDanceStyles;
                             final selectedIndex = danceStyles.indexWhere(
                               (d) => selectedCodes.contains(d.code),
