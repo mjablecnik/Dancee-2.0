@@ -203,7 +203,15 @@ class EventDetailScreen extends StatelessWidget {
                                             itemId: event.id,
                                           ),
                                   onShare: null,
-                                  onMap: null,
+                                  onMap: event.venue != null &&
+                                          (event.venue!.latitude != 0 ||
+                                              event.venue!.longitude != 0)
+                                      ? () => openMap(
+                                            event.venue!.latitude,
+                                            event.venue!.longitude,
+                                            event.venue!.name,
+                                          )
+                                      : null,
                                 ),
                                 const SizedBox(height: AppSpacing.xxl),
                                 if (event.description.isNotEmpty)
