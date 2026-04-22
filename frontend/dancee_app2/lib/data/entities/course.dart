@@ -60,8 +60,10 @@ class Course extends Equatable {
 
   /// Computed course type for filtering.
   CourseType get courseType {
-    if (scheduleDay != null && scheduleDay!.isNotEmpty) return CourseType.regular;
     if (lessonCount != null && lessonCount! > 1) return CourseType.regular;
+    if (startDate != null && endDate != null && startDate != endDate) {
+      return CourseType.regular;
+    }
     return CourseType.workshop;
   }
 
