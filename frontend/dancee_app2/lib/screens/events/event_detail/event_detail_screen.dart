@@ -255,16 +255,21 @@ class EventDetailScreen extends StatelessWidget {
                                         .where((p) => p.trim().isNotEmpty)
                                         .toList(),
                                   ),
-                                if (event.description.isNotEmpty)
-                                  const SizedBox(height: AppSpacing.xxl),
-                                AdditionalInfoSection(
-                                  priceRange: priceRange,
-                                  dresscode: dresscode,
-                                  onBuyTickets: event.registrationUrl != null
-                                      ? () => openUrl(event.registrationUrl!)
-                                      : null,
-                                  onSource: event.originalUrl != null ? () => openUrl(event.originalUrl!) : null,
-                                ),
+                                if (priceRange.isNotEmpty ||
+                                    dresscode.isNotEmpty ||
+                                    event.registrationUrl != null ||
+                                    event.originalUrl != null) ...[
+                                  if (event.description.isNotEmpty)
+                                    const SizedBox(height: AppSpacing.xxl),
+                                  AdditionalInfoSection(
+                                    priceRange: priceRange,
+                                    dresscode: dresscode,
+                                    onBuyTickets: event.registrationUrl != null
+                                        ? () => openUrl(event.registrationUrl!)
+                                        : null,
+                                    onSource: event.originalUrl != null ? () => openUrl(event.originalUrl!) : null,
+                                  ),
+                                ],
                                 if (event.parts.isNotEmpty) ...[
                                   const SizedBox(height: AppSpacing.xxl),
                                   EventProgramSection(

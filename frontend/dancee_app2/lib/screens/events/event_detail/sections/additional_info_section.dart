@@ -20,6 +20,9 @@ class AdditionalInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPrice = priceRange.isNotEmpty;
+    final hasDresscode = dresscode.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -41,13 +44,20 @@ class AdditionalInfoSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildInfoRow(label: t.events.detail.admission, value: priceRange),
-              const SizedBox(height: AppSpacing.md),
-              _buildInfoRow(label: t.events.detail.dresscode, value: dresscode),
-              const SizedBox(height: AppSpacing.lg),
-              _buildBuyTicketsButton(),
-              const SizedBox(height: AppSpacing.sm),
-              _buildSourceButton(),
+              if (hasPrice)
+                _buildInfoRow(label: t.events.detail.admission, value: priceRange),
+              if (hasPrice && hasDresscode)
+                const SizedBox(height: AppSpacing.md),
+              if (hasDresscode)
+                _buildInfoRow(label: t.events.detail.dresscode, value: dresscode),
+              if ((hasPrice || hasDresscode) && (onBuyTickets != null || onSource != null))
+                const SizedBox(height: AppSpacing.lg),
+              if (onBuyTickets != null) ...[
+                _buildBuyTicketsButton(),
+                if (onSource != null) const SizedBox(height: AppSpacing.sm),
+              ],
+              if (onSource != null)
+                _buildSourceButton(),
             ],
           ),
         ),
