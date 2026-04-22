@@ -155,7 +155,8 @@
       "allCities": "Todas las ciudades",
       "selectedRegions": "REGIONES SELECCIONADAS",
       "noResults": "Sin resultados",
-      "abroad": "Extranjero"
+      "abroad": "Extranjero",
+      "unknownRegion": "Ubicación desconocida"
     },
     "filters": {
       "today": "Hoy",
@@ -179,6 +180,7 @@
       "aboutInstructor": "Sobre el instructor",
       "shareCourse": "Compartir curso",
       "coursePrice": "Precio del curso",
+      "priceUnknown": "Precio no especificado",
       "availableSpots": "Plazas disponibles",
       "register": "Inscribirse al curso",
       "startDate": "Fecha de inicio",

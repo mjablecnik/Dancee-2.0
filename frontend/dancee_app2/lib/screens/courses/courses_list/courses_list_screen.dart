@@ -35,6 +35,8 @@ class CoursesListScreen extends StatelessWidget {
               return EventsHeaderSection(
                 location: location,
                 onLocationTap: () => context.push('/events/filter-location?source=courses'),
+                hasActiveFilters: filterState.hasActiveFilters,
+                onClearFilters: () => context.read<FilterCubit>().clearAll(),
               );
             },
           ),

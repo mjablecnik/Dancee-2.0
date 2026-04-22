@@ -155,7 +155,8 @@
       "allCities": "Všechna města",
       "selectedRegions": "VYBRANÉ OBLASTI",
       "noResults": "Žádné výsledky",
-      "abroad": "Zahraničí"
+      "abroad": "Zahraničí",
+      "unknownRegion": "Neznámá lokalita"
     },
     "filters": {
       "today": "Dnes",
@@ -179,6 +180,7 @@
       "aboutInstructor": "O lektorovi",
       "shareCourse": "Sdílet kurz",
       "coursePrice": "Cena kurzu",
+      "priceUnknown": "Cena neuvedena",
       "availableSpots": "Volná místa",
       "register": "Registrovat se na kurz",
       "startDate": "Datum začátku",

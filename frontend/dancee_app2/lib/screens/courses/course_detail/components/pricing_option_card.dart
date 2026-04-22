@@ -22,6 +22,10 @@ class PricingOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPrice = price.trim().isNotEmpty;
+    final hasSpots = spotsAvailable.isNotEmpty && spotsTotal.isNotEmpty;
+    final displayPrice = hasPrice ? price : t.courses.detail.priceUnknown;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
@@ -34,55 +38,61 @@ class PricingOptionCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    t.courses.detail.coursePrice,
-                    style: const TextStyle(
-                      color: appText,
-                      fontSize: AppTypography.fontSizeMd,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.courses.detail.coursePrice,
+                      style: const TextStyle(
+                        color: appText,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    price,
-                    style: const TextStyle(
-                      color: appPrimary,
-                      fontSize: AppTypography.fontSize4xl,
-                      fontWeight: FontWeight.bold,
+                    Text(
+                      displayPrice,
+                      style: TextStyle(
+                        color: hasPrice ? appPrimary : appMuted,
+                        fontSize: hasPrice
+                            ? AppTypography.fontSize4xl
+                            : AppTypography.fontSizeXl,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    priceNote,
-                    style: const TextStyle(
-                      color: appMuted,
-                      fontSize: AppTypography.fontSizeSm,
-                    ),
-                  ),
-                ],
+                    if (hasPrice && priceNote.trim().isNotEmpty)
+                      Text(
+                        priceNote,
+                        style: const TextStyle(
+                          color: appMuted,
+                          fontSize: AppTypography.fontSizeSm,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    t.courses.detail.availableSpots,
-                    style: const TextStyle(
-                      color: appSuccess,
-                      fontSize: AppTypography.fontSizeMd,
-                      fontWeight: AppTypography.fontWeightMedium,
+              if (hasSpots)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      t.courses.detail.availableSpots,
+                      style: const TextStyle(
+                        color: appSuccess,
+                        fontSize: AppTypography.fontSizeMd,
+                        fontWeight: AppTypography.fontWeightMedium,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '$spotsAvailable/$spotsTotal',
-                    style: const TextStyle(
-                      color: appSuccess,
-                      fontSize: AppTypography.fontSize2xl,
-                      fontWeight: FontWeight.bold,
+                    Text(
+                      '$spotsAvailable/$spotsTotal',
+                      style: const TextStyle(
+                        color: appSuccess,
+                        fontSize: AppTypography.fontSize2xl,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),

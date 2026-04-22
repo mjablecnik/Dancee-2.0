@@ -8,6 +8,7 @@ import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/course_cubit.dart';
 import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/filter_cubit.dart';
+import '../../../shared/utils/region_label.dart';
 import 'sections/filter_location_header_section.dart';
 import '../filter_dance/sections/filter_bottom_actions_section.dart';
 
@@ -242,7 +243,7 @@ class _RegionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = region == kAbroadRegionKey ? t.events.filter.abroad : region;
+    final label = regionLabel(region);
     return InkWell(
       onTap: onToggle,
       child: Container(
@@ -339,9 +340,7 @@ class _SelectedRegionsSection extends StatelessWidget {
           runSpacing: AppSpacing.sm,
           children: selectedRegions
               .map((region) => _SelectedTag(
-                    label: region == kAbroadRegionKey
-                        ? t.events.filter.abroad
-                        : region,
+                    label: regionLabel(region),
                     onRemove: () => onRemove(region),
                   ))
               .toList(),

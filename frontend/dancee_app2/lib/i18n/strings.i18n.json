@@ -155,7 +155,8 @@
       "allCities": "All cities",
       "selectedRegions": "SELECTED REGIONS",
       "noResults": "No results found",
-      "abroad": "Abroad"
+      "abroad": "Abroad",
+      "unknownRegion": "Unknown location"
     },
     "filters": {
       "today": "Today",
@@ -179,6 +180,7 @@
       "aboutInstructor": "About instructor",
       "shareCourse": "Share course",
       "coursePrice": "Course price",
+      "priceUnknown": "Price not specified",
       "availableSpots": "Available spots",
       "register": "Register for course",
       "startDate": "Start date",

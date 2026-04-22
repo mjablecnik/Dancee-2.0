@@ -33,6 +33,8 @@ class EventsListScreen extends StatelessWidget {
               return EventsHeaderSection(
                 location: location,
                 onLocationTap: () => context.push('/events/filter-location'),
+                hasActiveFilters: filterState.hasActiveFilters,
+                onClearFilters: () => context.read<FilterCubit>().clearAll(),
               );
             },
           ),
