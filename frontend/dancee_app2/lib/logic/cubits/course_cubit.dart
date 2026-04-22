@@ -31,11 +31,16 @@ class CourseCubit extends Cubit<CourseState> {
   /// its child styles resolved via [allDanceStyles].
   int countCoursesForDanceStyle(String styleCode, List<DanceStyle> allDanceStyles) {
     final expandedCodes = <String>{styleCode};
-    expandedCodes.addAll(
-      allDanceStyles.where((s) => s.parentCode == styleCode).map((s) => s.code),
-    );
+    final expandedNames = <String>{};
+    final parent = allDanceStyles.where((s) => s.code == styleCode).firstOrNull;
+    if (parent != null) expandedNames.add(parent.name.toLowerCase());
+    for (final child in allDanceStyles.where((s) => s.parentCode == styleCode)) {
+      expandedCodes.add(child.code);
+      expandedNames.add(child.name.toLowerCase());
+    }
     return _allCourses
-        .where((c) => c.dances.any((d) => expandedCodes.contains(d)))
+        .where((c) => c.dances.any((d) =>
+            expandedCodes.contains(d) || expandedNames.contains(d.toLowerCase())))
         .length;
   }
 
@@ -86,13 +91,20 @@ List<Course> _filterCourses(
   return courses.where((course) {
     if (filters.selectedDanceStyles.isNotEmpty) {
       final expandedCodes = <String>{};
+      final expandedNames = <String>{};
       for (final code in filters.selectedDanceStyles) {
         expandedCodes.add(code);
-        expandedCodes.addAll(
-          allStyles.where((s) => s.parentCode == code).map((s) => s.code),
-        );
+        final parent = allStyles.where((s) => s.code == code).firstOrNull;
+        if (parent != null) expandedNames.add(parent.name.toLowerCase());
+        for (final child in allStyles.where((s) => s.parentCode == code)) {
+          expandedCodes.add(child.code);
+          expandedNames.add(child.name.toLowerCase());
+        }
       }
-      if (!course.dances.any((d) => expandedCodes.contains(d))) return false;
+      if (!course.dances.any((d) =>
+          expandedCodes.contains(d) || expandedNames.contains(d.toLowerCase()))) {
+        return false;
+      }
     }
     if (filters.selectedRegions.isNotEmpty) {
       if (course.venue == null ||

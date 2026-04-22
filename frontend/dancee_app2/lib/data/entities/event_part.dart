@@ -29,8 +29,9 @@ class EventPart extends Equatable {
         (translation?['description'] as String?) ??
         (json['description'] as String?);
 
-    final startTimeStr = json['start_time'] as String?;
-    final endTimeStr = json['end_time'] as String?;
+    final rawDateRange = json['date_time_range'] as Map<String, dynamic>?;
+    final startTimeStr = rawDateRange?['start'] as String? ?? json['start_time'] as String?;
+    final endTimeStr = rawDateRange?['end'] as String? ?? json['end_time'] as String?;
 
     final lectors = (json['lectors'] as List<dynamic>?)
             ?.map((e) => e.toString())
