@@ -7,11 +7,13 @@ class KeyInfoItem {
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   const KeyInfoItem({
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 }
 
@@ -48,35 +50,40 @@ class _KeyInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FaIcon(item.icon, size: 18, color: appPrimary),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.title,
-                style: const TextStyle(
-                  color: appText,
-                  fontSize: AppTypography.fontSizeLg,
-                  fontWeight: AppTypography.fontWeightSemiBold,
+    return GestureDetector(
+      onTap: item.onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FaIcon(item.icon, size: 18, color: appPrimary),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    color: appText,
+                    fontSize: AppTypography.fontSizeLg,
+                    fontWeight: AppTypography.fontWeightSemiBold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                item.subtitle,
-                style: const TextStyle(
-                  color: appMuted,
-                  fontSize: AppTypography.fontSizeMd,
+                const SizedBox(height: 2),
+                Text(
+                  item.subtitle,
+                  style: TextStyle(
+                    color: item.onTap != null ? appPrimary : appMuted,
+                    fontSize: AppTypography.fontSizeMd,
+                    decoration: item.onTap != null ? TextDecoration.underline : null,
+                    decorationColor: item.onTap != null ? appPrimary : null,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

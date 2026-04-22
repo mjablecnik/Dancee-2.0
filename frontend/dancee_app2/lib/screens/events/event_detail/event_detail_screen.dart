@@ -61,10 +61,15 @@ class EventDetailScreen extends StatelessWidget {
     // Additional info items (url type shown as key info)
     for (final info in event.info) {
       if (info.type == EventInfoType.url && info.key.isNotEmpty) {
+        var url = info.value;
+        if (url.isNotEmpty && !url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://$url';
+        }
         items.add(KeyInfoItem(
           icon: FontAwesomeIcons.link,
           title: info.key,
           subtitle: info.value,
+          onTap: url.isNotEmpty ? () => openUrl(url) : null,
         ));
       }
     }
