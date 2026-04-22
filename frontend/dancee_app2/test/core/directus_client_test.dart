@@ -94,7 +94,6 @@ void _propertyErrorMapping() {
       throwsA(
         predicate<ApiException>(
           (e) =>
-              e is ApiException &&
               e.statusCode == null &&
               e.message.toLowerCase().contains('timed out'),
           'should map connectionTimeout to ApiException with null statusCode',
@@ -118,7 +117,6 @@ void _propertyErrorMapping() {
       throwsA(
         predicate<ApiException>(
           (e) =>
-              e is ApiException &&
               e.statusCode == null &&
               e.message.toLowerCase().contains('respond'),
           'should map receiveTimeout to ApiException with null statusCode',
@@ -142,7 +140,6 @@ void _propertyErrorMapping() {
       throwsA(
         predicate<ApiException>(
           (e) =>
-              e is ApiException &&
               e.statusCode == null &&
               e.message.toLowerCase().contains('sending'),
           'should map sendTimeout to ApiException with null statusCode',
@@ -166,7 +163,6 @@ void _propertyErrorMapping() {
       throwsA(
         predicate<ApiException>(
           (e) =>
-              e is ApiException &&
               e.statusCode == null &&
               e.message.toLowerCase().contains('internet'),
           'should map connectionError to ApiException about network',
@@ -190,7 +186,6 @@ void _propertyErrorMapping() {
       throwsA(
         predicate<ApiException>(
           (e) =>
-              e is ApiException &&
               e.statusCode == null &&
               e.message.toLowerCase().contains('cancel'),
           'should map cancel to ApiException about cancellation',
@@ -208,7 +203,7 @@ void _propertyErrorMapping() {
           () => client.get('/items/test'),
           throwsA(
             predicate<ApiException>(
-              (e) => e is ApiException && e.statusCode == statusCode,
+              (e) => e.statusCode == statusCode,
               'should map HTTP $statusCode to ApiException with statusCode $statusCode',
             ),
           ),
@@ -224,7 +219,6 @@ void _propertyErrorMapping() {
         throwsA(
           predicate<ApiException>(
             (e) =>
-                e is ApiException &&
                 e.statusCode == 401 &&
                 e.message.toLowerCase().contains('auth'),
             'should include authentication info in 401 message',
@@ -241,7 +235,6 @@ void _propertyErrorMapping() {
         throwsA(
           predicate<ApiException>(
             (e) =>
-                e is ApiException &&
                 e.statusCode == 404 &&
                 e.message.toLowerCase().contains('not found'),
             'should include not found info in 404 message',
@@ -257,7 +250,7 @@ void _propertyErrorMapping() {
         () => client.get('/items/test'),
         throwsA(
           predicate<ApiException>(
-            (e) => e is ApiException && e.statusCode == 422,
+            (e) => e.statusCode == 422,
             'should map 422 to ApiException with statusCode 422',
           ),
         ),
@@ -271,7 +264,7 @@ void _propertyErrorMapping() {
         () => client.get('/items/test'),
         throwsA(
           predicate<ApiException>(
-            (e) => e is ApiException && e.statusCode == 504,
+            (e) => e.statusCode == 504,
             'should map 504 to ApiException with statusCode 504',
           ),
         ),

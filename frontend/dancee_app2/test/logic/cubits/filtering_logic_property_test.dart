@@ -55,8 +55,8 @@ Event _makeEvent({
     organizer: 'Organizer',
     dances: List<String>.from(dances),
     eventType: eventType,
-    info: [],
-    parts: [],
+    info: const [],
+    parts: const [],
     isFavorited: false,
     venue: region != null
         ? Venue(
@@ -335,7 +335,7 @@ void _propertyParentChildExpansion() {
           _makeEvent(id: 5, dances: ['salsa_cubana', 'salsa_on2']),
         ];
 
-        final filter = const FilterState(selectedDanceStyles: {'salsa'});
+        const filter = FilterState(selectedDanceStyles: {'salsa'});
 
         final cubit = EventCubit(
           eventRepository: _FakeEventRepository(events),
