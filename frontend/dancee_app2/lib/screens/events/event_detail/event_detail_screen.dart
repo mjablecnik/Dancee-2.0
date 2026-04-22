@@ -220,7 +220,7 @@ class EventDetailScreen extends StatelessWidget {
                                   priceRange: priceRange,
                                   dresscode: dresscode,
                                   onBuyTickets: event.registrationUrl != null
-                                      ? () {}
+                                      ? () => openUrl(event.registrationUrl!)
                                       : null,
                                   onSource: event.originalUrl != null ? () => openUrl(event.originalUrl!) : null,
                                 ),
