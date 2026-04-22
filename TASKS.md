@@ -41,7 +41,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 - [x] 18. [HIGH] Run `task slang` to regenerate translations
 - [x] 19. [HIGH] Modify `extractRegions()` in `lib/features/events/logic/event_filter.dart` to separate CZ regions from foreign events, returning CZ regions + a single "Abroad" entry
 - [x] 20. [HIGH] Modify `filterEvents()` in `lib/features/events/logic/event_filter.dart` to handle the "Abroad" region key — when selected, include non-CZ events; when nothing selected, show all
-- [ ] 21. [HIGH] Modify `countEventsForRegion()` in `lib/features/events/logic/event_filter.dart` to count foreign events for the "Abroad" option
+- [x] 21. [HIGH] Modify `countEventsForRegion()` in `lib/features/events/logic/event_filter.dart` to count foreign events for the "Abroad" option
 - [ ] 22. [MEDIUM] Update `LocationFilterSection` in `lib/features/events/pages/event_filters/sections.dart` to show CZ regions + "Abroad" option with event counts
 - [ ] 23. [LOW] Verify the free-text location search input remains hidden in `LocationFilterSection`
 

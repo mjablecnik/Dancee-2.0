@@ -59,6 +59,26 @@ class EventCubit extends Cubit<EventState> {
         .length;
   }
 
+  /// Returns the number of events that match [region].
+  ///
+  /// If [region] is [kAbroadRegionKey], counts events whose venue country is
+  /// not in [kCzCountryValues]. Otherwise counts events whose venue region
+  /// matches [region] and whose country is in [kCzCountryValues].
+  int countEventsForRegion(String region) {
+    if (region == kAbroadRegionKey) {
+      return _allEvents.where((e) {
+        final venue = e.venue;
+        if (venue == null) return true;
+        return !kCzCountryValues.contains(venue.country);
+      }).length;
+    }
+    return _allEvents.where((e) {
+      final venue = e.venue;
+      if (venue == null) return false;
+      return kCzCountryValues.contains(venue.country) && venue.region == region;
+    }).length;
+  }
+
   /// Updates the [isFavorited] flag on the event matching [eventId].
   void updateFavoriteStatus(int eventId, bool isFavorited) {
     _allEvents = _allEvents
