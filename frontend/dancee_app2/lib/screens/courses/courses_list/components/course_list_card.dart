@@ -16,6 +16,7 @@ class CourseListCard extends StatelessWidget {
   final String title;
   final String instructor;
   final String dateRange;
+  final String? time;
   final List<CourseTag> tags;
   final String price;
   final bool isFavorited;
@@ -28,6 +29,7 @@ class CourseListCard extends StatelessWidget {
     required this.title,
     required this.instructor,
     required this.dateRange,
+    this.time,
     required this.tags,
     required this.price,
     this.isFavorited = false,
@@ -116,6 +118,15 @@ class CourseListCard extends StatelessWidget {
           dateRange,
           style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
         ),
+        if (time != null && time!.isNotEmpty) ...[
+          const SizedBox(width: AppSpacing.lg),
+          const FaIcon(FontAwesomeIcons.clock, size: 12, color: appMuted),
+          const SizedBox(width: AppSpacing.sm),
+          Text(
+            time!,
+            style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
+          ),
+        ],
       ],
     );
   }

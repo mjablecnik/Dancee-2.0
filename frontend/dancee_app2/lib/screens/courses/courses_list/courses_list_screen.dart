@@ -20,14 +20,17 @@ import '../../events/events_list/sections/upcoming_events_section.dart' show par
 import 'components/course_list_card.dart';
 
 String _courseDisplayDate(Course course) {
-  final dateStr = formatDateRange(course.startDate, course.endDate);
+  return formatDateRange(course.startDate, course.endDate);
+}
+
+String? _courseDisplayTime(Course course) {
   final isSameDate = course.startDate != null &&
       course.endDate != null &&
       course.startDate == course.endDate;
   if (isSameDate && course.scheduleTime != null && course.scheduleTime!.isNotEmpty) {
-    return '$dateStr · ${course.scheduleTime}';
+    return course.scheduleTime;
   }
-  return dateStr;
+  return null;
 }
 
 class CoursesListScreen extends StatelessWidget {
@@ -225,6 +228,7 @@ class _AllCoursesSection extends StatelessWidget {
                       title: course.title,
                       instructor: course.instructorName ?? '',
                       dateRange: _courseDisplayDate(course),
+                      time: _courseDisplayTime(course),
                       tags: parentDanceNames(
                               course.dances,
                               context.read<FilterCubit>().allDanceStyles,
