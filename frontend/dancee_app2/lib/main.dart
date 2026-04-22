@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'core/service_locator.dart';
 import 'core/theme.dart';
@@ -175,6 +176,7 @@ class DanceeApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           locale: TranslationProvider.of(context).flutterLocale,
           supportedLocales: AppLocale.values.map((l) => l.flutterLocale).toList(),
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
         ),
       ),
     );
