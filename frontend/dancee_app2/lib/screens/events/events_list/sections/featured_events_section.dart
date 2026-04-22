@@ -14,12 +14,14 @@ import 'upcoming_events_section.dart' show parentDanceNames;
 class FeaturedEventsSection extends StatelessWidget {
   final List<Event> events;
   final List<DanceStyle> allDanceStyles;
+  final Set<String> activeFilterCodes;
   final void Function(int eventId)? onEventTap;
 
   const FeaturedEventsSection({
     super.key,
     required this.events,
     this.allDanceStyles = const [],
+    this.activeFilterCodes = const {},
     this.onEventTap,
   });
 
@@ -60,8 +62,11 @@ class FeaturedEventsSection extends StatelessWidget {
               price: price.isEmpty ? t.events.detail.admission : price,
               isFree: isFree,
               isFavorited: event.isFavorited,
-              tags: parentDanceNames(event.dances, allDanceStyles)
-                  .map((name) => EventTagData(name, appPrimary))
+              tags: parentDanceNames(
+                      event.dances, allDanceStyles,
+                      activeFilterCodes: activeFilterCodes)
+                  .map((tag) => EventTagData(
+                      tag.name, tag.isFilterMatch ? appSuccess : appPrimary))
                   .toList(),
               onTap: () => onEventTap?.call(event.id),
               onFavoriteTap: () => context.read<FavoritesCubit>().toggleFavorite(

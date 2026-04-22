@@ -14,39 +14,90 @@ import '../components/upcoming_event_card.dart';
 /// Max number of dance style tags shown per event card.
 const _kMaxDanceTags = 6;
 
+/// Tag data with highlight flag for active filter matches.
+class ResolvedTag {
+  final String name;
+  final bool isFilterMatch;
+  const ResolvedTag(this.name, {this.isFilterMatch = false});
+}
+
 /// Resolves dance codes/names to unique parent display names, limited to [_kMaxDanceTags].
-///
-/// Each dance in [codes] is matched against [allStyles] by code or name.
-/// If a match has a parentCode, the parent's name is used instead.
-/// Unmatched codes are kept as-is.
-List<String> parentDanceNames(List<String> codes, List<DanceStyle> allStyles) {
-  final names = <String>[];
+/// Tags matching [activeFilterCodes] are prioritized and marked as filter matches.
+/// If a filter match is found via child dance but the parent isn't in the resolved
+/// tags yet, it's injected so the user sees why the item matched.
+List<ResolvedTag> parentDanceNames(
+  List<String> codes,
+  List<DanceStyle> allStyles, {
+  Set<String> activeFilterCodes = const {},
+}) {
+  // Build lookup: filter parent code → display name
+  final filterParentNames = <String, String>{};
+  for (final fc in activeFilterCodes) {
+    final parent = allStyles.where((s) => s.code == fc).firstOrNull;
+    filterParentNames[fc] = parent?.name ?? fc;
+  }
+
+  // Build set of all filter-related codes/names for matching
+  final filterMatchSet = <String>{};
+  for (final fc in activeFilterCodes) {
+    filterMatchSet.add(fc.toLowerCase());
+    final parent = allStyles.where((s) => s.code == fc).firstOrNull;
+    if (parent != null) filterMatchSet.add(parent.name.toLowerCase());
+    for (final child in allStyles.where((s) => s.parentCode == fc)) {
+      filterMatchSet.add(child.code.toLowerCase());
+      filterMatchSet.add(child.name.toLowerCase());
+    }
+  }
+
+  final tags = <ResolvedTag>[];
+  final seen = <String>{};
+
+  // First: inject filter parent names so they always appear
+  for (final fc in activeFilterCodes) {
+    final name = filterParentNames[fc]!;
+    if (seen.add(name)) {
+      tags.add(ResolvedTag(name, isFilterMatch: true));
+    }
+  }
+
   for (final code in codes) {
-    // Match by code first, then by name (case-insensitive)
     final style = allStyles.where((s) => s.code == code).firstOrNull ??
         allStyles.where((s) => s.name.toLowerCase() == code.toLowerCase()).firstOrNull;
 
     String displayName;
     if (style != null && style.parentCode != null) {
-      // Resolve to parent name
       final parent = allStyles.where((s) => s.code == style.parentCode).firstOrNull;
       displayName = parent?.name ?? code;
     } else if (style != null) {
-      // Already a parent style
       displayName = style.name;
     } else {
       displayName = code;
     }
 
-    if (!names.contains(displayName)) names.add(displayName);
-    if (names.length >= _kMaxDanceTags) break;
+    if (seen.add(displayName)) {
+      final isMatch = filterMatchSet.contains(displayName.toLowerCase()) ||
+          filterMatchSet.contains(code.toLowerCase());
+      tags.add(ResolvedTag(displayName, isFilterMatch: isMatch));
+    }
+    if (tags.length >= _kMaxDanceTags) break;
   }
-  return names;
+
+  // Sort: filter matches first
+  if (activeFilterCodes.isNotEmpty) {
+    tags.sort((a, b) {
+      if (a.isFilterMatch && !b.isFilterMatch) return -1;
+      if (!a.isFilterMatch && b.isFilterMatch) return 1;
+      return 0;
+    });
+  }
+
+  return tags;
 }
 
 class UpcomingEventsSection extends StatelessWidget {
   final List<Event> events;
   final List<DanceStyle> allDanceStyles;
+  final Set<String> activeFilterCodes;
   final bool hasActiveFilters;
   final VoidCallback? onClearFilters;
   final void Function(int eventId)? onEventTap;
@@ -55,6 +106,7 @@ class UpcomingEventsSection extends StatelessWidget {
     super.key,
     required this.events,
     this.allDanceStyles = const [],
+    this.activeFilterCodes = const {},
     this.hasActiveFilters = false,
     this.onClearFilters,
     this.onEventTap,
@@ -142,8 +194,11 @@ class UpcomingEventsSection extends StatelessWidget {
                     title: event.title,
                     location: event.venue?.town ?? event.venue?.name ?? '',
                     date: formatDate(event.startTime),
-                    tags: parentDanceNames(event.dances, allDanceStyles)
-                        .map((name) => EventTagData(name, appPrimary))
+                    tags: parentDanceNames(
+                            event.dances, allDanceStyles,
+                            activeFilterCodes: activeFilterCodes)
+                        .map((tag) => EventTagData(
+                            tag.name, tag.isFilterMatch ? appSuccess : appPrimary))
                         .toList(),
                     isFavorited: event.isFavorited,
                     onTap: () => onEventTap?.call(event.id),

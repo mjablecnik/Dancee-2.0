@@ -62,6 +62,7 @@ class EventsListScreen extends StatelessWidget {
                         FeaturedEventsSection(
                           events: loaded.featuredEvents,
                           allDanceStyles: context.read<FilterCubit>().allDanceStyles,
+                          activeFilterCodes: context.read<FilterCubit>().state.selectedDanceStyles,
                           onEventTap: (id) => context.push('/events/detail?id=$id'),
                         ),
                         if (loaded.featuredEvents.isNotEmpty)
@@ -69,6 +70,7 @@ class EventsListScreen extends StatelessWidget {
                         UpcomingEventsSection(
                           events: loaded.filteredEvents,
                           allDanceStyles: context.read<FilterCubit>().allDanceStyles,
+                          activeFilterCodes: context.read<FilterCubit>().state.selectedDanceStyles,
                           hasActiveFilters: context.read<FilterCubit>().state.hasActiveFilters,
                           onClearFilters: () => context.read<FilterCubit>().clearAll(),
                           onEventTap: (id) => context.push('/events/detail?id=$id'),

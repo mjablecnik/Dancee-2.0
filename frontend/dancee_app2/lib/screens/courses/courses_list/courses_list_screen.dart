@@ -215,8 +215,12 @@ class _AllCoursesSection extends StatelessWidget {
                       instructor: course.instructorName ?? '',
                       dateRange:
                           formatDateRange(course.startDate, course.endDate),
-                      tags: parentDanceNames(course.dances, context.read<FilterCubit>().allDanceStyles)
-                          .map((name) => CourseTag(name, appPrimary))
+                      tags: parentDanceNames(
+                              course.dances,
+                              context.read<FilterCubit>().allDanceStyles,
+                              activeFilterCodes: context.read<FilterCubit>().state.selectedDanceStyles)
+                          .map((tag) => CourseTag(
+                              tag.name, tag.isFilterMatch ? appSuccess : appPrimary))
                           .toList(),
                       price: course.price ?? '',
                       isFavorited: course.isFavorited,
