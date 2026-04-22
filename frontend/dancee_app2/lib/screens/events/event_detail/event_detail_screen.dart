@@ -205,11 +205,13 @@ class EventDetailScreen extends StatelessWidget {
                                   onShare: null,
                                   onMap: event.venue != null &&
                                           (event.venue!.latitude != 0 ||
-                                              event.venue!.longitude != 0)
+                                              event.venue!.longitude != 0 ||
+                                              event.venue!.fullAddress.isNotEmpty)
                                       ? () => openMap(
                                             event.venue!.latitude,
                                             event.venue!.longitude,
                                             event.venue!.name,
+                                            fullAddress: event.venue!.fullAddress,
                                           )
                                       : null,
                                 ),

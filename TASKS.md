@@ -17,7 +17,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 ## Frontend: Map Address Fix (Spec §1)
 
-- [ ] 6. [HIGH] In `lib/features/events/logic/event_detail.dart`, change `openMap()` to use `venue.address.fullAddress` (URL-encoded) as the Google Maps destination, falling back to coordinates if address is empty
+- [x] 6. [HIGH] In `lib/features/events/logic/event_detail.dart`, change `openMap()` to use `venue.address.fullAddress` (URL-encoded) as the Google Maps destination, falling back to coordinates if address is empty
 
 ## Frontend: Parent-Only Dance Styles in Filters (Spec §2)
 

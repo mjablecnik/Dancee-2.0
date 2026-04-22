@@ -9,11 +9,15 @@ Future<void> openUrl(String url) async {
   }
 }
 
-/// Opens the platform's default map app centered on [lat]/[lng].
-/// Uses a Google Maps web URL that works cross-platform.
-Future<void> openMap(double lat, double lng, String label) async {
+/// Opens the platform's default map app for the given location.
+/// Uses [fullAddress] as the query when non-empty; falls back to [lat]/[lng].
+Future<void> openMap(double lat, double lng, String label,
+    {String fullAddress = ''}) async {
+  final query = fullAddress.isNotEmpty
+      ? Uri.encodeComponent(fullAddress)
+      : '$lat,$lng';
   final uri = Uri.parse(
-    'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+    'https://www.google.com/maps/search/?api=1&query=$query',
   );
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
