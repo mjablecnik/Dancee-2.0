@@ -31,13 +31,38 @@ class EventDetailScreen extends StatelessWidget {
     final items = <KeyInfoItem>[];
 
     // Date/time
-    final dateStr = formatDate(event.startTime);
-    final timeStr = formatTime(event.startTime);
-    final endStr = event.endTime != null ? ' – ${formatTime(event.endTime!)}' : '';
+    final startDateStr = formatDate(event.startTime);
+    final startDay = event.startTime.toIso8601String().substring(0, 10);
+    final endDay = event.endTime?.toIso8601String().substring(0, 10);
+    final isMultiDay = event.endTime != null && endDay != startDay;
+
+    final dateTitle = isMultiDay
+        ? '$startDateStr – ${formatDate(event.endTime!)}'
+        : startDateStr;
+
+    // Build time subtitle
+    String timeSubtitle;
+    final startTime = formatTime(event.startTime);
+    final endTime = event.endTime != null ? formatTime(event.endTime!) : null;
+    final sameTime = endTime != null && startTime == endTime;
+
+    if (sameTime) {
+      // Placeholder data (e.g. 03:00 – 03:00) — hide time
+      timeSubtitle = '';
+    } else if (isMultiDay && endTime != null) {
+      // Multi-day: show start time only
+      timeSubtitle = t.common.from(time: startTime);
+    } else if (endTime != null) {
+      // Single day with range
+      timeSubtitle = '$startTime – $endTime';
+    } else {
+      timeSubtitle = t.common.from(time: startTime);
+    }
+
     items.add(KeyInfoItem(
       icon: FontAwesomeIcons.calendar,
-      title: dateStr,
-      subtitle: '$timeStr$endStr',
+      title: dateTitle,
+      subtitle: timeSubtitle,
     ));
 
     // Venue

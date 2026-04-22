@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 789 (263 per locale)
+/// Strings: 792 (264 per locale)
 ///
-/// Built on 2026-04-22 at 14:47 UTC
+/// Built on 2026-04-22 at 21:12 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -188,6 +188,7 @@ class _StringsCommonEn {
 	String get saveChanges => 'Save changes';
 	String get loading => 'Loading...';
 	String get retry => 'Retry';
+	String from({required Object time}) => 'From ${time}';
 	late final _StringsCommonFormEn form = _StringsCommonFormEn._(_root);
 }
 
@@ -839,6 +840,7 @@ class _StringsCommonCs extends _StringsCommonEn {
 	@override String get saveChanges => 'Uložit změny';
 	@override String get loading => 'Načítání...';
 	@override String get retry => 'Zkusit znovu';
+	@override String from({required Object time}) => 'Od ${time}';
 	@override late final _StringsCommonFormCs form = _StringsCommonFormCs._(_root);
 }
 
@@ -1490,6 +1492,7 @@ class _StringsCommonEs extends _StringsCommonEn {
 	@override String get saveChanges => 'Guardar cambios';
 	@override String get loading => 'Cargando...';
 	@override String get retry => 'Reintentar';
+	@override String from({required Object time}) => 'Desde ${time}';
 	@override late final _StringsCommonFormEs form = _StringsCommonFormEs._(_root);
 }
 
@@ -2113,6 +2116,7 @@ extension on Translations {
 			case 'common.saveChanges': return 'Save changes';
 			case 'common.loading': return 'Loading...';
 			case 'common.retry': return 'Retry';
+			case 'common.from': return ({required Object time}) => 'From ${time}';
 			case 'common.form.email': return 'E-mail';
 			case 'common.form.emailHint': return 'your@email.com';
 			case 'common.form.password': return 'Password';
@@ -2384,6 +2388,7 @@ extension on _StringsCs {
 			case 'common.saveChanges': return 'Uložit změny';
 			case 'common.loading': return 'Načítání...';
 			case 'common.retry': return 'Zkusit znovu';
+			case 'common.from': return ({required Object time}) => 'Od ${time}';
 			case 'common.form.email': return 'E-mail';
 			case 'common.form.emailHint': return 'tvuj@email.cz';
 			case 'common.form.password': return 'Heslo';
@@ -2655,6 +2660,7 @@ extension on _StringsEs {
 			case 'common.saveChanges': return 'Guardar cambios';
 			case 'common.loading': return 'Cargando...';
 			case 'common.retry': return 'Reintentar';
+			case 'common.from': return ({required Object time}) => 'Desde ${time}';
 			case 'common.form.email': return 'E-mail';
 			case 'common.form.emailHint': return 'tu@email.com';
 			case 'common.form.password': return 'Contraseña';

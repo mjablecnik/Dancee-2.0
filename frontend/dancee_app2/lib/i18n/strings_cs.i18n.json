@@ -33,6 +33,7 @@
     "saveChanges": "Uložit změny",
     "loading": "Načítání...",
     "retry": "Zkusit znovu",
+    "from": "Od ${time}",
     "form": {
       "email": "E-mail",
       "emailHint": "tvuj@email.cz",

@@ -33,6 +33,7 @@
     "saveChanges": "Save changes",
     "loading": "Loading...",
     "retry": "Retry",
+    "from": "From ${time}",
     "form": {
       "email": "E-mail",
       "emailHint": "your@email.com",
