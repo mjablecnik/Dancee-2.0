@@ -136,7 +136,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Implement `updateFavoriteStatus(eventId, isFavorited)` — update isFavorited on matching event in allEvents and re-apply filters
     - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 10.1, 10.3, 10.4, 15.3_
 
-  - [ ]* 5.6 Write property tests for filtering logic
+  - [x]* 5.6 Write property tests for filtering logic
     - **Property 6: Featured events are filtered festivals** — generate random event lists with mixed types + random filters, verify featured subset contains only festivals matching all filters
     - **Property 7: Combined AND filtering** — generate random items + random filter states, verify AND logic for dance styles and regions
     - **Property 8: Parent/child dance style expansion** — generate random dance style trees, verify expansion includes parent + all children
