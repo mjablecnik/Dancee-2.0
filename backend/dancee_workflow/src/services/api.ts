@@ -1,5 +1,5 @@
 import * as restate from "@restatedev/restate-sdk";
-import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError, getDanceStyleCodes, listPublishedCourses, createFavorite, deleteFavorite, listFavorites } from "../clients/directus-client";
+import { listPublishedEvents, findEventByOriginalUrl, getEventById, updateEvent, deleteEventTranslations, createError, getDanceStyleCodes, listPublishedCourses, createFavorite, deleteFavorite, listFavorites, listDanceStyles } from "../clients/directus-client";
 import { config, captureError } from "../core/config";
 import { log } from "../core/logger";
 import { normalizeEventUrl } from "../core/utils";
@@ -406,6 +406,10 @@ export const apiService = restate.service({
       }
 
       return ctx.run("listFavorites", () => listFavorites(request.user_id!));
+    },
+
+    listDanceStyles: async (ctx: restate.Context) => {
+      return ctx.run("listDanceStyles", () => listDanceStyles());
     },
 
     listEvents: async (ctx: restate.Context) => {
