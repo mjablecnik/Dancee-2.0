@@ -49,14 +49,31 @@ List<ResolvedTag> parentDanceNames(
     }
   }
 
+  // Build per-filter match sets to check which filters this event actually matches
+  final perFilterMatchSets = <String, Set<String>>{};
+  for (final fc in activeFilterCodes) {
+    final matchSet = <String>{fc.toLowerCase()};
+    final parent = allStyles.where((s) => s.code == fc).firstOrNull;
+    if (parent != null) matchSet.add(parent.name.toLowerCase());
+    for (final child in allStyles.where((s) => s.parentCode == fc)) {
+      matchSet.add(child.code.toLowerCase());
+      matchSet.add(child.name.toLowerCase());
+    }
+    perFilterMatchSets[fc] = matchSet;
+  }
+
   final tags = <ResolvedTag>[];
   final seen = <String>{};
 
-  // First: inject filter parent names so they always appear
+  // Inject filter parent names only if the event actually has a matching dance
   for (final fc in activeFilterCodes) {
-    final name = filterParentNames[fc]!;
-    if (seen.add(name)) {
-      tags.add(ResolvedTag(name, isFilterMatch: true));
+    final matchSet = perFilterMatchSets[fc]!;
+    final eventMatches = codes.any((d) => matchSet.contains(d.toLowerCase()));
+    if (eventMatches) {
+      final name = filterParentNames[fc]!;
+      if (seen.add(name)) {
+        tags.add(ResolvedTag(name, isFilterMatch: true));
+      }
     }
   }
 
