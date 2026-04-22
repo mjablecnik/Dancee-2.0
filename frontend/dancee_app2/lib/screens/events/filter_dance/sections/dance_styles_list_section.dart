@@ -20,7 +20,8 @@ class DanceStylesListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (styles.isEmpty) return const SizedBox.shrink();
+    final visible = styles.where((s) => (counts[s.code] ?? 0) > 0).toList();
+    if (visible.isEmpty) return const SizedBox.shrink();
     return Container(
       decoration: BoxDecoration(
         color: appSurface,
@@ -29,9 +30,9 @@ class DanceStylesListSection extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-        children: List.generate(styles.length, (index) {
-          final style = styles[index];
-          final isLast = index == styles.length - 1;
+        children: List.generate(visible.length, (index) {
+          final style = visible[index];
+          final isLast = index == visible.length - 1;
           final isChecked = selected[style.code] ?? false;
           final count = counts[style.code] ?? 0;
           return _StyleRow(

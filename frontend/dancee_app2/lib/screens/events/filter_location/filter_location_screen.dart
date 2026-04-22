@@ -182,6 +182,8 @@ class _RegionsListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final visible = regions.where((r) => (regionCounts[r] ?? 0) > 0).toList();
+    if (visible.isEmpty) return const SizedBox.shrink();
     return Container(
       decoration: BoxDecoration(
         color: appSurface,
@@ -190,9 +192,9 @@ class _RegionsListSection extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-        children: List.generate(regions.length, (index) {
-          final region = regions[index];
-          final isLast = index == regions.length - 1;
+        children: List.generate(visible.length, (index) {
+          final region = visible[index];
+          final isLast = index == visible.length - 1;
           final isChecked = selected[region] ?? false;
           return _RegionRow(
             region: region,
