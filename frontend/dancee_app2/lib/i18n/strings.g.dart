@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 792 (264 per locale)
+/// Strings: 813 (271 per locale)
 ///
-/// Built on 2026-04-22 at 21:12 UTC
+/// Built on 2026-04-22 at 21:49 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -272,6 +272,7 @@ class _StringsCoursesEn {
 	String get allCourses => 'All courses';
 	String get noCoursesFound => 'No courses found';
 	String get noCoursesForFilter => 'No courses match your current filters. Try adjusting your selection or clear all filters.';
+	late final _StringsCoursesCourseTypesEn courseTypes = _StringsCoursesCourseTypesEn._(_root);
 	late final _StringsCoursesDetailEn detail = _StringsCoursesDetailEn._(_root);
 }
 
@@ -544,6 +545,22 @@ class _StringsEventsFiltersEn {
 	String get thisWeek => 'This week';
 	String get thisMonth => 'This month';
 	String get thisWeekend => 'This weekend';
+	String get all => 'All';
+	String get evening => 'Evening';
+	String get weekend => 'Weekend';
+	String get multiDay => 'Multi-day';
+}
+
+// Path: courses.courseTypes
+class _StringsCoursesCourseTypesEn {
+	_StringsCoursesCourseTypesEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get all => 'All';
+	String get workshop => 'Workshop';
+	String get regular => 'Regular course';
 }
 
 // Path: courses.detail
@@ -924,6 +941,7 @@ class _StringsCoursesCs extends _StringsCoursesEn {
 	@override String get allCourses => 'Všechny kurzy';
 	@override String get noCoursesFound => 'Žádné kurzy nenalezeny';
 	@override String get noCoursesForFilter => 'Pro zvolené filtry nebyly nalezeny žádné kurzy. Zkuste upravit výběr nebo vymazat filtry.';
+	@override late final _StringsCoursesCourseTypesCs courseTypes = _StringsCoursesCourseTypesCs._(_root);
 	@override late final _StringsCoursesDetailCs detail = _StringsCoursesDetailCs._(_root);
 }
 
@@ -1196,6 +1214,22 @@ class _StringsEventsFiltersCs extends _StringsEventsFiltersEn {
 	@override String get thisWeek => 'Tento týden';
 	@override String get thisMonth => 'Tento měsíc';
 	@override String get thisWeekend => 'Tento víkend';
+	@override String get all => 'Vše';
+	@override String get evening => 'Večerní';
+	@override String get weekend => 'Víkendové';
+	@override String get multiDay => 'Několikadenní';
+}
+
+// Path: courses.courseTypes
+class _StringsCoursesCourseTypesCs extends _StringsCoursesCourseTypesEn {
+	_StringsCoursesCourseTypesCs._(_StringsCs root) : this._root = root, super._(root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => 'Vše';
+	@override String get workshop => 'Workshop';
+	@override String get regular => 'Pravidelný kurz';
 }
 
 // Path: courses.detail
@@ -1576,6 +1610,7 @@ class _StringsCoursesEs extends _StringsCoursesEn {
 	@override String get allCourses => 'Todos los cursos';
 	@override String get noCoursesFound => 'No se encontraron cursos';
 	@override String get noCoursesForFilter => 'No hay cursos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.';
+	@override late final _StringsCoursesCourseTypesEs courseTypes = _StringsCoursesCourseTypesEs._(_root);
 	@override late final _StringsCoursesDetailEs detail = _StringsCoursesDetailEs._(_root);
 }
 
@@ -1848,6 +1883,22 @@ class _StringsEventsFiltersEs extends _StringsEventsFiltersEn {
 	@override String get thisWeek => 'Esta semana';
 	@override String get thisMonth => 'Este mes';
 	@override String get thisWeekend => 'Este fin de semana';
+	@override String get all => 'Todo';
+	@override String get evening => 'Nocturno';
+	@override String get weekend => 'Fin de semana';
+	@override String get multiDay => 'Varios días';
+}
+
+// Path: courses.courseTypes
+class _StringsCoursesCourseTypesEs extends _StringsCoursesCourseTypesEn {
+	_StringsCoursesCourseTypesEs._(_StringsEs root) : this._root = root, super._(root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => 'Todo';
+	@override String get workshop => 'Taller';
+	@override String get regular => 'Curso regular';
 }
 
 // Path: courses.detail
@@ -2220,12 +2271,19 @@ extension on Translations {
 			case 'events.filters.thisWeek': return 'This week';
 			case 'events.filters.thisMonth': return 'This month';
 			case 'events.filters.thisWeekend': return 'This weekend';
+			case 'events.filters.all': return 'All';
+			case 'events.filters.evening': return 'Evening';
+			case 'events.filters.weekend': return 'Weekend';
+			case 'events.filters.multiDay': return 'Multi-day';
 			case 'courses.title': return 'Dance courses';
 			case 'courses.subtitle': return 'Find your course';
 			case 'courses.featuredCourses': return 'Featured courses';
 			case 'courses.allCourses': return 'All courses';
 			case 'courses.noCoursesFound': return 'No courses found';
 			case 'courses.noCoursesForFilter': return 'No courses match your current filters. Try adjusting your selection or clear all filters.';
+			case 'courses.courseTypes.all': return 'All';
+			case 'courses.courseTypes.workshop': return 'Workshop';
+			case 'courses.courseTypes.regular': return 'Regular course';
 			case 'courses.detail.header': return 'Course detail';
 			case 'courses.detail.notFound': return 'Course not found';
 			case 'courses.detail.description': return 'Course description';
@@ -2492,12 +2550,19 @@ extension on _StringsCs {
 			case 'events.filters.thisWeek': return 'Tento týden';
 			case 'events.filters.thisMonth': return 'Tento měsíc';
 			case 'events.filters.thisWeekend': return 'Tento víkend';
+			case 'events.filters.all': return 'Vše';
+			case 'events.filters.evening': return 'Večerní';
+			case 'events.filters.weekend': return 'Víkendové';
+			case 'events.filters.multiDay': return 'Několikadenní';
 			case 'courses.title': return 'Taneční kurzy';
 			case 'courses.subtitle': return 'Najdi svůj kurz';
 			case 'courses.featuredCourses': return 'Doporučené kurzy';
 			case 'courses.allCourses': return 'Všechny kurzy';
 			case 'courses.noCoursesFound': return 'Žádné kurzy nenalezeny';
 			case 'courses.noCoursesForFilter': return 'Pro zvolené filtry nebyly nalezeny žádné kurzy. Zkuste upravit výběr nebo vymazat filtry.';
+			case 'courses.courseTypes.all': return 'Vše';
+			case 'courses.courseTypes.workshop': return 'Workshop';
+			case 'courses.courseTypes.regular': return 'Pravidelný kurz';
 			case 'courses.detail.header': return 'Detail kurzu';
 			case 'courses.detail.notFound': return 'Kurz nenalezen';
 			case 'courses.detail.description': return 'Popis kurzu';
@@ -2764,12 +2829,19 @@ extension on _StringsEs {
 			case 'events.filters.thisWeek': return 'Esta semana';
 			case 'events.filters.thisMonth': return 'Este mes';
 			case 'events.filters.thisWeekend': return 'Este fin de semana';
+			case 'events.filters.all': return 'Todo';
+			case 'events.filters.evening': return 'Nocturno';
+			case 'events.filters.weekend': return 'Fin de semana';
+			case 'events.filters.multiDay': return 'Varios días';
 			case 'courses.title': return 'Cursos de baile';
 			case 'courses.subtitle': return 'Encuentra tu curso';
 			case 'courses.featuredCourses': return 'Cursos destacados';
 			case 'courses.allCourses': return 'Todos los cursos';
 			case 'courses.noCoursesFound': return 'No se encontraron cursos';
 			case 'courses.noCoursesForFilter': return 'No hay cursos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.';
+			case 'courses.courseTypes.all': return 'Todo';
+			case 'courses.courseTypes.workshop': return 'Taller';
+			case 'courses.courseTypes.regular': return 'Curso regular';
 			case 'courses.detail.header': return 'Detalle del curso';
 			case 'courses.detail.notFound': return 'Curso no encontrado';
 			case 'courses.detail.description': return 'Descripción del curso';

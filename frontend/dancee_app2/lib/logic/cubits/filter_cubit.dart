@@ -46,7 +46,38 @@ class FilterCubit extends Cubit<FilterState> {
     emit(state.copyWith(selectedRegions: regions));
   }
 
+  void toggleEventDurationType(String type) {
+    final current = state.selectedEventDurationTypes;
+    if (current.contains(type)) {
+      emit(state.copyWith(selectedEventDurationTypes: {}));
+    } else {
+      emit(state.copyWith(selectedEventDurationTypes: {type}));
+    }
+  }
+
+  void toggleCourseType(String type) {
+    final current = state.selectedCourseTypes;
+    if (current.contains(type)) {
+      emit(state.copyWith(selectedCourseTypes: {}));
+    } else {
+      emit(state.copyWith(selectedCourseTypes: {type}));
+    }
+  }
+
+  void clearEventDurationTypes() {
+    emit(state.copyWith(selectedEventDurationTypes: {}));
+  }
+
+  void clearCourseTypes() {
+    emit(state.copyWith(selectedCourseTypes: {}));
+  }
+
   void clearAll() {
-    emit(state.copyWith(selectedDanceStyles: {}, selectedRegions: {}));
+    emit(state.copyWith(
+      selectedDanceStyles: {},
+      selectedRegions: {},
+      selectedEventDurationTypes: {},
+      selectedCourseTypes: {},
+    ));
   }
 }

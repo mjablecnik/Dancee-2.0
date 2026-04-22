@@ -10,6 +10,7 @@ import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/event_state.dart';
 import '../../../logic/states/filter_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
+import '../../../shared/sections/duration_type_filter_section.dart';
 import '../../../shared/utils/region_label.dart';
 import 'sections/events_header_section.dart';
 import 'sections/featured_events_section.dart';
@@ -51,6 +52,8 @@ class EventsListScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const EventDurationTypeFilterSection(),
+                        const SizedBox(height: AppSpacing.xxl),
                         BlocBuilder<FilterCubit, FilterState>(
                           builder: (context, filterState) {
                             return DanceStylesFilterSection(

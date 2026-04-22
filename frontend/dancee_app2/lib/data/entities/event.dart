@@ -5,6 +5,8 @@ import 'event_part.dart';
 import 'translation_utils.dart';
 import 'venue.dart';
 
+enum EventDurationType { evening, weekend, multiDay }
+
 class Event extends Equatable {
   const Event({
     required this.id,
@@ -41,6 +43,29 @@ class Event extends Equatable {
   final String? originalUrl;
   final String? registrationUrl;
   final bool isFavorited;
+
+  /// Computed duration type for filtering.
+  EventDurationType get durationType {
+    final end = endTime;
+    if (end != null) {
+      final days = end.difference(startTime).inHours / 24;
+      if (days >= 2 || eventType == 'festival' || eventType == 'holiday') {
+        // Weekend: starts Fri/Sat, lasts 2-3 days
+        final weekday = startTime.weekday; // 1=Mon .. 7=Sun
+        if (days <= 3 && (weekday == 5 || weekday == 6)) {
+          return EventDurationType.weekend;
+        }
+        return EventDurationType.multiDay;
+      }
+    }
+    // Festival/holiday type without end time
+    if (eventType == 'festival' || eventType == 'holiday') {
+      return EventDurationType.multiDay;
+    }
+    // Evening: starts at 17:00 or later
+    if (startTime.hour >= 17) return EventDurationType.evening;
+    return EventDurationType.evening;
+  }
 
   factory Event.fromDirectus(
     Map<String, dynamic> json, {

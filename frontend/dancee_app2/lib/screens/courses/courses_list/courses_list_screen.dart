@@ -13,6 +13,7 @@ import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/filter_state.dart';
 import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
+import '../../../shared/sections/duration_type_filter_section.dart';
 import '../../../shared/utils/date_format.dart';
 import '../../../shared/utils/region_label.dart';
 import '../../events/events_list/sections/upcoming_events_section.dart' show parentDanceNames;
@@ -55,6 +56,8 @@ class CoursesListScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const CourseTypeFilterSection(),
+                        const SizedBox(height: AppSpacing.xxl),
                         BlocBuilder<FilterCubit, FilterState>(
                           builder: (context, filterState) {
                             final filterCubit = context.read<FilterCubit>();

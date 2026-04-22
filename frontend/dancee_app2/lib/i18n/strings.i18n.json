@@ -165,7 +165,11 @@
       "today": "Today",
       "thisWeek": "This week",
       "thisMonth": "This month",
-      "thisWeekend": "This weekend"
+      "thisWeekend": "This weekend",
+      "all": "All",
+      "evening": "Evening",
+      "weekend": "Weekend",
+      "multiDay": "Multi-day"
     }
   },
   "courses": {
@@ -175,6 +179,11 @@
     "allCourses": "All courses",
     "noCoursesFound": "No courses found",
     "noCoursesForFilter": "No courses match your current filters. Try adjusting your selection or clear all filters.",
+    "courseTypes": {
+      "all": "All",
+      "workshop": "Workshop",
+      "regular": "Regular course"
+    },
     "detail": {
       "header": "Course detail",
       "notFound": "Course not found",

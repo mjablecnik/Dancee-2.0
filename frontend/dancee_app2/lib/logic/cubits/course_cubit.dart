@@ -89,6 +89,11 @@ List<Course> _filterCourses(
   List<DanceStyle> allStyles,
 ) {
   return courses.where((course) {
+    if (filters.selectedCourseTypes.isNotEmpty) {
+      if (!filters.selectedCourseTypes.contains(course.courseType.name)) {
+        return false;
+      }
+    }
     if (filters.selectedDanceStyles.isNotEmpty) {
       final expandedCodes = <String>{};
       final expandedNames = <String>{};

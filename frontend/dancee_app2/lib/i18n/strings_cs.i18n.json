@@ -165,7 +165,11 @@
       "today": "Dnes",
       "thisWeek": "Tento týden",
       "thisMonth": "Tento měsíc",
-      "thisWeekend": "Tento víkend"
+      "thisWeekend": "Tento víkend",
+      "all": "Vše",
+      "evening": "Večerní",
+      "weekend": "Víkendové",
+      "multiDay": "Několikadenní"
     }
   },
   "courses": {
@@ -175,6 +179,11 @@
     "allCourses": "Všechny kurzy",
     "noCoursesFound": "Žádné kurzy nenalezeny",
     "noCoursesForFilter": "Pro zvolené filtry nebyly nalezeny žádné kurzy. Zkuste upravit výběr nebo vymazat filtry.",
+    "courseTypes": {
+      "all": "Vše",
+      "workshop": "Workshop",
+      "regular": "Pravidelný kurz"
+    },
     "detail": {
       "header": "Detail kurzu",
       "notFound": "Kurz nenalezen",

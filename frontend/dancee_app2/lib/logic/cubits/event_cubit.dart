@@ -123,6 +123,11 @@ List<Event> _filterEvents(
   List<DanceStyle> allStyles,
 ) {
   return events.where((event) {
+    if (filters.selectedEventDurationTypes.isNotEmpty) {
+      if (!filters.selectedEventDurationTypes.contains(event.durationType.name)) {
+        return false;
+      }
+    }
     if (filters.selectedDanceStyles.isNotEmpty) {
       final expandedCodes = <String>{};
       final expandedNames = <String>{};

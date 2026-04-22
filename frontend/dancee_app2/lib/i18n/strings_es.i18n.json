@@ -165,7 +165,11 @@
       "today": "Hoy",
       "thisWeek": "Esta semana",
       "thisMonth": "Este mes",
-      "thisWeekend": "Este fin de semana"
+      "thisWeekend": "Este fin de semana",
+      "all": "Todo",
+      "evening": "Nocturno",
+      "weekend": "Fin de semana",
+      "multiDay": "Varios días"
     }
   },
   "courses": {
@@ -175,6 +179,11 @@
     "allCourses": "Todos los cursos",
     "noCoursesFound": "No se encontraron cursos",
     "noCoursesForFilter": "No hay cursos que coincidan con tus filtros. Intenta ajustar tu selección o borrar los filtros.",
+    "courseTypes": {
+      "all": "Todo",
+      "workshop": "Taller",
+      "regular": "Curso regular"
+    },
     "detail": {
       "header": "Detalle del curso",
       "notFound": "Curso no encontrado",

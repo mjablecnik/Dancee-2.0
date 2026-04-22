@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'translation_utils.dart';
 import 'venue.dart';
 
+enum CourseType { workshop, regular }
+
 class Course extends Equatable {
   const Course({
     required this.id,
@@ -55,6 +57,13 @@ class Course extends Equatable {
   final String? originalUrl;
   final String? registrationUrl;
   final bool isFavorited;
+
+  /// Computed course type for filtering.
+  CourseType get courseType {
+    if (scheduleDay != null && scheduleDay!.isNotEmpty) return CourseType.regular;
+    if (lessonCount != null && lessonCount! > 1) return CourseType.regular;
+    return CourseType.workshop;
+  }
 
   factory Course.fromDirectus(
     Map<String, dynamic> json, {
