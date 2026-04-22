@@ -47,7 +47,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 ## Frontend: Dance Style Event Count Display (Spec §5)
 
-- [ ] 24. [MEDIUM] Verify `DanceTypeOption` in `lib/features/events/pages/event_filters/components.dart` displays the event count in parentheses; fix if missing
+- [x] 24. [MEDIUM] Verify `DanceTypeOption` in `lib/features/events/pages/event_filters/components.dart` displays the event count in parentheses; fix if missing
 
 ## Frontend: Favorites Heart Icon on Initial Load (Spec §6)
 

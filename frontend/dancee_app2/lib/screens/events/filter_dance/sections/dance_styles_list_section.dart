@@ -7,12 +7,14 @@ import '../../../../data/entities/dance_style.dart';
 class DanceStylesListSection extends StatelessWidget {
   final List<DanceStyle> styles;
   final Map<String, bool> selected; // key = dance style code
+  final Map<String, int> counts; // key = dance style code, value = event count
   final ValueChanged<String> onToggle; // passes dance style code
 
   const DanceStylesListSection({
     super.key,
     required this.styles,
     required this.selected,
+    required this.counts,
     required this.onToggle,
   });
 
@@ -31,10 +33,12 @@ class DanceStylesListSection extends StatelessWidget {
           final style = styles[index];
           final isLast = index == styles.length - 1;
           final isChecked = selected[style.code] ?? false;
+          final count = counts[style.code] ?? 0;
           return _StyleRow(
             style: style,
             isChecked: isChecked,
             isLast: isLast,
+            count: count,
             onToggle: () => onToggle(style.code),
           );
         }),
@@ -47,12 +51,14 @@ class _StyleRow extends StatelessWidget {
   final DanceStyle style;
   final bool isChecked;
   final bool isLast;
+  final int count;
   final VoidCallback onToggle;
 
   const _StyleRow({
     required this.style,
     required this.isChecked,
     required this.isLast,
+    required this.count,
     required this.onToggle,
   });
 
@@ -79,7 +85,7 @@ class _StyleRow extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
-                style.name,
+                '${style.name} ($count)',
                 style: const TextStyle(
                   fontSize: AppTypography.fontSizeXl,
                   fontWeight: AppTypography.fontWeightSemiBold,

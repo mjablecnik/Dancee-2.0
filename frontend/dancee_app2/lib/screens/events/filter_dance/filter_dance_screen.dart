@@ -5,6 +5,7 @@ import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/entities/dance_style.dart';
 import '../../../i18n/strings.g.dart';
+import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/filter_cubit.dart';
 import 'sections/dance_styles_list_section.dart';
 import 'sections/filter_bottom_actions_section.dart';
@@ -21,15 +22,22 @@ class FilterDanceScreen extends StatefulWidget {
 class _FilterDanceScreenState extends State<FilterDanceScreen> {
   List<DanceStyle> _styles = [];
   Map<String, bool> _selected = {}; // key = dance style code
+  Map<String, int> _counts = {}; // key = dance style code, value = event count
 
   @override
   void initState() {
     super.initState();
     final filterCubit = context.read<FilterCubit>();
+    final eventCubit = context.read<EventCubit>();
     _styles = filterCubit.parentDanceStyles;
     final alreadySelected = filterCubit.state.selectedDanceStyles;
     _selected = {
       for (final s in _styles) s.code: alreadySelected.contains(s.code),
+    };
+    final allDanceStyles = filterCubit.allDanceStyles;
+    _counts = {
+      for (final s in _styles)
+        s.code: eventCubit.countEventsForDanceStyle(s.code, allDanceStyles),
     };
   }
 
@@ -103,6 +111,7 @@ class _FilterDanceScreenState extends State<FilterDanceScreen> {
                   DanceStylesListSection(
                     styles: _styles,
                     selected: _selected,
+                    counts: _counts,
                     onToggle: (code) =>
                         setState(() => _selected[code] = !(_selected[code] ?? false)),
                   ),
