@@ -67,6 +67,7 @@ const apiRoutes: Record<string, string> = {
   "/api/favorites": "/ApiService/createFavorite",
   "/api/favorites/delete": "/ApiService/deleteFavorite",
   "/api/favorites/list": "/ApiService/listFavorites",
+  "/api/dance-styles/list": "/ApiService/listDanceStyles",
 };
 
 // Restate server ingress port (HTTP/1.1 compatible)

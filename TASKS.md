@@ -8,7 +8,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 - [x] 1. [HIGH] Add `listDanceStyles` function to `backend/dancee_workflow/src/clients/directus-client.ts` that fetches all dance styles with `code`, `name`, `parent_code`, `sort_order` from Directus
 - [x] 2. [HIGH] Add `listDanceStyles` handler to `backend/dancee_workflow/src/services/api.ts` that returns the full dance styles list via the API
-- [ ] 3. [HIGH] Document the new `listDanceStyles` endpoint in `backend/dancee_api/specs/workflow.openapi.yaml`
+- [x] 3. [HIGH] Document the new `listDanceStyles` endpoint in `backend/dancee_api/specs/workflow.openapi.yaml`
 
 ## Frontend: Data Layer
 

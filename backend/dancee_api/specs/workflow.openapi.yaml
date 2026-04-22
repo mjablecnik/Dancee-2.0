@@ -26,6 +26,8 @@ tags:
     description: Querying stored events and courses
   - name: Favorites
     description: User favorites management
+  - name: Dance Styles
+    description: Dance style catalogue (hierarchy)
 
 paths:
   /api/event:
@@ -354,6 +356,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/dance-styles/list:
+    get:
+      tags:
+        - Dance Styles
+      summary: List all dance styles
+      description: |
+        Returns the full dance styles catalogue from Directus, ordered by `sort_order`.
+
+        Each entry includes a `parent_code` field that links child styles to their parent.
+        Styles with `parent_code: null` are top-level (parent) styles.
+        Styles with a non-null `parent_code` are sub-styles of that parent.
+      operationId: listDanceStyles
+      responses:
+        '200':
+          description: List of all dance styles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DirectusDanceStyle'
+              example:
+                - code: "salsa"
+                  name: "Salsa"
+                  parent_code: null
+                  sort_order: 1
+                - code: "salsa-on1"
+                  name: "Salsa On1"
+                  parent_code: "salsa"
+                  sort_order: 2
+                - code: "bachata"
+                  name: "Bachata"
+                  parent_code: null
+                  sort_order: 10
 
   /api/favorites/list:
     post:
