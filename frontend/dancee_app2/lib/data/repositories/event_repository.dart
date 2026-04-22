@@ -26,7 +26,7 @@ class EventRepository {
         .map((json) => Event.fromDirectus(
               json,
               languageCode: languageCode,
-              directusBaseUrl: directusBaseUrl,
+              directusBaseUrl: AppConfig.directusBaseUrl,
             ))
         .toList();
   }

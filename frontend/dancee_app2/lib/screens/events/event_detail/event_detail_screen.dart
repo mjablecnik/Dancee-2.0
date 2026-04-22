@@ -12,6 +12,7 @@ import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/favorites_cubit.dart';
 import '../../../logic/states/event_state.dart';
 import '../../../shared/sections/description_section.dart';
+import '../../../shared/utils/date_format.dart';
 import '../../../shared/sections/detail_header_section.dart';
 import '../../../shared/sections/hero_image_section.dart';
 import '../../../shared/sections/key_info_section.dart';
@@ -25,25 +26,13 @@ class EventDetailScreen extends StatelessWidget {
 
   const EventDetailScreen({super.key, required this.eventId});
 
-  String _formatDate(DateTime dt) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-  }
-
-  String _formatTime(DateTime dt) {
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    return '$h:$m';
-  }
-
   List<KeyInfoItem> _buildKeyInfo(Event event) {
     final items = <KeyInfoItem>[];
 
     // Date/time
-    final dateStr = _formatDate(event.startTime);
-    final timeStr = _formatTime(event.startTime);
-    final endStr = event.endTime != null ? ' – ${_formatTime(event.endTime!)}' : '';
+    final dateStr = formatDate(event.startTime);
+    final timeStr = formatTime(event.startTime);
+    final endStr = event.endTime != null ? ' – ${formatTime(event.endTime!)}' : '';
     items.add(KeyInfoItem(
       icon: FontAwesomeIcons.calendar,
       title: dateStr,
@@ -89,8 +78,8 @@ class EventDetailScreen extends StatelessWidget {
     final Map<String, List<EventPart>> byDate = {};
     for (final part in parts) {
       final key = part.startTime != null
-          ? _formatDate(part.startTime!)
-          : 'Program';
+          ? formatDate(part.startTime!)
+          : t.events.detail.program;
       byDate.putIfAbsent(key, () => []).add(part);
     }
 
@@ -99,11 +88,11 @@ class EventDetailScreen extends StatelessWidget {
         day: entry.key,
         slots: entry.value.map((part) {
           final timeStr = part.startTime != null
-              ? _formatTime(part.startTime!)
+              ? formatTime(part.startTime!)
               : '';
           final extras = [
-            ...part.lectors.map((l) => 'Lector: $l'),
-            ...part.djs.map((dj) => 'DJ: $dj'),
+            ...part.lectors.map((l) => t.events.detail.lector(name: l)),
+            ...part.djs.map((dj) => t.events.detail.dj(name: dj)),
           ].join(', ');
           return ProgramSlotData(
             time: timeStr,
@@ -144,7 +133,7 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                     orElse: () => Center(
                       child: Text(
-                        'Event not found',
+                        t.events.detail.notFound,
                         style: const TextStyle(color: appMuted),
                       ),
                     ),

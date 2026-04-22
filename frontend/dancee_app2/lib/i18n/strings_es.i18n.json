@@ -2,6 +2,20 @@
   "common": {
     "appName": "Dancee",
     "showAll": "Ver todo",
+    "months": {
+      "jan": "Ene",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Abr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Ago",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dic"
+    },
     "date": "Fecha",
     "save": "Guardar",
     "share": "Compartir",
@@ -123,7 +137,10 @@
       "dresscode": "Código de vestimenta",
       "buyTickets": "Comprar entradas",
       "originalSource": "Fuente original",
-      "program": "Programa del evento"
+      "program": "Programa del evento",
+      "notFound": "Evento no encontrado",
+      "lector": "Instructor: ${name}",
+      "dj": "DJ: ${name}"
     },
     "filter": {
       "selectedCount": "${count} seleccionados",
@@ -154,6 +171,7 @@
     "noCoursesFound": "No se encontraron cursos",
     "detail": {
       "header": "Detalle del curso",
+      "notFound": "Curso no encontrado",
       "description": "Descripción del curso",
       "details": "Detalles del curso",
       "whatYouLearn": "Qué aprenderás",

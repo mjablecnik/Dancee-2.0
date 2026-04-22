@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import 'translation_utils.dart';
 import 'venue.dart';
 
 class Course extends Equatable {
@@ -62,7 +63,7 @@ class Course extends Equatable {
     Set<int> favoriteCourseIds = const {},
   }) {
     final translations = (json['translations'] as List<dynamic>?) ?? [];
-    final translation = _extractTranslation(translations, languageCode);
+    final translation = extractTranslation(translations, languageCode);
 
     final title = (translation?['title'] as String?) ??
         (json['title'] as String?) ??
@@ -179,24 +180,3 @@ class Course extends Equatable {
       ];
 }
 
-Map<String, dynamic>? _extractTranslation(
-  List<dynamic> translations,
-  String languageCode,
-) {
-  if (translations.isEmpty) return null;
-
-  // 1. Try exact language match
-  final match = translations.cast<Map<String, dynamic>>().where(
-        (t) => t['languages_code'] == languageCode,
-      );
-  if (match.isNotEmpty) return match.first;
-
-  // 2. Fallback to English
-  final enMatch = translations.cast<Map<String, dynamic>>().where(
-        (t) => t['languages_code'] == 'en',
-      );
-  if (enMatch.isNotEmpty) return enMatch.first;
-
-  // 3. Fallback to first available
-  return translations.first as Map<String, dynamic>;
-}

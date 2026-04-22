@@ -10,6 +10,7 @@ import '../../../logic/cubits/course_cubit.dart';
 import '../../../logic/cubits/favorites_cubit.dart';
 import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/description_section.dart';
+import '../../../shared/utils/date_format.dart';
 import '../../../shared/sections/detail_header_section.dart';
 import '../../../shared/sections/hero_image_section.dart';
 import '../../../shared/sections/key_info_section.dart';
@@ -23,23 +24,14 @@ class CourseDetailScreen extends StatelessWidget {
 
   const CourseDetailScreen({super.key, required this.courseId});
 
-  String _formatDate(String? dateStr) {
-    if (dateStr == null) return '';
-    final dt = DateTime.tryParse(dateStr);
-    if (dt == null) return dateStr;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-  }
-
   List<KeyInfoItem> _buildKeyInfo(Course course) {
     final items = <KeyInfoItem>[];
 
     // Date range
     if (course.startDate != null) {
-      final startStr = _formatDate(course.startDate);
+      final startStr = formatDateString(course.startDate);
       final endStr =
-          course.endDate != null ? ' – ${_formatDate(course.endDate)}' : '';
+          course.endDate != null ? ' – ${formatDateString(course.endDate)}' : '';
       items.add(KeyInfoItem(
         icon: FontAwesomeIcons.calendar,
         title: '$startStr$endStr',
@@ -100,13 +92,13 @@ class CourseDetailScreen extends StatelessWidget {
     if (course.startDate != null) {
       details.add(ScheduleDetail(
         label: t.courses.detail.startDate,
-        value: _formatDate(course.startDate),
+        value: formatDateString(course.startDate),
       ));
     }
     if (course.endDate != null) {
       details.add(ScheduleDetail(
         label: t.courses.detail.endDate,
-        value: _formatDate(course.endDate),
+        value: formatDateString(course.endDate),
       ));
     }
     if (course.scheduleDay != null) {
@@ -167,10 +159,10 @@ class CourseDetailScreen extends StatelessWidget {
                     loading: (_) => const Center(
                       child: CircularProgressIndicator(color: appPrimary),
                     ),
-                    orElse: () => const Center(
+                    orElse: () => Center(
                       child: Text(
-                        'Course not found',
-                        style: TextStyle(color: appMuted),
+                        t.courses.detail.notFound,
+                        style: const TextStyle(color: appMuted),
                       ),
                     ),
                   );

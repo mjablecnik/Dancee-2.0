@@ -2,6 +2,20 @@
   "common": {
     "appName": "Dancee",
     "showAll": "Zobrazit vše",
+    "months": {
+      "jan": "Led",
+      "feb": "Úno",
+      "mar": "Bře",
+      "apr": "Dub",
+      "may": "Kvě",
+      "jun": "Čvn",
+      "jul": "Čvc",
+      "aug": "Srp",
+      "sep": "Zář",
+      "oct": "Říj",
+      "nov": "Lis",
+      "dec": "Pro"
+    },
     "date": "Datum",
     "save": "Uložit",
     "share": "Sdílet",
@@ -123,7 +137,10 @@
       "dresscode": "Dresscode",
       "buyTickets": "Koupit vstupenky",
       "originalSource": "Původní zdroj",
-      "program": "Program akce"
+      "program": "Program akce",
+      "notFound": "Akce nenalezena",
+      "lector": "Lektor: ${name}",
+      "dj": "DJ: ${name}"
     },
     "filter": {
       "selectedCount": "${count} vybraných",
@@ -154,6 +171,7 @@
     "noCoursesFound": "Žádné kurzy nenalezeny",
     "detail": {
       "header": "Detail kurzu",
+      "notFound": "Kurz nenalezen",
       "description": "Popis kurzu",
       "details": "Podrobnosti kurzu",
       "whatYouLearn": "Co se naučíte",

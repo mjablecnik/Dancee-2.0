@@ -1,13 +1,27 @@
 // Re-exports sensitive CMS config values and defines public app constants.
 // Import this file throughout the app instead of importing lib/config.dart directly.
 
-export '../config.dart' show directusBaseUrl, directusAccessToken;
+import '../config.dart' as sensitive;
 
-/// Default user ID used for favorites operations (auth is out of scope).
-const String defaultUserId = 'default-user';
+/// Application configuration.
+///
+/// Sensitive values ([directusBaseUrl], [directusAccessToken]) are read from
+/// the gitignored `lib/config.dart`. All other constants are defined here.
+class AppConfig {
+  AppConfig._();
 
-/// HTTP connection timeout in milliseconds.
-const int connectionTimeoutMs = 10000;
+  /// Directus CMS base URL (e.g. "https://your-cms.example.com").
+  static const String directusBaseUrl = sensitive.directusBaseUrl;
 
-/// HTTP receive timeout in milliseconds.
-const int receiveTimeoutMs = 15000;
+  /// Directus static access token for API requests.
+  static const String directusAccessToken = sensitive.directusAccessToken;
+
+  /// Default user ID used for favorites operations (auth is out of scope).
+  static const String defaultUserId = 'default-user';
+
+  /// HTTP connection timeout in milliseconds.
+  static const int connectionTimeoutMs = 10000;
+
+  /// HTTP receive timeout in milliseconds.
+  static const int receiveTimeoutMs = 15000;
+}

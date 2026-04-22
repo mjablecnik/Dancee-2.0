@@ -6,6 +6,7 @@ import '../../../../core/theme.dart';
 import '../../../../data/entities/event.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../../../logic/cubits/favorites_cubit.dart';
+import '../../../../shared/utils/date_format.dart';
 import '../components/featured_event_card.dart' show EventTagData;
 import '../components/upcoming_event_card.dart';
 
@@ -18,12 +19,6 @@ class UpcomingEventsSection extends StatelessWidget {
     required this.events,
     this.onEventTap,
   });
-
-  String _formatDate(DateTime dt) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +73,7 @@ class UpcomingEventsSection extends StatelessWidget {
                     imageUrl: event.imageUrl ?? '',
                     title: event.title,
                     location: event.venue?.town ?? event.venue?.name ?? '',
-                    date: _formatDate(event.startTime),
+                    date: formatDate(event.startTime),
                     tags: event.dances
                         .map((d) => EventTagData(d, appPrimary))
                         .toList(),

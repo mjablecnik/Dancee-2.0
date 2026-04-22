@@ -21,9 +21,9 @@ class DirectusClient {
                   'Content-Type': 'application/json',
                 },
                 connectTimeout:
-                    const Duration(milliseconds: connectionTimeoutMs),
+                    const Duration(milliseconds: AppConfig.connectionTimeoutMs),
                 receiveTimeout:
-                    const Duration(milliseconds: receiveTimeoutMs),
+                    const Duration(milliseconds: AppConfig.receiveTimeoutMs),
               ),
             );
 
@@ -84,32 +84,41 @@ class DirectusClient {
     final statusCode = e.response?.statusCode;
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
-        return const ApiException(
+        return ApiException(
           message: 'Connection timed out. Please check your network.',
+          originalError: e,
         );
       case DioExceptionType.receiveTimeout:
-        return const ApiException(
+        return ApiException(
           message: 'Server took too long to respond. Please try again.',
+          originalError: e,
         );
       case DioExceptionType.sendTimeout:
-        return const ApiException(
+        return ApiException(
           message: 'Request timed out while sending data.',
+          originalError: e,
         );
       case DioExceptionType.connectionError:
-        return const ApiException(
+        return ApiException(
           message: 'No internet connection. Please check your network.',
+          originalError: e,
         );
       case DioExceptionType.badResponse:
         return ApiException(
           statusCode: statusCode,
           message: _messageForStatusCode(statusCode),
+          originalError: e,
         );
       case DioExceptionType.cancel:
-        return const ApiException(message: 'Request was cancelled.');
+        return ApiException(
+          message: 'Request was cancelled.',
+          originalError: e,
+        );
       default:
         return ApiException(
           statusCode: statusCode,
           message: e.message ?? 'An unexpected error occurred.',
+          originalError: e,
         );
     }
   }

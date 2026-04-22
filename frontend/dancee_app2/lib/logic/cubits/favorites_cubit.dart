@@ -36,7 +36,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   Future<void> loadFavorites() async {
     emit(const FavoritesState.loading());
     try {
-      _allFavorites = await _favoritesRepository.getFavorites(defaultUserId);
+      _allFavorites = await _favoritesRepository.getFavorites(AppConfig.defaultUserId);
       _emitLoaded();
     } catch (e) {
       emit(FavoritesState.error(message: e.toString()));
@@ -59,7 +59,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       _allFavorites = [
         Favorite(
           id: -1,
-          userId: defaultUserId,
+          userId: AppConfig.defaultUserId,
           itemType: itemType,
           itemId: itemId,
         ),
@@ -71,13 +71,13 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     try {
       if (wasAlreadyFavorited) {
         await _favoritesRepository.removeFavorite(
-          userId: defaultUserId,
+          userId: AppConfig.defaultUserId,
           itemType: itemType,
           itemId: itemId,
         );
       } else {
         final created = await _favoritesRepository.addFavorite(
-          userId: defaultUserId,
+          userId: AppConfig.defaultUserId,
           itemType: itemType,
           itemId: itemId,
         );

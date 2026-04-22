@@ -26,7 +26,7 @@ class CourseRepository {
         .map((json) => Course.fromDirectus(
               json,
               languageCode: languageCode,
-              directusBaseUrl: directusBaseUrl,
+              directusBaseUrl: AppConfig.directusBaseUrl,
             ))
         .toList();
   }

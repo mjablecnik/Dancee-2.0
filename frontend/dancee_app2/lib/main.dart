@@ -43,6 +43,11 @@ void main() async {
   ));
 }
 
+// TODO(navigation): Migrate from string-based context.push('/path') navigation
+// to type-safe @TypedGoRoute annotated route classes using go_router_builder.
+// This requires adding go_router_builder dev dependency, creating route data
+// classes with @TypedGoRoute annotations, and running build_runner to generate
+// the type-safe route extensions. Track as a separate large refactor task.
 final _router = GoRouter(
   initialLocation: '/login',
   routes: [

@@ -18,8 +18,8 @@ void setupServiceLocator() {
   // Core
   sl.registerLazySingleton<DirectusClient>(
     () => DirectusClient(
-      baseUrl: directusBaseUrl,
-      accessToken: directusAccessToken,
+      baseUrl: AppConfig.directusBaseUrl,
+      accessToken: AppConfig.directusAccessToken,
     ),
   );
 

@@ -30,13 +30,21 @@ class EventsHeaderSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLocationRow(context),
+          _HeaderLocationRow(location: location, onLocationTap: onLocationTap),
         ],
       ),
     );
   }
+}
 
-  Widget _buildLocationRow(BuildContext context) {
+class _HeaderLocationRow extends StatelessWidget {
+  final String location;
+  final VoidCallback? onLocationTap;
+
+  const _HeaderLocationRow({required this.location, this.onLocationTap});
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -73,62 +81,23 @@ class EventsHeaderSection extends StatelessWidget {
             ),
           ],
         ),
-        _buildNotificationBell(),
+        const _HeaderNotificationBell(),
       ],
     );
   }
+}
 
-  Widget _buildNotificationBell() {
+class _HeaderNotificationBell extends StatelessWidget {
+  const _HeaderNotificationBell();
+
+  @override
+  Widget build(BuildContext context) {
     return const Visibility(
       visible: false,
       maintainSize: true,
       maintainAnimation: true,
       maintainState: true,
       child: SizedBox(width: 40, height: 40),
-    );
-  }
-
-  Widget _buildQuickFilters() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _buildQuickFilterPill(FontAwesomeIcons.calendarDay, t.events.filters.today),
-          const SizedBox(width: AppSpacing.sm),
-          _buildQuickFilterPill(FontAwesomeIcons.calendarWeek, t.events.filters.thisWeek),
-          const SizedBox(width: AppSpacing.sm),
-          _buildQuickFilterPill(null, t.events.filters.thisMonth),
-          const SizedBox(width: AppSpacing.sm),
-          _buildQuickFilterPill(null, t.events.filters.thisWeekend),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickFilterPill(IconData? icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: appSurface,
-        border: Border.all(color: appBorder),
-        borderRadius: BorderRadius.circular(AppRadius.full),
-      ),
-      child: Row(
-        children: [
-          if (icon != null) ...[
-            FaIcon(icon, size: 12, color: appText),
-            const SizedBox(width: AppSpacing.xs + 2),
-          ],
-          Text(
-            label,
-            style: const TextStyle(
-              color: appText,
-              fontSize: AppTypography.fontSizeSm,
-              fontWeight: AppTypography.fontWeightMedium,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 723 (241 per locale)
+/// Strings: 771 (257 per locale)
 ///
-/// Built on 2026-04-21 at 23:57 UTC
+/// Built on 2026-04-22 at 02:10 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -170,6 +170,7 @@ class _StringsCommonEn {
 	// Translations
 	String get appName => 'Dancee';
 	String get showAll => 'Show all';
+	late final _StringsCommonMonthsEn months = _StringsCommonMonthsEn._(_root);
 	String get date => 'Date';
 	String get save => 'Save';
 	String get share => 'Share';
@@ -339,6 +340,27 @@ class _StringsContactEn {
 	late final _StringsContactDeviceInfoLabelsEn deviceInfoLabels = _StringsContactDeviceInfoLabelsEn._(_root);
 }
 
+// Path: common.months
+class _StringsCommonMonthsEn {
+	_StringsCommonMonthsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get jan => 'Jan';
+	String get feb => 'Feb';
+	String get mar => 'Mar';
+	String get apr => 'Apr';
+	String get may => 'May';
+	String get jun => 'Jun';
+	String get jul => 'Jul';
+	String get aug => 'Aug';
+	String get sep => 'Sep';
+	String get oct => 'Oct';
+	String get nov => 'Nov';
+	String get dec => 'Dec';
+}
+
 // Path: common.form
 class _StringsCommonFormEn {
 	_StringsCommonFormEn._(this._root);
@@ -479,6 +501,9 @@ class _StringsEventsDetailEn {
 	String get buyTickets => 'Buy tickets';
 	String get originalSource => 'Original source';
 	String get program => 'Event program';
+	String get notFound => 'Event not found';
+	String lector({required Object name}) => 'Lector: ${name}';
+	String dj({required Object name}) => 'DJ: ${name}';
 }
 
 // Path: events.filter
@@ -523,6 +548,7 @@ class _StringsCoursesDetailEn {
 
 	// Translations
 	String get header => 'Course detail';
+	String get notFound => 'Course not found';
 	String get description => 'Course description';
 	String get details => 'Course details';
 	String get whatYouLearn => 'What you\'ll learn';
@@ -789,6 +815,7 @@ class _StringsCommonCs extends _StringsCommonEn {
 	// Translations
 	@override String get appName => 'Dancee';
 	@override String get showAll => 'Zobrazit vše';
+	@override late final _StringsCommonMonthsCs months = _StringsCommonMonthsCs._(_root);
 	@override String get date => 'Datum';
 	@override String get save => 'Uložit';
 	@override String get share => 'Sdílet';
@@ -958,6 +985,27 @@ class _StringsContactCs extends _StringsContactEn {
 	@override late final _StringsContactDeviceInfoLabelsCs deviceInfoLabels = _StringsContactDeviceInfoLabelsCs._(_root);
 }
 
+// Path: common.months
+class _StringsCommonMonthsCs extends _StringsCommonMonthsEn {
+	_StringsCommonMonthsCs._(_StringsCs root) : this._root = root, super._(root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get jan => 'Led';
+	@override String get feb => 'Úno';
+	@override String get mar => 'Bře';
+	@override String get apr => 'Dub';
+	@override String get may => 'Kvě';
+	@override String get jun => 'Čvn';
+	@override String get jul => 'Čvc';
+	@override String get aug => 'Srp';
+	@override String get sep => 'Zář';
+	@override String get oct => 'Říj';
+	@override String get nov => 'Lis';
+	@override String get dec => 'Pro';
+}
+
 // Path: common.form
 class _StringsCommonFormCs extends _StringsCommonFormEn {
 	_StringsCommonFormCs._(_StringsCs root) : this._root = root, super._(root);
@@ -1098,6 +1146,9 @@ class _StringsEventsDetailCs extends _StringsEventsDetailEn {
 	@override String get buyTickets => 'Koupit vstupenky';
 	@override String get originalSource => 'Původní zdroj';
 	@override String get program => 'Program akce';
+	@override String get notFound => 'Akce nenalezena';
+	@override String lector({required Object name}) => 'Lektor: ${name}';
+	@override String dj({required Object name}) => 'DJ: ${name}';
 }
 
 // Path: events.filter
@@ -1142,6 +1193,7 @@ class _StringsCoursesDetailCs extends _StringsCoursesDetailEn {
 
 	// Translations
 	@override String get header => 'Detail kurzu';
+	@override String get notFound => 'Kurz nenalezen';
 	@override String get description => 'Popis kurzu';
 	@override String get details => 'Podrobnosti kurzu';
 	@override String get whatYouLearn => 'Co se naučíte';
@@ -1408,6 +1460,7 @@ class _StringsCommonEs extends _StringsCommonEn {
 	// Translations
 	@override String get appName => 'Dancee';
 	@override String get showAll => 'Ver todo';
+	@override late final _StringsCommonMonthsEs months = _StringsCommonMonthsEs._(_root);
 	@override String get date => 'Fecha';
 	@override String get save => 'Guardar';
 	@override String get share => 'Compartir';
@@ -1577,6 +1630,27 @@ class _StringsContactEs extends _StringsContactEn {
 	@override late final _StringsContactDeviceInfoLabelsEs deviceInfoLabels = _StringsContactDeviceInfoLabelsEs._(_root);
 }
 
+// Path: common.months
+class _StringsCommonMonthsEs extends _StringsCommonMonthsEn {
+	_StringsCommonMonthsEs._(_StringsEs root) : this._root = root, super._(root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get jan => 'Ene';
+	@override String get feb => 'Feb';
+	@override String get mar => 'Mar';
+	@override String get apr => 'Abr';
+	@override String get may => 'May';
+	@override String get jun => 'Jun';
+	@override String get jul => 'Jul';
+	@override String get aug => 'Ago';
+	@override String get sep => 'Sep';
+	@override String get oct => 'Oct';
+	@override String get nov => 'Nov';
+	@override String get dec => 'Dic';
+}
+
 // Path: common.form
 class _StringsCommonFormEs extends _StringsCommonFormEn {
 	_StringsCommonFormEs._(_StringsEs root) : this._root = root, super._(root);
@@ -1717,6 +1791,9 @@ class _StringsEventsDetailEs extends _StringsEventsDetailEn {
 	@override String get buyTickets => 'Comprar entradas';
 	@override String get originalSource => 'Fuente original';
 	@override String get program => 'Programa del evento';
+	@override String get notFound => 'Evento no encontrado';
+	@override String lector({required Object name}) => 'Instructor: ${name}';
+	@override String dj({required Object name}) => 'DJ: ${name}';
 }
 
 // Path: events.filter
@@ -1761,6 +1838,7 @@ class _StringsCoursesDetailEs extends _StringsCoursesDetailEn {
 
 	// Translations
 	@override String get header => 'Detalle del curso';
+	@override String get notFound => 'Curso no encontrado';
 	@override String get description => 'Descripción del curso';
 	@override String get details => 'Detalles del curso';
 	@override String get whatYouLearn => 'Qué aprenderás';
@@ -1988,6 +2066,18 @@ extension on Translations {
 		switch (path) {
 			case 'common.appName': return 'Dancee';
 			case 'common.showAll': return 'Show all';
+			case 'common.months.jan': return 'Jan';
+			case 'common.months.feb': return 'Feb';
+			case 'common.months.mar': return 'Mar';
+			case 'common.months.apr': return 'Apr';
+			case 'common.months.may': return 'May';
+			case 'common.months.jun': return 'Jun';
+			case 'common.months.jul': return 'Jul';
+			case 'common.months.aug': return 'Aug';
+			case 'common.months.sep': return 'Sep';
+			case 'common.months.oct': return 'Oct';
+			case 'common.months.nov': return 'Nov';
+			case 'common.months.dec': return 'Dec';
 			case 'common.date': return 'Date';
 			case 'common.save': return 'Save';
 			case 'common.share': return 'Share';
@@ -2085,6 +2175,9 @@ extension on Translations {
 			case 'events.detail.buyTickets': return 'Buy tickets';
 			case 'events.detail.originalSource': return 'Original source';
 			case 'events.detail.program': return 'Event program';
+			case 'events.detail.notFound': return 'Event not found';
+			case 'events.detail.lector': return ({required Object name}) => 'Lector: ${name}';
+			case 'events.detail.dj': return ({required Object name}) => 'DJ: ${name}';
 			case 'events.filter.selectedCount': return ({required Object count}) => '${count} selected';
 			case 'events.filter.selectedStyles': return 'SELECTED STYLES';
 			case 'events.filter.apply': return 'Apply filter';
@@ -2107,6 +2200,7 @@ extension on Translations {
 			case 'courses.allCourses': return 'All courses';
 			case 'courses.noCoursesFound': return 'No courses found';
 			case 'courses.detail.header': return 'Course detail';
+			case 'courses.detail.notFound': return 'Course not found';
 			case 'courses.detail.description': return 'Course description';
 			case 'courses.detail.details': return 'Course details';
 			case 'courses.detail.whatYouLearn': return 'What you\'ll learn';
@@ -2237,6 +2331,18 @@ extension on _StringsCs {
 		switch (path) {
 			case 'common.appName': return 'Dancee';
 			case 'common.showAll': return 'Zobrazit vše';
+			case 'common.months.jan': return 'Led';
+			case 'common.months.feb': return 'Úno';
+			case 'common.months.mar': return 'Bře';
+			case 'common.months.apr': return 'Dub';
+			case 'common.months.may': return 'Kvě';
+			case 'common.months.jun': return 'Čvn';
+			case 'common.months.jul': return 'Čvc';
+			case 'common.months.aug': return 'Srp';
+			case 'common.months.sep': return 'Zář';
+			case 'common.months.oct': return 'Říj';
+			case 'common.months.nov': return 'Lis';
+			case 'common.months.dec': return 'Pro';
 			case 'common.date': return 'Datum';
 			case 'common.save': return 'Uložit';
 			case 'common.share': return 'Sdílet';
@@ -2334,6 +2440,9 @@ extension on _StringsCs {
 			case 'events.detail.buyTickets': return 'Koupit vstupenky';
 			case 'events.detail.originalSource': return 'Původní zdroj';
 			case 'events.detail.program': return 'Program akce';
+			case 'events.detail.notFound': return 'Akce nenalezena';
+			case 'events.detail.lector': return ({required Object name}) => 'Lektor: ${name}';
+			case 'events.detail.dj': return ({required Object name}) => 'DJ: ${name}';
 			case 'events.filter.selectedCount': return ({required Object count}) => '${count} vybraných';
 			case 'events.filter.selectedStyles': return 'VYBRANÉ STYLY';
 			case 'events.filter.apply': return 'Použít filtr';
@@ -2356,6 +2465,7 @@ extension on _StringsCs {
 			case 'courses.allCourses': return 'Všechny kurzy';
 			case 'courses.noCoursesFound': return 'Žádné kurzy nenalezeny';
 			case 'courses.detail.header': return 'Detail kurzu';
+			case 'courses.detail.notFound': return 'Kurz nenalezen';
 			case 'courses.detail.description': return 'Popis kurzu';
 			case 'courses.detail.details': return 'Podrobnosti kurzu';
 			case 'courses.detail.whatYouLearn': return 'Co se naučíte';
@@ -2486,6 +2596,18 @@ extension on _StringsEs {
 		switch (path) {
 			case 'common.appName': return 'Dancee';
 			case 'common.showAll': return 'Ver todo';
+			case 'common.months.jan': return 'Ene';
+			case 'common.months.feb': return 'Feb';
+			case 'common.months.mar': return 'Mar';
+			case 'common.months.apr': return 'Abr';
+			case 'common.months.may': return 'May';
+			case 'common.months.jun': return 'Jun';
+			case 'common.months.jul': return 'Jul';
+			case 'common.months.aug': return 'Ago';
+			case 'common.months.sep': return 'Sep';
+			case 'common.months.oct': return 'Oct';
+			case 'common.months.nov': return 'Nov';
+			case 'common.months.dec': return 'Dic';
 			case 'common.date': return 'Fecha';
 			case 'common.save': return 'Guardar';
 			case 'common.share': return 'Compartir';
@@ -2583,6 +2705,9 @@ extension on _StringsEs {
 			case 'events.detail.buyTickets': return 'Comprar entradas';
 			case 'events.detail.originalSource': return 'Fuente original';
 			case 'events.detail.program': return 'Programa del evento';
+			case 'events.detail.notFound': return 'Evento no encontrado';
+			case 'events.detail.lector': return ({required Object name}) => 'Instructor: ${name}';
+			case 'events.detail.dj': return ({required Object name}) => 'DJ: ${name}';
 			case 'events.filter.selectedCount': return ({required Object count}) => '${count} seleccionados';
 			case 'events.filter.selectedStyles': return 'ESTILOS SELECCIONADOS';
 			case 'events.filter.apply': return 'Aplicar filtro';
@@ -2605,6 +2730,7 @@ extension on _StringsEs {
 			case 'courses.allCourses': return 'Todos los cursos';
 			case 'courses.noCoursesFound': return 'No se encontraron cursos';
 			case 'courses.detail.header': return 'Detalle del curso';
+			case 'courses.detail.notFound': return 'Curso no encontrado';
 			case 'courses.detail.description': return 'Descripción del curso';
 			case 'courses.detail.details': return 'Detalles del curso';
 			case 'courses.detail.whatYouLearn': return 'Qué aprenderás';

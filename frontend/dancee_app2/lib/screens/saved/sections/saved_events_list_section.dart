@@ -9,20 +9,13 @@ import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/course_cubit.dart';
 import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/favorites_cubit.dart';
+import '../../../shared/utils/date_format.dart';
 import '../../courses/courses_list/components/course_list_card.dart';
 import '../../events/events_list/components/featured_event_card.dart' show EventTagData;
 import '../../events/events_list/components/upcoming_event_card.dart';
 
 class SavedEventsListSection extends StatelessWidget {
   const SavedEventsListSection({super.key});
-
-  String _formatDate(DateTime dt) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-  }
 
   String _buildCourseDateRange(Course course) {
     if (course.startDate != null && course.endDate != null) {
@@ -40,8 +33,8 @@ class SavedEventsListSection extends StatelessWidget {
     final courseState = context.watch<CourseCubit>().state;
 
     return favoritesState.map(
-      initial: (_) => _buildLoading(),
-      loading: (_) => _buildLoading(),
+      initial: (_) => const _SavedLoadingWidget(),
+      loading: (_) => const _SavedLoadingWidget(),
       loaded: (_) {
         final allEvents = eventState.maybeMap(
           loaded: (s) => s.allEvents,
@@ -57,7 +50,7 @@ class SavedEventsListSection extends StatelessWidget {
             favoritesCubit.getResolvedFavorites(allEvents, allCourses);
 
         if (resolvedFavorites.isEmpty) {
-          return _buildEmpty();
+          return const _SavedEmptyWidget();
         }
 
         return Padding(
@@ -72,7 +65,7 @@ class SavedEventsListSection extends StatelessWidget {
           ),
         );
       },
-      error: (s) => _buildError(context, s.message),
+      error: (s) => _SavedErrorWidget(message: s.message),
     );
   }
 
@@ -85,7 +78,7 @@ class SavedEventsListSection extends StatelessWidget {
         imageUrl: event.imageUrl ?? '',
         title: event.title,
         location: event.venue?.town ?? event.venue?.name ?? '',
-        date: _formatDate(event.startTime),
+        date: formatDate(event.startTime),
         tags: event.dances.map((d) => EventTagData(d, appPrimary)).toList(),
         isFavorited: event.isFavorited,
         onFavoriteTap: () => favoritesCubit.toggleFavorite(
@@ -110,8 +103,13 @@ class SavedEventsListSection extends StatelessWidget {
       );
     }
   }
+}
 
-  Widget _buildLoading() {
+class _SavedLoadingWidget extends StatelessWidget {
+  const _SavedLoadingWidget();
+
+  @override
+  Widget build(BuildContext context) {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(AppSpacing.xl),
@@ -119,8 +117,13 @@ class SavedEventsListSection extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildEmpty() {
+class _SavedEmptyWidget extends StatelessWidget {
+  const _SavedEmptyWidget();
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -152,8 +155,15 @@ class SavedEventsListSection extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildError(BuildContext context, String message) {
+class _SavedErrorWidget extends StatelessWidget {
+  final String message;
+
+  const _SavedErrorWidget({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),

@@ -6,6 +6,7 @@ import '../../../../data/entities/event.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../../../logic/cubits/favorites_cubit.dart';
 import '../../../../shared/components/snap_carousel.dart';
+import '../../../../shared/utils/date_format.dart';
 import '../components/featured_event_card.dart';
 
 class FeaturedEventsSection extends StatelessWidget {
@@ -17,12 +18,6 @@ class FeaturedEventsSection extends StatelessWidget {
     required this.events,
     this.onEventTap,
   });
-
-  String _formatDate(DateTime dt) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +51,7 @@ class FeaturedEventsSection extends StatelessWidget {
             return FeaturedEventCard(
               imageUrl: event.imageUrl ?? '',
               title: event.title,
-              date: _formatDate(event.startTime),
+              date: formatDate(event.startTime),
               location: event.venue?.town ?? event.venue?.name ?? '',
               price: price.isEmpty ? t.events.detail.admission : price,
               isFree: isFree,

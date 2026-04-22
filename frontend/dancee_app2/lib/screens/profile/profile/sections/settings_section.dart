@@ -28,9 +28,9 @@ class SettingsSection extends StatelessWidget {
           style: const TextStyle(color: appText),
         ),
         children: [
-          _buildOption(ctx, AppLocale.en, t.profile.settings.english, currentLocale),
-          _buildOption(ctx, AppLocale.cs, t.profile.settings.czech, currentLocale),
-          _buildOption(ctx, AppLocale.es, t.profile.settings.spanish, currentLocale),
+          _LanguageOption(locale: AppLocale.en, label: t.profile.settings.english, current: currentLocale),
+          _LanguageOption(locale: AppLocale.cs, label: t.profile.settings.czech, current: currentLocale),
+          _LanguageOption(locale: AppLocale.es, label: t.profile.settings.spanish, current: currentLocale),
         ],
       ),
     ).then((selected) {
@@ -38,23 +38,6 @@ class SettingsSection extends StatelessWidget {
         cubit.setLanguage(selected.languageCode);
       }
     });
-  }
-
-  Widget _buildOption(BuildContext ctx, AppLocale locale, String label, AppLocale current) {
-    final isSelected = locale == current;
-    return SimpleDialogOption(
-      onPressed: () => Navigator.pop(ctx, locale),
-      child: Row(
-        children: [
-          if (isSelected)
-            const Icon(Icons.check, color: appPrimary, size: 18)
-          else
-            const SizedBox(width: 18),
-          const SizedBox(width: 8),
-          Text(label, style: TextStyle(color: isSelected ? appPrimary : appText)),
-        ],
-      ),
-    );
   }
 
   String _currentLanguageName(String languageCode) {
@@ -95,6 +78,36 @@ class SettingsSection extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  final AppLocale locale;
+  final String label;
+  final AppLocale current;
+
+  const _LanguageOption({
+    required this.locale,
+    required this.label,
+    required this.current,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = locale == current;
+    return SimpleDialogOption(
+      onPressed: () => Navigator.pop(context, locale),
+      child: Row(
+        children: [
+          if (isSelected)
+            const Icon(Icons.check, color: appPrimary, size: 18)
+          else
+            const SizedBox(width: 18),
+          const SizedBox(width: 8),
+          Text(label, style: TextStyle(color: isSelected ? appPrimary : appText)),
+        ],
+      ),
     );
   }
 }

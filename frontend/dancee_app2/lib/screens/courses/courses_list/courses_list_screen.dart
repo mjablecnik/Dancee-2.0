@@ -12,27 +12,12 @@ import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/filter_state.dart';
 import '../../../logic/states/course_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
+import '../../../shared/utils/date_format.dart';
 import 'components/course_list_card.dart';
 import 'sections/courses_header_section.dart';
 
 class CoursesListScreen extends StatelessWidget {
   const CoursesListScreen({super.key});
-
-  String _formatDateRange(String? startDate, String? endDate) {
-    if (startDate == null) return '';
-    final start = DateTime.tryParse(startDate);
-    if (start == null) return startDate;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final startStr = '${start.day} ${months[start.month - 1]}';
-    if (endDate != null) {
-      final end = DateTime.tryParse(endDate);
-      if (end != null) {
-        return '$startStr – ${end.day} ${months[end.month - 1]} ${end.year}';
-      }
-    }
-    return '$startStr ${start.year}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +68,7 @@ class CoursesListScreen extends StatelessWidget {
                         const SizedBox(height: AppSpacing.xxxl),
                         _AllCoursesSection(
                           courses: loaded.filteredCourses,
-                          formatDateRange: _formatDateRange,
+                          formatDateRange: formatDateRange,
                         ),
                       ],
                     ),

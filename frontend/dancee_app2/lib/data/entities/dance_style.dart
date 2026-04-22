@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'translation_utils.dart';
+
 class DanceStyle extends Equatable {
   const DanceStyle({
     required this.code,
@@ -18,7 +20,7 @@ class DanceStyle extends Equatable {
     required String languageCode,
   }) {
     final translations = (json['translations'] as List<dynamic>?) ?? [];
-    final translation = _extractTranslation(translations, languageCode);
+    final translation = extractTranslation(translations, languageCode);
 
     final name = (translation?['name'] as String?) ??
         (json['name'] as String?) ??
@@ -36,21 +38,3 @@ class DanceStyle extends Equatable {
   List<Object?> get props => [code, name, parentCode, sortOrder];
 }
 
-Map<String, dynamic>? _extractTranslation(
-  List<dynamic> translations,
-  String languageCode,
-) {
-  if (translations.isEmpty) return null;
-
-  final match = translations.cast<Map<String, dynamic>>().where(
-        (t) => t['languages_code'] == languageCode,
-      );
-  if (match.isNotEmpty) return match.first;
-
-  final enMatch = translations.cast<Map<String, dynamic>>().where(
-        (t) => t['languages_code'] == 'en',
-      );
-  if (enMatch.isNotEmpty) return enMatch.first;
-
-  return translations.first as Map<String, dynamic>;
-}
