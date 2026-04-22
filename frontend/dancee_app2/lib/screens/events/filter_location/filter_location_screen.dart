@@ -19,7 +19,6 @@ class FilterLocationScreen extends StatefulWidget {
 }
 
 class _FilterLocationScreenState extends State<FilterLocationScreen> {
-  final TextEditingController _searchController = TextEditingController();
   List<String> _allRegions = [];
   Map<String, bool> _selected = {}; // key = region string
   Map<String, int> _regionCounts = {}; // key = region string, value = event count
@@ -28,7 +27,6 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
   void initState() {
     super.initState();
     _deriveRegions();
-    _searchController.addListener(() => setState(() {}));
   }
 
   void _deriveRegions() {
@@ -88,19 +86,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   int get _selectedCount => _selected.values.where((v) => v).length;
-
-  List<String> get _filteredRegions {
-    final query = _searchController.text.trim().toLowerCase();
-    if (query.isEmpty) return _allRegions;
-    return _allRegions.where((r) => r.toLowerCase().contains(query)).toList();
-  }
 
   void _apply() {
     final regions = _selected.entries
@@ -113,7 +99,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filteredRegions;
+    final filtered = _allRegions;
     final selectedRegionNames = _selected.entries
         .where((e) => e.value)
         .map((e) => e.key)
@@ -124,7 +110,6 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
       body: Column(
         children: [
           FilterLocationHeaderSection(
-            controller: _searchController,
             onBack: () => context.pop(),
           ),
           Expanded(
