@@ -73,7 +73,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Configure Dio with base URL, access token header, and timeouts from AppConfig
     - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.7_
 
-  - [ ]* 3.2 Write property tests for DirectusClient
+  - [x]* 3.2 Write property tests for DirectusClient
     - **Property 1: Deep language filter in API queries** — verify query parameters include correct `deep[translations][_filter][languages_code][_eq]` for any valid language code
     - **Property 2: HTTP error to ApiException mapping** — generate random HTTP status codes (4xx, 5xx), verify ApiException is thrown with non-empty message
     - **Validates: Requirements 1.5, 1.7, 15.1, 15.2**
