@@ -11,15 +11,6 @@ import '../../../logic/cubits/filter_cubit.dart';
 import 'sections/filter_location_header_section.dart';
 import '../filter_dance/sections/filter_bottom_actions_section.dart';
 
-/// Internal sentinel key used to represent the "Abroad" filter option.
-/// Events whose venue country is not in [_czCountryValues] are grouped under
-/// this key. It is never shown as raw text — the UI translates it to
-/// [t.events.filter.abroad].
-const kAbroadRegionKey = '__abroad__';
-
-/// Known country values used in Directus data for Czech Republic venues.
-const _czCountryValues = {'CZ', 'Česká republika', 'Česko', 'Czech Republic', 'Czechia'};
-
 class FilterLocationScreen extends StatefulWidget {
   const FilterLocationScreen({super.key});
 
@@ -49,7 +40,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         for (final event in s.allEvents) {
           final venue = event.venue;
           if (venue == null) continue;
-          if (_czCountryValues.contains(venue.country)) {
+          if (kCzCountryValues.contains(venue.country)) {
             final region = venue.region;
             if (region.isNotEmpty) czRegions.add(region);
           } else {
@@ -66,7 +57,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         for (final course in s.allCourses) {
           final venue = course.venue;
           if (venue == null) continue;
-          if (_czCountryValues.contains(venue.country)) {
+          if (kCzCountryValues.contains(venue.country)) {
             final region = venue.region;
             if (region.isNotEmpty) czRegions.add(region);
           } else {

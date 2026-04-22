@@ -46,6 +46,7 @@ Event _makeEvent({
   List<String> dances = const [],
   String eventType = 'party',
   String? region,
+  String country = 'CZ',
 }) {
   return Event(
     id: id,
@@ -65,7 +66,7 @@ Event _makeEvent({
             street: '',
             number: '',
             town: '',
-            country: '',
+            country: country,
             postalCode: '',
             region: region,
             latitude: 0,

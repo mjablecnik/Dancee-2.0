@@ -6,6 +6,14 @@ import '../../data/repositories/event_repository.dart';
 import '../states/event_state.dart';
 import '../states/filter_state.dart';
 
+/// Sentinel key used to represent the "Abroad" filter option in region filters.
+/// Events whose venue country is not in [kCzCountryValues] are grouped under
+/// this key.
+const kAbroadRegionKey = '__abroad__';
+
+/// Known country values used in Directus data for Czech Republic venues.
+const kCzCountryValues = {'CZ', 'Česká republika', 'Česko', 'Czech Republic', 'Czechia'};
+
 class EventCubit extends Cubit<EventState> {
   EventCubit({required EventRepository eventRepository})
       : _eventRepository = eventRepository,
@@ -90,9 +98,20 @@ List<Event> _filterEvents(
       if (!event.dances.any((d) => expandedCodes.contains(d))) return false;
     }
     if (filters.selectedRegions.isNotEmpty) {
-      if (event.venue == null ||
-          !filters.selectedRegions.contains(event.venue!.region)) {
-        return false;
+      final venue = event.venue;
+      if (venue == null) return false;
+      final isCz = kCzCountryValues.contains(venue.country);
+      final abroadSelected = filters.selectedRegions.contains(kAbroadRegionKey);
+      final czRegions = filters.selectedRegions.where((r) => r != kAbroadRegionKey).toSet();
+
+      if (!isCz) {
+        // Foreign event: only include if "Abroad" is selected.
+        if (!abroadSelected) return false;
+      } else {
+        // CZ event: include if any CZ region matches, or if no CZ regions are
+        // selected at all (only "Abroad" is selected — exclude CZ events).
+        if (czRegions.isEmpty) return false;
+        if (!czRegions.contains(venue.region)) return false;
       }
     }
     return true;
