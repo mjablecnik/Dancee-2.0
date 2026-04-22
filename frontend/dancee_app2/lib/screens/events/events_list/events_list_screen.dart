@@ -5,7 +5,10 @@ import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/event_cubit.dart';
+import '../../../logic/cubits/filter_cubit.dart';
+import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/event_state.dart';
+import '../../../logic/states/filter_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import 'sections/events_header_section.dart';
 import 'sections/featured_events_section.dart';
@@ -20,9 +23,17 @@ class EventsListScreen extends StatelessWidget {
       color: appBg,
       child: Column(
         children: [
-          EventsHeaderSection(
-            location: 'Praha, CZ',
-            onLocationTap: () => context.push('/events/filter-location'),
+          BlocBuilder<FilterCubit, FilterState>(
+            builder: (context, filterState) {
+              final regions = filterState.selectedRegions;
+              final location = regions.isEmpty
+                  ? t.events.filter.allCities
+                  : regions.join(', ');
+              return EventsHeaderSection(
+                location: location,
+                onLocationTap: () => context.push('/events/filter-location'),
+              );
+            },
           ),
           Expanded(
             child: BlocBuilder<EventCubit, EventState>(
@@ -37,14 +48,28 @@ class EventsListScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        DanceStylesFilterSection(
-                          styles: loaded.allEvents
-                              .expand((e) => e.dances)
-                              .toSet()
-                              .toList(),
-                          selectedIndex: 0,
-                          onSelected: (_) {},
-                          onShowAll: () => context.push('/events/filter-dance'),
+                        BlocBuilder<FilterCubit, FilterState>(
+                          builder: (context, filterState) {
+                            final filterCubit = context.read<FilterCubit>();
+                            final danceStyles = filterCubit.allDanceStyles;
+                            final selectedCodes = filterState.selectedDanceStyles;
+                            final selectedIndex = danceStyles.indexWhere(
+                              (d) => selectedCodes.contains(d.code),
+                            );
+                            return DanceStylesFilterSection(
+                              styles: danceStyles.map((d) => d.name).toList(),
+                              selectedIndex: selectedIndex,
+                              onSelected: (index) {
+                                final code = danceStyles[index].code;
+                                if (selectedCodes.contains(code)) {
+                                  filterCubit.setDanceStyles({});
+                                } else {
+                                  filterCubit.setDanceStyles({code});
+                                }
+                              },
+                              onShowAll: () => context.push('/events/filter-dance'),
+                            );
+                          },
                         ),
                         const SizedBox(height: AppSpacing.xxxl),
                         FeaturedEventsSection(
@@ -73,7 +98,8 @@ class EventsListScreen extends StatelessWidget {
                         TextButton(
                           onPressed: () {
                             final cubit = context.read<EventCubit>();
-                            cubit.loadEvents('en');
+                            final lang = context.read<SettingsCubit>().currentLanguageCode;
+                            cubit.loadEvents(lang);
                           },
                           child: Text(t.common.retry, style: const TextStyle(color: appPrimary)),
                         ),

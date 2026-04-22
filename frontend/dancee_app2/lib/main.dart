@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -142,6 +144,8 @@ final _router = GoRouter(
   ],
 );
 
+final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 class DanceeApp extends StatelessWidget {
   const DanceeApp({super.key, required this.settingsCubit});
 
@@ -162,6 +166,7 @@ class DanceeApp extends StatelessWidget {
           title: t.common.appName,
           theme: AppTheme.theme,
           routerConfig: _router,
+          scaffoldMessengerKey: _scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           locale: TranslationProvider.of(context).flutterLocale,
           supportedLocales: AppLocale.values.map((l) => l.flutterLocale).toList(),
@@ -184,11 +189,28 @@ class _AppListeners extends StatefulWidget {
 }
 
 class _AppListenersState extends State<_AppListeners> {
+  StreamSubscription<String>? _favErrorSub;
+
   @override
   void initState() {
     super.initState();
     // Trigger initial data load once cubits are in the tree
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initialLoad());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialLoad();
+      _favErrorSub = context.read<FavoritesCubit>().toggleErrors.listen(
+        (message) {
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        },
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _favErrorSub?.cancel();
+    super.dispose();
   }
 
   void _initialLoad() {
@@ -198,6 +220,7 @@ class _AppListenersState extends State<_AppListeners> {
     context.read<FilterCubit>().loadDanceStyles(languageCode);
     context.read<FavoritesCubit>().loadFavorites();
   }
+
 
   @override
   Widget build(BuildContext context) {

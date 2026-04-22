@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/config.dart';
@@ -17,6 +19,18 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
   final FavoritesRepository _favoritesRepository;
   List<Favorite> _allFavorites = [];
+
+  final _toggleErrorController = StreamController<String>.broadcast();
+
+  /// Stream of error messages emitted when a favorite toggle fails.
+  /// Listen to this stream to show snackbars or other error feedback.
+  Stream<String> get toggleErrors => _toggleErrorController.stream;
+
+  @override
+  Future<void> close() {
+    _toggleErrorController.close();
+    return super.close();
+  }
 
   /// Fetches all favorites for the default user, emits loaded state.
   Future<void> loadFavorites() async {
@@ -76,7 +90,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
         }).toList();
         _emitLoaded();
       }
-    } catch (_) {
+    } catch (e) {
       // Revert optimistic update on failure
       if (wasAlreadyFavorited) {
         // Re-fetch from server to restore accurate state
@@ -87,6 +101,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
             .toList();
         _emitLoaded();
       }
+      _toggleErrorController.add(e.toString());
     }
   }
 

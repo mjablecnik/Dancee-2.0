@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
-import '../../../data/event_repository.dart';
 import '../../../data/user_repository.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../shared/components/back_button_header.dart';
@@ -16,6 +15,15 @@ import 'sections/personal_info_section.dart';
 import 'sections/profile_photo_section.dart';
 import 'sections/save_button_section.dart';
 import 'sections/social_links_section.dart';
+
+const _kDanceStyleNames = [
+  'Salsa', 'Bachata', 'Kizomba', 'Zouk', 'Reggaeton',
+  'Tango', 'Swing', 'Ballroom', 'Afro', 'Forró',
+];
+
+const _kExperienceLevelNames = [
+  'Začátečník', 'Mírně pokročilý', 'Pokročilý', 'Expert',
+];
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
@@ -31,7 +39,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   late Map<String, String> _notificationSubtitles;
   bool _initialized = false;
 
-  Future<(UserData, List<DanceStyleData>, List<ExperienceLevelData>)>? _dataFuture;
+  Future<UserData>? _dataFuture;
 
   @override
   void initState() {
@@ -46,22 +54,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       t.profile.editProfile.notifications.eventReminders: t.profile.editProfile.notificationSubtitles.eventReminders,
       t.profile.editProfile.notifications.marketing: t.profile.editProfile.notificationSubtitles.marketing,
     };
-    _dataFuture = Future.wait([
-      const UserRepository().getCurrentUser(),
-      const EventRepository().getDanceStyles(),
-      const EventRepository().getExperienceLevels(),
-    ]).then((results) => (
-          results[0] as UserData,
-          results[1] as List<DanceStyleData>,
-          results[2] as List<ExperienceLevelData>,
-        ));
+    _dataFuture = const UserRepository().getCurrentUser();
   }
 
-  void _initFromData(UserData user, List<DanceStyleData> styles, List<ExperienceLevelData> levels) {
+  void _initFromData(UserData user) {
     if (_initialized) return;
     _initialized = true;
     final userDanceLabels = user.danceTags.map((tag) => tag.label).toSet();
-    _dancePrefs = {for (final s in styles) s.name: userDanceLabels.contains(s.name)};
+    _dancePrefs = {for (final name in _kDanceStyleNames) name: userDanceLabels.contains(name)};
     _level = user.experienceLevel;
   }
 
@@ -90,12 +90,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<(UserData, List<DanceStyleData>, List<ExperienceLevelData>)>(
+            child: FutureBuilder<UserData>(
               future: _dataFuture,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return const SizedBox.shrink();
-                final (user, styles, levels) = snapshot.data!;
-                _initFromData(user, styles, levels);
+                final user = snapshot.data!;
+                _initFromData(user);
                 return StatefulBuilder(
                   builder: (context, setInnerState) {
                     return SingleChildScrollView(
@@ -140,7 +140,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                             child: SectionLabel(title: t.profile.editProfile.sections.level),
                           ),
                           ExperienceLevelSection(
-                            levels: levels.map((l) => l.name).toList(),
+                            levels: _kExperienceLevelNames,
                             selectedLevel: _level,
                             onChanged: (level) => setState(() => _level = level),
                           ),
