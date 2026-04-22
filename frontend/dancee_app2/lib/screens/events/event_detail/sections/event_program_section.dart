@@ -5,7 +5,7 @@ import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
 import '../components/program_day_card.dart';
 export '../components/program_day_card.dart' show ProgramDayData;
-export '../components/program_slot_item.dart' show ProgramSlotData;
+export '../components/program_slot_item.dart' show ProgramSlotData, SlotExtra;
 
 class EventProgramSection extends StatefulWidget {
   final List<ProgramDayData> days;

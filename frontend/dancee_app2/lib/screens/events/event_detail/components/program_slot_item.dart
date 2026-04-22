@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 
+class SlotExtra {
+  final String text;
+  final Color color;
+  const SlotExtra(this.text, this.color);
+}
+
 class ProgramSlotData {
   final String time;
   final String title;
   final String description;
-  final String? extra;
-  final Color? extraColor;
+  final List<SlotExtra> extras;
 
   const ProgramSlotData({
     required this.time,
     required this.title,
     required this.description,
-    this.extra,
-    this.extraColor,
+    this.extras = const [],
   });
 }
 
@@ -53,17 +57,19 @@ class ProgramSlotItem extends StatelessWidget {
                   fontWeight: AppTypography.fontWeightSemiBold,
                 ),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                slot.description,
-                style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
-              ),
-              if (slot.extra != null) ...[
+              if (slot.description.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  slot.extra!,
+                  slot.description,
+                  style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeSm),
+                ),
+              ],
+              for (final extra in slot.extras) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  extra.text,
                   style: TextStyle(
-                    color: slot.extraColor,
+                    color: extra.color,
                     fontSize: AppTypography.fontSizeSm,
                   ),
                 ),

@@ -121,16 +121,17 @@ class EventDetailScreen extends StatelessWidget {
           final timeStr = part.startTime != null
               ? formatTime(part.startTime!)
               : '';
-          final extras = [
-            ...part.lectors.map((l) => t.events.detail.lector(name: l)),
-            ...part.djs.map((dj) => t.events.detail.dj(name: dj)),
-          ].join(', ');
+          final lectorExtras = part.lectors
+              .map((l) => SlotExtra(t.events.detail.lector(name: l), appLavender))
+              .toList();
+          final djExtras = part.djs
+              .map((dj) => SlotExtra(t.events.detail.dj(name: dj), appPrimary))
+              .toList();
           return ProgramSlotData(
             time: timeStr,
             title: part.name,
             description: part.description ?? '',
-            extra: extras.isNotEmpty ? extras : null,
-            extraColor: appPrimary,
+            extras: [...lectorExtras, ...djExtras],
           );
         }).toList(),
       );
