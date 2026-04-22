@@ -13,9 +13,12 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: AppBottomNavBar(currentTab: currentTab),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: child,
+        bottomNavigationBar: AppBottomNavBar(currentTab: currentTab),
+      ),
     );
   }
 }

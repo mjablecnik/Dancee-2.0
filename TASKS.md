@@ -56,7 +56,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 ## Frontend: Back Button Handling (Spec §7)
 
-- [ ] 27. [HIGH] Wrap the `Scaffold` in `AppLayout` (`lib/features/app/layouts.dart`) with `PopScope(canPop: false)` to prevent app exit on hardware back button when on main pages
+- [x] 27. [HIGH] Wrap the `Scaffold` in `AppLayout` (`lib/features/app/layouts.dart`) with `PopScope(canPop: false)` to prevent app exit on hardware back button when on main pages
 
 ## Code Generation & Validation
 
