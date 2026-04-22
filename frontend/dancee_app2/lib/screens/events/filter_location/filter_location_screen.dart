@@ -22,6 +22,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<String> _allRegions = [];
   Map<String, bool> _selected = {}; // key = region string
+  Map<String, int> _regionCounts = {}; // key = region string, value = event count
 
   @override
   void initState() {
@@ -34,7 +35,8 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
     final czRegions = <String>{};
     var hasAbroad = false;
 
-    final eventState = context.read<EventCubit>().state;
+    final eventCubit = context.read<EventCubit>();
+    final eventState = eventCubit.state;
     eventState.maybeMap(
       loaded: (s) {
         for (final event in s.allEvents) {
@@ -73,11 +75,16 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
 
     final alreadySelected = context.read<FilterCubit>().state.selectedRegions;
 
+    final counts = <String, int>{
+      for (final r in sortedRegions) r: eventCubit.countEventsForRegion(r),
+    };
+
     setState(() {
       _allRegions = sortedRegions;
       _selected = {
         for (final r in sortedRegions) r: alreadySelected.contains(r),
       };
+      _regionCounts = counts;
     });
   }
 
@@ -148,6 +155,7 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
                     _RegionsListSection(
                       regions: filtered,
                       selected: _selected,
+                      regionCounts: _regionCounts,
                       onToggle: (region) => setState(
                         () => _selected[region] = !(_selected[region] ?? false),
                       ),
@@ -177,11 +185,13 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
 class _RegionsListSection extends StatelessWidget {
   final List<String> regions;
   final Map<String, bool> selected;
+  final Map<String, int> regionCounts;
   final ValueChanged<String> onToggle;
 
   const _RegionsListSection({
     required this.regions,
     required this.selected,
+    required this.regionCounts,
     required this.onToggle,
   });
 
@@ -203,6 +213,7 @@ class _RegionsListSection extends StatelessWidget {
             region: region,
             isChecked: isChecked,
             isLast: isLast,
+            count: regionCounts[region],
             onToggle: () => onToggle(region),
           );
         }),
@@ -215,6 +226,7 @@ class _RegionRow extends StatelessWidget {
   final String region;
   final bool isChecked;
   final bool isLast;
+  final int? count;
   final VoidCallback onToggle;
 
   const _RegionRow({
@@ -222,10 +234,12 @@ class _RegionRow extends StatelessWidget {
     required this.isChecked,
     required this.isLast,
     required this.onToggle,
+    this.count,
   });
 
   @override
   Widget build(BuildContext context) {
+    final label = region == kAbroadRegionKey ? t.events.filter.abroad : region;
     return InkWell(
       onTap: onToggle,
       child: Container(
@@ -247,7 +261,7 @@ class _RegionRow extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
-                region == kAbroadRegionKey ? t.events.filter.abroad : region,
+                count != null ? '$label ($count)' : label,
                 style: const TextStyle(
                   fontSize: AppTypography.fontSizeXl,
                   fontWeight: AppTypography.fontWeightSemiBold,
