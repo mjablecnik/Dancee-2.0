@@ -102,6 +102,7 @@ class SavedEventsListSection extends StatelessWidget {
           itemType: 'course',
           itemId: course.id,
         ),
+        onTap: () => context.push('/courses/detail?id=${course.id}'),
       );
     }
   }
