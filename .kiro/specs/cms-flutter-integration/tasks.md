@@ -157,7 +157,7 @@ Replace all hardcoded mock data in dancee_app2 with live data from dancee_cms (D
     - Implement `getResolvedFavorites(events, courses)` — resolve favorite IDs against loaded data, sort by createdAt descending
     - _Requirements: 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 12.4, 12.5_
 
-  - [ ]* 5.9 Write property tests for favorites logic
+  - [x]* 5.9 Write property tests for favorites logic
     - **Property 10: Favorite resolution against loaded data** — generate random favorites + items, verify resolution correctness
     - **Property 11: Favorites sorted by creation date** — generate random favorites with dates, verify descending sort
     - **Property 12: Favorites unaffected by filters** — generate random favorites + active filters, verify all favorites shown
