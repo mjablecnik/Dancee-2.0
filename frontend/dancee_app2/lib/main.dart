@@ -119,11 +119,17 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/events/filter-dance',
-      builder: (context, state) => const FilterDanceScreen(),
+      builder: (context, state) {
+        final source = state.uri.queryParameters['source'] ?? 'events';
+        return FilterDanceScreen(source: source);
+      },
     ),
     GoRoute(
       path: '/events/filter-location',
-      builder: (context, state) => const FilterLocationScreen(),
+      builder: (context, state) {
+        final source = state.uri.queryParameters['source'] ?? 'events';
+        return FilterLocationScreen(source: source);
+      },
     ),
     GoRoute(
       path: '/courses/detail',

@@ -6,10 +6,12 @@ import '../../../../i18n/strings.g.dart';
 
 class FilterLocationHeaderSection extends StatelessWidget {
   final VoidCallback onBack;
+  final VoidCallback onClear;
 
   const FilterLocationHeaderSection({
     super.key,
     required this.onBack,
+    required this.onClear,
   });
 
   @override
@@ -40,12 +42,25 @@ class FilterLocationHeaderSection extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.lg),
-          Text(
-            t.events.filter.selectLocation,
-            style: const TextStyle(
-              fontSize: AppTypography.fontSize3xl,
-              fontWeight: AppTypography.fontWeightBold,
-              color: appText,
+          Expanded(
+            child: Text(
+              t.events.filter.selectLocation,
+              style: const TextStyle(
+                fontSize: AppTypography.fontSize3xl,
+                fontWeight: AppTypography.fontWeightBold,
+                color: appText,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onClear,
+            child: Text(
+              t.common.clear,
+              style: const TextStyle(
+                fontSize: AppTypography.fontSizeMd,
+                fontWeight: AppTypography.fontWeightMedium,
+                color: appPrimary,
+              ),
             ),
           ),
         ],

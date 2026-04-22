@@ -34,7 +34,7 @@ class CoursesListScreen extends StatelessWidget {
                   : regions.map(regionLabel).join(', ');
               return EventsHeaderSection(
                 location: location,
-                onLocationTap: () => context.push('/events/filter-location'),
+                onLocationTap: () => context.push('/events/filter-location?source=courses'),
               );
             },
           ),
@@ -61,7 +61,7 @@ class CoursesListScreen extends StatelessWidget {
                               (d) => selectedCodes.contains(d.code),
                             );
                             return DanceStylesFilterSection(
-                              onShowAll: () => context.push('/events/filter-dance'),
+                              onShowAll: () => context.push('/events/filter-dance?source=courses'),
                             );
                           },
                         ),

@@ -27,6 +27,27 @@ class CourseCubit extends Cubit<CourseState> {
     }
   }
 
+  /// Returns the number of courses whose dances match [styleCode] or any of
+  /// its child styles resolved via [allDanceStyles].
+  int countCoursesForDanceStyle(String styleCode, List<DanceStyle> allDanceStyles) {
+    final expandedCodes = <String>{styleCode};
+    expandedCodes.addAll(
+      allDanceStyles.where((s) => s.parentCode == styleCode).map((s) => s.code),
+    );
+    return _allCourses
+        .where((c) => c.dances.any((d) => expandedCodes.contains(d)))
+        .length;
+  }
+
+  /// Returns the number of courses whose venue region matches [region].
+  int countCoursesForRegion(String region) {
+    return _allCourses.where((c) {
+      final venue = c.venue;
+      if (venue == null) return false;
+      return venue.region == region;
+    }).length;
+  }
+
   /// Applies [filters] client-side with parent/child dance style expansion.
   void applyFilters(FilterState filters, List<DanceStyle> allDanceStyles) {
     _currentFilters = filters;

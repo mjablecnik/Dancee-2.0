@@ -5,6 +5,7 @@ import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/entities/dance_style.dart';
 import '../../../i18n/strings.g.dart';
+import '../../../logic/cubits/course_cubit.dart';
 import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/filter_cubit.dart';
 import 'sections/dance_styles_list_section.dart';
@@ -13,7 +14,10 @@ import 'sections/filter_dance_header_section.dart';
 import 'sections/selected_styles_section.dart';
 
 class FilterDanceScreen extends StatefulWidget {
-  const FilterDanceScreen({super.key});
+  const FilterDanceScreen({super.key, this.source = 'events'});
+
+  /// 'events' or 'courses' — determines which cubit provides the counts.
+  final String source;
 
   @override
   State<FilterDanceScreen> createState() => _FilterDanceScreenState();
@@ -22,23 +26,31 @@ class FilterDanceScreen extends StatefulWidget {
 class _FilterDanceScreenState extends State<FilterDanceScreen> {
   List<DanceStyle> _styles = [];
   Map<String, bool> _selected = {}; // key = dance style code
-  Map<String, int> _counts = {}; // key = dance style code, value = event count
+  Map<String, int> _counts = {}; // key = dance style code, value = item count
 
   @override
   void initState() {
     super.initState();
     final filterCubit = context.read<FilterCubit>();
-    final eventCubit = context.read<EventCubit>();
     _styles = filterCubit.parentDanceStyles;
     final alreadySelected = filterCubit.state.selectedDanceStyles;
     _selected = {
       for (final s in _styles) s.code: alreadySelected.contains(s.code),
     };
     final allDanceStyles = filterCubit.allDanceStyles;
-    _counts = {
-      for (final s in _styles)
-        s.code: eventCubit.countEventsForDanceStyle(s.code, allDanceStyles),
-    };
+    if (widget.source == 'courses') {
+      final courseCubit = context.read<CourseCubit>();
+      _counts = {
+        for (final s in _styles)
+          s.code: courseCubit.countCoursesForDanceStyle(s.code, allDanceStyles),
+      };
+    } else {
+      final eventCubit = context.read<EventCubit>();
+      _counts = {
+        for (final s in _styles)
+          s.code: eventCubit.countEventsForDanceStyle(s.code, allDanceStyles),
+      };
+    }
   }
 
   int get _selectedCount => _selected.values.where((v) => v).length;

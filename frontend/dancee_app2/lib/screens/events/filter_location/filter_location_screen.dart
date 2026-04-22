@@ -12,7 +12,10 @@ import 'sections/filter_location_header_section.dart';
 import '../filter_dance/sections/filter_bottom_actions_section.dart';
 
 class FilterLocationScreen extends StatefulWidget {
-  const FilterLocationScreen({super.key});
+  const FilterLocationScreen({super.key, this.source = 'events'});
+
+  /// 'events' or 'courses' — determines which cubit provides the counts.
+  final String source;
 
   @override
   State<FilterLocationScreen> createState() => _FilterLocationScreenState();
@@ -73,9 +76,17 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
 
     final alreadySelected = context.read<FilterCubit>().state.selectedRegions;
 
-    final counts = <String, int>{
-      for (final r in sortedRegions) r: eventCubit.countEventsForRegion(r),
-    };
+    final counts = <String, int>{};
+    if (widget.source == 'courses') {
+      final courseCubit = context.read<CourseCubit>();
+      for (final r in sortedRegions) {
+        counts[r] = courseCubit.countCoursesForRegion(r);
+      }
+    } else {
+      for (final r in sortedRegions) {
+        counts[r] = eventCubit.countEventsForRegion(r);
+      }
+    }
 
     setState(() {
       _allRegions = sortedRegions;
@@ -111,6 +122,11 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
         children: [
           FilterLocationHeaderSection(
             onBack: () => context.pop(),
+            onClear: () => setState(() {
+              for (final key in _selected.keys) {
+                _selected[key] = false;
+              }
+            }),
           ),
           Expanded(
             child: SingleChildScrollView(
