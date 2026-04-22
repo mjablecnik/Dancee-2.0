@@ -14,6 +14,7 @@ class EventRepository {
       queryParameters: {
         'fields': '*,venue.*,translations.*',
         'filter[status][_eq]': 'published',
+        'filter[start_time][_gte]': '\$NOW',
         'sort': 'start_time',
         'limit': '-1',
         'deep[translations][_filter][languages_code][_eq]': languageCode,

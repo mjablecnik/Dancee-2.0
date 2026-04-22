@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 
 import 'config.dart';
@@ -104,6 +105,11 @@ class DirectusClient {
           originalError: e,
         );
       case DioExceptionType.badResponse:
+        // ignore: avoid_print
+        print(
+          '[DirectusClient] badResponse: status=$statusCode '
+          'body=${e.response?.data}',
+        );
         return ApiException(
           statusCode: statusCode,
           message: _messageForStatusCode(statusCode),

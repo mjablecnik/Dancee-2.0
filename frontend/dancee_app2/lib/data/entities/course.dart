@@ -82,8 +82,16 @@ class Course extends Equatable {
         ? Venue.fromDirectus(venueJson)
         : null;
 
-    // Construct image URL
-    final fileId = json['image'];
+    // Construct image URL — image can be a UUID string or an expanded object with 'id'
+    final rawImage = json['image'];
+    final String? fileId;
+    if (rawImage is Map<String, dynamic>) {
+      fileId = rawImage['id']?.toString();
+    } else if (rawImage != null) {
+      fileId = rawImage.toString();
+    } else {
+      fileId = null;
+    }
     final imageUrl = fileId != null ? '$directusBaseUrl/assets/$fileId' : null;
 
     // Parse dances

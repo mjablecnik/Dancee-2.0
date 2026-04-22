@@ -35,6 +35,7 @@ class FavoritesRepository {
         'user_id': userId,
         'item_type': itemType,
         'item_id': itemId,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
       },
     );
 
