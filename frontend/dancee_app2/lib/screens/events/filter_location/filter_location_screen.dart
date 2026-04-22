@@ -11,6 +11,15 @@ import '../../../logic/cubits/filter_cubit.dart';
 import 'sections/filter_location_header_section.dart';
 import '../filter_dance/sections/filter_bottom_actions_section.dart';
 
+/// Internal sentinel key used to represent the "Abroad" filter option.
+/// Events whose venue country is not in [_czCountryValues] are grouped under
+/// this key. It is never shown as raw text — the UI translates it to
+/// [t.events.filter.abroad].
+const kAbroadRegionKey = '__abroad__';
+
+/// Known country values used in Directus data for Czech Republic venues.
+const _czCountryValues = {'CZ', 'Česká republika', 'Česko', 'Czech Republic', 'Czechia'};
+
 class FilterLocationScreen extends StatefulWidget {
   const FilterLocationScreen({super.key});
 
@@ -31,14 +40,21 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
   }
 
   void _deriveRegions() {
-    final regions = <String>{};
+    final czRegions = <String>{};
+    var hasAbroad = false;
 
     final eventState = context.read<EventCubit>().state;
     eventState.maybeMap(
       loaded: (s) {
         for (final event in s.allEvents) {
-          final region = event.venue?.region;
-          if (region != null && region.isNotEmpty) regions.add(region);
+          final venue = event.venue;
+          if (venue == null) continue;
+          if (_czCountryValues.contains(venue.country)) {
+            final region = venue.region;
+            if (region.isNotEmpty) czRegions.add(region);
+          } else {
+            hasAbroad = true;
+          }
         }
       },
       orElse: () {},
@@ -48,14 +64,22 @@ class _FilterLocationScreenState extends State<FilterLocationScreen> {
     courseState.maybeMap(
       loaded: (s) {
         for (final course in s.allCourses) {
-          final region = course.venue?.region;
-          if (region != null && region.isNotEmpty) regions.add(region);
+          final venue = course.venue;
+          if (venue == null) continue;
+          if (_czCountryValues.contains(venue.country)) {
+            final region = venue.region;
+            if (region.isNotEmpty) czRegions.add(region);
+          } else {
+            hasAbroad = true;
+          }
         }
       },
       orElse: () {},
     );
 
-    final sortedRegions = regions.toList()..sort();
+    final sortedRegions = czRegions.toList()..sort();
+    if (hasAbroad) sortedRegions.add(kAbroadRegionKey);
+
     final alreadySelected = context.read<FilterCubit>().state.selectedRegions;
 
     setState(() {
@@ -232,7 +256,7 @@ class _RegionRow extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
-                region,
+                region == kAbroadRegionKey ? t.events.filter.abroad : region,
                 style: const TextStyle(
                   fontSize: AppTypography.fontSizeXl,
                   fontWeight: AppTypography.fontWeightSemiBold,
@@ -307,7 +331,9 @@ class _SelectedRegionsSection extends StatelessWidget {
           runSpacing: AppSpacing.sm,
           children: selectedRegions
               .map((region) => _SelectedTag(
-                    label: region,
+                    label: region == kAbroadRegionKey
+                        ? t.events.filter.abroad
+                        : region,
                     onRemove: () => onRemove(region),
                   ))
               .toList(),
