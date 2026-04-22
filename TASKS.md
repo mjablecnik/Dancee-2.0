@@ -52,7 +52,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 ## Frontend: Favorites Heart Icon on Initial Load (Spec §6)
 
 - [x] 25. [HIGH] Investigate and fix the favorites loading race condition — ensure `EventRepository.getAllEvents()` loads favorite IDs from SharedPreferences before constructing Event objects, and that `EventFilterCubit` preserves `isFavorite` through filtering
-- [ ] 26. [MEDIUM] Verify the fix by confirming heart icons are red on initial event list load for favorited events
+- [x] 26. [MEDIUM] Verify the fix by confirming heart icons are red on initial event list load for favorited events
 
 ## Frontend: Back Button Handling (Spec §7)
 
