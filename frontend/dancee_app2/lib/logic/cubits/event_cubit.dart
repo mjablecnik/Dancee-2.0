@@ -37,6 +37,20 @@ class EventCubit extends Cubit<EventState> {
     );
   }
 
+  /// Returns the number of events that match [styleCode] or any of its child styles.
+  ///
+  /// Uses [allDanceStyles] to resolve parent-child relationships, so a parent
+  /// code like "salsa" also counts events tagged "salsa-on1", "salsa-on2", etc.
+  int countEventsForDanceStyle(String styleCode, List<DanceStyle> allDanceStyles) {
+    final expandedCodes = <String>{styleCode};
+    expandedCodes.addAll(
+      allDanceStyles.where((s) => s.parentCode == styleCode).map((s) => s.code),
+    );
+    return _allEvents
+        .where((e) => e.dances.any((d) => expandedCodes.contains(d)))
+        .length;
+  }
+
   /// Updates the [isFavorited] flag on the event matching [eventId].
   void updateFavoriteStatus(int eventId, bool isFavorited) {
     _allEvents = _allEvents
