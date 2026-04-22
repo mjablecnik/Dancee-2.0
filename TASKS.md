@@ -31,7 +31,7 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 ## Frontend: Multi-Select Dance Style Chips on Event List (Spec §3)
 
-- [ ] 14. [HIGH] Add `toggleDanceType(String code)` method to `EventFilterCubit` in `lib/features/events/logic/event_filter.dart`
+- [x] 14. [HIGH] Add `toggleDanceType(String code)` method to `EventFilterCubit` in `lib/features/events/logic/event_filter.dart`
 - [ ] 15. [HIGH] Create `DanceStyleChipsRow` component in `lib/features/events/pages/event_list/components.dart` — horizontally scrollable row of toggle chips reading from `EventFilterCubit` state
 - [ ] 16. [HIGH] Add `DanceStyleChipsRow` to `SearchAndFiltersSection` in `lib/features/events/pages/event_list/sections.dart` below `FilterChipsRow`
 

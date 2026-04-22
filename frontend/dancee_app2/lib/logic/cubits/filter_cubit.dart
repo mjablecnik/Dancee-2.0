@@ -32,6 +32,16 @@ class FilterCubit extends Cubit<FilterState> {
     emit(state.copyWith(selectedDanceStyles: codes));
   }
 
+  void toggleDanceType(String code) {
+    final current = Set<String>.from(state.selectedDanceStyles);
+    if (current.contains(code)) {
+      current.remove(code);
+    } else {
+      current.add(code);
+    }
+    emit(state.copyWith(selectedDanceStyles: current));
+  }
+
   void setLocations(Set<String> regions) {
     emit(state.copyWith(selectedRegions: regions));
   }
