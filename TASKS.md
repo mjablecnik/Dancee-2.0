@@ -24,12 +24,12 @@ Derived from [CODE_REVIEW.md](CODE_REVIEW.md). Sorted by severity.
 
 ## Medium
 
-- [ ] 15. [MEDIUM] Create `Favorite` entity class with `id`, `userId`, `itemType`, `itemId`, `createdAt` fields and `fromDirectus()` factory
-- [ ] 16. [MEDIUM] Rename `selectedDanceTypes` to `selectedDanceStyles` throughout codebase for consistency with specification
-- [ ] 17. [MEDIUM] Extract shared `FilterCubit` from `EventFilterCubit` to manage `FilterState` shared between events and courses pages (Req 7)
-- [ ] 18. [MEDIUM] Refactor `FavoritesState.loaded` to store favorite IDs (`Set<int>`) instead of full event objects; resolve against loaded data at render time
-- [ ] 19. [MEDIUM] Add `filteredEvents` and `featuredEvents` fields to `EventListState.loaded` to match design state structure
-- [ ] 20. [MEDIUM] Implement missing property tests P1–P16 as specified in the design document's testing strategy
+- [x] 15. [MEDIUM] Create `Favorite` entity class with `id`, `userId`, `itemType`, `itemId`, `createdAt` fields and `fromDirectus()` factory
+- [x] 16. [MEDIUM] Rename `selectedDanceTypes` to `selectedDanceStyles` throughout codebase for consistency with specification
+- [x] 17. [MEDIUM] Extract shared `FilterCubit` from `EventFilterCubit` to manage `FilterState` shared between events and courses pages (Req 7)
+- [x] 18. [MEDIUM] Refactor `FavoritesState.loaded` to store favorite IDs (`Set<int>`) instead of full event objects; resolve against loaded data at render time
+- [x] 19. [MEDIUM] Add `filteredEvents` and `featuredEvents` fields to `EventListState.loaded` to match design state structure
+- [x] 20. [MEDIUM] Implement missing property tests P1–P16 as specified in the design document's testing strategy
 
 ## Low
 
