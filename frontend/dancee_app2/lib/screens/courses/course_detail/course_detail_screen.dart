@@ -236,7 +236,9 @@ class CourseDetailScreen extends StatelessWidget {
                                   learningItems: course.learningItems,
                                 ),
                                 if (course.instructorName != null &&
-                                    course.instructorName!.isNotEmpty) ...[
+                                    course.instructorName!.isNotEmpty &&
+                                    course.instructorBio != null &&
+                                    course.instructorBio!.isNotEmpty) ...[
                                   const SizedBox(height: AppSpacing.xxl),
                                   CourseInstructorSection(
                                     avatarUrl:
