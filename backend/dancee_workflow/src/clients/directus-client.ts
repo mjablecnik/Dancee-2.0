@@ -16,6 +16,7 @@ import {
   type DirectusSkippedEvent,
   type DirectusLanguage,
   type DirectusCourse,
+  type DirectusDanceStyle,
   type DirectusFavorite,
 } from "../core/schemas";
 import { z } from "zod";
@@ -353,6 +354,12 @@ export async function listFavorites(userId: string): Promise<DirectusFavorite[]>
 }
 
 // ---- Dance Styles ----
+
+export async function listDanceStyles(): Promise<DirectusDanceStyle[]> {
+  const data = await directusGet("/items/dance_styles?fields=code,name,parent_code,sort_order&limit=-1&sort[]=sort_order");
+  const items = extractDirectusData(data, "listDanceStyles") as unknown[];
+  return z.array(DirectusDanceStyleSchema).parse(items);
+}
 
 let danceStyleCodesCache: string[] | null = null;
 
