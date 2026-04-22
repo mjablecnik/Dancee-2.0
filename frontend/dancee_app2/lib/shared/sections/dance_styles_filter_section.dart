@@ -1,3 +1,4 @@
+import 'package:dancee_app2/screens/events/events_list/components/dance_style_chips_row.dart';
 import 'package:flutter/material.dart';
 import '../../core/colors.dart';
 import '../../core/theme.dart';
@@ -27,7 +28,7 @@ class DanceStylesFilterSection extends StatelessWidget {
       children: [
         _buildHeader(context),
         SizedBox(height: onShowAll != null ? AppSpacing.lg : AppSpacing.md),
-        _buildChips(),
+        const DanceStyleChipsRow(),
       ],
     );
   }
@@ -73,47 +74,6 @@ class DanceStylesFilterSection extends StatelessWidget {
           fontWeight: AppTypography.fontWeightSemiBold,
           letterSpacing: 1.0,
         ),
-      ),
-    );
-  }
-
-  Widget _buildChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-      child: Row(
-        children: List.generate(styles.length, (index) {
-          final isActive = selectedIndex == index;
-          final isLast = index == styles.length - 1;
-          return Padding(
-            padding: EdgeInsets.only(right: isLast ? 0 : AppSpacing.md),
-            child: GestureDetector(
-              onTap: () => onSelected(index),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isActive ? appPrimary : appSurface,
-                  border: Border.all(
-                    color: isActive ? appPrimary : appBorder,
-                  ),
-                  borderRadius: BorderRadius.circular(AppRadius.full),
-                  boxShadow: isActive ? [AppShadows.primary] : null,
-                ),
-                child: Text(
-                  styles[index],
-                  style: TextStyle(
-                    color: isActive ? Colors.white : appText,
-                    fontSize: AppTypography.fontSizeMd,
-                    fontWeight: AppTypography.fontWeightMedium,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }),
       ),
     );
   }

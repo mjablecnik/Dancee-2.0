@@ -34,8 +34,6 @@ class EventsHeaderSection extends StatelessWidget {
             ),
             child: _HeaderLocationRow(location: location, onLocationTap: onLocationTap),
           ),
-          const DanceStyleChipsRow(),
-          const SizedBox(height: AppSpacing.lg),
         ],
       ),
     );
