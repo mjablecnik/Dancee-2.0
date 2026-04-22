@@ -15,6 +15,15 @@ flutter doctor
 
 ## Getting Started
 
+### Configure the app
+
+Copy the example configuration file and fill in your Directus instance details:
+
+```bash
+cp lib/config.example.dart lib/config.dart
+# Then edit lib/config.dart with your actual directusBaseUrl and directusAccessToken
+```
+
 ### Install dependencies
 
 ```bash
