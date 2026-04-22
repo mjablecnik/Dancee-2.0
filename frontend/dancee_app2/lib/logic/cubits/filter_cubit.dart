@@ -10,19 +10,19 @@ class FilterCubit extends Cubit<FilterState> {
         super(const FilterState());
 
   final DanceStyleRepository _danceStyleRepository;
-  List<DanceStyle> _allDanceStyles = [];
 
   /// All loaded dance styles — available for UI and filter expansion logic.
-  List<DanceStyle> get allDanceStyles => _allDanceStyles;
+  List<DanceStyle> get allDanceStyles => state.danceStyles;
 
   /// Only parent dance styles (those with no parentCode) — for filter display.
-  List<DanceStyle> get parentDanceStyles =>
-      _allDanceStyles.where((s) => s.parentCode == null).toList();
+  List<DanceStyle> get parentDanceStyles => state.parentDanceStyles;
 
-  /// Fetches dance styles from CMS with [languageCode] translations.
+  /// Fetches dance styles from CMS with [languageCode] translations and stores
+  /// them in state so BlocBuilder widgets react when styles become available.
   Future<void> loadDanceStyles(String languageCode) async {
     try {
-      _allDanceStyles = await _danceStyleRepository.getDanceStyles(languageCode);
+      final styles = await _danceStyleRepository.getDanceStyles(languageCode);
+      emit(state.copyWith(danceStyles: styles));
     } catch (_) {
       // Non-fatal — filter UI degrades gracefully without dance styles
     }
@@ -37,6 +37,6 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void clearAll() {
-    emit(const FilterState());
+    emit(state.copyWith(selectedDanceStyles: {}, selectedRegions: {}));
   }
 }

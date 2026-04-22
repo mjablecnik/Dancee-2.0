@@ -246,9 +246,8 @@ class _AppListenersState extends State<_AppListeners> {
         // 7.4 — Filter change: apply new filters to events and courses
         BlocListener<FilterCubit, FilterState>(
           listener: (context, filterState) {
-            final allStyles = context.read<FilterCubit>().allDanceStyles;
-            context.read<EventCubit>().applyFilters(filterState, allStyles);
-            context.read<CourseCubit>().applyFilters(filterState, allStyles);
+            context.read<EventCubit>().applyFilters(filterState, filterState.danceStyles);
+            context.read<CourseCubit>().applyFilters(filterState, filterState.danceStyles);
           },
         ),
         // 11.2 — Favorites change: sync isFavorited on EventCubit and CourseCubit
