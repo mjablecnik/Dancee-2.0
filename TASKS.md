@@ -62,4 +62,4 @@ Derived from SPEC.md. Tasks ordered by dependency (setup → data → logic → 
 
 - [x] 28. [HIGH] Run `task build-runner` to regenerate freezed/json_serializable/go_router code after all changes
 - [x] 29. [MEDIUM] Run `task test` to verify no regressions
-- [ ] 30. [LOW] Run `task slang-analyze` to verify no missing translation keys
+- [x] 30. [LOW] Run `task slang-analyze` to verify no missing translation keys
