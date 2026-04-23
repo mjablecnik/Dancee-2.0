@@ -27,6 +27,7 @@ import 'screens/auth/login/login_screen.dart';
 import 'screens/auth/register/register_screen.dart';
 import 'screens/auth/forgot_password/forgot_password_screen.dart';
 import 'screens/auth/onboarding/onboarding_screen.dart';
+import 'screens/auth/email_verification/email_verification_screen.dart';
 import 'screens/events/events_list/events_list_screen.dart';
 import 'screens/events/event_detail/event_detail_screen.dart';
 import 'screens/events/filter_dance/filter_dance_screen.dart';
@@ -144,6 +145,10 @@ GoRouter _buildRouter(_GoRouterRefreshNotifier authRefreshNotifier) {
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
+    ),
+    GoRoute(
+      path: '/verify-email',
+      builder: (context, state) => const EmailVerificationScreen(),
     ),
 
     // Main app — top-level pages wrapped in shell with bottom nav

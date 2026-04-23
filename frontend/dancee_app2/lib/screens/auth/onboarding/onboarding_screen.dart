@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../shared/components/background_circles.dart';
@@ -45,7 +46,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   void _goToStep(int step) => setState(() => _currentStep = step);
 
-  void _finish() => context.go('/events');
+  Future<void> _finish() async {
+    await _savePreferences();
+    if (mounted) context.go('/events');
+  }
+
+  Future<void> _savePreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Save selected dance styles as comma-separated indices
+    final selectedIndices = <int>[];
+    for (int i = 0; i < _selectedDances.length; i++) {
+      if (_selectedDances[i]) selectedIndices.add(i);
+    }
+    await prefs.setString('onboarding_dance_styles', selectedIndices.join(','));
+    await prefs.setInt('onboarding_level', _selectedLevel);
+    await prefs.setInt('onboarding_radius', _selectedRadius);
+    await prefs.setBool('onboarding_completed', true);
+  }
 
   @override
   Widget build(BuildContext context) {
