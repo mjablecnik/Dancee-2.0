@@ -11,15 +11,31 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dancee_app2/core/clients.dart';
 import 'package:dancee_app2/data/entities/course.dart';
 import 'package:dancee_app2/data/entities/event.dart';
 import 'package:dancee_app2/data/entities/favorite.dart';
+import 'package:dancee_app2/data/repositories/auth_repository.dart';
 import 'package:dancee_app2/data/repositories/favorites_repository.dart';
+import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/cubits/favorites_cubit.dart';
 import 'package:dancee_app2/logic/states/favorites_state.dart';
+
+/// Minimal fake [AuthRepository] that returns an empty auth stream.
+/// Allows constructing [AuthCubit] without a real Firebase instance.
+class _FakeAuthRepository extends Fake implements AuthRepository {
+  @override
+  Stream<User?> get authStateChanges => const Stream.empty();
+
+  @override
+  User? get currentUser => null;
+}
+
+AuthCubit _makeAuthCubit() =>
+    AuthCubit(authRepository: _FakeAuthRepository());
 
 // ---------------------------------------------------------------------------
 // Helpers / Generators
@@ -188,7 +204,7 @@ void _propertyFavoriteResolution() {
         ));
 
         final repo = _FakeFavoritesRepository(initialFavorites: favorites);
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         final resolved = cubit.getResolvedFavorites(events, courses);
@@ -229,7 +245,7 @@ void _propertyFavoriteResolution() {
     'P10b: getResolvedFavorites returns empty list when no favorites exist',
     () async {
       final repo = _FakeFavoritesRepository();
-      final cubit = FavoritesCubit(favoritesRepository: repo);
+      final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
       await cubit.loadFavorites();
 
       final resolved = cubit.getResolvedFavorites(
@@ -251,7 +267,7 @@ void _propertyFavoriteResolution() {
         _makeFavorite(id: 2, itemType: 'course', itemId: 1),
       ];
       final repo = _FakeFavoritesRepository(initialFavorites: favorites);
-      final cubit = FavoritesCubit(favoritesRepository: repo);
+      final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
       await cubit.loadFavorites();
 
       final resolved = cubit.getResolvedFavorites([], []);
@@ -295,7 +311,7 @@ void _propertyFavoritesSortedByDate() {
         favorites.shuffle(_rng);
 
         final repo = _FakeFavoritesRepository(initialFavorites: favorites);
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         final resolved = cubit.getResolvedFavorites(events, []);
@@ -345,7 +361,7 @@ void _propertyFavoritesSortedByDate() {
       ];
 
       final repo = _FakeFavoritesRepository(initialFavorites: favorites);
-      final cubit = FavoritesCubit(favoritesRepository: repo);
+      final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
       await cubit.loadFavorites();
 
       final resolved = cubit.getResolvedFavorites(events, []);
@@ -388,7 +404,7 @@ void _propertyFavoritesUnaffectedByFilters() {
         );
 
         final repo = _FakeFavoritesRepository(initialFavorites: favorites);
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         // Regardless of any external filter, all $count favorites should be resolved
@@ -421,7 +437,7 @@ void _propertyFavoriteToggleRoundTrip() {
         const itemType = 'event';
 
         final repo = _FakeFavoritesRepository();
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         // Initially not favorited
@@ -462,7 +478,7 @@ void _propertyFavoriteToggleRoundTrip() {
         const itemId = 42;
 
         final repo = _FakeFavoritesRepository();
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         await cubit.toggleFavorite(itemType: itemType, itemId: itemId);
@@ -491,7 +507,7 @@ void _propertyOptimisticUpdate() {
 
       // Repository with a delay to simulate slow network
       final repo = _FakeFavoritesRepository(addDelayMs: 50);
-      final cubit = FavoritesCubit(favoritesRepository: repo);
+      final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
       await cubit.loadFavorites();
 
       // Start toggle but don't await — check state before API resolves
@@ -527,7 +543,7 @@ void _propertyOptimisticUpdate() {
       const itemId = 7;
 
       final repo = _FakeFavoritesRepository(addDelayMs: 50);
-      final cubit = FavoritesCubit(favoritesRepository: repo);
+      final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
       await cubit.loadFavorites();
 
       final states = <FavoritesState>[];
@@ -572,7 +588,7 @@ void _propertyRevertOnFailure() {
         const itemType = 'event';
 
         final repo = _FakeFavoritesRepository(shouldThrowOnAdd: true);
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         // Initially not favorited
@@ -611,7 +627,7 @@ void _propertyRevertOnFailure() {
           initialFavorites: [existingFav],
           shouldThrowOnRemove: true,
         );
-        final cubit = FavoritesCubit(favoritesRepository: repo);
+        final cubit = FavoritesCubit(favoritesRepository: repo, authCubit: _makeAuthCubit());
         await cubit.loadFavorites();
 
         // Initially favorited

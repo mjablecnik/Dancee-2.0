@@ -24,6 +24,7 @@ void setupServiceLocator() {
     () => DirectusClient(
       baseUrl: AppConfig.directusBaseUrl,
       accessToken: AppConfig.directusAccessToken,
+      idTokenProvider: () => sl<AuthRepository>().getIdToken(),
     ),
   );
 
@@ -64,6 +65,9 @@ void setupServiceLocator() {
     () => CourseCubit(courseRepository: sl<CourseRepository>()),
   );
   sl.registerFactory<FavoritesCubit>(
-    () => FavoritesCubit(favoritesRepository: sl<FavoritesRepository>()),
+    () => FavoritesCubit(
+      favoritesRepository: sl<FavoritesRepository>(),
+      authCubit: sl<AuthCubit>(),
+    ),
   );
 }

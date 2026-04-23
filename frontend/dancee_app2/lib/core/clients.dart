@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 
 import 'config.dart';
@@ -12,13 +11,15 @@ class DirectusClient {
   DirectusClient({
     required String baseUrl,
     required String accessToken,
+    Future<String?> Function()? idTokenProvider,
     Dio? dio,
-  }) : _dio = dio ??
+  })  : _accessToken = accessToken,
+        _idTokenProvider = idTokenProvider,
+        _dio = dio ??
             Dio(
               BaseOptions(
                 baseUrl: baseUrl,
                 headers: {
-                  'Authorization': 'Bearer $accessToken',
                   'Content-Type': 'application/json',
                 },
                 connectTimeout:
@@ -26,9 +27,26 @@ class DirectusClient {
                 receiveTimeout:
                     const Duration(milliseconds: AppConfig.receiveTimeoutMs),
               ),
-            );
+            ) {
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        String? token;
+        if (_idTokenProvider != null) {
+          try {
+            token = await _idTokenProvider();
+          } catch (_) {
+            // fall back to static token on error
+          }
+        }
+        options.headers['Authorization'] = 'Bearer ${token ?? _accessToken}';
+        handler.next(options);
+      },
+    ));
+  }
 
   final Dio _dio;
+  final String _accessToken;
+  final Future<String?> Function()? _idTokenProvider;
 
   /// Performs a GET request and returns the unwrapped `data` field from the
   /// Directus response envelope.

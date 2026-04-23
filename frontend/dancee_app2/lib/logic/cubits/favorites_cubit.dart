@@ -2,23 +2,31 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/config.dart';
 import '../../data/entities/course.dart';
 import '../../data/entities/event.dart';
 import '../../data/entities/favorite.dart';
 import '../../data/repositories/favorites_repository.dart';
+import '../states/auth_state.dart';
 import '../states/favorites_state.dart';
+import 'auth_cubit.dart';
 
 /// A resolved favorite item — either an [Event] or [Course] with its creation timestamp.
 typedef FavoriteItem = ({String itemType, Object item, String? createdAt});
 
 class FavoritesCubit extends Cubit<FavoritesState> {
-  FavoritesCubit({required FavoritesRepository favoritesRepository})
-      : _favoritesRepository = favoritesRepository,
-        super(const FavoritesState.initial());
+  FavoritesCubit({
+    required FavoritesRepository favoritesRepository,
+    required AuthCubit authCubit,
+  })  : _favoritesRepository = favoritesRepository,
+        _authCubit = authCubit,
+        super(const FavoritesState.initial()) {
+    _authSubscription = authCubit.stream.listen(_onAuthStateChanged);
+  }
 
   final FavoritesRepository _favoritesRepository;
+  final AuthCubit _authCubit;
   List<Favorite> _allFavorites = [];
+  late final StreamSubscription<AuthState> _authSubscription;
 
   final _toggleErrorController = StreamController<String>.broadcast();
 
@@ -26,17 +34,30 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   /// Listen to this stream to show snackbars or other error feedback.
   Stream<String> get toggleErrors => _toggleErrorController.stream;
 
+  void _onAuthStateChanged(AuthState authState) {
+    authState.maybeMap(
+      unauthenticated: (_) {
+        _allFavorites = [];
+        emit(const FavoritesState.initial());
+      },
+      orElse: () {},
+    );
+  }
+
   @override
   Future<void> close() {
+    _authSubscription.cancel();
     _toggleErrorController.close();
     return super.close();
   }
 
-  /// Fetches all favorites for the default user, emits loaded state.
+  String get _currentUserId => _authCubit.currentUid ?? '';
+
+  /// Fetches all favorites for the current user, emits loaded state.
   Future<void> loadFavorites() async {
     emit(const FavoritesState.loading());
     try {
-      _allFavorites = await _favoritesRepository.getFavorites(AppConfig.defaultUserId);
+      _allFavorites = await _favoritesRepository.getFavorites(_currentUserId);
       _emitLoaded();
     } catch (e) {
       emit(FavoritesState.error(message: e.toString()));
@@ -59,7 +80,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       _allFavorites = [
         Favorite(
           id: -1,
-          userId: AppConfig.defaultUserId,
+          userId: _currentUserId,
           itemType: itemType,
           itemId: itemId,
         ),
@@ -71,13 +92,13 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     try {
       if (wasAlreadyFavorited) {
         await _favoritesRepository.removeFavorite(
-          userId: AppConfig.defaultUserId,
+          userId: _currentUserId,
           itemType: itemType,
           itemId: itemId,
         );
       } else {
         final created = await _favoritesRepository.addFavorite(
-          userId: AppConfig.defaultUserId,
+          userId: _currentUserId,
           itemType: itemType,
           itemId: itemId,
         );
