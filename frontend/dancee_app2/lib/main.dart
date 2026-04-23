@@ -241,11 +241,14 @@ class DanceeApp extends StatelessWidget {
     required this.settingsCubit,
     required this.authCubit,
     required this.router,
+    this.theme,
   });
 
   final SettingsCubit settingsCubit;
   final AuthCubit authCubit;
   final GoRouter router;
+  /// Optional theme override — used in tests to avoid Google Fonts asset loading.
+  final ThemeData? theme;
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +264,7 @@ class DanceeApp extends StatelessWidget {
       child: _AppListeners(
         child: MaterialApp.router(
           title: t.common.appName,
-          theme: AppTheme.theme,
+          theme: theme ?? AppTheme.theme,
           routerConfig: router,
           scaffoldMessengerKey: _scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
