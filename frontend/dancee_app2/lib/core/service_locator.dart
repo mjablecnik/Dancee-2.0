@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'clients.dart';
 import 'config.dart';
+import '../data/repositories/auth_repository.dart';
 import '../data/repositories/event_repository.dart';
 import '../data/repositories/course_repository.dart';
 import '../data/repositories/favorites_repository.dart';
@@ -20,6 +23,14 @@ void setupServiceLocator() {
     () => DirectusClient(
       baseUrl: AppConfig.directusBaseUrl,
       accessToken: AppConfig.directusAccessToken,
+    ),
+  );
+
+  // Auth
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepository(
+      firebaseAuth: FirebaseAuth.instance,
+      googleSignIn: GoogleSignIn(),
     ),
   );
 
