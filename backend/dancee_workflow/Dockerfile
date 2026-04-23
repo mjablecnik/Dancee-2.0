@@ -1,10 +1,17 @@
 # Build stage
 FROM oven/bun:latest AS build
 
+# git is required for GitHub dependencies (facebook-event-scraper fork)
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
+
+# The facebook-event-scraper git dependency is installed from source without
+# a pre-built dist/ folder. Build it so TypeScript can find the type declarations.
+RUN cd node_modules/facebook-event-scraper && /app/node_modules/.bin/tsc
 
 COPY tsconfig.json ./
 COPY src ./src
