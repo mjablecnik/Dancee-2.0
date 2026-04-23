@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 846 (282 per locale)
+/// Strings: 915 (305 per locale)
 ///
-/// Built on 2026-04-22 at 22:26 UTC
+/// Built on 2026-04-23 at 21:33 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -152,6 +152,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsCommonEn common = _StringsCommonEn._(_root);
 	late final _StringsNavEn nav = _StringsNavEn._(_root);
 	late final _StringsAuthEn auth = _StringsAuthEn._(_root);
+	late final _StringsValidationEn validation = _StringsValidationEn._(_root);
 	late final _StringsOnboardingEn onboarding = _StringsOnboardingEn._(_root);
 	late final _StringsEventsEn events = _StringsEventsEn._(_root);
 	late final _StringsCoursesEn courses = _StringsCoursesEn._(_root);
@@ -226,6 +227,23 @@ class _StringsAuthEn {
 	late final _StringsAuthRegisterEn register = _StringsAuthRegisterEn._(_root);
 	late final _StringsAuthForgotPasswordEn forgotPassword = _StringsAuthForgotPasswordEn._(_root);
 	late final _StringsAuthPasswordStrengthEn passwordStrength = _StringsAuthPasswordStrengthEn._(_root);
+	late final _StringsAuthErrorsEn errors = _StringsAuthErrorsEn._(_root);
+	late final _StringsAuthEmailVerificationEn emailVerification = _StringsAuthEmailVerificationEn._(_root);
+	late final _StringsAuthDeleteAccountEn deleteAccount = _StringsAuthDeleteAccountEn._(_root);
+}
+
+// Path: validation
+class _StringsValidationEn {
+	_StringsValidationEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get emailRequired => 'Please enter your email address';
+	String get invalidEmail => 'Please enter a valid email address';
+	String get fieldRequired => 'This field is required';
+	String get passwordTooShort => 'Password must be at least 8 characters';
+	String get passwordsDoNotMatch => 'Passwords do not match';
 }
 
 // Path: onboarding
@@ -449,6 +467,51 @@ class _StringsAuthPasswordStrengthEn {
 	String get strong => 'Strong password';
 	String get veryStrong => 'Very strong';
 	String get hint => 'At least 8 characters';
+}
+
+// Path: auth.errors
+class _StringsAuthErrorsEn {
+	_StringsAuthErrorsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get invalidCredential => 'Invalid email or password';
+	String get userDisabled => 'This account has been disabled';
+	String get emailAlreadyInUse => 'An account with this email already exists';
+	String get weakPassword => 'Password is too weak';
+	String get tooManyRequests => 'Too many attempts. Please try again later';
+	String get networkError => 'Network error. Please check your connection';
+	String get generic => 'An error occurred. Please try again';
+}
+
+// Path: auth.emailVerification
+class _StringsAuthEmailVerificationEn {
+	_StringsAuthEmailVerificationEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Verify your email';
+	String subtitle({required Object email}) => 'We sent a verification email to ${email}';
+	String get resend => 'Resend verification email';
+	String get checkVerified => 'I\'ve verified my email';
+	String get notVerifiedYet => 'Email not verified yet. Please check your inbox.';
+	String get signOut => 'Sign out';
+}
+
+// Path: auth.deleteAccount
+class _StringsAuthDeleteAccountEn {
+	_StringsAuthDeleteAccountEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get confirmTitle => 'Delete account?';
+	String get confirmBody => 'This action permanently removes all your data. This cannot be undone.';
+	String get reauthPrompt => 'Please confirm your password to continue';
+	String get success => 'Your account has been deleted';
+	String get error => 'Failed to delete account. Please try again.';
 }
 
 // Path: onboarding.step1
@@ -824,7 +887,7 @@ class _StringsProfileEditProfileNotificationSubtitlesEn {
 }
 
 // Path: <root>
-class _StringsCs extends Translations {
+class _StringsCs implements Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	_StringsCs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
@@ -834,9 +897,7 @@ class _StringsCs extends Translations {
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ),
-		  super.build(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
+		  ) {
 		$meta.setFlatMapFunction(_flatMapFunction);
 	}
 
@@ -844,7 +905,7 @@ class _StringsCs extends Translations {
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => $meta.getTranslation(key);
 
 	@override late final _StringsCs _root = this; // ignore: unused_field
 
@@ -852,6 +913,7 @@ class _StringsCs extends Translations {
 	@override late final _StringsCommonCs common = _StringsCommonCs._(_root);
 	@override late final _StringsNavCs nav = _StringsNavCs._(_root);
 	@override late final _StringsAuthCs auth = _StringsAuthCs._(_root);
+	@override late final _StringsValidationCs validation = _StringsValidationCs._(_root);
 	@override late final _StringsOnboardingCs onboarding = _StringsOnboardingCs._(_root);
 	@override late final _StringsEventsCs events = _StringsEventsCs._(_root);
 	@override late final _StringsCoursesCs courses = _StringsCoursesCs._(_root);
@@ -862,8 +924,8 @@ class _StringsCs extends Translations {
 }
 
 // Path: common
-class _StringsCommonCs extends _StringsCommonEn {
-	_StringsCommonCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCommonCs implements _StringsCommonEn {
+	_StringsCommonCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -893,8 +955,8 @@ class _StringsCommonCs extends _StringsCommonEn {
 }
 
 // Path: nav
-class _StringsNavCs extends _StringsNavEn {
-	_StringsNavCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsNavCs implements _StringsNavEn {
+	_StringsNavCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -906,8 +968,8 @@ class _StringsNavCs extends _StringsNavEn {
 }
 
 // Path: auth
-class _StringsAuthCs extends _StringsAuthEn {
-	_StringsAuthCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthCs implements _StringsAuthEn {
+	_StringsAuthCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -926,11 +988,28 @@ class _StringsAuthCs extends _StringsAuthEn {
 	@override late final _StringsAuthRegisterCs register = _StringsAuthRegisterCs._(_root);
 	@override late final _StringsAuthForgotPasswordCs forgotPassword = _StringsAuthForgotPasswordCs._(_root);
 	@override late final _StringsAuthPasswordStrengthCs passwordStrength = _StringsAuthPasswordStrengthCs._(_root);
+	@override late final _StringsAuthErrorsCs errors = _StringsAuthErrorsCs._(_root);
+	@override late final _StringsAuthEmailVerificationCs emailVerification = _StringsAuthEmailVerificationCs._(_root);
+	@override late final _StringsAuthDeleteAccountCs deleteAccount = _StringsAuthDeleteAccountCs._(_root);
+}
+
+// Path: validation
+class _StringsValidationCs implements _StringsValidationEn {
+	_StringsValidationCs._(this._root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get emailRequired => 'Zadejte prosím svou e-mailovou adresu';
+	@override String get invalidEmail => 'Zadejte prosím platnou e-mailovou adresu';
+	@override String get fieldRequired => 'Toto pole je povinné';
+	@override String get passwordTooShort => 'Heslo musí mít alespoň 8 znaků';
+	@override String get passwordsDoNotMatch => 'Hesla se neshodují';
 }
 
 // Path: onboarding
-class _StringsOnboardingCs extends _StringsOnboardingEn {
-	_StringsOnboardingCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingCs implements _StringsOnboardingEn {
+	_StringsOnboardingCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -941,8 +1020,8 @@ class _StringsOnboardingCs extends _StringsOnboardingEn {
 }
 
 // Path: events
-class _StringsEventsCs extends _StringsEventsEn {
-	_StringsEventsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsCs implements _StringsEventsEn {
+	_StringsEventsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -960,8 +1039,8 @@ class _StringsEventsCs extends _StringsEventsEn {
 }
 
 // Path: courses
-class _StringsCoursesCs extends _StringsCoursesEn {
-	_StringsCoursesCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesCs implements _StringsCoursesEn {
+	_StringsCoursesCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -977,8 +1056,8 @@ class _StringsCoursesCs extends _StringsCoursesEn {
 }
 
 // Path: profile
-class _StringsProfileCs extends _StringsProfileEn {
-	_StringsProfileCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileCs implements _StringsProfileEn {
+	_StringsProfileCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -995,8 +1074,8 @@ class _StringsProfileCs extends _StringsProfileEn {
 }
 
 // Path: premium
-class _StringsPremiumCs extends _StringsPremiumEn {
-	_StringsPremiumCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsPremiumCs implements _StringsPremiumEn {
+	_StringsPremiumCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1015,8 +1094,8 @@ class _StringsPremiumCs extends _StringsPremiumEn {
 }
 
 // Path: saved
-class _StringsSavedCs extends _StringsSavedEn {
-	_StringsSavedCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsSavedCs implements _StringsSavedEn {
+	_StringsSavedCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1028,8 +1107,8 @@ class _StringsSavedCs extends _StringsSavedEn {
 }
 
 // Path: contact
-class _StringsContactCs extends _StringsContactEn {
-	_StringsContactCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsContactCs implements _StringsContactEn {
+	_StringsContactCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1046,8 +1125,8 @@ class _StringsContactCs extends _StringsContactEn {
 }
 
 // Path: common.months
-class _StringsCommonMonthsCs extends _StringsCommonMonthsEn {
-	_StringsCommonMonthsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCommonMonthsCs implements _StringsCommonMonthsEn {
+	_StringsCommonMonthsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1067,8 +1146,8 @@ class _StringsCommonMonthsCs extends _StringsCommonMonthsEn {
 }
 
 // Path: common.form
-class _StringsCommonFormCs extends _StringsCommonFormEn {
-	_StringsCommonFormCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCommonFormCs implements _StringsCommonFormEn {
+	_StringsCommonFormCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1088,8 +1167,8 @@ class _StringsCommonFormCs extends _StringsCommonFormEn {
 }
 
 // Path: auth.login
-class _StringsAuthLoginCs extends _StringsAuthLoginEn {
-	_StringsAuthLoginCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthLoginCs implements _StringsAuthLoginEn {
+	_StringsAuthLoginCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1104,8 +1183,8 @@ class _StringsAuthLoginCs extends _StringsAuthLoginEn {
 }
 
 // Path: auth.register
-class _StringsAuthRegisterCs extends _StringsAuthRegisterEn {
-	_StringsAuthRegisterCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthRegisterCs implements _StringsAuthRegisterEn {
+	_StringsAuthRegisterCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1121,8 +1200,8 @@ class _StringsAuthRegisterCs extends _StringsAuthRegisterEn {
 }
 
 // Path: auth.forgotPassword
-class _StringsAuthForgotPasswordCs extends _StringsAuthForgotPasswordEn {
-	_StringsAuthForgotPasswordCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthForgotPasswordCs implements _StringsAuthForgotPasswordEn {
+	_StringsAuthForgotPasswordCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1138,8 +1217,8 @@ class _StringsAuthForgotPasswordCs extends _StringsAuthForgotPasswordEn {
 }
 
 // Path: auth.passwordStrength
-class _StringsAuthPasswordStrengthCs extends _StringsAuthPasswordStrengthEn {
-	_StringsAuthPasswordStrengthCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsAuthPasswordStrengthCs implements _StringsAuthPasswordStrengthEn {
+	_StringsAuthPasswordStrengthCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1151,9 +1230,54 @@ class _StringsAuthPasswordStrengthCs extends _StringsAuthPasswordStrengthEn {
 	@override String get hint => 'Alespoň 8 znaků';
 }
 
+// Path: auth.errors
+class _StringsAuthErrorsCs implements _StringsAuthErrorsEn {
+	_StringsAuthErrorsCs._(this._root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get invalidCredential => 'Neplatný e-mail nebo heslo';
+	@override String get userDisabled => 'Tento účet byl deaktivován';
+	@override String get emailAlreadyInUse => 'Účet s tímto e-mailem již existuje';
+	@override String get weakPassword => 'Heslo je příliš slabé';
+	@override String get tooManyRequests => 'Příliš mnoho pokusů. Zkuste to prosím později';
+	@override String get networkError => 'Chyba sítě. Zkontrolujte své připojení';
+	@override String get generic => 'Došlo k chybě. Zkuste to prosím znovu';
+}
+
+// Path: auth.emailVerification
+class _StringsAuthEmailVerificationCs implements _StringsAuthEmailVerificationEn {
+	_StringsAuthEmailVerificationCs._(this._root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ověřte svůj e-mail';
+	@override String subtitle({required Object email}) => 'Zaslali jsme ověřovací e-mail na adresu ${email}';
+	@override String get resend => 'Znovu odeslat ověřovací e-mail';
+	@override String get checkVerified => 'Ověřil jsem svůj e-mail';
+	@override String get notVerifiedYet => 'E-mail ještě nebyl ověřen. Zkontrolujte prosím svou doručenou poštu.';
+	@override String get signOut => 'Odhlásit se';
+}
+
+// Path: auth.deleteAccount
+class _StringsAuthDeleteAccountCs implements _StringsAuthDeleteAccountEn {
+	_StringsAuthDeleteAccountCs._(this._root);
+
+	@override final _StringsCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get confirmTitle => 'Smazat účet?';
+	@override String get confirmBody => 'Tato akce trvale odstraní všechna vaše data. Tuto akci nelze vrátit zpět.';
+	@override String get reauthPrompt => 'Pro pokračování potvrďte své heslo';
+	@override String get success => 'Váš účet byl smazán';
+	@override String get error => 'Nepodařilo se smazat účet. Zkuste to prosím znovu.';
+}
+
 // Path: onboarding.step1
-class _StringsOnboardingStep1Cs extends _StringsOnboardingStep1En {
-	_StringsOnboardingStep1Cs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingStep1Cs implements _StringsOnboardingStep1En {
+	_StringsOnboardingStep1Cs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1163,8 +1287,8 @@ class _StringsOnboardingStep1Cs extends _StringsOnboardingStep1En {
 }
 
 // Path: onboarding.step2
-class _StringsOnboardingStep2Cs extends _StringsOnboardingStep2En {
-	_StringsOnboardingStep2Cs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingStep2Cs implements _StringsOnboardingStep2En {
+	_StringsOnboardingStep2Cs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1174,8 +1298,8 @@ class _StringsOnboardingStep2Cs extends _StringsOnboardingStep2En {
 }
 
 // Path: onboarding.step3
-class _StringsOnboardingStep3Cs extends _StringsOnboardingStep3En {
-	_StringsOnboardingStep3Cs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsOnboardingStep3Cs implements _StringsOnboardingStep3En {
+	_StringsOnboardingStep3Cs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1192,8 +1316,8 @@ class _StringsOnboardingStep3Cs extends _StringsOnboardingStep3En {
 }
 
 // Path: events.detail
-class _StringsEventsDetailCs extends _StringsEventsDetailEn {
-	_StringsEventsDetailCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsDetailCs implements _StringsEventsDetailEn {
+	_StringsEventsDetailCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1212,8 +1336,8 @@ class _StringsEventsDetailCs extends _StringsEventsDetailEn {
 }
 
 // Path: events.filter
-class _StringsEventsFilterCs extends _StringsEventsFilterEn {
-	_StringsEventsFilterCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsFilterCs implements _StringsEventsFilterEn {
+	_StringsEventsFilterCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1235,8 +1359,8 @@ class _StringsEventsFilterCs extends _StringsEventsFilterEn {
 }
 
 // Path: events.filters
-class _StringsEventsFiltersCs extends _StringsEventsFiltersEn {
-	_StringsEventsFiltersCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsEventsFiltersCs implements _StringsEventsFiltersEn {
+	_StringsEventsFiltersCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1252,8 +1376,8 @@ class _StringsEventsFiltersCs extends _StringsEventsFiltersEn {
 }
 
 // Path: courses.courseTypes
-class _StringsCoursesCourseTypesCs extends _StringsCoursesCourseTypesEn {
-	_StringsCoursesCourseTypesCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesCourseTypesCs implements _StringsCoursesCourseTypesEn {
+	_StringsCoursesCourseTypesCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1264,8 +1388,8 @@ class _StringsCoursesCourseTypesCs extends _StringsCoursesCourseTypesEn {
 }
 
 // Path: courses.detail
-class _StringsCoursesDetailCs extends _StringsCoursesDetailEn {
-	_StringsCoursesDetailCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesDetailCs implements _StringsCoursesDetailEn {
+	_StringsCoursesDetailCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1297,8 +1421,8 @@ class _StringsCoursesDetailCs extends _StringsCoursesDetailEn {
 }
 
 // Path: profile.sections
-class _StringsProfileSectionsCs extends _StringsProfileSectionsEn {
-	_StringsProfileSectionsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileSectionsCs implements _StringsProfileSectionsEn {
+	_StringsProfileSectionsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1311,8 +1435,8 @@ class _StringsProfileSectionsCs extends _StringsProfileSectionsEn {
 }
 
 // Path: profile.account
-class _StringsProfileAccountCs extends _StringsProfileAccountEn {
-	_StringsProfileAccountCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileAccountCs implements _StringsProfileAccountEn {
+	_StringsProfileAccountCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1322,8 +1446,8 @@ class _StringsProfileAccountCs extends _StringsProfileAccountEn {
 }
 
 // Path: profile.settings
-class _StringsProfileSettingsCs extends _StringsProfileSettingsEn {
-	_StringsProfileSettingsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileSettingsCs implements _StringsProfileSettingsEn {
+	_StringsProfileSettingsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1336,8 +1460,8 @@ class _StringsProfileSettingsCs extends _StringsProfileSettingsEn {
 }
 
 // Path: profile.support
-class _StringsProfileSupportCs extends _StringsProfileSupportEn {
-	_StringsProfileSupportCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileSupportCs implements _StringsProfileSupportEn {
+	_StringsProfileSupportCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1347,8 +1471,8 @@ class _StringsProfileSupportCs extends _StringsProfileSupportEn {
 }
 
 // Path: profile.appInfo
-class _StringsProfileAppInfoCs extends _StringsProfileAppInfoEn {
-	_StringsProfileAppInfoCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileAppInfoCs implements _StringsProfileAppInfoEn {
+	_StringsProfileAppInfoCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1359,8 +1483,8 @@ class _StringsProfileAppInfoCs extends _StringsProfileAppInfoEn {
 }
 
 // Path: profile.danger
-class _StringsProfileDangerCs extends _StringsProfileDangerEn {
-	_StringsProfileDangerCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileDangerCs implements _StringsProfileDangerEn {
+	_StringsProfileDangerCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1370,8 +1494,8 @@ class _StringsProfileDangerCs extends _StringsProfileDangerEn {
 }
 
 // Path: profile.changePassword
-class _StringsProfileChangePasswordCs extends _StringsProfileChangePasswordEn {
-	_StringsProfileChangePasswordCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileChangePasswordCs implements _StringsProfileChangePasswordEn {
+	_StringsProfileChangePasswordCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1400,8 +1524,8 @@ class _StringsProfileChangePasswordCs extends _StringsProfileChangePasswordEn {
 }
 
 // Path: profile.editProfile
-class _StringsProfileEditProfileCs extends _StringsProfileEditProfileEn {
-	_StringsProfileEditProfileCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileCs implements _StringsProfileEditProfileEn {
+	_StringsProfileEditProfileCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1422,8 +1546,8 @@ class _StringsProfileEditProfileCs extends _StringsProfileEditProfileEn {
 }
 
 // Path: contact.form
-class _StringsContactFormCs extends _StringsContactFormEn {
-	_StringsContactFormCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsContactFormCs implements _StringsContactFormEn {
+	_StringsContactFormCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1444,8 +1568,8 @@ class _StringsContactFormCs extends _StringsContactFormEn {
 }
 
 // Path: contact.deviceInfoLabels
-class _StringsContactDeviceInfoLabelsCs extends _StringsContactDeviceInfoLabelsEn {
-	_StringsContactDeviceInfoLabelsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsContactDeviceInfoLabelsCs implements _StringsContactDeviceInfoLabelsEn {
+	_StringsContactDeviceInfoLabelsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1456,8 +1580,8 @@ class _StringsContactDeviceInfoLabelsCs extends _StringsContactDeviceInfoLabelsE
 }
 
 // Path: courses.detail.levels
-class _StringsCoursesDetailLevelsCs extends _StringsCoursesDetailLevelsEn {
-	_StringsCoursesDetailLevelsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesDetailLevelsCs implements _StringsCoursesDetailLevelsEn {
+	_StringsCoursesDetailLevelsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1469,8 +1593,8 @@ class _StringsCoursesDetailLevelsCs extends _StringsCoursesDetailLevelsEn {
 }
 
 // Path: courses.detail.days
-class _StringsCoursesDetailDaysCs extends _StringsCoursesDetailDaysEn {
-	_StringsCoursesDetailDaysCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsCoursesDetailDaysCs implements _StringsCoursesDetailDaysEn {
+	_StringsCoursesDetailDaysCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1485,8 +1609,8 @@ class _StringsCoursesDetailDaysCs extends _StringsCoursesDetailDaysEn {
 }
 
 // Path: profile.editProfile.sections
-class _StringsProfileEditProfileSectionsCs extends _StringsProfileEditProfileSectionsEn {
-	_StringsProfileEditProfileSectionsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileSectionsCs implements _StringsProfileEditProfileSectionsEn {
+	_StringsProfileEditProfileSectionsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1500,8 +1624,8 @@ class _StringsProfileEditProfileSectionsCs extends _StringsProfileEditProfileSec
 }
 
 // Path: profile.editProfile.notifications
-class _StringsProfileEditProfileNotificationsCs extends _StringsProfileEditProfileNotificationsEn {
-	_StringsProfileEditProfileNotificationsCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileNotificationsCs implements _StringsProfileEditProfileNotificationsEn {
+	_StringsProfileEditProfileNotificationsCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1512,8 +1636,8 @@ class _StringsProfileEditProfileNotificationsCs extends _StringsProfileEditProfi
 }
 
 // Path: profile.editProfile.notificationSubtitles
-class _StringsProfileEditProfileNotificationSubtitlesCs extends _StringsProfileEditProfileNotificationSubtitlesEn {
-	_StringsProfileEditProfileNotificationSubtitlesCs._(_StringsCs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileNotificationSubtitlesCs implements _StringsProfileEditProfileNotificationSubtitlesEn {
+	_StringsProfileEditProfileNotificationSubtitlesCs._(this._root);
 
 	@override final _StringsCs _root; // ignore: unused_field
 
@@ -1524,7 +1648,7 @@ class _StringsProfileEditProfileNotificationSubtitlesCs extends _StringsProfileE
 }
 
 // Path: <root>
-class _StringsEs extends Translations {
+class _StringsEs implements Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	_StringsEs.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
@@ -1534,9 +1658,7 @@ class _StringsEs extends Translations {
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ),
-		  super.build(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
+		  ) {
 		$meta.setFlatMapFunction(_flatMapFunction);
 	}
 
@@ -1544,7 +1666,7 @@ class _StringsEs extends Translations {
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => $meta.getTranslation(key);
 
 	@override late final _StringsEs _root = this; // ignore: unused_field
 
@@ -1552,6 +1674,7 @@ class _StringsEs extends Translations {
 	@override late final _StringsCommonEs common = _StringsCommonEs._(_root);
 	@override late final _StringsNavEs nav = _StringsNavEs._(_root);
 	@override late final _StringsAuthEs auth = _StringsAuthEs._(_root);
+	@override late final _StringsValidationEs validation = _StringsValidationEs._(_root);
 	@override late final _StringsOnboardingEs onboarding = _StringsOnboardingEs._(_root);
 	@override late final _StringsEventsEs events = _StringsEventsEs._(_root);
 	@override late final _StringsCoursesEs courses = _StringsCoursesEs._(_root);
@@ -1562,8 +1685,8 @@ class _StringsEs extends Translations {
 }
 
 // Path: common
-class _StringsCommonEs extends _StringsCommonEn {
-	_StringsCommonEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCommonEs implements _StringsCommonEn {
+	_StringsCommonEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1593,8 +1716,8 @@ class _StringsCommonEs extends _StringsCommonEn {
 }
 
 // Path: nav
-class _StringsNavEs extends _StringsNavEn {
-	_StringsNavEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsNavEs implements _StringsNavEn {
+	_StringsNavEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1606,8 +1729,8 @@ class _StringsNavEs extends _StringsNavEn {
 }
 
 // Path: auth
-class _StringsAuthEs extends _StringsAuthEn {
-	_StringsAuthEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsAuthEs implements _StringsAuthEn {
+	_StringsAuthEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1626,11 +1749,28 @@ class _StringsAuthEs extends _StringsAuthEn {
 	@override late final _StringsAuthRegisterEs register = _StringsAuthRegisterEs._(_root);
 	@override late final _StringsAuthForgotPasswordEs forgotPassword = _StringsAuthForgotPasswordEs._(_root);
 	@override late final _StringsAuthPasswordStrengthEs passwordStrength = _StringsAuthPasswordStrengthEs._(_root);
+	@override late final _StringsAuthErrorsEs errors = _StringsAuthErrorsEs._(_root);
+	@override late final _StringsAuthEmailVerificationEs emailVerification = _StringsAuthEmailVerificationEs._(_root);
+	@override late final _StringsAuthDeleteAccountEs deleteAccount = _StringsAuthDeleteAccountEs._(_root);
+}
+
+// Path: validation
+class _StringsValidationEs implements _StringsValidationEn {
+	_StringsValidationEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get emailRequired => 'Por favor, ingresa tu dirección de e-mail';
+	@override String get invalidEmail => 'Por favor, ingresa una dirección de e-mail válida';
+	@override String get fieldRequired => 'Este campo es obligatorio';
+	@override String get passwordTooShort => 'La contraseña debe tener al menos 8 caracteres';
+	@override String get passwordsDoNotMatch => 'Las contraseñas no coinciden';
 }
 
 // Path: onboarding
-class _StringsOnboardingEs extends _StringsOnboardingEn {
-	_StringsOnboardingEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsOnboardingEs implements _StringsOnboardingEn {
+	_StringsOnboardingEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1641,8 +1781,8 @@ class _StringsOnboardingEs extends _StringsOnboardingEn {
 }
 
 // Path: events
-class _StringsEventsEs extends _StringsEventsEn {
-	_StringsEventsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsEventsEs implements _StringsEventsEn {
+	_StringsEventsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1660,8 +1800,8 @@ class _StringsEventsEs extends _StringsEventsEn {
 }
 
 // Path: courses
-class _StringsCoursesEs extends _StringsCoursesEn {
-	_StringsCoursesEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCoursesEs implements _StringsCoursesEn {
+	_StringsCoursesEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1677,8 +1817,8 @@ class _StringsCoursesEs extends _StringsCoursesEn {
 }
 
 // Path: profile
-class _StringsProfileEs extends _StringsProfileEn {
-	_StringsProfileEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileEs implements _StringsProfileEn {
+	_StringsProfileEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1695,8 +1835,8 @@ class _StringsProfileEs extends _StringsProfileEn {
 }
 
 // Path: premium
-class _StringsPremiumEs extends _StringsPremiumEn {
-	_StringsPremiumEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsPremiumEs implements _StringsPremiumEn {
+	_StringsPremiumEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1715,8 +1855,8 @@ class _StringsPremiumEs extends _StringsPremiumEn {
 }
 
 // Path: saved
-class _StringsSavedEs extends _StringsSavedEn {
-	_StringsSavedEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsSavedEs implements _StringsSavedEn {
+	_StringsSavedEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1728,8 +1868,8 @@ class _StringsSavedEs extends _StringsSavedEn {
 }
 
 // Path: contact
-class _StringsContactEs extends _StringsContactEn {
-	_StringsContactEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsContactEs implements _StringsContactEn {
+	_StringsContactEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1746,8 +1886,8 @@ class _StringsContactEs extends _StringsContactEn {
 }
 
 // Path: common.months
-class _StringsCommonMonthsEs extends _StringsCommonMonthsEn {
-	_StringsCommonMonthsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCommonMonthsEs implements _StringsCommonMonthsEn {
+	_StringsCommonMonthsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1767,8 +1907,8 @@ class _StringsCommonMonthsEs extends _StringsCommonMonthsEn {
 }
 
 // Path: common.form
-class _StringsCommonFormEs extends _StringsCommonFormEn {
-	_StringsCommonFormEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCommonFormEs implements _StringsCommonFormEn {
+	_StringsCommonFormEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1788,8 +1928,8 @@ class _StringsCommonFormEs extends _StringsCommonFormEn {
 }
 
 // Path: auth.login
-class _StringsAuthLoginEs extends _StringsAuthLoginEn {
-	_StringsAuthLoginEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsAuthLoginEs implements _StringsAuthLoginEn {
+	_StringsAuthLoginEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1804,8 +1944,8 @@ class _StringsAuthLoginEs extends _StringsAuthLoginEn {
 }
 
 // Path: auth.register
-class _StringsAuthRegisterEs extends _StringsAuthRegisterEn {
-	_StringsAuthRegisterEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsAuthRegisterEs implements _StringsAuthRegisterEn {
+	_StringsAuthRegisterEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1821,8 +1961,8 @@ class _StringsAuthRegisterEs extends _StringsAuthRegisterEn {
 }
 
 // Path: auth.forgotPassword
-class _StringsAuthForgotPasswordEs extends _StringsAuthForgotPasswordEn {
-	_StringsAuthForgotPasswordEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsAuthForgotPasswordEs implements _StringsAuthForgotPasswordEn {
+	_StringsAuthForgotPasswordEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1838,8 +1978,8 @@ class _StringsAuthForgotPasswordEs extends _StringsAuthForgotPasswordEn {
 }
 
 // Path: auth.passwordStrength
-class _StringsAuthPasswordStrengthEs extends _StringsAuthPasswordStrengthEn {
-	_StringsAuthPasswordStrengthEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsAuthPasswordStrengthEs implements _StringsAuthPasswordStrengthEn {
+	_StringsAuthPasswordStrengthEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1851,9 +1991,54 @@ class _StringsAuthPasswordStrengthEs extends _StringsAuthPasswordStrengthEn {
 	@override String get hint => 'Al menos 8 caracteres';
 }
 
+// Path: auth.errors
+class _StringsAuthErrorsEs implements _StringsAuthErrorsEn {
+	_StringsAuthErrorsEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get invalidCredential => 'E-mail o contraseña inválidos';
+	@override String get userDisabled => 'Esta cuenta ha sido desactivada';
+	@override String get emailAlreadyInUse => 'Ya existe una cuenta con este e-mail';
+	@override String get weakPassword => 'La contraseña es demasiado débil';
+	@override String get tooManyRequests => 'Demasiados intentos. Por favor, inténtalo más tarde';
+	@override String get networkError => 'Error de red. Por favor, verifica tu conexión';
+	@override String get generic => 'Ocurrió un error. Por favor, inténtalo de nuevo';
+}
+
+// Path: auth.emailVerification
+class _StringsAuthEmailVerificationEs implements _StringsAuthEmailVerificationEn {
+	_StringsAuthEmailVerificationEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Verifica tu e-mail';
+	@override String subtitle({required Object email}) => 'Enviamos un e-mail de verificación a ${email}';
+	@override String get resend => 'Reenviar e-mail de verificación';
+	@override String get checkVerified => 'He verificado mi e-mail';
+	@override String get notVerifiedYet => 'E-mail aún no verificado. Por favor, revisa tu bandeja de entrada.';
+	@override String get signOut => 'Cerrar sesión';
+}
+
+// Path: auth.deleteAccount
+class _StringsAuthDeleteAccountEs implements _StringsAuthDeleteAccountEn {
+	_StringsAuthDeleteAccountEs._(this._root);
+
+	@override final _StringsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get confirmTitle => '¿Eliminar cuenta?';
+	@override String get confirmBody => 'Esta acción elimina permanentemente todos tus datos. No se puede deshacer.';
+	@override String get reauthPrompt => 'Por favor, confirma tu contraseña para continuar';
+	@override String get success => 'Tu cuenta ha sido eliminada';
+	@override String get error => 'No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo.';
+}
+
 // Path: onboarding.step1
-class _StringsOnboardingStep1Es extends _StringsOnboardingStep1En {
-	_StringsOnboardingStep1Es._(_StringsEs root) : this._root = root, super._(root);
+class _StringsOnboardingStep1Es implements _StringsOnboardingStep1En {
+	_StringsOnboardingStep1Es._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1863,8 +2048,8 @@ class _StringsOnboardingStep1Es extends _StringsOnboardingStep1En {
 }
 
 // Path: onboarding.step2
-class _StringsOnboardingStep2Es extends _StringsOnboardingStep2En {
-	_StringsOnboardingStep2Es._(_StringsEs root) : this._root = root, super._(root);
+class _StringsOnboardingStep2Es implements _StringsOnboardingStep2En {
+	_StringsOnboardingStep2Es._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1874,8 +2059,8 @@ class _StringsOnboardingStep2Es extends _StringsOnboardingStep2En {
 }
 
 // Path: onboarding.step3
-class _StringsOnboardingStep3Es extends _StringsOnboardingStep3En {
-	_StringsOnboardingStep3Es._(_StringsEs root) : this._root = root, super._(root);
+class _StringsOnboardingStep3Es implements _StringsOnboardingStep3En {
+	_StringsOnboardingStep3Es._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1892,8 +2077,8 @@ class _StringsOnboardingStep3Es extends _StringsOnboardingStep3En {
 }
 
 // Path: events.detail
-class _StringsEventsDetailEs extends _StringsEventsDetailEn {
-	_StringsEventsDetailEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsEventsDetailEs implements _StringsEventsDetailEn {
+	_StringsEventsDetailEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1912,8 +2097,8 @@ class _StringsEventsDetailEs extends _StringsEventsDetailEn {
 }
 
 // Path: events.filter
-class _StringsEventsFilterEs extends _StringsEventsFilterEn {
-	_StringsEventsFilterEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsEventsFilterEs implements _StringsEventsFilterEn {
+	_StringsEventsFilterEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1935,8 +2120,8 @@ class _StringsEventsFilterEs extends _StringsEventsFilterEn {
 }
 
 // Path: events.filters
-class _StringsEventsFiltersEs extends _StringsEventsFiltersEn {
-	_StringsEventsFiltersEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsEventsFiltersEs implements _StringsEventsFiltersEn {
+	_StringsEventsFiltersEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1952,8 +2137,8 @@ class _StringsEventsFiltersEs extends _StringsEventsFiltersEn {
 }
 
 // Path: courses.courseTypes
-class _StringsCoursesCourseTypesEs extends _StringsCoursesCourseTypesEn {
-	_StringsCoursesCourseTypesEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCoursesCourseTypesEs implements _StringsCoursesCourseTypesEn {
+	_StringsCoursesCourseTypesEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1964,8 +2149,8 @@ class _StringsCoursesCourseTypesEs extends _StringsCoursesCourseTypesEn {
 }
 
 // Path: courses.detail
-class _StringsCoursesDetailEs extends _StringsCoursesDetailEn {
-	_StringsCoursesDetailEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCoursesDetailEs implements _StringsCoursesDetailEn {
+	_StringsCoursesDetailEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -1997,8 +2182,8 @@ class _StringsCoursesDetailEs extends _StringsCoursesDetailEn {
 }
 
 // Path: profile.sections
-class _StringsProfileSectionsEs extends _StringsProfileSectionsEn {
-	_StringsProfileSectionsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileSectionsEs implements _StringsProfileSectionsEn {
+	_StringsProfileSectionsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2011,8 +2196,8 @@ class _StringsProfileSectionsEs extends _StringsProfileSectionsEn {
 }
 
 // Path: profile.account
-class _StringsProfileAccountEs extends _StringsProfileAccountEn {
-	_StringsProfileAccountEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileAccountEs implements _StringsProfileAccountEn {
+	_StringsProfileAccountEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2022,8 +2207,8 @@ class _StringsProfileAccountEs extends _StringsProfileAccountEn {
 }
 
 // Path: profile.settings
-class _StringsProfileSettingsEs extends _StringsProfileSettingsEn {
-	_StringsProfileSettingsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileSettingsEs implements _StringsProfileSettingsEn {
+	_StringsProfileSettingsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2036,8 +2221,8 @@ class _StringsProfileSettingsEs extends _StringsProfileSettingsEn {
 }
 
 // Path: profile.support
-class _StringsProfileSupportEs extends _StringsProfileSupportEn {
-	_StringsProfileSupportEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileSupportEs implements _StringsProfileSupportEn {
+	_StringsProfileSupportEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2047,8 +2232,8 @@ class _StringsProfileSupportEs extends _StringsProfileSupportEn {
 }
 
 // Path: profile.appInfo
-class _StringsProfileAppInfoEs extends _StringsProfileAppInfoEn {
-	_StringsProfileAppInfoEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileAppInfoEs implements _StringsProfileAppInfoEn {
+	_StringsProfileAppInfoEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2059,8 +2244,8 @@ class _StringsProfileAppInfoEs extends _StringsProfileAppInfoEn {
 }
 
 // Path: profile.danger
-class _StringsProfileDangerEs extends _StringsProfileDangerEn {
-	_StringsProfileDangerEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileDangerEs implements _StringsProfileDangerEn {
+	_StringsProfileDangerEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2070,8 +2255,8 @@ class _StringsProfileDangerEs extends _StringsProfileDangerEn {
 }
 
 // Path: profile.changePassword
-class _StringsProfileChangePasswordEs extends _StringsProfileChangePasswordEn {
-	_StringsProfileChangePasswordEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileChangePasswordEs implements _StringsProfileChangePasswordEn {
+	_StringsProfileChangePasswordEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2100,8 +2285,8 @@ class _StringsProfileChangePasswordEs extends _StringsProfileChangePasswordEn {
 }
 
 // Path: profile.editProfile
-class _StringsProfileEditProfileEs extends _StringsProfileEditProfileEn {
-	_StringsProfileEditProfileEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileEs implements _StringsProfileEditProfileEn {
+	_StringsProfileEditProfileEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2122,8 +2307,8 @@ class _StringsProfileEditProfileEs extends _StringsProfileEditProfileEn {
 }
 
 // Path: contact.form
-class _StringsContactFormEs extends _StringsContactFormEn {
-	_StringsContactFormEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsContactFormEs implements _StringsContactFormEn {
+	_StringsContactFormEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2144,8 +2329,8 @@ class _StringsContactFormEs extends _StringsContactFormEn {
 }
 
 // Path: contact.deviceInfoLabels
-class _StringsContactDeviceInfoLabelsEs extends _StringsContactDeviceInfoLabelsEn {
-	_StringsContactDeviceInfoLabelsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsContactDeviceInfoLabelsEs implements _StringsContactDeviceInfoLabelsEn {
+	_StringsContactDeviceInfoLabelsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2156,8 +2341,8 @@ class _StringsContactDeviceInfoLabelsEs extends _StringsContactDeviceInfoLabelsE
 }
 
 // Path: courses.detail.levels
-class _StringsCoursesDetailLevelsEs extends _StringsCoursesDetailLevelsEn {
-	_StringsCoursesDetailLevelsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCoursesDetailLevelsEs implements _StringsCoursesDetailLevelsEn {
+	_StringsCoursesDetailLevelsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2169,8 +2354,8 @@ class _StringsCoursesDetailLevelsEs extends _StringsCoursesDetailLevelsEn {
 }
 
 // Path: courses.detail.days
-class _StringsCoursesDetailDaysEs extends _StringsCoursesDetailDaysEn {
-	_StringsCoursesDetailDaysEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsCoursesDetailDaysEs implements _StringsCoursesDetailDaysEn {
+	_StringsCoursesDetailDaysEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2185,8 +2370,8 @@ class _StringsCoursesDetailDaysEs extends _StringsCoursesDetailDaysEn {
 }
 
 // Path: profile.editProfile.sections
-class _StringsProfileEditProfileSectionsEs extends _StringsProfileEditProfileSectionsEn {
-	_StringsProfileEditProfileSectionsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileSectionsEs implements _StringsProfileEditProfileSectionsEn {
+	_StringsProfileEditProfileSectionsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2200,8 +2385,8 @@ class _StringsProfileEditProfileSectionsEs extends _StringsProfileEditProfileSec
 }
 
 // Path: profile.editProfile.notifications
-class _StringsProfileEditProfileNotificationsEs extends _StringsProfileEditProfileNotificationsEn {
-	_StringsProfileEditProfileNotificationsEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileNotificationsEs implements _StringsProfileEditProfileNotificationsEn {
+	_StringsProfileEditProfileNotificationsEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2212,8 +2397,8 @@ class _StringsProfileEditProfileNotificationsEs extends _StringsProfileEditProfi
 }
 
 // Path: profile.editProfile.notificationSubtitles
-class _StringsProfileEditProfileNotificationSubtitlesEs extends _StringsProfileEditProfileNotificationSubtitlesEn {
-	_StringsProfileEditProfileNotificationSubtitlesEs._(_StringsEs root) : this._root = root, super._(root);
+class _StringsProfileEditProfileNotificationSubtitlesEs implements _StringsProfileEditProfileNotificationSubtitlesEn {
+	_StringsProfileEditProfileNotificationSubtitlesEs._(this._root);
 
 	@override final _StringsEs _root; // ignore: unused_field
 
@@ -2315,6 +2500,29 @@ extension on Translations {
 			case 'auth.passwordStrength.strong': return 'Strong password';
 			case 'auth.passwordStrength.veryStrong': return 'Very strong';
 			case 'auth.passwordStrength.hint': return 'At least 8 characters';
+			case 'auth.errors.invalidCredential': return 'Invalid email or password';
+			case 'auth.errors.userDisabled': return 'This account has been disabled';
+			case 'auth.errors.emailAlreadyInUse': return 'An account with this email already exists';
+			case 'auth.errors.weakPassword': return 'Password is too weak';
+			case 'auth.errors.tooManyRequests': return 'Too many attempts. Please try again later';
+			case 'auth.errors.networkError': return 'Network error. Please check your connection';
+			case 'auth.errors.generic': return 'An error occurred. Please try again';
+			case 'auth.emailVerification.title': return 'Verify your email';
+			case 'auth.emailVerification.subtitle': return ({required Object email}) => 'We sent a verification email to ${email}';
+			case 'auth.emailVerification.resend': return 'Resend verification email';
+			case 'auth.emailVerification.checkVerified': return 'I\'ve verified my email';
+			case 'auth.emailVerification.notVerifiedYet': return 'Email not verified yet. Please check your inbox.';
+			case 'auth.emailVerification.signOut': return 'Sign out';
+			case 'auth.deleteAccount.confirmTitle': return 'Delete account?';
+			case 'auth.deleteAccount.confirmBody': return 'This action permanently removes all your data. This cannot be undone.';
+			case 'auth.deleteAccount.reauthPrompt': return 'Please confirm your password to continue';
+			case 'auth.deleteAccount.success': return 'Your account has been deleted';
+			case 'auth.deleteAccount.error': return 'Failed to delete account. Please try again.';
+			case 'validation.emailRequired': return 'Please enter your email address';
+			case 'validation.invalidEmail': return 'Please enter a valid email address';
+			case 'validation.fieldRequired': return 'This field is required';
+			case 'validation.passwordTooShort': return 'Password must be at least 8 characters';
+			case 'validation.passwordsDoNotMatch': return 'Passwords do not match';
 			case 'onboarding.step1.title': return 'What dances do you like?';
 			case 'onboarding.step1.subtitle': return 'Choose your favorite dance styles so we can offer you relevant events';
 			case 'onboarding.step2.title': return 'What is your level?';
@@ -2605,6 +2813,29 @@ extension on _StringsCs {
 			case 'auth.passwordStrength.strong': return 'Silné heslo';
 			case 'auth.passwordStrength.veryStrong': return 'Velmi silné';
 			case 'auth.passwordStrength.hint': return 'Alespoň 8 znaků';
+			case 'auth.errors.invalidCredential': return 'Neplatný e-mail nebo heslo';
+			case 'auth.errors.userDisabled': return 'Tento účet byl deaktivován';
+			case 'auth.errors.emailAlreadyInUse': return 'Účet s tímto e-mailem již existuje';
+			case 'auth.errors.weakPassword': return 'Heslo je příliš slabé';
+			case 'auth.errors.tooManyRequests': return 'Příliš mnoho pokusů. Zkuste to prosím později';
+			case 'auth.errors.networkError': return 'Chyba sítě. Zkontrolujte své připojení';
+			case 'auth.errors.generic': return 'Došlo k chybě. Zkuste to prosím znovu';
+			case 'auth.emailVerification.title': return 'Ověřte svůj e-mail';
+			case 'auth.emailVerification.subtitle': return ({required Object email}) => 'Zaslali jsme ověřovací e-mail na adresu ${email}';
+			case 'auth.emailVerification.resend': return 'Znovu odeslat ověřovací e-mail';
+			case 'auth.emailVerification.checkVerified': return 'Ověřil jsem svůj e-mail';
+			case 'auth.emailVerification.notVerifiedYet': return 'E-mail ještě nebyl ověřen. Zkontrolujte prosím svou doručenou poštu.';
+			case 'auth.emailVerification.signOut': return 'Odhlásit se';
+			case 'auth.deleteAccount.confirmTitle': return 'Smazat účet?';
+			case 'auth.deleteAccount.confirmBody': return 'Tato akce trvale odstraní všechna vaše data. Tuto akci nelze vrátit zpět.';
+			case 'auth.deleteAccount.reauthPrompt': return 'Pro pokračování potvrďte své heslo';
+			case 'auth.deleteAccount.success': return 'Váš účet byl smazán';
+			case 'auth.deleteAccount.error': return 'Nepodařilo se smazat účet. Zkuste to prosím znovu.';
+			case 'validation.emailRequired': return 'Zadejte prosím svou e-mailovou adresu';
+			case 'validation.invalidEmail': return 'Zadejte prosím platnou e-mailovou adresu';
+			case 'validation.fieldRequired': return 'Toto pole je povinné';
+			case 'validation.passwordTooShort': return 'Heslo musí mít alespoň 8 znaků';
+			case 'validation.passwordsDoNotMatch': return 'Hesla se neshodují';
 			case 'onboarding.step1.title': return 'Jaké tance tě baví?';
 			case 'onboarding.step1.subtitle': return 'Vyber své oblíbené taneční styly, abychom ti mohli nabídnout relevantní akce';
 			case 'onboarding.step2.title': return 'Jaká je tvoje úroveň?';
@@ -2895,6 +3126,29 @@ extension on _StringsEs {
 			case 'auth.passwordStrength.strong': return 'Contraseña fuerte';
 			case 'auth.passwordStrength.veryStrong': return 'Muy fuerte';
 			case 'auth.passwordStrength.hint': return 'Al menos 8 caracteres';
+			case 'auth.errors.invalidCredential': return 'E-mail o contraseña inválidos';
+			case 'auth.errors.userDisabled': return 'Esta cuenta ha sido desactivada';
+			case 'auth.errors.emailAlreadyInUse': return 'Ya existe una cuenta con este e-mail';
+			case 'auth.errors.weakPassword': return 'La contraseña es demasiado débil';
+			case 'auth.errors.tooManyRequests': return 'Demasiados intentos. Por favor, inténtalo más tarde';
+			case 'auth.errors.networkError': return 'Error de red. Por favor, verifica tu conexión';
+			case 'auth.errors.generic': return 'Ocurrió un error. Por favor, inténtalo de nuevo';
+			case 'auth.emailVerification.title': return 'Verifica tu e-mail';
+			case 'auth.emailVerification.subtitle': return ({required Object email}) => 'Enviamos un e-mail de verificación a ${email}';
+			case 'auth.emailVerification.resend': return 'Reenviar e-mail de verificación';
+			case 'auth.emailVerification.checkVerified': return 'He verificado mi e-mail';
+			case 'auth.emailVerification.notVerifiedYet': return 'E-mail aún no verificado. Por favor, revisa tu bandeja de entrada.';
+			case 'auth.emailVerification.signOut': return 'Cerrar sesión';
+			case 'auth.deleteAccount.confirmTitle': return '¿Eliminar cuenta?';
+			case 'auth.deleteAccount.confirmBody': return 'Esta acción elimina permanentemente todos tus datos. No se puede deshacer.';
+			case 'auth.deleteAccount.reauthPrompt': return 'Por favor, confirma tu contraseña para continuar';
+			case 'auth.deleteAccount.success': return 'Tu cuenta ha sido eliminada';
+			case 'auth.deleteAccount.error': return 'No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo.';
+			case 'validation.emailRequired': return 'Por favor, ingresa tu dirección de e-mail';
+			case 'validation.invalidEmail': return 'Por favor, ingresa una dirección de e-mail válida';
+			case 'validation.fieldRequired': return 'Este campo es obligatorio';
+			case 'validation.passwordTooShort': return 'La contraseña debe tener al menos 8 caracteres';
+			case 'validation.passwordsDoNotMatch': return 'Las contraseñas no coinciden';
 			case 'onboarding.step1.title': return '¿Qué bailes te gustan?';
 			case 'onboarding.step1.subtitle': return 'Elige tus estilos de baile favoritos para ofrecerte eventos relevantes';
 			case 'onboarding.step2.title': return '¿Cuál es tu nivel?';

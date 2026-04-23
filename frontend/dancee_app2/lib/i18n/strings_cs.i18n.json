@@ -101,7 +101,38 @@
       "strong": "Silné heslo",
       "veryStrong": "Velmi silné",
       "hint": "Alespoň 8 znaků"
+    },
+    "errors": {
+      "invalidCredential": "Neplatný e-mail nebo heslo",
+      "userDisabled": "Tento účet byl deaktivován",
+      "emailAlreadyInUse": "Účet s tímto e-mailem již existuje",
+      "weakPassword": "Heslo je příliš slabé",
+      "tooManyRequests": "Příliš mnoho pokusů. Zkuste to prosím později",
+      "networkError": "Chyba sítě. Zkontrolujte své připojení",
+      "generic": "Došlo k chybě. Zkuste to prosím znovu"
+    },
+    "emailVerification": {
+      "title": "Ověřte svůj e-mail",
+      "subtitle": "Zaslali jsme ověřovací e-mail na adresu ${email}",
+      "resend": "Znovu odeslat ověřovací e-mail",
+      "checkVerified": "Ověřil jsem svůj e-mail",
+      "notVerifiedYet": "E-mail ještě nebyl ověřen. Zkontrolujte prosím svou doručenou poštu.",
+      "signOut": "Odhlásit se"
+    },
+    "deleteAccount": {
+      "confirmTitle": "Smazat účet?",
+      "confirmBody": "Tato akce trvale odstraní všechna vaše data. Tuto akci nelze vrátit zpět.",
+      "reauthPrompt": "Pro pokračování potvrďte své heslo",
+      "success": "Váš účet byl smazán",
+      "error": "Nepodařilo se smazat účet. Zkuste to prosím znovu."
     }
+  },
+  "validation": {
+    "emailRequired": "Zadejte prosím svou e-mailovou adresu",
+    "invalidEmail": "Zadejte prosím platnou e-mailovou adresu",
+    "fieldRequired": "Toto pole je povinné",
+    "passwordTooShort": "Heslo musí mít alespoň 8 znaků",
+    "passwordsDoNotMatch": "Hesla se neshodují"
   },
   "onboarding": {
     "step1": {

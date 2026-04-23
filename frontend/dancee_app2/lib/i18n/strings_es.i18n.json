@@ -101,7 +101,38 @@
       "strong": "Contraseña fuerte",
       "veryStrong": "Muy fuerte",
       "hint": "Al menos 8 caracteres"
+    },
+    "errors": {
+      "invalidCredential": "E-mail o contraseña inválidos",
+      "userDisabled": "Esta cuenta ha sido desactivada",
+      "emailAlreadyInUse": "Ya existe una cuenta con este e-mail",
+      "weakPassword": "La contraseña es demasiado débil",
+      "tooManyRequests": "Demasiados intentos. Por favor, inténtalo más tarde",
+      "networkError": "Error de red. Por favor, verifica tu conexión",
+      "generic": "Ocurrió un error. Por favor, inténtalo de nuevo"
+    },
+    "emailVerification": {
+      "title": "Verifica tu e-mail",
+      "subtitle": "Enviamos un e-mail de verificación a ${email}",
+      "resend": "Reenviar e-mail de verificación",
+      "checkVerified": "He verificado mi e-mail",
+      "notVerifiedYet": "E-mail aún no verificado. Por favor, revisa tu bandeja de entrada.",
+      "signOut": "Cerrar sesión"
+    },
+    "deleteAccount": {
+      "confirmTitle": "¿Eliminar cuenta?",
+      "confirmBody": "Esta acción elimina permanentemente todos tus datos. No se puede deshacer.",
+      "reauthPrompt": "Por favor, confirma tu contraseña para continuar",
+      "success": "Tu cuenta ha sido eliminada",
+      "error": "No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo."
     }
+  },
+  "validation": {
+    "emailRequired": "Por favor, ingresa tu dirección de e-mail",
+    "invalidEmail": "Por favor, ingresa una dirección de e-mail válida",
+    "fieldRequired": "Este campo es obligatorio",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden"
   },
   "onboarding": {
     "step1": {

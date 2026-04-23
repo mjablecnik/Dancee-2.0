@@ -101,7 +101,38 @@
       "strong": "Strong password",
       "veryStrong": "Very strong",
       "hint": "At least 8 characters"
+    },
+    "errors": {
+      "invalidCredential": "Invalid email or password",
+      "userDisabled": "This account has been disabled",
+      "emailAlreadyInUse": "An account with this email already exists",
+      "weakPassword": "Password is too weak",
+      "tooManyRequests": "Too many attempts. Please try again later",
+      "networkError": "Network error. Please check your connection",
+      "generic": "An error occurred. Please try again"
+    },
+    "emailVerification": {
+      "title": "Verify your email",
+      "subtitle": "We sent a verification email to ${email}",
+      "resend": "Resend verification email",
+      "checkVerified": "I've verified my email",
+      "notVerifiedYet": "Email not verified yet. Please check your inbox.",
+      "signOut": "Sign out"
+    },
+    "deleteAccount": {
+      "confirmTitle": "Delete account?",
+      "confirmBody": "This action permanently removes all your data. This cannot be undone.",
+      "reauthPrompt": "Please confirm your password to continue",
+      "success": "Your account has been deleted",
+      "error": "Failed to delete account. Please try again."
     }
+  },
+  "validation": {
+    "emailRequired": "Please enter your email address",
+    "invalidEmail": "Please enter a valid email address",
+    "fieldRequired": "This field is required",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match"
   },
   "onboarding": {
     "step1": {
