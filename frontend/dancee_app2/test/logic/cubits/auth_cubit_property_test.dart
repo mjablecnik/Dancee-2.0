@@ -516,6 +516,123 @@ void _propertyFailedOperationsEmitError() {
 }
 
 // ---------------------------------------------------------------------------
+// Property 9: New user detection by creation time
+// ---------------------------------------------------------------------------
+
+void _propertyNewUserDetection() {
+  // Requirements: 13.2
+  // Returns true iff |creationTime - currentTime| ≤ 60s
+
+  late _FakeAuthRepository repo;
+  late AuthCubit cubit;
+
+  setUp(() {
+    repo = _FakeAuthRepository();
+    cubit = AuthCubit(authRepository: repo);
+  });
+
+  tearDown(() async {
+    await cubit.close();
+    repo.dispose();
+  });
+
+  Future<bool?> _getIsNewUser(_FakeUser user) async {
+    repo.pushUser(user);
+    await Future.delayed(Duration.zero);
+    return cubit.state.maybeMap(
+      authenticated: (s) => s.isNewUser,
+      orElse: () => null,
+    );
+  }
+
+  test('P9a: null creationTime → isNewUser is false', () async {
+    final user = _FakeUser(uid: 'uid-no-creation', creationTime: null);
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isFalse);
+  });
+
+  test('P9b: creationTime = now → isNewUser is true', () async {
+    final user = _FakeUser(uid: 'uid-just-now', creationTime: DateTime.now());
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isTrue);
+  });
+
+  test('P9c: creationTime 30s ago → isNewUser is true', () async {
+    final user = _FakeUser(
+      uid: 'uid-30s-ago',
+      creationTime: DateTime.now().subtract(const Duration(seconds: 30)),
+    );
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isTrue);
+  });
+
+  test('P9d: creationTime exactly 60s ago → isNewUser is true', () async {
+    final user = _FakeUser(
+      uid: 'uid-60s-ago',
+      creationTime: DateTime.now().subtract(const Duration(seconds: 60)),
+    );
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isTrue);
+  });
+
+  test('P9e: creationTime 61s ago → isNewUser is false', () async {
+    final user = _FakeUser(
+      uid: 'uid-61s-ago',
+      creationTime: DateTime.now().subtract(const Duration(seconds: 61)),
+    );
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isFalse);
+  });
+
+  test('P9f: creationTime 5 minutes ago → isNewUser is false', () async {
+    final user = _FakeUser(
+      uid: 'uid-5min-ago',
+      creationTime: DateTime.now().subtract(const Duration(minutes: 5)),
+    );
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isFalse);
+  });
+
+  test('P9g: creationTime in the future within 60s → isNewUser is true',
+      () async {
+    final user = _FakeUser(
+      uid: 'uid-future-30s',
+      creationTime: DateTime.now().add(const Duration(seconds: 30)),
+    );
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isTrue);
+  });
+
+  test('P9h: creationTime in the future beyond 60s → isNewUser is false',
+      () async {
+    // Use 120s to avoid boundary flakiness from sub-millisecond timing differences
+    final user = _FakeUser(
+      uid: 'uid-future-120s',
+      creationTime: DateTime.now().add(const Duration(seconds: 120)),
+    );
+    final isNew = await _getIsNewUser(user);
+    expect(isNew, isFalse);
+  });
+
+  test('P9i: isNewUser changes across successive auth stream events', () async {
+    final oldUser = _FakeUser(
+      uid: 'uid-old',
+      creationTime: DateTime.now().subtract(const Duration(minutes: 10)),
+    );
+    final newUser = _FakeUser(
+      uid: 'uid-new',
+      creationTime: DateTime.now(),
+    );
+
+    final isOld = await _getIsNewUser(oldUser);
+    expect(isOld, isFalse, reason: 'Returning user must not be marked as new');
+
+    final isNew = await _getIsNewUser(newUser);
+    expect(isNew, isTrue, reason: 'Fresh user must be marked as new');
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Test entry point
 // ---------------------------------------------------------------------------
 
@@ -532,6 +649,10 @@ void main() {
     group(
       'Property 4: Failed auth operations emit error state with message',
       _propertyFailedOperationsEmitError,
+    );
+    group(
+      'Property 9: New user detection by creation time',
+      _propertyNewUserDetection,
     );
   });
 }
