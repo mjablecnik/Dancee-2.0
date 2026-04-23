@@ -46,3 +46,10 @@ app.*.map.json
 
 # Sensitive app configuration (copy config.example.dart to config.dart)
 lib/config.dart
+
+# Firebase platform configuration files (contain project-specific identifiers)
+# Place these in the correct platform directories and do NOT commit them.
+# For Android: android/app/google-services.json
+# For iOS: ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist

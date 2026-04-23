@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'core/service_locator.dart';
 import 'core/theme.dart';
+import 'firebase_options.dart';
 import 'i18n/strings.g.dart';
 import 'logic/cubits/event_cubit.dart';
 import 'logic/cubits/course_cubit.dart';
@@ -38,12 +40,52 @@ import 'screens/saved/saved_events_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    runApp(_FirebaseErrorApp(message: e.toString()));
+    return;
+  }
   setupServiceLocator();
   final settingsCubit = sl<SettingsCubit>();
   await settingsCubit.init();
   runApp(TranslationProvider(
     child: DanceeApp(settingsCubit: settingsCubit),
   ));
+}
+
+class _FirebaseErrorApp extends StatelessWidget {
+  const _FirebaseErrorApp({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                const Text(
+                  'Firebase initialization failed',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(message, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // TODO(navigation): Migrate from string-based context.push('/path') navigation
