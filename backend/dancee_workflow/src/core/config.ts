@@ -20,6 +20,13 @@ export const config = {
   // LLM temperature for structured output (classification, extraction, translation).
   // Lower values reduce non-determinism and improve JSON reliability.
   llmTemperature: parseFloat(process.env.LLM_TEMPERATURE ?? "0.1"),
+  // Facebook cookies for authenticated scraping (raw cookie string, e.g. "c_user=123; xs=abc").
+  // When set, the scraper sends requests as a logged-in user, which unlocks
+  // private events and reduces the chance of being rate-limited.
+  fbCookies: process.env.FB_COOKIES ?? "",
+  // Delay in milliseconds between consecutive Facebook scrape requests.
+  // Prevents aggressive request patterns that could trigger account blocks.
+  scrapeDelayMs: parseInt(process.env.SCRAPE_DELAY_MS ?? "3000", 10),
 };
 
 export function validateConfig(): void {
