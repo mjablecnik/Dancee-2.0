@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -211,12 +212,15 @@ class _LoginFormSectionState extends State<LoginFormSection> {
               label: t.auth.continueWithGoogle,
               onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithGoogle(),
             ),
-            const SizedBox(height: AppSpacing.md),
-            _SocialButton(
-              icon: const FaIcon(FontAwesomeIcons.apple, color: appText, size: 20),
-              label: t.auth.continueWithApple,
-              onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithApple(),
-            ),
+            if (defaultTargetPlatform == TargetPlatform.iOS ||
+                defaultTargetPlatform == TargetPlatform.macOS) ...[
+              const SizedBox(height: AppSpacing.md),
+              _SocialButton(
+                icon: const FaIcon(FontAwesomeIcons.apple, color: appText, size: 20),
+                label: t.auth.continueWithApple,
+                onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithApple(),
+              ),
+            ],
             const SizedBox(height: AppSpacing.xxl),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
