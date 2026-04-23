@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'core/router_guard.dart';
 import 'core/service_locator.dart';
 import 'core/theme.dart';
 import 'firebase_options.dart';
 import 'i18n/strings.g.dart';
+import 'logic/cubits/auth_cubit.dart';
 import 'logic/cubits/event_cubit.dart';
 import 'logic/cubits/course_cubit.dart';
 import 'logic/cubits/favorites_cubit.dart';
@@ -51,9 +53,36 @@ void main() async {
   setupServiceLocator();
   final settingsCubit = sl<SettingsCubit>();
   await settingsCubit.init();
+
+  // Create AuthCubit singleton and a ChangeNotifier that triggers GoRouter
+  // re-evaluation whenever auth state changes.
+  final authCubit = sl<AuthCubit>();
+  final authRefreshNotifier = _GoRouterRefreshNotifier(authCubit.stream);
+
+  final router = _buildRouter(authRefreshNotifier);
+
   runApp(TranslationProvider(
-    child: DanceeApp(settingsCubit: settingsCubit),
+    child: DanceeApp(
+      settingsCubit: settingsCubit,
+      authCubit: authCubit,
+      router: router,
+    ),
   ));
+}
+
+/// Wraps a [Stream] as a [ChangeNotifier] so GoRouter can listen for changes.
+class _GoRouterRefreshNotifier extends ChangeNotifier {
+  _GoRouterRefreshNotifier(Stream<dynamic> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 }
 
 class _FirebaseErrorApp extends StatelessWidget {
@@ -93,8 +122,11 @@ class _FirebaseErrorApp extends StatelessWidget {
 // This requires adding go_router_builder dev dependency, creating route data
 // classes with @TypedGoRoute annotations, and running build_runner to generate
 // the type-safe route extensions. Track as a separate large refactor task.
-final _router = GoRouter(
+GoRouter _buildRouter(_GoRouterRefreshNotifier authRefreshNotifier) {
+  return GoRouter(
   initialLocation: '/login',
+  refreshListenable: authRefreshNotifier,
+  redirect: routerGuard,
   routes: [
     // Auth flow
     GoRoute(
@@ -198,20 +230,29 @@ final _router = GoRouter(
       builder: (context, state) => const AuthorContactScreen(),
     ),
   ],
-);
+  );
+}
 
 final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 class DanceeApp extends StatelessWidget {
-  const DanceeApp({super.key, required this.settingsCubit});
+  const DanceeApp({
+    super.key,
+    required this.settingsCubit,
+    required this.authCubit,
+    required this.router,
+  });
 
   final SettingsCubit settingsCubit;
+  final AuthCubit authCubit;
+  final GoRouter router;
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<SettingsCubit>.value(value: settingsCubit),
+        BlocProvider<AuthCubit>.value(value: authCubit),
         BlocProvider<FilterCubit>(create: (_) => sl<FilterCubit>()),
         BlocProvider<EventCubit>(create: (_) => sl<EventCubit>()),
         BlocProvider<CourseCubit>(create: (_) => sl<CourseCubit>()),
@@ -221,7 +262,7 @@ class DanceeApp extends StatelessWidget {
         child: MaterialApp.router(
           title: t.common.appName,
           theme: AppTheme.theme,
-          routerConfig: _router,
+          routerConfig: router,
           scaffoldMessengerKey: _scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           locale: TranslationProvider.of(context).flutterLocale,

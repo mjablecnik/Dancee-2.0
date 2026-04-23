@@ -9,6 +9,7 @@ import '../data/repositories/event_repository.dart';
 import '../data/repositories/course_repository.dart';
 import '../data/repositories/favorites_repository.dart';
 import '../data/repositories/dance_style_repository.dart';
+import '../logic/cubits/auth_cubit.dart';
 import '../logic/cubits/event_cubit.dart';
 import '../logic/cubits/course_cubit.dart';
 import '../logic/cubits/favorites_cubit.dart';
@@ -32,6 +33,9 @@ void setupServiceLocator() {
       firebaseAuth: FirebaseAuth.instance,
       googleSignIn: GoogleSignIn(),
     ),
+  );
+  sl.registerLazySingleton<AuthCubit>(
+    () => AuthCubit(authRepository: sl<AuthRepository>()),
   );
 
   // Repositories
