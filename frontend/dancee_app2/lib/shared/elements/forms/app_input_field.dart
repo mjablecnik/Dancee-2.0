@@ -8,6 +8,8 @@ class AppInputField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextEditingController? controller;
   final Widget? icon;
+  final String? errorText;
+  final FocusNode? focusNode;
 
   const AppInputField({
     super.key,
@@ -16,6 +18,8 @@ class AppInputField extends StatelessWidget {
     this.keyboardType,
     this.controller,
     this.icon,
+    this.errorText,
+    this.focusNode,
   });
 
   @override
@@ -37,7 +41,7 @@ class AppInputField extends StatelessWidget {
           decoration: BoxDecoration(
             color: appSurface,
             borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: appBorder),
+            border: Border.all(color: errorText != null ? appError : appBorder),
           ),
           child: Row(
             children: [
@@ -49,6 +53,7 @@ class AppInputField extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  focusNode: focusNode,
                   keyboardType: keyboardType,
                   style: const TextStyle(color: appText),
                   decoration: InputDecoration(
@@ -64,6 +69,16 @@ class AppInputField extends StatelessWidget {
             ],
           ),
         ),
+        if (errorText != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            errorText!,
+            style: const TextStyle(
+              color: appError,
+              fontSize: AppTypography.fontSizeSm,
+            ),
+          ),
+        ],
       ],
     );
   }

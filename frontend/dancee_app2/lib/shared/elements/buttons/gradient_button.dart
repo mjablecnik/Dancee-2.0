@@ -5,12 +5,14 @@ class GradientButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final Gradient? gradient;
+  final bool isLoading;
 
   const GradientButton({
     super.key,
     required this.label,
     required this.onTap,
     this.gradient,
+    this.isLoading = false,
   });
 
   @override
@@ -26,16 +28,25 @@ class GradientButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.xl),
-          onTap: onTap,
+          onTap: isLoading ? null : onTap,
           child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: AppTypography.fontSizeXl,
-                fontWeight: AppTypography.fontWeightBold,
-              ),
-            ),
+            child: isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                : Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppTypography.fontSizeXl,
+                      fontWeight: AppTypography.fontWeightBold,
+                    ),
+                  ),
           ),
         ),
       ),

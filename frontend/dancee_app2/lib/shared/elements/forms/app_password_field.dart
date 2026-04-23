@@ -9,6 +9,8 @@ class AppPasswordField extends StatefulWidget {
   final String? hintText;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
+  final String? errorText;
+  final FocusNode? focusNode;
 
   const AppPasswordField({
     super.key,
@@ -16,6 +18,8 @@ class AppPasswordField extends StatefulWidget {
     this.hintText,
     this.controller,
     this.onChanged,
+    this.errorText,
+    this.focusNode,
   });
 
   @override
@@ -44,7 +48,7 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
           decoration: BoxDecoration(
             color: appSurface,
             borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: appBorder),
+            border: Border.all(color: widget.errorText != null ? appError : appBorder),
           ),
           child: Row(
             children: [
@@ -54,6 +58,7 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
               Expanded(
                 child: TextField(
                   controller: widget.controller,
+                  focusNode: widget.focusNode,
                   obscureText: !_showPassword,
                   onChanged: widget.onChanged,
                   style: const TextStyle(color: appText),
@@ -78,6 +83,16 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
             ],
           ),
         ),
+        if (widget.errorText != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            widget.errorText!,
+            style: const TextStyle(
+              color: appError,
+              fontSize: AppTypography.fontSizeSm,
+            ),
+          ),
+        ],
       ],
     );
   }
