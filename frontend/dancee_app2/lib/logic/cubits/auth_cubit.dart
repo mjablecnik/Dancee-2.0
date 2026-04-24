@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../data/repositories/auth_repository.dart';
@@ -79,6 +80,13 @@ class AuthCubit extends Cubit<AuthState> {
         authenticated: (s) => s.uid,
         orElse: () => null,
       );
+
+  String? get currentEmail => state.maybeMap(
+        authenticated: (s) => s.email,
+        orElse: () => null,
+      );
+
+  bool get isEmailProvider => _authRepository.isEmailProvider;
 
   Future<void> signInWithEmail(String email, String password) async {
     emit(const AuthState.loading());
@@ -184,9 +192,18 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> _clearOnboardingPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('onboarding_dance_styles');
+    await prefs.remove('onboarding_level');
+    await prefs.remove('onboarding_radius');
+    await prefs.remove('onboarding_completed');
+  }
+
   Future<void> signOut() async {
     emit(const AuthState.loading());
     try {
+      await _clearOnboardingPrefs();
       await _authRepository.signOut();
       // authStateChanges stream will emit unauthenticated
     } catch (e) {
@@ -202,6 +219,7 @@ class AuthCubit extends Cubit<AuthState> {
       if (uid != null) {
         await _favoritesRepository.deleteAllFavoritesForUser(uid);
       }
+      await _clearOnboardingPrefs();
       await _authRepository.deleteAccount();
       // authStateChanges stream will emit unauthenticated
     } catch (e) {

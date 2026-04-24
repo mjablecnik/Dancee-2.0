@@ -36,6 +36,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
   void _onAuthStateChanged(AuthState authState) {
     authState.maybeMap(
+      authenticated: (_) => loadFavorites(),
       unauthenticated: (_) {
         _allFavorites = [];
         emit(const FavoritesState.initial());

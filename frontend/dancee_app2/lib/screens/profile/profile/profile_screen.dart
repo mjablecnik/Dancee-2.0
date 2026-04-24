@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -86,9 +85,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (confirmed != true || !mounted) return;
 
-    final user = FirebaseAuth.instance.currentUser;
-    final isEmailProvider =
-        user?.providerData.any((p) => p.providerId == 'password') ?? false;
+    final authCubit = context.read<AuthCubit>();
+    final isEmailProvider = authCubit.isEmailProvider;
+    final currentEmail = authCubit.currentEmail ?? '';
 
     String? email;
     String? password;
@@ -96,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (isEmailProvider) {
       final credentials = await showDialog<(String, String)?>(
         context: context,
-        builder: (ctx) => _ReauthDialog(email: user?.email ?? ''),
+        builder: (ctx) => _ReauthDialog(email: currentEmail),
       );
       if (credentials == null || !mounted) return;
       email = credentials.$1;

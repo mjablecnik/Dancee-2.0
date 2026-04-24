@@ -16,6 +16,11 @@ class AuthRepository {
 
   User? get currentUser => _auth.currentUser;
 
+  /// Returns true if the current user's primary sign-in provider is email/password.
+  bool get isEmailProvider =>
+      _auth.currentUser?.providerData.any((p) => p.providerId == 'password') ??
+      false;
+
   Future<String?> getIdToken({bool forceRefresh = false}) async {
     return _auth.currentUser?.getIdToken(forceRefresh);
   }
