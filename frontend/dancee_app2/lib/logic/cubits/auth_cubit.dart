@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -9,7 +10,7 @@ import '../../data/repositories/favorites_repository.dart';
 import '../states/auth_state.dart';
 
 // ignore: constant_identifier_names
-enum AuthOperation { passwordReset, emailVerification }
+enum AuthOperation { passwordReset, emailVerification, userReloaded }
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
@@ -36,10 +37,20 @@ class AuthCubit extends Cubit<AuthState> {
   Stream<AuthOperation> get operationSuccess =>
       _operationSuccessController.stream;
 
+  /// Loading indicator for non-auth-changing operations
+  /// (`sendPasswordReset`, `sendEmailVerification`, `reloadUser`).
+  ///
+  /// These operations do not emit [AuthState.loading()] because they do not
+  /// change the global auth state and should not cause router re-evaluations
+  /// or UI flicker in unrelated screens. Use [operationInProgress] instead to
+  /// show a local loading indicator inside the affected screen.
+  final operationInProgress = ValueNotifier<bool>(false);
+
   @override
   Future<void> close() {
     _authStateSubscription.cancel();
     _operationSuccessController.close();
+    operationInProgress.dispose();
     return super.close();
   }
 
@@ -133,37 +144,43 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> sendEmailVerification() async {
-    final previousState = state;
-    emit(const AuthState.loading());
+    operationInProgress.value = true;
     try {
       await _authRepository.sendEmailVerification();
-      emit(previousState);
       _operationSuccessController.add(AuthOperation.emailVerification);
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
+    } finally {
+      operationInProgress.value = false;
     }
   }
 
   Future<void> reloadUser() async {
-    emit(const AuthState.loading());
+    operationInProgress.value = true;
     try {
       await _authRepository.reloadAndCheckVerified();
-      // Emit the updated user state (email verification status may have changed)
+      // Emit the updated user state (email verification status may have changed).
+      // This is always called — but if emailVerified status is unchanged, the
+      // AuthState is the same object and BlocConsumer.listenWhen won't fire.
+      // Emit userReloaded via operationSuccess so the screen can react regardless.
       _onAuthStateChanged(_authRepository.currentUser);
+      _operationSuccessController.add(AuthOperation.userReloaded);
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
+    } finally {
+      operationInProgress.value = false;
     }
   }
 
   Future<void> sendPasswordReset(String email) async {
-    final previousState = state;
-    emit(const AuthState.loading());
+    operationInProgress.value = true;
     try {
       await _authRepository.sendPasswordReset(email);
-      emit(previousState);
       _operationSuccessController.add(AuthOperation.passwordReset);
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
+    } finally {
+      operationInProgress.value = false;
     }
   }
 

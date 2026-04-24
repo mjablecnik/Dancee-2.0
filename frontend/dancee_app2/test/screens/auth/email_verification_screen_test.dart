@@ -257,8 +257,9 @@ void _resendButtonTests() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    // Force loading state
-    cubit.emit(const AuthState.loading());
+    // Simulate an operation in progress via operationInProgress (task 11:
+    // non-auth-changing operations no longer emit AuthState.loading()).
+    cubit.operationInProgress.value = true;
     await tester.pump();
 
     // OutlinedButton with null onPressed is disabled
@@ -267,6 +268,8 @@ void _resendButtonTests() {
     );
     expect(resendButton.onPressed, isNull,
         reason: 'Resend button must be disabled when loading');
+
+    cubit.operationInProgress.value = false;
   });
 
   testWidgets('resend can be tapped multiple times', (tester) async {
@@ -357,7 +360,9 @@ void _checkButtonTests() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    cubit.emit(const AuthState.loading());
+    // Simulate an operation in progress via operationInProgress (task 11:
+    // non-auth-changing operations no longer emit AuthState.loading()).
+    cubit.operationInProgress.value = true;
     await tester.pump();
 
     // When isLoading=true, GradientButton shows CircularProgressIndicator
@@ -367,11 +372,10 @@ void _checkButtonTests() {
     // The label text is hidden while loading
     expect(find.text("I've verified my email"), findsNothing);
 
-    // Verify cubit state is loading
-    expect(
-      cubit.state.maybeMap(loading: (_) => true, orElse: () => false),
-      isTrue,
-    );
+    // Verify operationInProgress is true
+    expect(cubit.operationInProgress.value, isTrue);
+
+    cubit.operationInProgress.value = false;
   });
 }
 

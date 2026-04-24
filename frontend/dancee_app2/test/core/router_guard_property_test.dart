@@ -304,8 +304,11 @@ void _propertyRouterGuardCorrectness() {
     );
 
     test(
-      'P8n: authenticated+unverified + /onboarding → redirect to /verify-email',
-      () => expect(_guard('/onboarding'), equals('/verify-email')),
+      // Task 9 fix: /onboarding is allowed for authenticated+unverified users.
+      // Social sign-in users (Google/Apple) skip email verification and go
+      // straight to onboarding, so the guard must let them through.
+      'P8n: authenticated+unverified + /onboarding → allowed (no redirect)',
+      () => expect(_guard('/onboarding'), isNull),
     );
   });
 

@@ -286,6 +286,7 @@
     },
     "danger": {
       "logout": "Odhlásit se",
+      "logoutConfirmBody": "Opravdu se chcete odhlásit?",
       "deleteAccount": "Smazat účet"
     },
     "changePassword": {

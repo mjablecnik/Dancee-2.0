@@ -286,6 +286,7 @@
     },
     "danger": {
       "logout": "Cerrar sesión",
+      "logoutConfirmBody": "¿Seguro que quieres cerrar sesión?",
       "deleteAccount": "Eliminar cuenta"
     },
     "changePassword": {

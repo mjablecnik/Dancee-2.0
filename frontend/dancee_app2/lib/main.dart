@@ -103,6 +103,11 @@ class _FirebaseErrorApp extends StatelessWidget {
               children: [
                 const Icon(Icons.error_outline, size: 48, color: Colors.red),
                 const SizedBox(height: 16),
+                // Hard-coded English string is intentional: this widget is
+                // shown when Firebase.initializeApp() throws, which means the
+                // app never reached TranslationProvider setup. Slang's `t`
+                // accessor is unavailable at this point, so a raw string is
+                // the only viable option (Requirement 15.2 accepted exception).
                 const Text(
                   'Firebase initialization failed',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

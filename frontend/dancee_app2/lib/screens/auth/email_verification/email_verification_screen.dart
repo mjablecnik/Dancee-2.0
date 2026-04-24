@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +24,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   late Animation<double> _floatAnim;
 
   bool _notVerifiedYet = false;
+  StreamSubscription<AuthOperation>? _operationSuccessSub;
+
+  AuthCubit get _authCubit => context.read<AuthCubit>();
 
   @override
   void initState() {
@@ -36,7 +41,29 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _operationSuccessSub?.cancel();
+    // Listen for userReloaded events. When reloadUser() completes and the email
+    // is still unverified, the AuthState may not change (same emailVerified=false
+    // state as before), so BlocConsumer.listenWhen won't fire. Use the
+    // operationSuccess stream instead to detect reload completion.
+    _operationSuccessSub = _authCubit.operationSuccess
+        .where((op) => op == AuthOperation.userReloaded)
+        .listen((_) {
+      final isVerified = _authCubit.state.maybeMap(
+        authenticated: (s) => s.emailVerified,
+        orElse: () => true, // non-authenticated: don't show the message
+      );
+      if (!isVerified && mounted) {
+        setState(() => _notVerifiedYet = true);
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _operationSuccessSub?.cancel();
     _animController.dispose();
     super.dispose();
   }
@@ -62,54 +89,61 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
         );
       },
       builder: (context, state) {
-        final isLoading = state.maybeMap(loading: (_) => true, orElse: () => false);
         final email = state.maybeMap(
           authenticated: (s) => s.email ?? '',
           orElse: () => '',
         );
 
-        return Scaffold(
-          backgroundColor: appBg,
-          body: Stack(
-            children: [
-              BackgroundCircles(animation: _floatAnim),
-              SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xxl,
-                    vertical: AppSpacing.xxxl,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: AppSpacing.xxxl),
-                      const VerificationHeader(),
-                      const SizedBox(height: AppSpacing.xl),
-                      VerificationEmailCard(email: email),
-                      if (_notVerifiedYet) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        const NotVerifiedMessage(),
-                      ],
-                      if (state.maybeMap(error: (_) => true, orElse: () => false)) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        VerificationErrorMessage(state: state),
-                      ],
-                      const SizedBox(height: AppSpacing.xxl),
-                      GradientButton(
-                        label: t.auth.emailVerification.checkVerified,
-                        onTap: () => context.read<AuthCubit>().reloadUser(),
-                        isLoading: isLoading,
+        // Use operationInProgress notifier so that sendEmailVerification and
+        // reloadUser do not emit AuthState.loading() into the global auth state.
+        return ListenableBuilder(
+          listenable: _authCubit.operationInProgress,
+          builder: (context, _) {
+            final isLoading = _authCubit.operationInProgress.value;
+            return Scaffold(
+              backgroundColor: appBg,
+              body: Stack(
+                children: [
+                  BackgroundCircles(animation: _floatAnim),
+                  SafeArea(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xxl,
+                        vertical: AppSpacing.xxxl,
                       ),
-                      const SizedBox(height: AppSpacing.lg),
-                      VerificationResendButton(isLoading: isLoading),
-                      const SizedBox(height: AppSpacing.xl),
-                      VerificationSignOutButton(isLoading: isLoading),
-                    ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: AppSpacing.xxxl),
+                          const VerificationHeader(),
+                          const SizedBox(height: AppSpacing.xl),
+                          VerificationEmailCard(email: email),
+                          if (_notVerifiedYet) ...[
+                            const SizedBox(height: AppSpacing.lg),
+                            const NotVerifiedMessage(),
+                          ],
+                          if (state.maybeMap(error: (_) => true, orElse: () => false)) ...[
+                            const SizedBox(height: AppSpacing.lg),
+                            VerificationErrorMessage(state: state),
+                          ],
+                          const SizedBox(height: AppSpacing.xxl),
+                          GradientButton(
+                            label: t.auth.emailVerification.checkVerified,
+                            onTap: () => _authCubit.reloadUser(),
+                            isLoading: isLoading,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          VerificationResendButton(isLoading: isLoading),
+                          const SizedBox(height: AppSpacing.xl),
+                          VerificationSignOutButton(isLoading: isLoading),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

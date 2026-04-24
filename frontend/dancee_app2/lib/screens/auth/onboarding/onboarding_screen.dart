@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/colors.dart';
+import '../../../core/service_locator.dart';
+import '../../../core/clients.dart';
 import '../../../core/theme.dart';
+import '../../../logic/cubits/auth_cubit.dart';
 import '../../../shared/components/background_circles.dart';
 import 'sections/onboarding_header_section.dart';
 import 'sections/onboarding_step1_section.dart';
@@ -52,13 +56,36 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Future<void> _savePreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    // Save selected dance styles as comma-separated indices
+    // Collect selected dance style indices
     final selectedIndices = <int>[];
     for (int i = 0; i < _selectedDances.length; i++) {
       if (_selectedDances[i]) selectedIndices.add(i);
     }
-    await prefs.setString('onboarding_dance_styles', selectedIndices.join(','));
+    final danceStylesValue = selectedIndices.join(',');
+
+    // Primary: persist to CMS so preferences survive across devices.
+    // Falls back gracefully to local storage if the CMS call fails (e.g. the
+    // user_preferences collection is not yet provisioned in Directus).
+    try {
+      final uid = context.read<AuthCubit>().currentUid;
+      if (uid != null) {
+        await sl<DirectusClient>().post(
+          '/items/user_preferences',
+          data: {
+            'user_id': uid,
+            'dance_style_indices': danceStylesValue,
+            'level': _selectedLevel,
+            'radius': _selectedRadius,
+          },
+        );
+      }
+    } catch (_) {
+      // CMS unavailable — SharedPreferences below acts as fallback.
+    }
+
+    // Always write to SharedPreferences for fast local reads.
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('onboarding_dance_styles', danceStylesValue);
     await prefs.setInt('onboarding_level', _selectedLevel);
     await prefs.setInt('onboarding_radius', _selectedRadius);
     await prefs.setBool('onboarding_completed', true);

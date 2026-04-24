@@ -332,28 +332,92 @@ void _propertyLoadingStateFirst() {
     );
   });
 
-  test('P3c: sendEmailVerification emits loading first (success path)',
+  // P3c-P3g: sendEmailVerification, reloadUser, and sendPasswordReset are
+  // non-auth-changing operations that must NOT emit AuthState.loading() into
+  // the global auth state (task 11 fix). Instead they use operationInProgress.
+
+  test('P3c: sendEmailVerification sets operationInProgress during operation',
       () async {
-    await _assertLoadingFirst(() => cubit.sendEmailVerification());
+    bool wasTrue = false;
+    bool wasFalse = false;
+    void listener() {
+      if (cubit.operationInProgress.value) wasTrue = true;
+      if (!cubit.operationInProgress.value && wasTrue) wasFalse = true;
+    }
+    cubit.operationInProgress.addListener(listener);
+    await cubit.sendEmailVerification();
+    cubit.operationInProgress.removeListener(listener);
+    expect(wasTrue, isTrue, reason: 'operationInProgress must be set to true');
+    expect(wasFalse, isTrue, reason: 'operationInProgress must be reset to false');
   });
 
-  test('P3d: sendEmailVerification emits loading first (failure path)',
+  test('P3d: sendEmailVerification (failure) sets operationInProgress and emits error',
       () async {
     repo.throwOnSendEmailVerification = true;
-    await _assertLoadingFirst(() => cubit.sendEmailVerification());
+    bool wasTrue = false;
+    void listener() {
+      if (cubit.operationInProgress.value) wasTrue = true;
+    }
+    cubit.operationInProgress.addListener(listener);
+    await cubit.sendEmailVerification();
+    cubit.operationInProgress.removeListener(listener);
+    expect(wasTrue, isTrue, reason: 'operationInProgress must be set to true');
+    expect(cubit.operationInProgress.value, isFalse,
+        reason: 'operationInProgress must be reset to false after completion');
+    // Error should be in auth state
+    expect(cubit.state, isA<AuthState>());
+    cubit.state.maybeMap(
+      error: (_) {}, // expected
+      orElse: () => fail('Expected error state, got ${cubit.state}'),
+    );
   });
 
-  test('P3e: reloadUser emits loading first (success path)', () async {
-    await _assertLoadingFirst(() => cubit.reloadUser());
+  test('P3e: reloadUser sets operationInProgress during operation', () async {
+    bool wasTrue = false;
+    bool wasFalse = false;
+    void listener() {
+      if (cubit.operationInProgress.value) wasTrue = true;
+      if (!cubit.operationInProgress.value && wasTrue) wasFalse = true;
+    }
+    cubit.operationInProgress.addListener(listener);
+    await cubit.reloadUser();
+    cubit.operationInProgress.removeListener(listener);
+    expect(wasTrue, isTrue, reason: 'operationInProgress must be set to true');
+    expect(wasFalse, isTrue, reason: 'operationInProgress must be reset to false');
   });
 
-  test('P3f: sendPasswordReset emits loading first (success path)', () async {
-    await _assertLoadingFirst(() => cubit.sendPasswordReset('a@b.com'));
+  test('P3f: sendPasswordReset sets operationInProgress during operation',
+      () async {
+    bool wasTrue = false;
+    bool wasFalse = false;
+    void listener() {
+      if (cubit.operationInProgress.value) wasTrue = true;
+      if (!cubit.operationInProgress.value && wasTrue) wasFalse = true;
+    }
+    cubit.operationInProgress.addListener(listener);
+    await cubit.sendPasswordReset('a@b.com');
+    cubit.operationInProgress.removeListener(listener);
+    expect(wasTrue, isTrue, reason: 'operationInProgress must be set to true');
+    expect(wasFalse, isTrue, reason: 'operationInProgress must be reset to false');
   });
 
-  test('P3g: sendPasswordReset emits loading first (failure path)', () async {
+  test('P3g: sendPasswordReset (failure) sets operationInProgress and emits error',
+      () async {
     repo.throwOnSendPasswordReset = true;
-    await _assertLoadingFirst(() => cubit.sendPasswordReset('a@b.com'));
+    bool wasTrue = false;
+    void listener() {
+      if (cubit.operationInProgress.value) wasTrue = true;
+    }
+    cubit.operationInProgress.addListener(listener);
+    await cubit.sendPasswordReset('a@b.com');
+    cubit.operationInProgress.removeListener(listener);
+    expect(wasTrue, isTrue, reason: 'operationInProgress must be set to true');
+    expect(cubit.operationInProgress.value, isFalse,
+        reason: 'operationInProgress must be reset to false after completion');
+    cubit.state.maybeMap(
+      error: (_) {}, // expected
+      orElse: () => fail('Expected error state, got ${cubit.state}'),
+    );
   });
 
   test('P3h: signOut emits loading first (success path)', () async {

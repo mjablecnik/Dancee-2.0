@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 3
-/// Strings: 915 (305 per locale)
+/// Strings: 918 (306 per locale)
 ///
-/// Built on 2026-04-23 at 21:33 UTC
+/// Built on 2026-04-24 at 01:14 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -729,6 +729,7 @@ class _StringsProfileDangerEn {
 
 	// Translations
 	String get logout => 'Log out';
+	String get logoutConfirmBody => 'Are you sure you want to log out?';
 	String get deleteAccount => 'Delete account';
 }
 
@@ -1490,6 +1491,7 @@ class _StringsProfileDangerCs implements _StringsProfileDangerEn {
 
 	// Translations
 	@override String get logout => 'Odhlásit se';
+	@override String get logoutConfirmBody => 'Opravdu se chcete odhlásit?';
 	@override String get deleteAccount => 'Smazat účet';
 }
 
@@ -2251,6 +2253,7 @@ class _StringsProfileDangerEs implements _StringsProfileDangerEn {
 
 	// Translations
 	@override String get logout => 'Cerrar sesión';
+	@override String get logoutConfirmBody => '¿Seguro que quieres cerrar sesión?';
 	@override String get deleteAccount => 'Eliminar cuenta';
 }
 
@@ -2637,6 +2640,7 @@ extension on Translations {
 			case 'profile.appInfo.termsOfUse': return 'Terms of use';
 			case 'profile.appInfo.privacy': return 'Privacy';
 			case 'profile.danger.logout': return 'Log out';
+			case 'profile.danger.logoutConfirmBody': return 'Are you sure you want to log out?';
 			case 'profile.danger.deleteAccount': return 'Delete account';
 			case 'profile.changePassword.title': return 'Change password';
 			case 'profile.changePassword.secureAccount': return 'Secure your account';
@@ -2950,6 +2954,7 @@ extension on _StringsCs {
 			case 'profile.appInfo.termsOfUse': return 'Podmínky použití';
 			case 'profile.appInfo.privacy': return 'Ochrana soukromí';
 			case 'profile.danger.logout': return 'Odhlásit se';
+			case 'profile.danger.logoutConfirmBody': return 'Opravdu se chcete odhlásit?';
 			case 'profile.danger.deleteAccount': return 'Smazat účet';
 			case 'profile.changePassword.title': return 'Změnit heslo';
 			case 'profile.changePassword.secureAccount': return 'Zabezpečte svůj účet';
@@ -3263,6 +3268,7 @@ extension on _StringsEs {
 			case 'profile.appInfo.termsOfUse': return 'Términos de uso';
 			case 'profile.appInfo.privacy': return 'Privacidad';
 			case 'profile.danger.logout': return 'Cerrar sesión';
+			case 'profile.danger.logoutConfirmBody': return '¿Seguro que quieres cerrar sesión?';
 			case 'profile.danger.deleteAccount': return 'Eliminar cuenta';
 			case 'profile.changePassword.title': return 'Cambiar contraseña';
 			case 'profile.changePassword.secureAccount': return 'Asegura tu cuenta';

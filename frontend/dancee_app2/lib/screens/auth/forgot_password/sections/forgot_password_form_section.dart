@@ -76,19 +76,21 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthCubit, AuthState>(
+    // Listen to auth errors — sendPasswordReset emits AuthState.error on failure.
+    return BlocListener<AuthCubit, AuthState>(
       listenWhen: (prev, curr) => curr.maybeMap(error: (_) => true, orElse: () => false),
       listener: (context, state) {
         state.mapOrNull(
           error: (s) => setState(() => _authError = resolveAuthError(s.message)),
         );
       },
-      buildWhen: (prev, curr) =>
-          curr.maybeMap(loading: (_) => true, orElse: () => false) ||
-          prev.maybeMap(loading: (_) => true, orElse: () => false),
-      builder: (context, state) {
-        final isLoading = state.maybeMap(loading: (_) => true, orElse: () => false);
-        return Column(
+      // Use operationInProgress notifier for loading so that sendPasswordReset
+      // does not emit AuthState.loading() into the global auth state.
+      child: ListenableBuilder(
+        listenable: context.read<AuthCubit>().operationInProgress,
+        builder: (context, _) {
+          final isLoading = context.read<AuthCubit>().operationInProgress.value;
+          return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppInputField(
@@ -233,7 +235,8 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
             const SizedBox(height: AppSpacing.xxxl),
           ],
         );
-      },
+        },
+      ),
     );
   }
 }

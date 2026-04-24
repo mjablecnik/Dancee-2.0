@@ -31,7 +31,11 @@ String? routerGuard(BuildContext context, GoRouterState state) {
     loading: (_) => null,
     authenticated: (s) {
       if (!s.emailVerified) {
-        if (location == '/verify-email') return null;
+        // Allow /verify-email and /onboarding for unverified users.
+        // Social sign-in users (Google/Apple) skip email verification and go
+        // straight to onboarding, so /onboarding must be accessible even when
+        // emailVerified is false.
+        if (location == '/verify-email' || location == '/onboarding') return null;
         // Redirect all other routes to email verification
         return '/verify-email';
       }

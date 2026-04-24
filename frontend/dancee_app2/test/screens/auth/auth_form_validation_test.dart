@@ -592,15 +592,23 @@ void _cubitInteraction() {
       );
     });
 
-    test('sendPasswordReset emits loading first', () async {
-      final states = <AuthState>[];
-      final sub = cubit.stream.listen(states.add);
-
+    // Task 11 fix: sendPasswordReset no longer emits AuthState.loading().
+    // It uses operationInProgress instead to avoid global auth state changes.
+    test('sendPasswordReset sets operationInProgress during operation', () async {
+      bool wasTrue = false;
+      bool wasFalse = false;
+      void listener() {
+        if (cubit.operationInProgress.value) wasTrue = true;
+        if (!cubit.operationInProgress.value && wasTrue) wasFalse = true;
+      }
+      cubit.operationInProgress.addListener(listener);
       await cubit.sendPasswordReset('a@b.com');
-      await sub.cancel();
+      cubit.operationInProgress.removeListener(listener);
 
-      expect(states, isNotEmpty);
-      expect(states.first, const AuthState.loading());
+      expect(wasTrue, isTrue,
+          reason: 'operationInProgress must be true during sendPasswordReset');
+      expect(wasFalse, isTrue,
+          reason: 'operationInProgress must reset to false after completion');
     });
   });
 }

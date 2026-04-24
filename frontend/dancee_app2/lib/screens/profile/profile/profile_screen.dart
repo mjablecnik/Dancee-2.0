@@ -33,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: const TextStyle(color: appText),
         ),
         content: Text(
-          t.auth.deleteAccount.confirmBody,
+          t.profile.danger.logoutConfirmBody,
           style: const TextStyle(color: appMuted),
         ),
         actions: [
