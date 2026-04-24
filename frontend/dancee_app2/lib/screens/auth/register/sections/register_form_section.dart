@@ -13,6 +13,7 @@ import '../../../../shared/elements/forms/app_checkbox.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
 import '../../../../shared/elements/forms/app_password_field.dart';
 import '../../../../shared/elements/buttons/social_button.dart';
+import '../../../../shared/utils/auth_translations.dart';
 import '../../../../shared/utils/form_validators.dart';
 import '../components/password_strength_indicator.dart';
 
@@ -91,25 +92,31 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
   }
 
   void _validateFirstName() {
-    setState(() => _firstNameError = FormValidators.notEmpty(_firstNameController.text));
+    setState(() => _firstNameError =
+        resolveValidationKey(FormValidators.notEmpty(_firstNameController.text)));
   }
 
   void _validateLastName() {
-    setState(() => _lastNameError = FormValidators.notEmpty(_lastNameController.text));
+    setState(() => _lastNameError =
+        resolveValidationKey(FormValidators.notEmpty(_lastNameController.text)));
   }
 
   void _validateEmail() {
-    setState(() => _emailError = FormValidators.email(_emailController.text));
+    setState(() => _emailError =
+        resolveValidationKey(FormValidators.email(_emailController.text)));
   }
 
   void _validatePassword() {
-    setState(() => _passwordError = FormValidators.password(_passwordController.text));
+    setState(() => _passwordError =
+        resolveValidationKey(FormValidators.password(_passwordController.text)));
   }
 
   void _validateConfirmPassword() {
-    setState(() => _confirmPasswordError = FormValidators.confirmPassword(
-      _confirmPasswordController.text,
-      _passwordController.text,
+    setState(() => _confirmPasswordError = resolveValidationKey(
+      FormValidators.confirmPassword(
+        _confirmPasswordController.text,
+        _passwordController.text,
+      ),
     ));
   }
 
@@ -156,7 +163,7 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
       ),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = s.message),
+          error: (s) => setState(() => _authError = resolveAuthErrorKey(s.message)),
           authenticated: (_) => setState(() => _authError = null),
         );
       },

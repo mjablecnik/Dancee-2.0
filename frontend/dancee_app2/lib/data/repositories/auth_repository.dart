@@ -2,8 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-import '../../i18n/strings.g.dart';
-
 class AuthRepository {
   AuthRepository({
     required FirebaseAuth firebaseAuth,
@@ -181,22 +179,29 @@ class AuthRepository {
     }
   }
 
+  /// Maps a [FirebaseAuthException] to a translation key.
+  ///
+  /// Returns a dot-separated key string (e.g. `'auth.errors.invalidCredential'`)
+  /// that the UI layer resolves via [resolveAuthErrorKey] from
+  /// `shared/utils/auth_translations.dart`. Keeping key resolution out of the
+  /// repository decouples the data layer from the current locale (design
+  /// Property 1 — Req 2.10, 14.1–14.7).
   String mapFirebaseError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-credential':
-        return t.auth.errors.invalidCredential;
+        return 'auth.errors.invalidCredential';
       case 'user-disabled':
-        return t.auth.errors.userDisabled;
+        return 'auth.errors.userDisabled';
       case 'email-already-in-use':
-        return t.auth.errors.emailAlreadyInUse;
+        return 'auth.errors.emailAlreadyInUse';
       case 'weak-password':
-        return t.auth.errors.weakPassword;
+        return 'auth.errors.weakPassword';
       case 'too-many-requests':
-        return t.auth.errors.tooManyRequests;
+        return 'auth.errors.tooManyRequests';
       case 'network-request-failed':
-        return t.auth.errors.networkError;
+        return 'auth.errors.networkError';
       default:
-        return t.auth.errors.generic;
+        return 'auth.errors.generic';
     }
   }
 }

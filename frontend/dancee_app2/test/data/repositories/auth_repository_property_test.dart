@@ -8,23 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
-import 'package:dancee_app2/i18n/strings.g.dart';
 
 class _FakeFirebaseAuth extends Fake implements FirebaseAuth {}
 
 class _FakeGoogleSignIn extends Fake implements GoogleSignIn {}
 
 // ---------------------------------------------------------------------------
-// Property 1: Error code mapping always returns a non-empty string
+// Property 1: Error code mapping always returns a non-empty translation key
 // ---------------------------------------------------------------------------
 
 void _propertyErrorCodeMapping() {
   // Requirements: 2.10, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7
   late AuthRepository repository;
-
-  setUpAll(() {
-    LocaleSettings.setLocale(AppLocale.en);
-  });
 
   setUp(() {
     repository = AuthRepository(
@@ -36,14 +31,14 @@ void _propertyErrorCodeMapping() {
   FirebaseAuthException _makeException(String code) =>
       FirebaseAuthException(code: code);
 
-  test('P1a: known error codes map to their distinct, non-empty translated strings', () {
+  test('P1a: known error codes map to their distinct, non-empty translation keys', () {
     final knownMappings = {
-      'invalid-credential': 'Invalid email or password',
-      'user-disabled': 'This account has been disabled',
-      'email-already-in-use': 'An account with this email already exists',
-      'weak-password': 'Password is too weak',
-      'too-many-requests': 'Too many attempts. Please try again later',
-      'network-request-failed': 'Network error. Please check your connection',
+      'invalid-credential': 'auth.errors.invalidCredential',
+      'user-disabled': 'auth.errors.userDisabled',
+      'email-already-in-use': 'auth.errors.emailAlreadyInUse',
+      'weak-password': 'auth.errors.weakPassword',
+      'too-many-requests': 'auth.errors.tooManyRequests',
+      'network-request-failed': 'auth.errors.networkError',
     };
 
     for (final entry in knownMappings.entries) {
@@ -51,12 +46,12 @@ void _propertyErrorCodeMapping() {
       expect(
         result,
         equals(entry.value),
-        reason: 'Code "${entry.key}" should map to "${entry.value}"',
+        reason: 'Code "${entry.key}" should map to key "${entry.value}"',
       );
     }
   });
 
-  test('P1b: known codes produce distinct translated strings', () {
+  test('P1b: known codes produce distinct translation keys', () {
     final knownCodes = [
       'invalid-credential',
       'user-disabled',
@@ -70,12 +65,12 @@ void _propertyErrorCodeMapping() {
       return repository.mapFirebaseError(_makeException(code));
     }).toList();
 
-    // All results should be unique (distinct strings)
+    // All results should be unique (distinct keys)
     expect(results.toSet().length, equals(results.length),
-        reason: 'Each known error code should map to a distinct translated string');
+        reason: 'Each known error code should map to a distinct translation key');
   });
 
-  test('P1c: unknown error codes fall back to the generic translated string', () {
+  test('P1c: unknown error codes fall back to the generic translation key', () {
     const unknownCodes = [
       'some-unknown-code',
       'random-error',
@@ -85,18 +80,18 @@ void _propertyErrorCodeMapping() {
       'user_disabled',
     ];
 
-    const expectedGeneric = 'An error occurred. Please try again';
+    const expectedGenericKey = 'auth.errors.generic';
     for (final code in unknownCodes) {
       final result = repository.mapFirebaseError(_makeException(code));
       expect(
         result,
-        equals(expectedGeneric),
-        reason: 'Unknown code "$code" should fall back to the generic error string',
+        equals(expectedGenericKey),
+        reason: 'Unknown code "$code" should fall back to the generic error key',
       );
     }
   });
 
-  test('P1d: every error code (known or unknown) returns a non-null, non-empty string', () {
+  test('P1d: every error code (known or unknown) returns a non-null, non-empty key', () {
     final allCodes = [
       'invalid-credential',
       'user-disabled',
@@ -118,7 +113,7 @@ void _propertyErrorCodeMapping() {
     }
   });
 
-  test('P1e: all returned strings are non-empty (translated directly, no longer key prefixed)', () {
+  test('P1e: all returned keys are dot-separated auth.errors.* paths', () {
     final allCodes = [
       'invalid-credential',
       'user-disabled',
@@ -134,8 +129,8 @@ void _propertyErrorCodeMapping() {
       final result = repository.mapFirebaseError(_makeException(code));
       expect(
         result,
-        isNotEmpty,
-        reason: 'Translated string for "$code" should not be empty',
+        startsWith('auth.errors.'),
+        reason: 'Key for "$code" should be a dot-separated auth.errors.* path',
       );
     }
   });

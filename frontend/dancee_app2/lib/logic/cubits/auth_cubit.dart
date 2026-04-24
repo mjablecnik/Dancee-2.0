@@ -8,7 +8,6 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/favorites_repository.dart';
-import '../../i18n/strings.g.dart';
 import '../states/auth_state.dart';
 
 // ignore: constant_identifier_names
@@ -89,12 +88,18 @@ class AuthCubit extends Cubit<AuthState> {
 
   bool get isEmailProvider => _authRepository.isEmailProvider;
 
-  /// Returns a user-friendly error message from [e].
-  /// If [e] is already a [String] (i.e. a translated message from [AuthRepository]),
-  /// it is used as-is. Otherwise the generic error message is used to avoid
-  /// exposing raw exception class names to the user (Task 6 — Req 3.7, 14.7).
+  /// Returns a translation key from [e].
+  ///
+  /// If [e] is a [String] it is assumed to be a translation key already
+  /// emitted by [AuthRepository.mapFirebaseError] and is returned as-is.
+  /// Otherwise the generic error key is used to avoid exposing raw exception
+  /// class names to the user (Req 3.7, 14.7).
+  ///
+  /// The key is stored in [AuthState.error.message] and resolved to a
+  /// translated string in the UI via [resolveAuthErrorKey] from
+  /// `shared/utils/auth_translations.dart`.
   String _errorMessage(Object e) =>
-      e is String ? e : t.auth.errors.generic;
+      e is String ? e : 'auth.errors.generic';
 
   Future<void> signInWithEmail(String email, String password) async {
     emit(const AuthState.loading());
@@ -132,7 +137,7 @@ class AuthCubit extends Cubit<AuthState> {
       if (e.code == AuthorizationErrorCode.canceled) {
         emit(previousState);
       } else {
-        emit(AuthState.error(message: e.message ?? t.auth.errors.generic));
+        emit(const AuthState.error(message: 'auth.errors.generic'));
       }
     } catch (e) {
       emit(AuthState.error(message: _errorMessage(e)));
