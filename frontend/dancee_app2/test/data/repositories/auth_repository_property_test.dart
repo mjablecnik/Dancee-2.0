@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
+import 'package:dancee_app2/i18n/strings.g.dart';
 
 class _FakeFirebaseAuth extends Fake implements FirebaseAuth {}
 
@@ -21,6 +22,10 @@ void _propertyErrorCodeMapping() {
   // Requirements: 2.10, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7
   late AuthRepository repository;
 
+  setUpAll(() {
+    LocaleSettings.setLocale(AppLocale.en);
+  });
+
   setUp(() {
     repository = AuthRepository(
       firebaseAuth: _FakeFirebaseAuth(),
@@ -31,14 +36,14 @@ void _propertyErrorCodeMapping() {
   FirebaseAuthException _makeException(String code) =>
       FirebaseAuthException(code: code);
 
-  test('P1a: known error codes map to their distinct, non-empty translation keys', () {
+  test('P1a: known error codes map to their distinct, non-empty translated strings', () {
     final knownMappings = {
-      'invalid-credential': 'auth.errors.invalidCredential',
-      'user-disabled': 'auth.errors.userDisabled',
-      'email-already-in-use': 'auth.errors.emailAlreadyInUse',
-      'weak-password': 'auth.errors.weakPassword',
-      'too-many-requests': 'auth.errors.tooManyRequests',
-      'network-request-failed': 'auth.errors.networkError',
+      'invalid-credential': 'Invalid email or password',
+      'user-disabled': 'This account has been disabled',
+      'email-already-in-use': 'An account with this email already exists',
+      'weak-password': 'Password is too weak',
+      'too-many-requests': 'Too many attempts. Please try again later',
+      'network-request-failed': 'Network error. Please check your connection',
     };
 
     for (final entry in knownMappings.entries) {
@@ -51,7 +56,7 @@ void _propertyErrorCodeMapping() {
     }
   });
 
-  test('P1b: known codes produce distinct translation keys', () {
+  test('P1b: known codes produce distinct translated strings', () {
     final knownCodes = [
       'invalid-credential',
       'user-disabled',
@@ -65,12 +70,12 @@ void _propertyErrorCodeMapping() {
       return repository.mapFirebaseError(_makeException(code));
     }).toList();
 
-    // All results should be unique (distinct keys)
+    // All results should be unique (distinct strings)
     expect(results.toSet().length, equals(results.length),
-        reason: 'Each known error code should map to a distinct translation key');
+        reason: 'Each known error code should map to a distinct translated string');
   });
 
-  test('P1c: unknown error codes fall back to the generic translation key', () {
+  test('P1c: unknown error codes fall back to the generic translated string', () {
     const unknownCodes = [
       'some-unknown-code',
       'random-error',
@@ -80,12 +85,13 @@ void _propertyErrorCodeMapping() {
       'user_disabled',
     ];
 
+    const expectedGeneric = 'An error occurred. Please try again';
     for (final code in unknownCodes) {
       final result = repository.mapFirebaseError(_makeException(code));
       expect(
         result,
-        equals('auth.errors.generic'),
-        reason: 'Unknown code "$code" should fall back to "auth.errors.generic"',
+        equals(expectedGeneric),
+        reason: 'Unknown code "$code" should fall back to the generic error string',
       );
     }
   });
@@ -112,7 +118,7 @@ void _propertyErrorCodeMapping() {
     }
   });
 
-  test('P1e: all returned translation keys start with "auth.errors."', () {
+  test('P1e: all returned strings are non-empty (translated directly, no longer key prefixed)', () {
     final allCodes = [
       'invalid-credential',
       'user-disabled',
@@ -128,8 +134,8 @@ void _propertyErrorCodeMapping() {
       final result = repository.mapFirebaseError(_makeException(code));
       expect(
         result,
-        startsWith('auth.errors.'),
-        reason: 'Translation key for "$code" should start with "auth.errors."',
+        isNotEmpty,
+        reason: 'Translated string for "$code" should not be empty',
       );
     }
   });

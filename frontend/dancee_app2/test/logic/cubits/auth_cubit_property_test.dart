@@ -508,13 +508,23 @@ void _propertyFailedOperationsEmitError() {
     _assertErrorStateNonEmpty();
   });
 
-  test('P4e: sendPasswordReset failure → error state with non-empty message',
+  test('P4e: sendPasswordReset failure → always emits passwordReset success (email enumeration protection)',
       () async {
     repo
       ..throwOnSendPasswordReset = true
       ..errorMessage = 'auth.errors.tooManyRequests';
+    final successEvents = <AuthOperation>[];
+    final sub = cubit.operationSuccess.listen(successEvents.add);
     await cubit.sendPasswordReset('a@b.com');
-    _assertErrorStateNonEmpty();
+    await sub.cancel();
+    // Errors are suppressed — the success signal is always emitted (Req 9.3)
+    expect(successEvents, contains(AuthOperation.passwordReset),
+        reason: 'passwordReset success must be signalled even when the repository throws');
+    // Auth state must NOT be an error state
+    cubit.state.maybeMap(
+      error: (_) => fail('sendPasswordReset must not emit error state (email enumeration protection)'),
+      orElse: () {},
+    );
   });
 
   test('P4f: signOut failure → error state with non-empty message', () async {

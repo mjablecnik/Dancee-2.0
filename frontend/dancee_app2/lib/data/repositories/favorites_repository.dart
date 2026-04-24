@@ -43,11 +43,12 @@ class FavoritesRepository {
   }
 
   /// Deletes all favorites belonging to [userId]. Used during account deletion.
+  /// Uses [Future.wait] to parallelize the individual delete calls.
   Future<void> deleteAllFavoritesForUser(String userId) async {
     final favorites = await getFavorites(userId);
-    for (final fav in favorites) {
-      await _client.delete('/items/favorites/${fav.id}');
-    }
+    await Future.wait(
+      favorites.map((fav) => _client.delete('/items/favorites/${fav.id}')),
+    );
   }
 
   /// Deletes a favorite by matching userId + itemType + itemId.

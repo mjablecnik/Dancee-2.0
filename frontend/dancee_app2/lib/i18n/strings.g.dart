@@ -495,6 +495,7 @@ class _StringsAuthEmailVerificationEn {
 	String get title => 'Verify your email';
 	String subtitle({required Object email}) => 'We sent a verification email to ${email}';
 	String get resend => 'Resend verification email';
+	String get resendConfirmed => 'Verification email sent. Please check your inbox.';
 	String get checkVerified => 'I\'ve verified my email';
 	String get notVerifiedYet => 'Email not verified yet. Please check your inbox.';
 	String get signOut => 'Sign out';
@@ -1257,6 +1258,7 @@ class _StringsAuthEmailVerificationCs implements _StringsAuthEmailVerificationEn
 	@override String get title => 'Ověřte svůj e-mail';
 	@override String subtitle({required Object email}) => 'Zaslali jsme ověřovací e-mail na adresu ${email}';
 	@override String get resend => 'Znovu odeslat ověřovací e-mail';
+	@override String get resendConfirmed => 'Ověřovací e-mail odeslán. Zkontrolujte prosím svou doručenou poštu.';
 	@override String get checkVerified => 'Ověřil jsem svůj e-mail';
 	@override String get notVerifiedYet => 'E-mail ještě nebyl ověřen. Zkontrolujte prosím svou doručenou poštu.';
 	@override String get signOut => 'Odhlásit se';
@@ -2019,6 +2021,7 @@ class _StringsAuthEmailVerificationEs implements _StringsAuthEmailVerificationEn
 	@override String get title => 'Verifica tu e-mail';
 	@override String subtitle({required Object email}) => 'Enviamos un e-mail de verificación a ${email}';
 	@override String get resend => 'Reenviar e-mail de verificación';
+	@override String get resendConfirmed => 'E-mail de verificación enviado. Por favor, revisa tu bandeja de entrada.';
 	@override String get checkVerified => 'He verificado mi e-mail';
 	@override String get notVerifiedYet => 'E-mail aún no verificado. Por favor, revisa tu bandeja de entrada.';
 	@override String get signOut => 'Cerrar sesión';
@@ -2513,6 +2516,7 @@ extension on Translations {
 			case 'auth.emailVerification.title': return 'Verify your email';
 			case 'auth.emailVerification.subtitle': return ({required Object email}) => 'We sent a verification email to ${email}';
 			case 'auth.emailVerification.resend': return 'Resend verification email';
+			case 'auth.emailVerification.resendConfirmed': return 'Verification email sent. Please check your inbox.';
 			case 'auth.emailVerification.checkVerified': return 'I\'ve verified my email';
 			case 'auth.emailVerification.notVerifiedYet': return 'Email not verified yet. Please check your inbox.';
 			case 'auth.emailVerification.signOut': return 'Sign out';
@@ -2827,6 +2831,7 @@ extension on _StringsCs {
 			case 'auth.emailVerification.title': return 'Ověřte svůj e-mail';
 			case 'auth.emailVerification.subtitle': return ({required Object email}) => 'Zaslali jsme ověřovací e-mail na adresu ${email}';
 			case 'auth.emailVerification.resend': return 'Znovu odeslat ověřovací e-mail';
+			case 'auth.emailVerification.resendConfirmed': return 'Ověřovací e-mail odeslán. Zkontrolujte prosím svou doručenou poštu.';
 			case 'auth.emailVerification.checkVerified': return 'Ověřil jsem svůj e-mail';
 			case 'auth.emailVerification.notVerifiedYet': return 'E-mail ještě nebyl ověřen. Zkontrolujte prosím svou doručenou poštu.';
 			case 'auth.emailVerification.signOut': return 'Odhlásit se';
@@ -3141,6 +3146,7 @@ extension on _StringsEs {
 			case 'auth.emailVerification.title': return 'Verifica tu e-mail';
 			case 'auth.emailVerification.subtitle': return ({required Object email}) => 'Enviamos un e-mail de verificación a ${email}';
 			case 'auth.emailVerification.resend': return 'Reenviar e-mail de verificación';
+			case 'auth.emailVerification.resendConfirmed': return 'E-mail de verificación enviado. Por favor, revisa tu bandeja de entrada.';
 			case 'auth.emailVerification.checkVerified': return 'He verificado mi e-mail';
 			case 'auth.emailVerification.notVerifiedYet': return 'E-mail aún no verificado. Por favor, revisa tu bandeja de entrada.';
 			case 'auth.emailVerification.signOut': return 'Cerrar sesión';

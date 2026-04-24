@@ -115,6 +115,7 @@
       "title": "Ověřte svůj e-mail",
       "subtitle": "Zaslali jsme ověřovací e-mail na adresu ${email}",
       "resend": "Znovu odeslat ověřovací e-mail",
+      "resendConfirmed": "Ověřovací e-mail odeslán. Zkontrolujte prosím svou doručenou poštu.",
       "checkVerified": "Ověřil jsem svůj e-mail",
       "notVerifiedYet": "E-mail ještě nebyl ověřen. Zkontrolujte prosím svou doručenou poštu.",
       "signOut": "Odhlásit se"

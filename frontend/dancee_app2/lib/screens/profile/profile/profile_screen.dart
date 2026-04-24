@@ -7,7 +7,6 @@ import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/auth_cubit.dart';
 import '../../../logic/states/auth_state.dart';
 import '../../../shared/components/back_button_header.dart';
-import '../../../shared/utils/auth_error_resolver.dart';
 import '../../../shared/elements/labels/section_label.dart';
 import 'sections/logout_section.dart';
 import 'sections/settings_section.dart';
@@ -118,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
+          error: (s) => setState(() => _authError = s.message),
           unauthenticated: (_) {
             if (context.mounted) context.go('/login');
           },

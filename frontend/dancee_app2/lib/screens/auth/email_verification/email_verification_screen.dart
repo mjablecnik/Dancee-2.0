@@ -24,6 +24,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   late Animation<double> _floatAnim;
 
   bool _notVerifiedYet = false;
+  bool _resendConfirmed = false;
   StreamSubscription<AuthOperation>? _operationSuccessSub;
 
   AuthCubit get _authCubit => context.read<AuthCubit>();
@@ -48,15 +49,25 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     // is still unverified, the AuthState may not change (same emailVerified=false
     // state as before), so BlocConsumer.listenWhen won't fire. Use the
     // operationSuccess stream instead to detect reload completion.
-    _operationSuccessSub = _authCubit.operationSuccess
-        .where((op) => op == AuthOperation.userReloaded)
-        .listen((_) {
-      final isVerified = _authCubit.state.maybeMap(
-        authenticated: (s) => s.emailVerified,
-        orElse: () => true, // non-authenticated: don't show the message
-      );
-      if (!isVerified && mounted) {
-        setState(() => _notVerifiedYet = true);
+    _operationSuccessSub = _authCubit.operationSuccess.listen((op) {
+      if (!mounted) return;
+      if (op == AuthOperation.userReloaded) {
+        final isVerified = _authCubit.state.maybeMap(
+          authenticated: (s) => s.emailVerified,
+          orElse: () => true, // non-authenticated: don't show the message
+        );
+        if (!isVerified) {
+          setState(() => _notVerifiedYet = true);
+        }
+      } else if (op == AuthOperation.emailVerification) {
+        // Show a SnackBar confirming the verification email was resent (Req 8.4).
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(t.auth.emailVerification.resendConfirmed),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        setState(() => _resendConfirmed = true);
       }
     });
   }

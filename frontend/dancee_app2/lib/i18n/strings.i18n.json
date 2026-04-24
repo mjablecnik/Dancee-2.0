@@ -115,6 +115,7 @@
       "title": "Verify your email",
       "subtitle": "We sent a verification email to ${email}",
       "resend": "Resend verification email",
+      "resendConfirmed": "Verification email sent. Please check your inbox.",
       "checkVerified": "I've verified my email",
       "notVerifiedYet": "Email not verified yet. Please check your inbox.",
       "signOut": "Sign out"

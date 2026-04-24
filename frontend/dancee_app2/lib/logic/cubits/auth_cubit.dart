@@ -8,6 +8,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/favorites_repository.dart';
+import '../../i18n/strings.g.dart';
 import '../states/auth_state.dart';
 
 // ignore: constant_identifier_names
@@ -88,13 +89,20 @@ class AuthCubit extends Cubit<AuthState> {
 
   bool get isEmailProvider => _authRepository.isEmailProvider;
 
+  /// Returns a user-friendly error message from [e].
+  /// If [e] is already a [String] (i.e. a translated message from [AuthRepository]),
+  /// it is used as-is. Otherwise the generic error message is used to avoid
+  /// exposing raw exception class names to the user (Task 6 — Req 3.7, 14.7).
+  String _errorMessage(Object e) =>
+      e is String ? e : t.auth.errors.generic;
+
   Future<void> signInWithEmail(String email, String password) async {
     emit(const AuthState.loading());
     try {
       await _authRepository.signInWithEmail(email, password);
       // authStateChanges stream will emit the authenticated state
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     }
   }
 
@@ -110,7 +118,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
       // authStateChanges stream will emit the authenticated state
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     }
   }
 
@@ -124,10 +132,10 @@ class AuthCubit extends Cubit<AuthState> {
       if (e.code == AuthorizationErrorCode.canceled) {
         emit(previousState);
       } else {
-        emit(AuthState.error(message: e.message));
+        emit(AuthState.error(message: e.message ?? t.auth.errors.generic));
       }
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     }
   }
 
@@ -147,7 +155,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
       // authStateChanges stream will emit the authenticated state
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     }
   }
 
@@ -157,7 +165,7 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.sendEmailVerification();
       _operationSuccessController.add(AuthOperation.emailVerification);
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     } finally {
       operationInProgress.value = false;
     }
@@ -174,20 +182,23 @@ class AuthCubit extends Cubit<AuthState> {
       _onAuthStateChanged(_authRepository.currentUser);
       _operationSuccessController.add(AuthOperation.userReloaded);
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     } finally {
       operationInProgress.value = false;
     }
   }
 
+  /// Sends a password reset email. Errors are suppressed and success is always
+  /// signalled to prevent email enumeration (Req 9.3).
   Future<void> sendPasswordReset(String email) async {
     operationInProgress.value = true;
     try {
       await _authRepository.sendPasswordReset(email);
-      _operationSuccessController.add(AuthOperation.passwordReset);
-    } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+    } catch (_) {
+      // Suppress all errors — we always show success to prevent revealing
+      // whether an email address is registered (email enumeration protection).
     } finally {
+      _operationSuccessController.add(AuthOperation.passwordReset);
       operationInProgress.value = false;
     }
   }
@@ -207,7 +218,7 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.signOut();
       // authStateChanges stream will emit unauthenticated
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     }
   }
 
@@ -223,7 +234,7 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.deleteAccount();
       // authStateChanges stream will emit unauthenticated
     } catch (e) {
-      emit(AuthState.error(message: e.toString()));
+      emit(AuthState.error(message: _errorMessage(e)));
     }
   }
 }

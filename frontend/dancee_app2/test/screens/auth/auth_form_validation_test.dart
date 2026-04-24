@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
 import 'package:dancee_app2/data/repositories/favorites_repository.dart';
+import 'package:dancee_app2/i18n/strings.g.dart';
 import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/states/auth_state.dart';
 import 'package:dancee_app2/shared/utils/form_validators.dart';
@@ -149,36 +150,36 @@ void _loginFormValidation() {
   group('Email field (uses FormValidators.email)', () {
     // Requirement 4.6: Email format validation
     test('empty string → emailRequired key', () {
-      expect(FormValidators.email(''), equals('validation.emailRequired'));
+      expect(FormValidators.email(''), equals(t.validation.emailRequired));
     });
 
     test('whitespace-only string → emailRequired key', () {
-      expect(FormValidators.email('   '), equals('validation.emailRequired'));
+      expect(FormValidators.email('   '), equals(t.validation.emailRequired));
     });
 
     test('null → emailRequired key', () {
-      expect(FormValidators.email(null), equals('validation.emailRequired'));
+      expect(FormValidators.email(null), equals(t.validation.emailRequired));
     });
 
     test('missing @ symbol → invalidEmail key', () {
-      expect(FormValidators.email('notanemail'), equals('validation.invalidEmail'));
-      expect(FormValidators.email('nodomain.com'), equals('validation.invalidEmail'));
+      expect(FormValidators.email('notanemail'), equals(t.validation.invalidEmail));
+      expect(FormValidators.email('nodomain.com'), equals(t.validation.invalidEmail));
     });
 
     test('missing TLD → invalidEmail key', () {
-      expect(FormValidators.email('user@nodomain'), equals('validation.invalidEmail'));
+      expect(FormValidators.email('user@nodomain'), equals(t.validation.invalidEmail));
     });
 
     test('@ at start → invalidEmail key', () {
-      expect(FormValidators.email('@domain.com'), equals('validation.invalidEmail'));
+      expect(FormValidators.email('@domain.com'), equals(t.validation.invalidEmail));
     });
 
     test('spaces in local part → invalidEmail key', () {
-      expect(FormValidators.email('first last@example.com'), equals('validation.invalidEmail'));
+      expect(FormValidators.email('first last@example.com'), equals(t.validation.invalidEmail));
     });
 
     test('spaces in domain → invalidEmail key', () {
-      expect(FormValidators.email('user@dom ain.com'), equals('validation.invalidEmail'));
+      expect(FormValidators.email('user@dom ain.com'), equals(t.validation.invalidEmail));
     });
 
     test('valid standard email → null', () {
@@ -205,15 +206,15 @@ void _loginFormValidation() {
   group('Password field (login uses notEmpty, not password)', () {
     // Requirement 4.7: Password not empty validation
     test('empty string → fieldRequired key', () {
-      expect(FormValidators.notEmpty(''), equals('validation.fieldRequired'));
+      expect(FormValidators.notEmpty(''), equals(t.validation.fieldRequired));
     });
 
     test('whitespace-only string → fieldRequired key', () {
-      expect(FormValidators.notEmpty('   '), equals('validation.fieldRequired'));
+      expect(FormValidators.notEmpty('   '), equals(t.validation.fieldRequired));
     });
 
     test('null → fieldRequired key', () {
-      expect(FormValidators.notEmpty(null), equals('validation.fieldRequired'));
+      expect(FormValidators.notEmpty(null), equals(t.validation.fieldRequired));
     });
 
     test('single character → null (login only checks not-empty)', () {
@@ -241,11 +242,11 @@ void _registerFormValidation() {
   group('First name / last name fields (uses notEmpty)', () {
     // Requirement 5.6: Name fields must not be empty
     test('empty first name → fieldRequired key', () {
-      expect(FormValidators.notEmpty(''), equals('validation.fieldRequired'));
+      expect(FormValidators.notEmpty(''), equals(t.validation.fieldRequired));
     });
 
     test('whitespace-only first name → fieldRequired key', () {
-      expect(FormValidators.notEmpty('\t\n'), equals('validation.fieldRequired'));
+      expect(FormValidators.notEmpty('\t\n'), equals(t.validation.fieldRequired));
     });
 
     test('non-empty first name → null', () {
@@ -253,7 +254,7 @@ void _registerFormValidation() {
     });
 
     test('empty last name → fieldRequired key', () {
-      expect(FormValidators.notEmpty(''), equals('validation.fieldRequired'));
+      expect(FormValidators.notEmpty(''), equals(t.validation.fieldRequired));
     });
 
     test('non-empty last name → null', () {
@@ -277,7 +278,7 @@ void _registerFormValidation() {
   group('Password field (register uses password validator, min 8 chars)', () {
     // Requirement 5.8: Password must be at least 8 characters
     test('7-char password → passwordTooShort key', () {
-      expect(FormValidators.password('1234567'), equals('validation.passwordTooShort'));
+      expect(FormValidators.password('1234567'), equals(t.validation.passwordTooShort));
     });
 
     test('8-char password → null (boundary)', () {
@@ -285,11 +286,11 @@ void _registerFormValidation() {
     });
 
     test('empty password → passwordTooShort key', () {
-      expect(FormValidators.password(''), equals('validation.passwordTooShort'));
+      expect(FormValidators.password(''), equals(t.validation.passwordTooShort));
     });
 
     test('null password → passwordTooShort key', () {
-      expect(FormValidators.password(null), equals('validation.passwordTooShort'));
+      expect(FormValidators.password(null), equals(t.validation.passwordTooShort));
     });
 
     test('long password → null', () {
@@ -310,14 +311,14 @@ void _registerFormValidation() {
     test('mismatched passwords → passwordsDoNotMatch key', () {
       expect(
         FormValidators.confirmPassword('password123', 'different'),
-        equals('validation.passwordsDoNotMatch'),
+        equals(t.validation.passwordsDoNotMatch),
       );
     });
 
     test('case-sensitive mismatch → passwordsDoNotMatch key', () {
       expect(
         FormValidators.confirmPassword('Password', 'password'),
-        equals('validation.passwordsDoNotMatch'),
+        equals(t.validation.passwordsDoNotMatch),
       );
     });
 
@@ -328,14 +329,14 @@ void _registerFormValidation() {
     test('confirm empty but password non-empty → passwordsDoNotMatch key', () {
       expect(
         FormValidators.confirmPassword('', 'somepassword'),
-        equals('validation.passwordsDoNotMatch'),
+        equals(t.validation.passwordsDoNotMatch),
       );
     });
 
     test('null confirm → passwordsDoNotMatch key (null != empty string)', () {
       expect(
         FormValidators.confirmPassword(null, 'password'),
-        equals('validation.passwordsDoNotMatch'),
+        equals(t.validation.passwordsDoNotMatch),
       );
     });
   });
@@ -409,17 +410,17 @@ void _forgotPasswordFormValidation() {
   group('Email field (uses FormValidators.email)', () {
     // Requirement 9.4: Email format validation for password reset
     test('empty email → emailRequired key', () {
-      expect(FormValidators.email(''), equals('validation.emailRequired'));
+      expect(FormValidators.email(''), equals(t.validation.emailRequired));
     });
 
     test('whitespace-only → emailRequired key', () {
-      expect(FormValidators.email('  '), equals('validation.emailRequired'));
+      expect(FormValidators.email('  '), equals(t.validation.emailRequired));
     });
 
     test('invalid email format → invalidEmail key', () {
-      expect(FormValidators.email('notanemail'), equals('validation.invalidEmail'));
-      expect(FormValidators.email('user@'), equals('validation.invalidEmail'));
-      expect(FormValidators.email('@domain.com'), equals('validation.invalidEmail'));
+      expect(FormValidators.email('notanemail'), equals(t.validation.invalidEmail));
+      expect(FormValidators.email('user@'), equals(t.validation.invalidEmail));
+      expect(FormValidators.email('@domain.com'), equals(t.validation.invalidEmail));
     });
 
     test('valid email → null (password reset accepts any valid email)', () {
@@ -614,44 +615,44 @@ void _cubitInteraction() {
 }
 
 // ---------------------------------------------------------------------------
-// Validation key mapping (tests _resolveValidationKey logic patterns)
+// Validation translated string mapping (FormValidators now returns translated strings)
 // ---------------------------------------------------------------------------
 
 void _validationKeyMapping() {
-  group('Known validation keys emitted by FormValidators', () {
-    test('email() emits only known keys or null', () {
-      const knownKeys = {'validation.emailRequired', 'validation.invalidEmail'};
+  group('Known validation translated strings emitted by FormValidators', () {
+    test('email() emits only known translated strings or null', () {
+      final knownStrings = {t.validation.emailRequired, t.validation.invalidEmail};
       const inputs = ['', '  ', null, 'notanemail', 'user@example.com', 'bad@', '@bad.com'];
 
       for (final input in inputs) {
-        final key = FormValidators.email(input);
-        if (key != null) {
-          expect(knownKeys, contains(key), reason: '"$input" → unknown key "$key"');
+        final result = FormValidators.email(input);
+        if (result != null) {
+          expect(knownStrings, contains(result), reason: '"$input" → unknown string "$result"');
         }
       }
     });
 
-    test('notEmpty() emits only fieldRequired key or null', () {
+    test('notEmpty() emits only fieldRequired translated string or null', () {
       const inputs = ['', '  ', null, 'value', 'a'];
       for (final input in inputs) {
-        final key = FormValidators.notEmpty(input);
-        if (key != null) {
-          expect(key, equals('validation.fieldRequired'));
+        final result = FormValidators.notEmpty(input);
+        if (result != null) {
+          expect(result, equals(t.validation.fieldRequired));
         }
       }
     });
 
-    test('password() emits only passwordTooShort key or null', () {
+    test('password() emits only passwordTooShort translated string or null', () {
       const inputs = ['', 'abc', '1234567', '12345678', null, 'longpassword'];
       for (final input in inputs) {
-        final key = FormValidators.password(input);
-        if (key != null) {
-          expect(key, equals('validation.passwordTooShort'));
+        final result = FormValidators.password(input);
+        if (result != null) {
+          expect(result, equals(t.validation.passwordTooShort));
         }
       }
     });
 
-    test('confirmPassword() emits only passwordsDoNotMatch key or null', () {
+    test('confirmPassword() emits only passwordsDoNotMatch translated string or null', () {
       const pairs = [
         ('same', 'same'),
         ('', ''),
@@ -659,9 +660,9 @@ void _validationKeyMapping() {
         (null, 'something'),
       ];
       for (final (value, password) in pairs) {
-        final key = FormValidators.confirmPassword(value, password);
-        if (key != null) {
-          expect(key, equals('validation.passwordsDoNotMatch'));
+        final result = FormValidators.confirmPassword(value, password);
+        if (result != null) {
+          expect(result, equals(t.validation.passwordsDoNotMatch));
         }
       }
     });
@@ -673,11 +674,15 @@ void _validationKeyMapping() {
 // ---------------------------------------------------------------------------
 
 void main() {
+  setUpAll(() {
+    LocaleSettings.setLocale(AppLocale.en);
+  });
+
   group('Auth screen form validation — unit tests', () {
     group('Login form validation edge cases', _loginFormValidation);
     group('Register form validation edge cases', _registerFormValidation);
     group('Forgot password form validation edge cases', _forgotPasswordFormValidation);
     group('Cubit interaction for auth forms', _cubitInteraction);
-    group('Validation key mapping', _validationKeyMapping);
+    group('Validation translated string mapping', _validationKeyMapping);
   });
 }

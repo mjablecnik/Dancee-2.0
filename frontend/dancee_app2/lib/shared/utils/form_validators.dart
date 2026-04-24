@@ -1,32 +1,34 @@
+import '../../i18n/strings.g.dart';
+
 class FormValidators {
   static String? email(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'validation.emailRequired';
+      return t.validation.emailRequired;
     }
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(value.trim())) {
-      return 'validation.invalidEmail';
+      return t.validation.invalidEmail;
     }
     return null;
   }
 
   static String? notEmpty(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'validation.fieldRequired';
+      return t.validation.fieldRequired;
     }
     return null;
   }
 
   static String? password(String? value) {
     if (value == null || value.length < 8) {
-      return 'validation.passwordTooShort';
+      return t.validation.passwordTooShort;
     }
     return null;
   }
 
   static String? confirmPassword(String? value, String password) {
     if (value != password) {
-      return 'validation.passwordsDoNotMatch';
+      return t.validation.passwordsDoNotMatch;
     }
     return null;
   }

@@ -115,6 +115,7 @@
       "title": "Verifica tu e-mail",
       "subtitle": "Enviamos un e-mail de verificación a ${email}",
       "resend": "Reenviar e-mail de verificación",
+      "resendConfirmed": "E-mail de verificación enviado. Por favor, revisa tu bandeja de entrada.",
       "checkVerified": "He verificado mi e-mail",
       "notVerifiedYet": "E-mail aún no verificado. Por favor, revisa tu bandeja de entrada.",
       "signOut": "Cerrar sesión"

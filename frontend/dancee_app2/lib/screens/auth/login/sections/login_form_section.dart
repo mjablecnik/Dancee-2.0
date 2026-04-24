@@ -13,7 +13,6 @@ import '../../../../shared/elements/forms/app_checkbox.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
 import '../../../../shared/elements/forms/app_password_field.dart';
 import '../../../../shared/elements/buttons/social_button.dart';
-import '../../../../shared/utils/auth_error_resolver.dart';
 import '../../../../shared/utils/form_validators.dart';
 
 class LoginFormSection extends StatefulWidget {
@@ -56,13 +55,11 @@ class _LoginFormSectionState extends State<LoginFormSection> {
   }
 
   void _validateEmail() {
-    final key = FormValidators.email(_emailController.text);
-    setState(() => _emailError = resolveValidationKey(key));
+    setState(() => _emailError = FormValidators.email(_emailController.text));
   }
 
   void _validatePassword() {
-    final key = FormValidators.notEmpty(_passwordController.text);
-    setState(() => _passwordError = resolveValidationKey(key));
+    setState(() => _passwordError = FormValidators.notEmpty(_passwordController.text));
   }
 
   bool _validateAll() {
@@ -90,7 +87,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
       ),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
+          error: (s) => setState(() => _authError = s.message),
           authenticated: (_) => setState(() => _authError = null),
         );
       },

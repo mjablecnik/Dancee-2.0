@@ -8,6 +8,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:dancee_app2/i18n/strings.g.dart';
 import 'package:dancee_app2/shared/utils/form_validators.dart';
 
 // ---------------------------------------------------------------------------
@@ -35,7 +36,7 @@ void _propertyEmailFormatValidation() {
     }
   });
 
-  test('P5b: invalid emails return a non-null translation key', () {
+  test('P5b: invalid emails return a non-null translated string', () {
     const invalidEmails = [
       'notanemail',
       'missing@tld',
@@ -55,18 +56,18 @@ void _propertyEmailFormatValidation() {
     }
   });
 
-  test('P5c: null input returns a non-null translation key', () {
+  test('P5c: null input returns a non-null translated string', () {
     expect(FormValidators.email(null), isNotNull);
   });
 
-  test('P5d: empty / whitespace-only returns emailRequired key', () {
-    expect(FormValidators.email(''), equals('validation.emailRequired'));
-    expect(FormValidators.email('   '), equals('validation.emailRequired'));
-    expect(FormValidators.email(null), equals('validation.emailRequired'));
+  test('P5d: empty / whitespace-only returns emailRequired translated string', () {
+    expect(FormValidators.email(''), equals(t.validation.emailRequired));
+    expect(FormValidators.email('   '), equals(t.validation.emailRequired));
+    expect(FormValidators.email(null), equals(t.validation.emailRequired));
   });
 
-  test('P5e: email without @ returns invalidEmail key', () {
-    expect(FormValidators.email('nodomain.com'), equals('validation.invalidEmail'));
+  test('P5e: email without @ returns invalidEmail translated string', () {
+    expect(FormValidators.email('nodomain.com'), equals(t.validation.invalidEmail));
   });
 }
 
@@ -93,7 +94,7 @@ void _propertyPasswordMinLength() {
     }
   });
 
-  test('P6b: passwords with length < 8 return a non-null translation key', () {
+  test('P6b: passwords with length < 8 return a non-null translated string', () {
     final shortPasswords = [
       '',
       'a',
@@ -110,12 +111,12 @@ void _propertyPasswordMinLength() {
     }
   });
 
-  test('P6c: null input returns passwordTooShort key', () {
-    expect(FormValidators.password(null), equals('validation.passwordTooShort'));
+  test('P6c: null input returns passwordTooShort translated string', () {
+    expect(FormValidators.password(null), equals(t.validation.passwordTooShort));
   });
 
   test('P6d: 7-char password returns passwordTooShort, 8-char returns null', () {
-    expect(FormValidators.password('1234567'), equals('validation.passwordTooShort'));
+    expect(FormValidators.password('1234567'), equals(t.validation.passwordTooShort));
     expect(FormValidators.password('12345678'), isNull);
   });
 }
@@ -143,7 +144,7 @@ void _propertyConfirmPasswordEquality() {
     }
   });
 
-  test('P7b: non-matching passwords return a non-null translation key', () {
+  test('P7b: non-matching passwords return a non-null translated string', () {
     const pairs = [
       ('password123', 'password456'),
       ('abc', 'ABC'),
@@ -155,15 +156,15 @@ void _propertyConfirmPasswordEquality() {
       expect(
         FormValidators.confirmPassword(value, password),
         isNotNull,
-        reason: 'Non-matching pair "$value" != "$password" should return error key',
+        reason: 'Non-matching pair "$value" != "$password" should return error string',
       );
     }
   });
 
-  test('P7c: non-matching pair returns passwordsDoNotMatch key', () {
+  test('P7c: non-matching pair returns passwordsDoNotMatch translated string', () {
     expect(
       FormValidators.confirmPassword('abc', 'xyz'),
-      equals('validation.passwordsDoNotMatch'),
+      equals(t.validation.passwordsDoNotMatch),
     );
   });
 }
@@ -222,6 +223,10 @@ void _propertyPasswordStrengthRange() {
 // ---------------------------------------------------------------------------
 
 void main() {
+  setUpAll(() {
+    LocaleSettings.setLocale(AppLocale.en);
+  });
+
   group('FormValidators — property tests', () {
     group('Property 5: Email format validation', _propertyEmailFormatValidation);
     group('Property 6: Password minimum length validation', _propertyPasswordMinLength);

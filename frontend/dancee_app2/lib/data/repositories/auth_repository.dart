@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../i18n/strings.g.dart';
+
 class AuthRepository {
   AuthRepository({
     required FirebaseAuth firebaseAuth,
@@ -182,19 +184,19 @@ class AuthRepository {
   String mapFirebaseError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-credential':
-        return 'auth.errors.invalidCredential';
+        return t.auth.errors.invalidCredential;
       case 'user-disabled':
-        return 'auth.errors.userDisabled';
+        return t.auth.errors.userDisabled;
       case 'email-already-in-use':
-        return 'auth.errors.emailAlreadyInUse';
+        return t.auth.errors.emailAlreadyInUse;
       case 'weak-password':
-        return 'auth.errors.weakPassword';
+        return t.auth.errors.weakPassword;
       case 'too-many-requests':
-        return 'auth.errors.tooManyRequests';
+        return t.auth.errors.tooManyRequests;
       case 'network-request-failed':
-        return 'auth.errors.networkError';
+        return t.auth.errors.networkError;
       default:
-        return 'auth.errors.generic';
+        return t.auth.errors.generic;
     }
   }
 }

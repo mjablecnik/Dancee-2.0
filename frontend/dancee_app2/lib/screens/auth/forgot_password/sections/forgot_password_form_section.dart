@@ -11,7 +11,6 @@ import '../../../../logic/cubits/auth_cubit.dart';
 import '../../../../logic/states/auth_state.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
-import '../../../../shared/utils/auth_error_resolver.dart';
 import '../../../../shared/utils/form_validators.dart';
 
 class ForgotPasswordFormSection extends StatefulWidget {
@@ -63,8 +62,7 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
   }
 
   void _validateEmail() {
-    final key = FormValidators.email(_emailController.text);
-    setState(() => _emailError = resolveValidationKey(key));
+    setState(() => _emailError = FormValidators.email(_emailController.text));
   }
 
   void _onSubmit() {
@@ -81,7 +79,7 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
       listenWhen: (prev, curr) => curr.maybeMap(error: (_) => true, orElse: () => false),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
+          error: (s) => setState(() => _authError = s.message),
         );
       },
       // Use operationInProgress notifier for loading so that sendPasswordReset
