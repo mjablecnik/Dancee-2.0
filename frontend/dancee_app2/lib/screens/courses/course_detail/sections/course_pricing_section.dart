@@ -30,14 +30,38 @@ class CoursePricingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildRegistrationCta(),
+        RegistrationCta(
+          price: price,
+          priceNote: priceNote,
+          spotsAvailable: spotsAvailable,
+          spotsTotal: spotsTotal,
+          onRegister: onRegister,
+        ),
         const SizedBox(height: AppSpacing.lg),
-        _buildAdditionalActions(),
+        CourseAdditionalActions(onShare: onShare, onSource: onSource),
       ],
     );
   }
+}
 
-  Widget _buildRegistrationCta() {
+class RegistrationCta extends StatelessWidget {
+  final String price;
+  final String priceNote;
+  final String spotsAvailable;
+  final String spotsTotal;
+  final VoidCallback? onRegister;
+
+  const RegistrationCta({
+    super.key,
+    required this.price,
+    required this.priceNote,
+    required this.spotsAvailable,
+    required this.spotsTotal,
+    this.onRegister,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return PricingOptionCard(
       price: price,
       priceNote: priceNote,
@@ -46,8 +70,20 @@ class CoursePricingSection extends StatelessWidget {
       onRegister: onRegister,
     );
   }
+}
 
-  Widget _buildAdditionalActions() {
+class CourseAdditionalActions extends StatelessWidget {
+  final VoidCallback? onShare;
+  final VoidCallback? onSource;
+
+  const CourseAdditionalActions({
+    super.key,
+    this.onShare,
+    this.onSource,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(

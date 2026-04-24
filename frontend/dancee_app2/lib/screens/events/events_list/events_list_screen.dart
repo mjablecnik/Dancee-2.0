@@ -8,6 +8,7 @@ import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/filter_cubit.dart';
 import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/event_state.dart';
+import '../../../shared/utils/auth_translations.dart';
 import '../../../logic/states/filter_state.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import '../../../shared/sections/duration_type_filter_section.dart';
@@ -86,7 +87,7 @@ class EventsListScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          err.message,
+                          resolveApiErrorKey(err.message),
                           style: const TextStyle(color: appMuted),
                           textAlign: TextAlign.center,
                         ),

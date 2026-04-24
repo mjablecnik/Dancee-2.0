@@ -67,7 +67,7 @@ void setupServiceLocator() {
   sl.registerFactory<CourseCubit>(
     () => CourseCubit(courseRepository: sl<CourseRepository>()),
   );
-  sl.registerFactory<FavoritesCubit>(
+  sl.registerLazySingleton<FavoritesCubit>(
     () => FavoritesCubit(
       favoritesRepository: sl<FavoritesRepository>(),
       authCubit: sl<AuthCubit>(),

@@ -18,6 +18,7 @@ import 'logic/cubits/favorites_cubit.dart';
 import 'logic/cubits/filter_cubit.dart';
 import 'logic/cubits/settings_cubit.dart';
 import 'logic/states/course_state.dart';
+import 'shared/utils/auth_translations.dart';
 import 'logic/states/event_state.dart';
 import 'logic/states/favorites_state.dart';
 import 'logic/states/filter_state.dart';
@@ -182,7 +183,7 @@ class _AppListenersState extends State<_AppListeners> {
       _favErrorSub = context.read<FavoritesCubit>().toggleErrors.listen(
         (message) {
           _scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBar(content: Text(message)),
+            SnackBar(content: Text(resolveApiErrorKey(message))),
           );
         },
       );

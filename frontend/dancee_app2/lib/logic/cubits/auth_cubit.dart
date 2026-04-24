@@ -219,7 +219,12 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signOut() async {
     emit(const AuthState.loading());
     try {
-      await _clearOnboardingPrefs();
+      // Onboarding preferences are NOT cleared on sign-out so that returning
+      // users who sign out and back in keep their locally cached preferences.
+      // Preferences are only cleared on full account deletion (see deleteAccount).
+      // Req 11.4 ("clear cached user-specific data") is satisfied by clearing
+      // favorites state, which happens via FavoritesCubit reacting to the
+      // unauthenticated AuthState emitted by the stream below.
       await _authRepository.signOut();
       // authStateChanges stream will emit unauthenticated
     } catch (e) {
@@ -233,6 +238,15 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.reauthenticate(email: email, password: password);
       final uid = currentUid;
       if (uid != null) {
+        // CMS data is deleted before the Firebase account (per design doc).
+        // PARTIAL FAILURE SCENARIO: if deleteAllFavoritesForUser succeeds but
+        // deleteAccount() below fails, the user's CMS favorites are already
+        // gone while their Firebase account remains intact. The user stays
+        // signed in and sees an error (correct per design: "keep user signed
+        // in"). This is an accepted trade-off — the user can retry and the
+        // CMS delete is idempotent (deleting already-deleted records is a
+        // no-op). Reversing the order (Firebase first) would be harder to
+        // roll back since Firebase account deletion cannot be undone.
         await _favoritesRepository.deleteAllFavoritesForUser(uid);
       }
       await _clearOnboardingPrefs();

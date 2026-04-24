@@ -16,25 +16,37 @@ class BackgroundCircles extends StatelessWidget {
             Positioned(
               top: 80 + animation.value,
               left: 40,
-              child: _buildCircle(128, appPrimary.withValues(alpha: 0.2)),
+              child: AnimatedCircle(size: 128, color: appPrimary.withValues(alpha: 0.2)),
             ),
             Positioned(
               top: 240 - animation.value,
               right: 32,
-              child: _buildCircle(96, appAccent.withValues(alpha: 0.2)),
+              child: AnimatedCircle(size: 96, color: appAccent.withValues(alpha: 0.2)),
             ),
             Positioned(
               bottom: 160 + animation.value * 0.5,
               left: 24,
-              child: _buildCircle(80, appSuccess.withValues(alpha: 0.2)),
+              child: AnimatedCircle(size: 80, color: appSuccess.withValues(alpha: 0.2)),
             ),
           ],
         );
       },
     );
   }
+}
 
-  Widget _buildCircle(double size, Color color) {
+class AnimatedCircle extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const AnimatedCircle({
+    super.key,
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,

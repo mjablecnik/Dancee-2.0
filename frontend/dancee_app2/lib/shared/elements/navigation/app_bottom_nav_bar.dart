@@ -36,38 +36,23 @@ class AppBottomNavBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: _tabs.map((tab) => _buildNavItem(context, tab)).toList(),
+        children: _tabs
+            .map((tab) => NavItem(tab: tab, currentTab: currentTab))
+            .toList(),
       ),
     );
   }
+}
 
-  Widget _buildNavItem(BuildContext context, NavTab tab) {
-    final isActive = tab == currentTab;
-    final color = isActive ? appPrimary : appMuted;
+class NavItem extends StatelessWidget {
+  final NavTab tab;
+  final NavTab currentTab;
 
-    return GestureDetector(
-      onTap: isActive ? null : () => _navigate(context, tab),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(_iconFor(tab), size: 22, color: color),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              _labelFor(tab),
-              style: TextStyle(
-                color: color,
-                fontSize: AppTypography.fontSizeXs,
-                fontWeight: AppTypography.fontWeightMedium,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  const NavItem({
+    super.key,
+    required this.tab,
+    required this.currentTab,
+  });
 
   IconData _iconFor(NavTab tab) {
     switch (tab) {
@@ -106,5 +91,34 @@ class AppBottomNavBar extends StatelessWidget {
       case NavTab.profile:
         const ProfileRoute().go(context);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = tab == currentTab;
+    final color = isActive ? appPrimary : appMuted;
+
+    return GestureDetector(
+      onTap: isActive ? null : () => _navigate(context, tab),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FaIcon(_iconFor(tab), size: 22, color: color),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              _labelFor(tab),
+              style: TextStyle(
+                color: color,
+                fontSize: AppTypography.fontSizeXs,
+                fontWeight: AppTypography.fontWeightMedium,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -12,6 +12,7 @@ import '../../../logic/cubits/filter_cubit.dart';
 import '../../../logic/cubits/settings_cubit.dart';
 import '../../../logic/states/filter_state.dart';
 import '../../../logic/states/course_state.dart';
+import '../../../shared/utils/auth_translations.dart';
 import '../../../shared/sections/dance_styles_filter_section.dart';
 import '../../../shared/sections/duration_type_filter_section.dart';
 import '../../../shared/utils/date_format.dart';
@@ -99,7 +100,7 @@ class CoursesListScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          err.message,
+                          resolveApiErrorKey(err.message),
                           style: const TextStyle(color: appMuted),
                           textAlign: TextAlign.center,
                         ),

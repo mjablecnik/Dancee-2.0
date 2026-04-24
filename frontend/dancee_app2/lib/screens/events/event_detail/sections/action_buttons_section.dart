@@ -20,15 +20,15 @@ class ActionButtonsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _buildSaveButton()),
+        Expanded(child: SaveButton(onTap: onSave)),
         const SizedBox(width: AppSpacing.md),
-        Expanded(child: _buildOutlineButton(
+        Expanded(child: OutlineActionButton(
           icon: FontAwesomeIcons.shareNodes,
           label: t.common.share,
           onTap: onShare,
         )),
         const SizedBox(width: AppSpacing.md),
-        Expanded(child: _buildOutlineButton(
+        Expanded(child: OutlineActionButton(
           icon: FontAwesomeIcons.mapLocationDot,
           label: t.common.map,
           onTap: onMap,
@@ -36,10 +36,17 @@ class ActionButtonsSection extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildSaveButton() {
+class SaveButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const SaveButton({super.key, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onSave,
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: appPrimary,
@@ -67,12 +74,22 @@ class ActionButtonsSection extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildOutlineButton({
-    required IconData icon,
-    required String label,
-    VoidCallback? onTap,
-  }) {
+class OutlineActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  const OutlineActionButton({
+    super.key,
+    required this.icon,
+    required this.label,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

@@ -12,48 +12,57 @@ class _ChipDef {
   const _ChipDef(this.code, this.label);
 }
 
-Widget _buildChipRow({
-  required BuildContext context,
-  required List<_ChipDef> chips,
-  required Set<String> selected,
-  required void Function(String?) onTap,
-}) {
-  return SizedBox(
-    height: 36,
-    child: ListView.separated(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-      itemCount: chips.length,
-      separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
-      itemBuilder: (context, index) {
-        final chip = chips[index];
-        final isActive =
-            chip.code == null ? selected.isEmpty : selected.contains(chip.code);
-        return GestureDetector(
-          onTap: () => onTap(chip.code),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: isActive ? appPrimary : appSurface,
-              border: Border.all(color: isActive ? appPrimary : appBorder),
-              borderRadius: BorderRadius.circular(AppRadius.round),
-            ),
-            child: Text(
-              chip.label,
-              style: TextStyle(
-                color: isActive ? Colors.white : appText,
-                fontSize: AppTypography.fontSizeMd,
-                fontWeight: AppTypography.fontWeightMedium,
+class ChipRow extends StatelessWidget {
+  final List<_ChipDef> chips;
+  final Set<String> selected;
+  final void Function(String?) onTap;
+
+  const ChipRow({
+    super.key,
+    required this.chips,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        itemCount: chips.length,
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          final chip = chips[index];
+          final isActive =
+              chip.code == null ? selected.isEmpty : selected.contains(chip.code);
+          return GestureDetector(
+            onTap: () => onTap(chip.code),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
+              decoration: BoxDecoration(
+                color: isActive ? appPrimary : appSurface,
+                border: Border.all(color: isActive ? appPrimary : appBorder),
+                borderRadius: BorderRadius.circular(AppRadius.round),
+              ),
+              child: Text(
+                chip.label,
+                style: TextStyle(
+                  color: isActive ? Colors.white : appText,
+                  fontSize: AppTypography.fontSizeMd,
+                  fontWeight: AppTypography.fontWeightMedium,
+                ),
               ),
             ),
-          ),
-        );
-      },
-    ),
-  );
+          );
+        },
+      ),
+    );
+  }
 }
 
 class EventDurationTypeFilterSection extends StatelessWidget {
@@ -68,8 +77,7 @@ class EventDurationTypeFilterSection extends StatelessWidget {
       _ChipDef('multiDay', t.events.filters.multiDay),
     ];
     return BlocBuilder<FilterCubit, FilterState>(
-      builder: (context, state) => _buildChipRow(
-        context: context,
+      builder: (context, state) => ChipRow(
         chips: chips,
         selected: state.selectedEventDurationTypes,
         onTap: (code) {
@@ -96,8 +104,7 @@ class CourseTypeFilterSection extends StatelessWidget {
       _ChipDef('workshop', t.courses.courseTypes.workshop),
     ];
     return BlocBuilder<FilterCubit, FilterState>(
-      builder: (context, state) => _buildChipRow(
-        context: context,
+      builder: (context, state) => ChipRow(
         chips: chips,
         selected: state.selectedCourseTypes,
         onTap: (code) {

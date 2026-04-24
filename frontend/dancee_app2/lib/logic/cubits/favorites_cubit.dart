@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/exceptions.dart';
 import '../../data/entities/course.dart';
 import '../../data/entities/event.dart';
 import '../../data/entities/favorite.dart';
@@ -63,7 +64,9 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       _allFavorites = await _favoritesRepository.getFavorites(_currentUserId);
       _emitLoaded();
     } catch (e) {
-      emit(FavoritesState.error(message: e.toString()));
+      emit(FavoritesState.error(
+        message: e is ApiException ? e.message : 'api.errors.generic',
+      ));
     }
   }
 
@@ -127,7 +130,9 @@ class FavoritesCubit extends Cubit<FavoritesState> {
             .toList();
         _emitLoaded();
       }
-      _toggleErrorController.add(e.toString());
+      _toggleErrorController.add(
+        e is ApiException ? e.message : 'api.errors.generic',
+      );
     }
   }
 

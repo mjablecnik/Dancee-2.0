@@ -52,15 +52,46 @@ class FeaturedEventCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            _buildImage(),
-            Expanded(child: _buildInfo()),
+            FeaturedEventCardImage(
+              imageUrl: imageUrl,
+              isFavorited: isFavorited,
+              isFree: isFree,
+              price: price,
+              onFavoriteTap: onFavoriteTap,
+            ),
+            Expanded(
+              child: FeaturedEventCardInfo(
+                title: title,
+                date: date,
+                location: location,
+                tags: tags,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildImage() {
+class FeaturedEventCardImage extends StatelessWidget {
+  final String imageUrl;
+  final bool isFavorited;
+  final bool isFree;
+  final String price;
+  final VoidCallback? onFavoriteTap;
+
+  const FeaturedEventCardImage({
+    super.key,
+    required this.imageUrl,
+    required this.isFavorited,
+    required this.isFree,
+    required this.price,
+    this.onFavoriteTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         ClipRRect(
@@ -134,8 +165,24 @@ class FeaturedEventCard extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildInfo() {
+class FeaturedEventCardInfo extends StatelessWidget {
+  final String title;
+  final String date;
+  final String location;
+  final List<EventTagData> tags;
+
+  const FeaturedEventCardInfo({
+    super.key,
+    required this.title,
+    required this.date,
+    required this.location,
+    required this.tags,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(

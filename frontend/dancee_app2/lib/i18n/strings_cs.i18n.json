@@ -128,6 +128,26 @@
       "error": "Nepodařilo se smazat účet. Zkuste to prosím znovu."
     }
   },
+  "api": {
+    "errors": {
+      "connectionTimeout": "Vypršel časový limit připojení. Zkontrolujte síťové připojení.",
+      "receiveTimeout": "Server reagoval příliš pomalu. Zkuste to prosím znovu.",
+      "sendTimeout": "Vypršel časový limit odesílání. Zkuste to prosím znovu.",
+      "noConnection": "Žádné internetové připojení. Zkontrolujte své připojení.",
+      "requestCancelled": "Požadavek byl zrušen.",
+      "badRequest": "Chybný požadavek. Zkuste to prosím znovu.",
+      "unauthorized": "Relace vypršela. Přihlaste se prosím znovu.",
+      "forbidden": "Přístup odepřen. Kontaktujte prosím podporu.",
+      "notFound": "Požadovaný zdroj nebyl nalezen.",
+      "conflict": "Došlo ke konfliktu. Zkuste to prosím znovu.",
+      "internalServerError": "Chyba serveru. Zkuste to prosím později.",
+      "badGateway": "Server je dočasně nedostupný. Zkuste to prosím později.",
+      "serviceUnavailable": "Služba není dostupná. Zkuste to prosím později.",
+      "clientError": "Došlo k chybě. Zkuste to prosím znovu.",
+      "serverError": "Chyba serveru. Zkuste to prosím později.",
+      "generic": "Došlo k neočekávané chybě. Zkuste to prosím znovu."
+    }
+  },
   "validation": {
     "emailRequired": "Zadejte prosím svou e-mailovou adresu",
     "invalidEmail": "Zadejte prosím platnou e-mailovou adresu",

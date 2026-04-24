@@ -10,6 +10,7 @@ import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/course_cubit.dart';
 import '../../../logic/cubits/event_cubit.dart';
 import '../../../logic/cubits/favorites_cubit.dart';
+import '../../../shared/utils/auth_translations.dart';
 import '../../../shared/utils/date_format.dart';
 import '../../courses/courses_list/components/course_list_card.dart';
 import '../../events/events_list/components/featured_event_card.dart' show EventTagData;
@@ -60,7 +61,10 @@ class SavedEventsListSection extends StatelessWidget {
             children: [
               for (int i = 0; i < resolvedFavorites.length; i++) ...[
                 if (i > 0) const SizedBox(height: AppSpacing.lg),
-                _buildFavoriteItem(context, resolvedFavorites[i]),
+                FavoriteItemCard(
+                  favItem: resolvedFavorites[i],
+                  buildCourseDateRange: _buildCourseDateRange,
+                ),
               ],
             ],
           ),
@@ -69,8 +73,20 @@ class SavedEventsListSection extends StatelessWidget {
       error: (s) => _SavedErrorWidget(message: s.message),
     );
   }
+}
 
-  Widget _buildFavoriteItem(BuildContext context, FavoriteItem favItem) {
+class FavoriteItemCard extends StatelessWidget {
+  final FavoriteItem favItem;
+  final String Function(Course) buildCourseDateRange;
+
+  const FavoriteItemCard({
+    super.key,
+    required this.favItem,
+    required this.buildCourseDateRange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final favoritesCubit = context.read<FavoritesCubit>();
 
     if (favItem.itemType == 'event') {
@@ -94,7 +110,7 @@ class SavedEventsListSection extends StatelessWidget {
         imageUrl: course.imageUrl ?? '',
         title: course.title,
         instructor: course.instructorName ?? '',
-        dateRange: _buildCourseDateRange(course),
+        dateRange: buildCourseDateRange(course),
         tags: course.dances.map((d) => CourseTag(d, appPrimary)).toList(),
         price: course.price ?? '',
         isFavorited: course.isFavorited,
@@ -180,7 +196,7 @@ class _SavedErrorWidget extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              message,
+              resolveApiErrorKey(message),
               style: const TextStyle(
                 color: appMuted,
                 fontSize: AppTypography.fontSizeMd,

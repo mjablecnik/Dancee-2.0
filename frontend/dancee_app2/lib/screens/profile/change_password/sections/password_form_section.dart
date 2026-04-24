@@ -64,7 +64,7 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildPasswordField(
+        PasswordField(
           label: t.profile.changePassword.currentPassword,
           placeholder: t.profile.changePassword.currentPasswordHint,
           controller: _currentPasswordController,
@@ -73,27 +73,58 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
               setState(() => _currentPasswordVisible = !_currentPasswordVisible),
         ),
         const SizedBox(height: AppSpacing.xl),
-        _buildNewPasswordField(),
+        NewPasswordField(
+          controller: _newPasswordController,
+          confirmController: _confirmPasswordController,
+          visible: _newPasswordVisible,
+          passwordStrength: _passwordStrength,
+          onToggle: () =>
+              setState(() => _newPasswordVisible = !_newPasswordVisible),
+          onEvaluateStrength: _evaluateStrength,
+          onCheckMatch: _checkMatch,
+        ),
         const SizedBox(height: AppSpacing.xl),
-        _buildConfirmPasswordField(),
+        ConfirmPasswordField(
+          controller: _confirmPasswordController,
+          visible: _confirmPasswordVisible,
+          passwordMismatch: _passwordMismatch,
+          onToggle: () => setState(
+              () => _confirmPasswordVisible = !_confirmPasswordVisible),
+          onCheckMatch: _checkMatch,
+        ),
         const SizedBox(height: 28),
-        _buildActionButtons(context),
+        PasswordActionButtons(
+          onSave: widget.onSave,
+          onCancel: widget.onCancel,
+        ),
         const SizedBox(height: AppSpacing.sm),
-        _buildPasswordRequirements(),
+        const PasswordRequirementsSection(),
         const SizedBox(height: AppSpacing.xxl),
-        _buildForgotPasswordLink(context),
+        const ForgotPasswordLink(),
         const SizedBox(height: AppSpacing.xxl),
       ],
     );
   }
+}
 
-  Widget _buildPasswordField({
-    required String label,
-    required String placeholder,
-    required TextEditingController controller,
-    required bool visible,
-    required VoidCallback onToggle,
-  }) {
+class PasswordField extends StatelessWidget {
+  final String label;
+  final String placeholder;
+  final TextEditingController controller;
+  final bool visible;
+  final VoidCallback onToggle;
+
+  const PasswordField({
+    super.key,
+    required this.label,
+    required this.placeholder,
+    required this.controller,
+    required this.visible,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,8 +181,30 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
       ],
     );
   }
+}
 
-  Widget _buildNewPasswordField() {
+class NewPasswordField extends StatelessWidget {
+  final TextEditingController controller;
+  final TextEditingController confirmController;
+  final bool visible;
+  final int passwordStrength;
+  final VoidCallback onToggle;
+  final void Function(String) onEvaluateStrength;
+  final void Function(String) onCheckMatch;
+
+  const NewPasswordField({
+    super.key,
+    required this.controller,
+    required this.confirmController,
+    required this.visible,
+    required this.passwordStrength,
+    required this.onToggle,
+    required this.onEvaluateStrength,
+    required this.onCheckMatch,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -174,12 +227,12 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
             children: [
               Expanded(
                 child: TextField(
-                  controller: _newPasswordController,
-                  obscureText: !_newPasswordVisible,
+                  controller: controller,
+                  obscureText: !visible,
                   onChanged: (val) {
-                    _evaluateStrength(val);
-                    if (_confirmPasswordController.text.isNotEmpty) {
-                      _checkMatch(_confirmPasswordController.text);
+                    onEvaluateStrength(val);
+                    if (confirmController.text.isNotEmpty) {
+                      onCheckMatch(confirmController.text);
                     }
                   },
                   style: const TextStyle(
@@ -198,12 +251,11 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
                 ),
               ),
               GestureDetector(
-                onTap: () =>
-                    setState(() => _newPasswordVisible = !_newPasswordVisible),
+                onTap: onToggle,
                 child: Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.lg),
                   child: FaIcon(
-                    _newPasswordVisible
+                    visible
                         ? FontAwesomeIcons.eyeSlash
                         : FontAwesomeIcons.eye,
                     size: 16,
@@ -214,15 +266,33 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
             ],
           ),
         ),
-        if (_passwordStrength > 0) ...[
+        if (passwordStrength > 0) ...[
           const SizedBox(height: 10),
-          PasswordStrengthBar(strength: _passwordStrength),
+          PasswordStrengthBar(strength: passwordStrength),
         ],
       ],
     );
   }
+}
 
-  Widget _buildConfirmPasswordField() {
+class ConfirmPasswordField extends StatelessWidget {
+  final TextEditingController controller;
+  final bool visible;
+  final bool passwordMismatch;
+  final VoidCallback onToggle;
+  final void Function(String) onCheckMatch;
+
+  const ConfirmPasswordField({
+    super.key,
+    required this.controller,
+    required this.visible,
+    required this.passwordMismatch,
+    required this.onToggle,
+    required this.onCheckMatch,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -245,9 +315,9 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
             children: [
               Expanded(
                 child: TextField(
-                  controller: _confirmPasswordController,
-                  obscureText: !_confirmPasswordVisible,
-                  onChanged: _checkMatch,
+                  controller: controller,
+                  obscureText: !visible,
+                  onChanged: onCheckMatch,
                   style: const TextStyle(
                     color: appText,
                     fontSize: AppTypography.fontSizeMd,
@@ -264,12 +334,11 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
                 ),
               ),
               GestureDetector(
-                onTap: () => setState(
-                    () => _confirmPasswordVisible = !_confirmPasswordVisible),
+                onTap: onToggle,
                 child: Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.lg),
                   child: FaIcon(
-                    _confirmPasswordVisible
+                    visible
                         ? FontAwesomeIcons.eyeSlash
                         : FontAwesomeIcons.eye,
                     size: 16,
@@ -280,7 +349,7 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
             ],
           ),
         ),
-        if (_passwordMismatch) ...[
+        if (passwordMismatch) ...[
           const SizedBox(height: 6),
           Text(
             t.auth.register.passwordsMismatch,
@@ -293,14 +362,26 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
       ],
     );
   }
+}
 
-  Widget _buildActionButtons(BuildContext context) {
+class PasswordActionButtons extends StatelessWidget {
+  final VoidCallback? onSave;
+  final VoidCallback? onCancel;
+
+  const PasswordActionButtons({
+    super.key,
+    this.onSave,
+    this.onCancel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: widget.onSave ?? () {},
+            onPressed: onSave ?? () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: appPrimary,
               foregroundColor: Colors.white,
@@ -330,7 +411,7 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: widget.onCancel ?? () => context.pop(),
+            onPressed: onCancel ?? () => context.pop(),
             style: OutlinedButton.styleFrom(
               foregroundColor: appText,
               side: const BorderSide(color: appBorder),
@@ -351,8 +432,13 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
       ],
     );
   }
+}
 
-  Widget _buildPasswordRequirements() {
+class PasswordRequirementsSection extends StatelessWidget {
+  const PasswordRequirementsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -379,8 +465,13 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
       ],
     );
   }
+}
 
-  Widget _buildForgotPasswordLink(BuildContext context) {
+class ForgotPasswordLink extends StatelessWidget {
+  const ForgotPasswordLink({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: TextButton(
         onPressed: () => const ForgotPasswordRoute().push(context),

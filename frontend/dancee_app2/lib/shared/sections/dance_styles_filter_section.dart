@@ -20,14 +20,21 @@ class DanceStylesFilterSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context),
+        DanceStylesFilterHeader(onShowAll: onShowAll),
         SizedBox(height: onShowAll != null ? AppSpacing.lg : AppSpacing.md),
         const DanceStyleChipsRow(),
       ],
     );
   }
+}
 
-  Widget _buildHeader(BuildContext context) {
+class DanceStylesFilterHeader extends StatelessWidget {
+  final VoidCallback? onShowAll;
+
+  const DanceStylesFilterHeader({super.key, this.onShowAll});
+
+  @override
+  Widget build(BuildContext context) {
     if (onShowAll != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),

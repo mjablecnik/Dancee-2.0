@@ -51,18 +51,41 @@ class CourseListCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTopRow(),
+            CourseCardTopRow(
+              title: title,
+              instructor: instructor,
+              imageUrl: imageUrl,
+            ),
             const SizedBox(height: AppSpacing.md),
-            _buildDateRow(),
+            CourseCardDateRow(dateRange: dateRange, time: time),
             const SizedBox(height: AppSpacing.sm),
-            _buildBottomRow(),
+            CourseCardBottomRow(
+              tags: tags,
+              price: price,
+              isFavorited: isFavorited,
+              onFavoriteTap: onFavoriteTap,
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildTopRow() {
+class CourseCardTopRow extends StatelessWidget {
+  final String title;
+  final String instructor;
+  final String imageUrl;
+
+  const CourseCardTopRow({
+    super.key,
+    required this.title,
+    required this.instructor,
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,8 +131,20 @@ class CourseListCard extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildDateRow() {
+class CourseCardDateRow extends StatelessWidget {
+  final String dateRange;
+  final String? time;
+
+  const CourseCardDateRow({
+    super.key,
+    required this.dateRange,
+    this.time,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         const FaIcon(FontAwesomeIcons.calendar, size: 12, color: appMuted),
@@ -130,8 +165,24 @@ class CourseListCard extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildBottomRow() {
+class CourseCardBottomRow extends StatelessWidget {
+  final List<CourseTag> tags;
+  final String price;
+  final bool isFavorited;
+  final VoidCallback? onFavoriteTap;
+
+  const CourseCardBottomRow({
+    super.key,
+    required this.tags,
+    required this.price,
+    required this.isFavorited,
+    this.onFavoriteTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

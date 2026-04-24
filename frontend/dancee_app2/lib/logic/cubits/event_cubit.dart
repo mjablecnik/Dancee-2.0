@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/exceptions.dart';
 import '../../data/entities/dance_style.dart';
 import '../../data/entities/event.dart';
 import '../../data/repositories/event_repository.dart';
@@ -31,7 +32,9 @@ class EventCubit extends Cubit<EventState> {
       _allEvents = await _eventRepository.getEvents(languageCode);
       _recompute();
     } catch (e) {
-      emit(EventState.error(message: e.toString()));
+      emit(EventState.error(
+        message: e is ApiException ? e.message : 'api.errors.generic',
+      ));
     }
   }
 

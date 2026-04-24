@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/exceptions.dart';
 import '../../data/entities/course.dart';
 import '../../data/entities/dance_style.dart';
 import '../../data/repositories/course_repository.dart';
@@ -23,7 +24,9 @@ class CourseCubit extends Cubit<CourseState> {
       _allCourses = await _courseRepository.getCourses(languageCode);
       _recompute();
     } catch (e) {
-      emit(CourseState.error(message: e.toString()));
+      emit(CourseState.error(
+        message: e is ApiException ? e.message : 'api.errors.generic',
+      ));
     }
   }
 

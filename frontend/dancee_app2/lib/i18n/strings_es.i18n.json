@@ -128,6 +128,26 @@
       "error": "No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo."
     }
   },
+  "api": {
+    "errors": {
+      "connectionTimeout": "Se agotó el tiempo de conexión. Por favor, verifica tu red.",
+      "receiveTimeout": "El servidor tardó demasiado en responder. Por favor, inténtalo de nuevo.",
+      "sendTimeout": "Se agotó el tiempo de envío. Por favor, inténtalo de nuevo.",
+      "noConnection": "Sin conexión a internet. Por favor, verifica tu red.",
+      "requestCancelled": "La solicitud fue cancelada.",
+      "badRequest": "Solicitud incorrecta. Por favor, inténtalo de nuevo.",
+      "unauthorized": "Sesión expirada. Por favor, inicia sesión de nuevo.",
+      "forbidden": "Acceso denegado. Por favor, contacta con soporte.",
+      "notFound": "El recurso solicitado no fue encontrado.",
+      "conflict": "Ocurrió un conflicto. Por favor, inténtalo de nuevo.",
+      "internalServerError": "Error del servidor. Por favor, inténtalo más tarde.",
+      "badGateway": "El servidor no está disponible temporalmente. Por favor, inténtalo más tarde.",
+      "serviceUnavailable": "El servicio no está disponible. Por favor, inténtalo más tarde.",
+      "clientError": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+      "serverError": "Error del servidor. Por favor, inténtalo más tarde.",
+      "generic": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+    }
+  },
   "validation": {
     "emailRequired": "Por favor, ingresa tu dirección de e-mail",
     "invalidEmail": "Por favor, ingresa una dirección de e-mail válida",

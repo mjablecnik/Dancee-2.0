@@ -45,27 +45,39 @@ class AdditionalInfoSection extends StatelessWidget {
           child: Column(
             children: [
               if (hasPrice)
-                _buildInfoRow(label: t.events.detail.admission, value: priceRange),
+                InfoRow(label: t.events.detail.admission, value: priceRange),
               if (hasPrice && hasDresscode)
                 const SizedBox(height: AppSpacing.md),
               if (hasDresscode)
-                _buildInfoRow(label: t.events.detail.dresscode, value: dresscode),
+                InfoRow(label: t.events.detail.dresscode, value: dresscode),
               if ((hasPrice || hasDresscode) && (onBuyTickets != null || onSource != null))
                 const SizedBox(height: AppSpacing.lg),
               if (onBuyTickets != null) ...[
-                _buildBuyTicketsButton(),
+                BuyTicketsButton(onTap: onBuyTickets),
                 if (onSource != null) const SizedBox(height: AppSpacing.sm),
               ],
               if (onSource != null)
-                _buildSourceButton(),
+                SourceButton(onTap: onSource),
             ],
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildInfoRow({required String label, required String value}) {
+class InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const InfoRow({
+    super.key,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -88,10 +100,17 @@ class AdditionalInfoSection extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildBuyTicketsButton() {
+class BuyTicketsButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const BuyTicketsButton({super.key, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onBuyTickets,
+      onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -117,10 +136,17 @@ class AdditionalInfoSection extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildSourceButton() {
+class SourceButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const SourceButton({super.key, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onSource,
+      onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 10),

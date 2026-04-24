@@ -128,6 +128,26 @@
       "error": "Failed to delete account. Please try again."
     }
   },
+  "api": {
+    "errors": {
+      "connectionTimeout": "Connection timed out. Please check your network.",
+      "receiveTimeout": "Server took too long to respond. Please try again.",
+      "sendTimeout": "Request timed out while sending. Please try again.",
+      "noConnection": "No internet connection. Please check your network.",
+      "requestCancelled": "Request was cancelled.",
+      "badRequest": "Bad request. Please try again.",
+      "unauthorized": "Session expired. Please sign in again.",
+      "forbidden": "Access denied. Please contact support.",
+      "notFound": "The requested resource was not found.",
+      "conflict": "A conflict occurred. Please try again.",
+      "internalServerError": "Server error. Please try again later.",
+      "badGateway": "Server is temporarily unavailable. Please try again later.",
+      "serviceUnavailable": "Service is unavailable. Please try again later.",
+      "clientError": "An error occurred. Please try again.",
+      "serverError": "Server error. Please try again later.",
+      "generic": "An unexpected error occurred. Please try again."
+    }
+  },
   "validation": {
     "emailRequired": "Please enter your email address",
     "invalidEmail": "Please enter a valid email address",

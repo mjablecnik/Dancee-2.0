@@ -128,7 +128,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     },
                     child: KeyedSubtree(
                       key: ValueKey(_currentStep),
-                      child: _buildCurrentStep(),
+                      child: OnboardingStepSwitcher(
+                        currentStep: _currentStep,
+                        selectedDances: _selectedDances,
+                        selectedLevel: _selectedLevel,
+                        selectedRadius: _selectedRadius,
+                        onDanceTap: (i) =>
+                            setState(() => _selectedDances[i] = !_selectedDances[i]),
+                        onLevelSelected: (i) => setState(() => _selectedLevel = i),
+                        onRadiusSelected: (i) => setState(() => _selectedRadius = i),
+                        onNext: _goToStep,
+                        onBack: _goToStep,
+                        onFinish: _finish,
+                      ),
                     ),
                   ),
                 ),
@@ -140,33 +152,68 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  Widget _buildCurrentStep() {
-    switch (_currentStep) {
+}
+
+/// Routes the current onboarding step index to the correct step widget.
+///
+/// Extracted from [_OnboardingScreenState] to comply with the project rule:
+/// "NEVER create private methods that define UI appearance. ALWAYS create a
+/// new class instead."
+class OnboardingStepSwitcher extends StatelessWidget {
+  const OnboardingStepSwitcher({
+    super.key,
+    required this.currentStep,
+    required this.selectedDances,
+    required this.selectedLevel,
+    required this.selectedRadius,
+    required this.onDanceTap,
+    required this.onLevelSelected,
+    required this.onRadiusSelected,
+    required this.onNext,
+    required this.onBack,
+    required this.onFinish,
+  });
+
+  final int currentStep;
+  final List<bool> selectedDances;
+  final int selectedLevel;
+  final int selectedRadius;
+  final void Function(int index) onDanceTap;
+  final void Function(int index) onLevelSelected;
+  final void Function(int index) onRadiusSelected;
+  /// Called with the target step number when advancing or going back.
+  final void Function(int step) onNext;
+  final void Function(int step) onBack;
+  final VoidCallback onFinish;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (currentStep) {
       case 1:
         return OnboardingStep1Section(
-          selectedDances: _selectedDances,
-          onDanceTap: (i) => setState(() => _selectedDances[i] = !_selectedDances[i]),
-          onNext: () => _goToStep(2),
+          selectedDances: selectedDances,
+          onDanceTap: onDanceTap,
+          onNext: () => onNext(2),
         );
       case 2:
         return OnboardingStep2Section(
-          selectedLevel: _selectedLevel,
-          onLevelSelected: (i) => setState(() => _selectedLevel = i),
-          onBack: () => _goToStep(1),
-          onNext: () => _goToStep(3),
+          selectedLevel: selectedLevel,
+          onLevelSelected: onLevelSelected,
+          onBack: () => onBack(1),
+          onNext: () => onNext(3),
         );
       case 3:
         return OnboardingStep3Section(
-          selectedRadius: _selectedRadius,
-          onRadiusSelected: (i) => setState(() => _selectedRadius = i),
-          onBack: () => _goToStep(2),
-          onFinish: _finish,
+          selectedRadius: selectedRadius,
+          onRadiusSelected: onRadiusSelected,
+          onBack: () => onBack(2),
+          onFinish: onFinish,
         );
       default:
         return OnboardingStep1Section(
-          selectedDances: _selectedDances,
-          onDanceTap: (i) => setState(() => _selectedDances[i] = !_selectedDances[i]),
-          onNext: () => _goToStep(2),
+          selectedDances: selectedDances,
+          onDanceTap: onDanceTap,
+          onNext: () => onNext(2),
         );
     }
   }

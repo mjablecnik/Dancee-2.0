@@ -104,22 +104,22 @@ class DirectusClient {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
         return ApiException(
-          message: 'Connection timed out. Please check your network.',
+          message: 'api.errors.connectionTimeout',
           originalError: e,
         );
       case DioExceptionType.receiveTimeout:
         return ApiException(
-          message: 'Server took too long to respond. Please try again.',
+          message: 'api.errors.receiveTimeout',
           originalError: e,
         );
       case DioExceptionType.sendTimeout:
         return ApiException(
-          message: 'Request timed out while sending data.',
+          message: 'api.errors.sendTimeout',
           originalError: e,
         );
       case DioExceptionType.connectionError:
         return ApiException(
-          message: 'No internet connection. Please check your network.',
+          message: 'api.errors.noConnection',
           originalError: e,
         );
       case DioExceptionType.badResponse:
@@ -130,49 +130,49 @@ class DirectusClient {
         );
         return ApiException(
           statusCode: statusCode,
-          message: _messageForStatusCode(statusCode),
+          message: _keyForStatusCode(statusCode),
           originalError: e,
         );
       case DioExceptionType.cancel:
         return ApiException(
-          message: 'Request was cancelled.',
+          message: 'api.errors.requestCancelled',
           originalError: e,
         );
       default:
         return ApiException(
           statusCode: statusCode,
-          message: e.message ?? 'An unexpected error occurred.',
+          message: 'api.errors.generic',
           originalError: e,
         );
     }
   }
 
-  String _messageForStatusCode(int? statusCode) {
+  String _keyForStatusCode(int? statusCode) {
     switch (statusCode) {
       case 400:
-        return 'Bad request. Please try again.';
+        return 'api.errors.badRequest';
       case 401:
-        return 'Authentication failed. Check your CMS access token.';
+        return 'api.errors.unauthorized';
       case 403:
-        return 'Access denied. Check your CMS permissions.';
+        return 'api.errors.forbidden';
       case 404:
-        return 'The requested resource was not found.';
+        return 'api.errors.notFound';
       case 409:
-        return 'Conflict — the resource already exists.';
+        return 'api.errors.conflict';
       case 500:
-        return 'Internal server error. Please try again later.';
+        return 'api.errors.internalServerError';
       case 502:
-        return 'Bad gateway. The server is temporarily unavailable.';
+        return 'api.errors.badGateway';
       case 503:
-        return 'Service unavailable. Please try again later.';
+        return 'api.errors.serviceUnavailable';
       default:
         if (statusCode != null && statusCode >= 400 && statusCode < 500) {
-          return 'Client error ($statusCode). Please try again.';
+          return 'api.errors.clientError';
         }
         if (statusCode != null && statusCode >= 500) {
-          return 'Server error ($statusCode). Please try again later.';
+          return 'api.errors.serverError';
         }
-        return 'An unexpected error occurred.';
+        return 'api.errors.generic';
     }
   }
 }
