@@ -36,7 +36,10 @@ void setupServiceLocator() {
     ),
   );
   sl.registerLazySingleton<AuthCubit>(
-    () => AuthCubit(authRepository: sl<AuthRepository>()),
+    () => AuthCubit(
+      authRepository: sl<AuthRepository>(),
+      favoritesRepository: sl<FavoritesRepository>(),
+    ),
   );
 
   // Repositories

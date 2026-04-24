@@ -81,8 +81,16 @@ class _FakeAuthRepository extends Fake implements AuthRepository {
   }
 }
 
+class _FakeFavoritesRepositoryForAuth extends Fake implements FavoritesRepository {
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
+}
+
 AuthCubit _makeAuthCubitWithUser(User? user, _FakeAuthRepository repo) {
-  final cubit = AuthCubit(authRepository: repo);
+  final cubit = AuthCubit(
+    authRepository: repo,
+    favoritesRepository: _FakeFavoritesRepositoryForAuth(),
+  );
   if (user != null) repo.pushUser(user);
   return cubit;
 }
@@ -167,6 +175,9 @@ class _RecordingFavoritesRepository extends FavoritesRepository {
     required String itemType,
     required int itemId,
   }) async {}
+
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
 }
 
 // ---------------------------------------------------------------------------
@@ -328,7 +339,10 @@ void _favoritesCubitUidTests() {
   test(
     'loadFavorites uses empty string for userId when unauthenticated',
     () async {
-      final authCubit = AuthCubit(authRepository: authRepo);
+      final authCubit = AuthCubit(
+        authRepository: authRepo,
+        favoritesRepository: _FakeFavoritesRepositoryForAuth(),
+      );
       // No user pushed — remains unauthenticated
 
       final repo = _RecordingFavoritesRepository();
@@ -341,8 +355,8 @@ void _favoritesCubitUidTests() {
 
       expect(
         repo.lastGetFavoritesUserId,
-        equals(''),
-        reason: 'Should use empty string when currentUid is null (unauthenticated)',
+        isNull,
+        reason: 'getFavorites must not be called when user is unauthenticated (early return)',
       );
 
       await cubit.close();

@@ -42,6 +42,14 @@ class FavoritesRepository {
     return Favorite.fromDirectus(data as Map<String, dynamic>);
   }
 
+  /// Deletes all favorites belonging to [userId]. Used during account deletion.
+  Future<void> deleteAllFavoritesForUser(String userId) async {
+    final favorites = await getFavorites(userId);
+    for (final fav in favorites) {
+      await _client.delete('/items/favorites/${fav.id}');
+    }
+  }
+
   /// Deletes a favorite by matching userId + itemType + itemId.
   Future<void> removeFavorite({
     required String userId,

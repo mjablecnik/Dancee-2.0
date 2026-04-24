@@ -34,8 +34,25 @@ class _FakeAuthRepository extends Fake implements AuthRepository {
   User? get currentUser => null;
 }
 
-AuthCubit _makeAuthCubit() =>
-    AuthCubit(authRepository: _FakeAuthRepository());
+/// [AuthCubit] subclass that always reports a fixed authenticated UID.
+/// Bypasses Firebase stream mechanics so tests can rely on a stable currentUid.
+class _FakeAuthCubit extends AuthCubit {
+  _FakeAuthCubit()
+      : super(
+          authRepository: _FakeAuthRepository(),
+          favoritesRepository: _FakeFavoritesRepositoryForAuth(),
+        );
+
+  @override
+  String? get currentUid => 'test-uid';
+}
+
+class _FakeFavoritesRepositoryForAuth extends Fake implements FavoritesRepository {
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
+}
+
+AuthCubit _makeAuthCubit() => _FakeAuthCubit();
 
 // ---------------------------------------------------------------------------
 // Helpers / Generators

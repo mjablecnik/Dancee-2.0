@@ -5,11 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../data/repositories/auth_repository.dart';
+import '../../data/repositories/favorites_repository.dart';
 import '../states/auth_state.dart';
 
+// ignore: constant_identifier_names
+enum AuthOperation { passwordReset, emailVerification }
+
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit({required AuthRepository authRepository})
-      : _authRepository = authRepository,
+  AuthCubit({
+    required AuthRepository authRepository,
+    required FavoritesRepository favoritesRepository,
+  })  : _authRepository = authRepository,
+        _favoritesRepository = favoritesRepository,
         super(const AuthState.unauthenticated()) {
     _authStateSubscription = authRepository.authStateChanges.listen(
       _onAuthStateChanged,
@@ -17,11 +24,22 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   final AuthRepository _authRepository;
+  final FavoritesRepository _favoritesRepository;
   late final StreamSubscription<User?> _authStateSubscription;
+
+  final _operationSuccessController =
+      StreamController<AuthOperation>.broadcast();
+
+  /// Stream that emits when a non-auth-changing operation completes successfully.
+  /// Listen to this for one-shot success signals (e.g. password reset sent,
+  /// verification email sent) without polling global [AuthState].
+  Stream<AuthOperation> get operationSuccess =>
+      _operationSuccessController.stream;
 
   @override
   Future<void> close() {
     _authStateSubscription.cancel();
+    _operationSuccessController.close();
     return super.close();
   }
 
@@ -115,10 +133,12 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> sendEmailVerification() async {
+    final previousState = state;
     emit(const AuthState.loading());
     try {
       await _authRepository.sendEmailVerification();
-      _onAuthStateChanged(_authRepository.currentUser);
+      emit(previousState);
+      _operationSuccessController.add(AuthOperation.emailVerification);
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
     }
@@ -128,6 +148,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthState.loading());
     try {
       await _authRepository.reloadAndCheckVerified();
+      // Emit the updated user state (email verification status may have changed)
       _onAuthStateChanged(_authRepository.currentUser);
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
@@ -135,10 +156,12 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> sendPasswordReset(String email) async {
+    final previousState = state;
     emit(const AuthState.loading());
     try {
       await _authRepository.sendPasswordReset(email);
-      _onAuthStateChanged(_authRepository.currentUser);
+      emit(previousState);
+      _operationSuccessController.add(AuthOperation.passwordReset);
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
     }
@@ -158,6 +181,10 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthState.loading());
     try {
       await _authRepository.reauthenticate(email: email, password: password);
+      final uid = currentUid;
+      if (uid != null) {
+        await _favoritesRepository.deleteAllFavoritesForUser(uid);
+      }
       await _authRepository.deleteAccount();
       // authStateChanges stream will emit unauthenticated
     } catch (e) {

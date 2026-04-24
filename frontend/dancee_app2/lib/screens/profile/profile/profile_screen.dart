@@ -8,6 +8,7 @@ import '../../../i18n/strings.g.dart';
 import '../../../logic/cubits/auth_cubit.dart';
 import '../../../logic/states/auth_state.dart';
 import '../../../shared/components/back_button_header.dart';
+import '../../../shared/utils/auth_error_resolver.dart';
 import '../../../shared/elements/labels/section_label.dart';
 import 'sections/logout_section.dart';
 import 'sections/settings_section.dart';
@@ -21,23 +22,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _authError;
-
-  String _resolveAuthError(String key) {
-    switch (key) {
-      case 'auth.errors.invalidCredential':
-        return t.auth.errors.invalidCredential;
-      case 'auth.errors.userDisabled':
-        return t.auth.errors.userDisabled;
-      case 'auth.errors.tooManyRequests':
-        return t.auth.errors.tooManyRequests;
-      case 'auth.errors.networkError':
-        return t.auth.errors.networkError;
-      case 'auth.errors.generic':
-        return t.auth.errors.generic;
-      default:
-        return key;
-    }
-  }
 
   Future<void> _handleLogout() async {
     final confirmed = await showDialog<bool>(
@@ -135,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = _resolveAuthError(s.message)),
+          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
           unauthenticated: (_) {
             if (context.mounted) context.go('/login');
           },

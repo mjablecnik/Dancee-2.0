@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
+import 'package:dancee_app2/data/repositories/favorites_repository.dart';
 import 'package:dancee_app2/i18n/strings.g.dart';
 import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/states/auth_state.dart';
@@ -19,6 +20,11 @@ import 'package:dancee_app2/screens/auth/email_verification/email_verification_s
 // ---------------------------------------------------------------------------
 // Fakes / Helpers
 // ---------------------------------------------------------------------------
+
+class _FakeFavoritesRepository extends Fake implements FavoritesRepository {
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
+}
 
 class _FakeUserMetadata extends Fake implements UserMetadata {
   _FakeUserMetadata({this.creationTime});
@@ -205,7 +211,7 @@ void _resendButtonTests() {
   setUp(() {
     LocaleSettings.setLocale(AppLocale.en);
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
     router = _makeRouter();
   });
 
@@ -303,7 +309,7 @@ void _checkButtonTests() {
   setUp(() {
     LocaleSettings.setLocale(AppLocale.en);
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
     router = _makeRouter();
   });
 
@@ -384,7 +390,7 @@ void _verifiedNavigationTests() {
   setUp(() {
     LocaleSettings.setLocale(AppLocale.en);
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
     router = _makeRouter();
   });
 
@@ -475,7 +481,7 @@ void _notVerifiedMessageTests() {
   setUp(() {
     LocaleSettings.setLocale(AppLocale.en);
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
     router = _makeRouter();
   });
 
@@ -611,7 +617,7 @@ void _signOutButtonTests() {
   setUp(() {
     LocaleSettings.setLocale(AppLocale.en);
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
     router = _makeRouter();
   });
 

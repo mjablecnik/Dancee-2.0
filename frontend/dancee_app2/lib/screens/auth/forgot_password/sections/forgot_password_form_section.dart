@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +11,7 @@ import '../../../../logic/cubits/auth_cubit.dart';
 import '../../../../logic/states/auth_state.dart';
 import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
+import '../../../../shared/utils/auth_error_resolver.dart';
 import '../../../../shared/utils/form_validators.dart';
 
 class ForgotPasswordFormSection extends StatefulWidget {
@@ -25,7 +28,8 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
   String? _emailError;
   String? _authError;
   bool _emailSent = false;
-  bool _isSubmitting = false;
+
+  StreamSubscription<AuthOperation>? _operationSuccessSub;
 
   @override
   void initState() {
@@ -36,7 +40,23 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _operationSuccessSub?.cancel();
+    _operationSuccessSub = context
+        .read<AuthCubit>()
+        .operationSuccess
+        .where((op) => op == AuthOperation.passwordReset)
+        .listen((_) {
+      if (mounted) {
+        setState(() => _emailSent = true);
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _operationSuccessSub?.cancel();
     _emailController.dispose();
     _emailFocus.dispose();
     super.dispose();
@@ -44,65 +64,23 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
 
   void _validateEmail() {
     final key = FormValidators.email(_emailController.text);
-    setState(() => _emailError = _resolveValidationKey(key));
-  }
-
-  String? _resolveValidationKey(String? key) {
-    if (key == null) return null;
-    switch (key) {
-      case 'validation.emailRequired':
-        return t.validation.emailRequired;
-      case 'validation.invalidEmail':
-        return t.validation.invalidEmail;
-      default:
-        return key;
-    }
-  }
-
-  String _resolveAuthError(String message) {
-    switch (message) {
-      case 'auth.errors.tooManyRequests':
-        return t.auth.errors.tooManyRequests;
-      case 'auth.errors.networkError':
-        return t.auth.errors.networkError;
-      case 'auth.errors.generic':
-        return t.auth.errors.generic;
-      default:
-        return message;
-    }
+    setState(() => _emailError = resolveValidationKey(key));
   }
 
   void _onSubmit() {
     _validateEmail();
     if (_emailError != null) return;
-    setState(() {
-      _authError = null;
-      _isSubmitting = true;
-    });
+    setState(() => _authError = null);
     context.read<AuthCubit>().sendPasswordReset(_emailController.text.trim());
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
-      listenWhen: (prev, curr) =>
-          curr.maybeMap(error: (_) => true, orElse: () => false) ||
-          (prev.maybeMap(loading: (_) => true, orElse: () => false) &&
-              curr.maybeMap(unauthenticated: (_) => true, orElse: () => false)),
+      listenWhen: (prev, curr) => curr.maybeMap(error: (_) => true, orElse: () => false),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() {
-            _authError = _resolveAuthError(s.message);
-            _isSubmitting = false;
-          }),
-          unauthenticated: (_) {
-            if (_isSubmitting) {
-              setState(() {
-                _emailSent = true;
-                _isSubmitting = false;
-              });
-            }
-          },
+          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
         );
       },
       buildWhen: (prev, curr) =>

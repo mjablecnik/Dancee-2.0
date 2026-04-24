@@ -83,16 +83,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: AppSpacing.xxxl),
-                      _buildHeader(),
+                      const VerificationHeader(),
                       const SizedBox(height: AppSpacing.xl),
-                      _buildEmailCard(email),
+                      VerificationEmailCard(email: email),
                       if (_notVerifiedYet) ...[
                         const SizedBox(height: AppSpacing.lg),
-                        _buildNotVerifiedMessage(),
+                        const NotVerifiedMessage(),
                       ],
                       if (state.maybeMap(error: (_) => true, orElse: () => false)) ...[
                         const SizedBox(height: AppSpacing.lg),
-                        _buildErrorMessage(state),
+                        VerificationErrorMessage(state: state),
                       ],
                       const SizedBox(height: AppSpacing.xxl),
                       GradientButton(
@@ -101,9 +101,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                         isLoading: isLoading,
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      _buildResendButton(context, isLoading),
+                      VerificationResendButton(isLoading: isLoading),
                       const SizedBox(height: AppSpacing.xl),
-                      _buildSignOutButton(context, isLoading),
+                      VerificationSignOutButton(isLoading: isLoading),
                     ],
                   ),
                 ),
@@ -114,8 +114,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       },
     );
   }
+}
 
-  Widget _buildHeader() {
+class VerificationHeader extends StatelessWidget {
+  const VerificationHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
@@ -143,8 +148,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       ],
     );
   }
+}
 
-  Widget _buildEmailCard(String email) {
+class VerificationEmailCard extends StatelessWidget {
+  const VerificationEmailCard({super.key, required this.email});
+
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
@@ -163,8 +175,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       ),
     );
   }
+}
 
-  Widget _buildNotVerifiedMessage() {
+class NotVerifiedMessage extends StatelessWidget {
+  const NotVerifiedMessage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
@@ -189,8 +206,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       ),
     );
   }
+}
 
-  Widget _buildErrorMessage(AuthState state) {
+class VerificationErrorMessage extends StatelessWidget {
+  const VerificationErrorMessage({super.key, required this.state});
+
+  final AuthState state;
+
+  @override
+  Widget build(BuildContext context) {
     final message = state.maybeMap(
       error: (s) => s.message,
       orElse: () => '',
@@ -208,8 +232,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       ),
     );
   }
+}
 
-  Widget _buildResendButton(BuildContext context, bool isLoading) {
+class VerificationResendButton extends StatelessWidget {
+  const VerificationResendButton({super.key, required this.isLoading});
+
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: isLoading ? null : () => context.read<AuthCubit>().sendEmailVerification(),
       style: OutlinedButton.styleFrom(
@@ -229,8 +260,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       ),
     );
   }
+}
 
-  Widget _buildSignOutButton(BuildContext context, bool isLoading) {
+class VerificationSignOutButton extends StatelessWidget {
+  const VerificationSignOutButton({super.key, required this.isLoading});
+
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
     return TextButton(
       onPressed: isLoading ? null : () => context.read<AuthCubit>().signOut(),
       child: Text(

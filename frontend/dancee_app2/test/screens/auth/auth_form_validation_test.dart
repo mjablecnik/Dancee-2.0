@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
+import 'package:dancee_app2/data/repositories/favorites_repository.dart';
 import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/states/auth_state.dart';
 import 'package:dancee_app2/shared/utils/form_validators.dart';
@@ -15,6 +16,11 @@ import 'package:dancee_app2/shared/utils/form_validators.dart';
 // ---------------------------------------------------------------------------
 // Fakes / Helpers (mirrored from auth_cubit_property_test.dart)
 // ---------------------------------------------------------------------------
+
+class _FakeFavoritesRepository extends Fake implements FavoritesRepository {
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
+}
 
 class _FakeUserMetadata extends Fake implements UserMetadata {
   _FakeUserMetadata({this.creationTime});
@@ -440,7 +446,7 @@ void _cubitInteraction() {
 
   setUp(() {
     repo = _TrackingAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {

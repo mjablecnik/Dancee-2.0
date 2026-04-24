@@ -122,15 +122,47 @@ class AuthRepository {
     try {
       final user = _auth.currentUser;
       if (user == null) throw 'auth.errors.generic';
-      if (email != null && password != null) {
+
+      final providerIds = user.providerData.map((p) => p.providerId).toList();
+
+      if (providerIds.contains('password') && email != null && password != null) {
         final credential = EmailAuthProvider.credential(
           email: email,
           password: password,
         );
         await user.reauthenticateWithCredential(credential);
+      } else if (providerIds.contains('google.com')) {
+        final googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) throw 'auth.errors.generic';
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await user.reauthenticateWithCredential(credential);
+      } else if (providerIds.contains('apple.com')) {
+        final appleCredential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+        final oAuthProvider = OAuthProvider('apple.com');
+        final credential = oAuthProvider.credential(
+          idToken: appleCredential.identityToken,
+          accessToken: appleCredential.authorizationCode,
+        );
+        await user.reauthenticateWithCredential(credential);
       }
     } on FirebaseAuthException catch (e) {
       throw mapFirebaseError(e);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        throw 'auth.errors.generic';
+      }
+      throw mapFirebaseError(
+        FirebaseAuthException(code: 'unknown', message: e.message),
+      );
     }
   }
 

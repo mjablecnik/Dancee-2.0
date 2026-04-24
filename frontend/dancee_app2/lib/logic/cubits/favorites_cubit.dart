@@ -54,7 +54,9 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   String get _currentUserId => _authCubit.currentUid ?? '';
 
   /// Fetches all favorites for the current user, emits loaded state.
+  /// Does nothing if the user is not authenticated (empty user ID).
   Future<void> loadFavorites() async {
+    if (_currentUserId.isEmpty) return;
     emit(const FavoritesState.loading());
     try {
       _allFavorites = await _favoritesRepository.getFavorites(_currentUserId);

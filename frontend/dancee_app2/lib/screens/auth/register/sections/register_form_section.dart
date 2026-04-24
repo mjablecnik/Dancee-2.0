@@ -12,6 +12,8 @@ import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_checkbox.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
 import '../../../../shared/elements/forms/app_password_field.dart';
+import '../../../../shared/elements/buttons/social_button.dart';
+import '../../../../shared/utils/auth_error_resolver.dart';
 import '../../../../shared/utils/form_validators.dart';
 import '../components/password_strength_indicator.dart';
 
@@ -91,22 +93,22 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
 
   void _validateFirstName() {
     final key = FormValidators.notEmpty(_firstNameController.text);
-    setState(() => _firstNameError = _resolveValidationKey(key));
+    setState(() => _firstNameError = resolveValidationKey(key));
   }
 
   void _validateLastName() {
     final key = FormValidators.notEmpty(_lastNameController.text);
-    setState(() => _lastNameError = _resolveValidationKey(key));
+    setState(() => _lastNameError = resolveValidationKey(key));
   }
 
   void _validateEmail() {
     final key = FormValidators.email(_emailController.text);
-    setState(() => _emailError = _resolveValidationKey(key));
+    setState(() => _emailError = resolveValidationKey(key));
   }
 
   void _validatePassword() {
     final key = FormValidators.password(_passwordController.text);
-    setState(() => _passwordError = _resolveValidationKey(key));
+    setState(() => _passwordError = resolveValidationKey(key));
   }
 
   void _validateConfirmPassword() {
@@ -114,7 +116,7 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
       _confirmPasswordController.text,
       _passwordController.text,
     );
-    setState(() => _confirmPasswordError = _resolveValidationKey(key));
+    setState(() => _confirmPasswordError = resolveValidationKey(key));
   }
 
   bool _validateAll() {
@@ -130,41 +132,6 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
         _passwordError == null &&
         _confirmPasswordError == null &&
         _agreeTerms;
-  }
-
-  String? _resolveValidationKey(String? key) {
-    if (key == null) return null;
-    switch (key) {
-      case 'validation.emailRequired':
-        return t.validation.emailRequired;
-      case 'validation.invalidEmail':
-        return t.validation.invalidEmail;
-      case 'validation.fieldRequired':
-        return t.validation.fieldRequired;
-      case 'validation.passwordTooShort':
-        return t.validation.passwordTooShort;
-      case 'validation.passwordsDoNotMatch':
-        return t.validation.passwordsDoNotMatch;
-      default:
-        return key;
-    }
-  }
-
-  String _resolveAuthError(String message) {
-    switch (message) {
-      case 'auth.errors.emailAlreadyInUse':
-        return t.auth.errors.emailAlreadyInUse;
-      case 'auth.errors.weakPassword':
-        return t.auth.errors.weakPassword;
-      case 'auth.errors.tooManyRequests':
-        return t.auth.errors.tooManyRequests;
-      case 'auth.errors.networkError':
-        return t.auth.errors.networkError;
-      case 'auth.errors.generic':
-        return t.auth.errors.generic;
-      default:
-        return message;
-    }
   }
 
   Future<void> _onSubmit() async {
@@ -195,7 +162,7 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
       ),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = _resolveAuthError(s.message)),
+          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
           authenticated: (_) => setState(() => _authError = null),
         );
       },
@@ -350,7 +317,7 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
               ],
             ),
             const SizedBox(height: AppSpacing.xxl),
-            _SocialButton(
+            SocialButton(
               icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 20),
               label: t.auth.continueWithGoogle,
               onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithGoogle(),
@@ -358,7 +325,7 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
             if (defaultTargetPlatform == TargetPlatform.iOS ||
                 defaultTargetPlatform == TargetPlatform.macOS) ...[
               const SizedBox(height: AppSpacing.md),
-              _SocialButton(
+              SocialButton(
                 icon: const FaIcon(FontAwesomeIcons.apple, color: appText, size: 20),
                 label: t.auth.continueWithApple,
                 onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithApple(),
@@ -399,48 +366,3 @@ class _RegisterFormSectionState extends State<RegisterFormSection> {
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _SocialButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: appSurface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: appBorder),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: onTap,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              icon,
-              const SizedBox(width: AppSpacing.md),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: appText,
-                  fontSize: AppTypography.fontSizeLg,
-                  fontWeight: AppTypography.fontWeightSemiBold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

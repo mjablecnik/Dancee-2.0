@@ -16,9 +16,6 @@ class AppConfig {
   /// Directus static access token for API requests.
   static const String directusAccessToken = sensitive.directusAccessToken;
 
-  /// Default user ID used for favorites operations (auth is out of scope).
-  static const String defaultUserId = 'default-user';
-
   /// HTTP connection timeout in milliseconds.
   static const int connectionTimeoutMs = 10000;
 

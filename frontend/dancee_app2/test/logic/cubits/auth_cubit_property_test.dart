@@ -11,12 +11,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
+import 'package:dancee_app2/data/repositories/favorites_repository.dart';
 import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/states/auth_state.dart';
 
 // ---------------------------------------------------------------------------
 // Fakes / Helpers
 // ---------------------------------------------------------------------------
+
+class _FakeFavoritesRepository extends Fake implements FavoritesRepository {
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
+}
 
 class _FakeUserMetadata extends Fake implements UserMetadata {
   _FakeUserMetadata({this.creationTime});
@@ -154,7 +160,7 @@ void _propertyAuthStreamMapping() {
 
   setUp(() {
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {
@@ -277,7 +283,7 @@ void _propertyLoadingStateFirst() {
 
   setUp(() {
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {
@@ -377,7 +383,7 @@ void _propertyFailedOperationsEmitError() {
 
   setUp(() {
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {
@@ -499,7 +505,7 @@ void _propertyFailedOperationsEmitError() {
       final testRepo = _FakeAuthRepository()
         ..throwOnSendPasswordReset = true
         ..errorMessage = code;
-      final testCubit = AuthCubit(authRepository: testRepo);
+      final testCubit = AuthCubit(authRepository: testRepo, favoritesRepository: _FakeFavoritesRepository());
 
       await testCubit.sendPasswordReset('a@b.com');
 
@@ -528,7 +534,7 @@ void _propertyNewUserDetection() {
 
   setUp(() {
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {

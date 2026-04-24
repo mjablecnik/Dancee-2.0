@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:dancee_app2/core/router_guard.dart';
 import 'package:dancee_app2/core/service_locator.dart';
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
+import 'package:dancee_app2/data/repositories/favorites_repository.dart';
 import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/states/auth_state.dart';
 
@@ -45,13 +46,21 @@ class _NoOpAuthRepository extends Fake implements AuthRepository {
   User? get currentUser => null;
 }
 
+class _NoOpFavoritesRepository extends Fake implements FavoritesRepository {
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {}
+}
+
 /// [AuthCubit] subclass that starts with a predetermined [AuthState].
 ///
 /// The state is emitted in the constructor body (after super), so it takes
 /// precedence over the initial `unauthenticated` state set by [AuthCubit].
 class _FixedStateAuthCubit extends AuthCubit {
   _FixedStateAuthCubit(AuthState fixedState)
-      : super(authRepository: _NoOpAuthRepository()) {
+      : super(
+          authRepository: _NoOpAuthRepository(),
+          favoritesRepository: _NoOpFavoritesRepository(),
+        ) {
     // ignore: invalid_use_of_protected_member
     emit(fixedState);
   }

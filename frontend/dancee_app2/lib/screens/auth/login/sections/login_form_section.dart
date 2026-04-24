@@ -12,6 +12,8 @@ import '../../../../shared/elements/buttons/gradient_button.dart';
 import '../../../../shared/elements/forms/app_checkbox.dart';
 import '../../../../shared/elements/forms/app_input_field.dart';
 import '../../../../shared/elements/forms/app_password_field.dart';
+import '../../../../shared/elements/buttons/social_button.dart';
+import '../../../../shared/utils/auth_error_resolver.dart';
 import '../../../../shared/utils/form_validators.dart';
 
 class LoginFormSection extends StatefulWidget {
@@ -55,49 +57,18 @@ class _LoginFormSectionState extends State<LoginFormSection> {
 
   void _validateEmail() {
     final key = FormValidators.email(_emailController.text);
-    setState(() => _emailError = _resolveValidationKey(key));
+    setState(() => _emailError = resolveValidationKey(key));
   }
 
   void _validatePassword() {
     final key = FormValidators.notEmpty(_passwordController.text);
-    setState(() => _passwordError = _resolveValidationKey(key));
+    setState(() => _passwordError = resolveValidationKey(key));
   }
 
   bool _validateAll() {
     _validateEmail();
     _validatePassword();
     return _emailError == null && _passwordError == null;
-  }
-
-  String? _resolveValidationKey(String? key) {
-    if (key == null) return null;
-    switch (key) {
-      case 'validation.emailRequired':
-        return t.validation.emailRequired;
-      case 'validation.invalidEmail':
-        return t.validation.invalidEmail;
-      case 'validation.fieldRequired':
-        return t.validation.fieldRequired;
-      default:
-        return key;
-    }
-  }
-
-  String _resolveAuthError(String message) {
-    switch (message) {
-      case 'auth.errors.invalidCredential':
-        return t.auth.errors.invalidCredential;
-      case 'auth.errors.userDisabled':
-        return t.auth.errors.userDisabled;
-      case 'auth.errors.tooManyRequests':
-        return t.auth.errors.tooManyRequests;
-      case 'auth.errors.networkError':
-        return t.auth.errors.networkError;
-      case 'auth.errors.generic':
-        return t.auth.errors.generic;
-      default:
-        return message;
-    }
   }
 
   void _onSubmit() {
@@ -119,7 +90,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
       ),
       listener: (context, state) {
         state.mapOrNull(
-          error: (s) => setState(() => _authError = _resolveAuthError(s.message)),
+          error: (s) => setState(() => _authError = resolveAuthError(s.message)),
           authenticated: (_) => setState(() => _authError = null),
         );
       },
@@ -207,7 +178,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
               ],
             ),
             const SizedBox(height: AppSpacing.xxl),
-            _SocialButton(
+            SocialButton(
               icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 20),
               label: t.auth.continueWithGoogle,
               onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithGoogle(),
@@ -215,7 +186,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
             if (defaultTargetPlatform == TargetPlatform.iOS ||
                 defaultTargetPlatform == TargetPlatform.macOS) ...[
               const SizedBox(height: AppSpacing.md),
-              _SocialButton(
+              SocialButton(
                 icon: const FaIcon(FontAwesomeIcons.apple, color: appText, size: 20),
                 label: t.auth.continueWithApple,
                 onTap: isLoading ? () {} : () => context.read<AuthCubit>().signInWithApple(),
@@ -281,48 +252,3 @@ class _LoginFormSectionState extends State<LoginFormSection> {
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _SocialButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      decoration: BoxDecoration(
-        color: appSurface,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: appBorder),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          onTap: onTap,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              icon,
-              const SizedBox(width: AppSpacing.md),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: appText,
-                  fontSize: AppTypography.fontSizeLg,
-                  fontWeight: AppTypography.fontWeightSemiBold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dancee_app2/data/repositories/auth_repository.dart';
+import 'package:dancee_app2/data/repositories/favorites_repository.dart';
 import 'package:dancee_app2/logic/cubits/auth_cubit.dart';
 import 'package:dancee_app2/logic/states/auth_state.dart';
 
@@ -42,6 +43,17 @@ class _FakeUser extends Fake implements User {
   final bool emailVerified;
   @override
   final UserMetadata metadata;
+}
+
+class _FakeFavoritesRepository extends Fake implements FavoritesRepository {
+  bool deleteCalled = false;
+  String? lastDeletedUserId;
+
+  @override
+  Future<void> deleteAllFavoritesForUser(String userId) async {
+    deleteCalled = true;
+    lastDeletedUserId = userId;
+  }
 }
 
 /// A controlled fake [AuthRepository] that:
@@ -113,7 +125,7 @@ void _reauthFailureCancelsDeletion() {
 
   setUp(() {
     repo = _TrackedAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {
@@ -215,7 +227,7 @@ void _callOrderingTests() {
 
   setUp(() {
     repo = _TrackedAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {
@@ -278,7 +290,7 @@ void _errorHandlingTests() {
 
   setUp(() {
     repo = _TrackedAuthRepository();
-    cubit = AuthCubit(authRepository: repo);
+    cubit = AuthCubit(authRepository: repo, favoritesRepository: _FakeFavoritesRepository());
   });
 
   tearDown(() async {
@@ -372,7 +384,7 @@ void _errorHandlingTests() {
       final testRepo = _TrackedAuthRepository()
         ..throwOnReauthenticate = true
         ..reauthenticateError = errorKey;
-      final testCubit = AuthCubit(authRepository: testRepo);
+      final testCubit = AuthCubit(authRepository: testRepo, favoritesRepository: _FakeFavoritesRepository());
 
       await testCubit.deleteAccount(email: 'a@b.com', password: 'pass');
 
