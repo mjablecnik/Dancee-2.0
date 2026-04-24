@@ -137,28 +137,33 @@ GoRouter _buildRouter(_GoRouterRefreshNotifier authRefreshNotifier) {
     // Auth flow
     GoRoute(
       path: '/login',
-      builder: (context, state) => const LoginScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: LoginScreen()),
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) => const RegisterScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: RegisterScreen()),
     ),
     GoRoute(
       path: '/forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: ForgotPasswordScreen()),
     ),
     GoRoute(
       path: '/onboarding',
-      builder: (context, state) => const OnboardingScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: OnboardingScreen()),
     ),
     GoRoute(
       path: '/verify-email',
-      builder: (context, state) => const EmailVerificationScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: EmailVerificationScreen()),
     ),
 
     // Main app — top-level pages wrapped in shell with bottom nav
     ShellRoute(
-      builder: (context, state, child) {
+      pageBuilder: (context, state, child) {
         final location = state.uri.path;
         final NavTab currentTab;
         if (location.startsWith('/courses')) {
@@ -170,24 +175,30 @@ GoRouter _buildRouter(_GoRouterRefreshNotifier authRefreshNotifier) {
         } else {
           currentTab = NavTab.events;
         }
-        return MainShell(currentTab: currentTab, child: child);
+        return NoTransitionPage(
+          child: MainShell(currentTab: currentTab, child: child),
+        );
       },
       routes: [
         GoRoute(
           path: '/events',
-          builder: (context, state) => const EventsListScreen(),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: EventsListScreen()),
         ),
         GoRoute(
           path: '/courses',
-          builder: (context, state) => const CoursesListScreen(),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: CoursesListScreen()),
         ),
         GoRoute(
           path: '/profile',
-          builder: (context, state) => const ProfileScreen(),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: ProfileScreen()),
         ),
         GoRoute(
           path: '/saved',
-          builder: (context, state) => const SavedEventsScreen(),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: SavedEventsScreen()),
         ),
       ],
     ),
@@ -195,49 +206,53 @@ GoRouter _buildRouter(_GoRouterRefreshNotifier authRefreshNotifier) {
     // Sub-pages — no bottom nav bar
     GoRoute(
       path: '/events/detail',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final idStr = state.uri.queryParameters['id'] ?? '';
         final id = int.tryParse(idStr) ?? 0;
-        return EventDetailScreen(eventId: id);
+        return NoTransitionPage(child: EventDetailScreen(eventId: id));
       },
     ),
     GoRoute(
       path: '/events/filter-dance',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final source = state.uri.queryParameters['source'] ?? 'events';
-        return FilterDanceScreen(source: source);
+        return NoTransitionPage(child: FilterDanceScreen(source: source));
       },
     ),
     GoRoute(
       path: '/events/filter-location',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final source = state.uri.queryParameters['source'] ?? 'events';
-        return FilterLocationScreen(source: source);
+        return NoTransitionPage(child: FilterLocationScreen(source: source));
       },
     ),
     GoRoute(
       path: '/courses/detail',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final idStr = state.uri.queryParameters['id'] ?? '';
         final id = int.tryParse(idStr) ?? 0;
-        return CourseDetailScreen(courseId: id);
+        return NoTransitionPage(child: CourseDetailScreen(courseId: id));
       },
     ),
     GoRoute(
       path: '/profile/edit',
-      builder: (context, state) => const ProfileEditScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: ProfileEditScreen()),
     ),
     GoRoute(
       path: '/profile/change-password',
-      builder: (context, state) => const ChangePasswordScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: ChangePasswordScreen()),
     ),
     GoRoute(
       path: '/profile/premium',
-      builder: (context, state) => const PremiumScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: PremiumScreen()),
     ),
     GoRoute(
       path: '/profile/author-contact',
-      builder: (context, state) => const AuthorContactScreen(),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: AuthorContactScreen()),
     ),
   ],
   );

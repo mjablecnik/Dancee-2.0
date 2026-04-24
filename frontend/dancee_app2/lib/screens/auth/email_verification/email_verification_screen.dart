@@ -10,6 +10,7 @@ import '../../../logic/cubits/auth_cubit.dart';
 import '../../../logic/states/auth_state.dart';
 import '../../../shared/components/background_circles.dart';
 import '../../../shared/elements/buttons/gradient_button.dart';
+import '../../../shared/utils/auth_translations.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
@@ -24,7 +25,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   late Animation<double> _floatAnim;
 
   bool _notVerifiedYet = false;
-  bool _resendConfirmed = false;
   StreamSubscription<AuthOperation>? _operationSuccessSub;
 
   AuthCubit get _authCubit => context.read<AuthCubit>();
@@ -67,7 +67,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
             behavior: SnackBarBehavior.floating,
           ),
         );
-        setState(() => _resendConfirmed = true);
       }
     });
   }
@@ -261,7 +260,7 @@ class VerificationErrorMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final message = state.maybeMap(
-      error: (s) => s.message,
+      error: (s) => resolveAuthErrorKey(s.message),
       orElse: () => '',
     );
     return Container(
