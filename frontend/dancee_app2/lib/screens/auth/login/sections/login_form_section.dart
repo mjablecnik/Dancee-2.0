@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
@@ -132,7 +132,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => context.go('/forgot-password'),
+                  onPressed: () => const ForgotPasswordRoute().go(context),
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
@@ -202,7 +202,7 @@ class _LoginFormSectionState extends State<LoginFormSection> {
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 TextButton(
-                  onPressed: () => context.go('/register'),
+                  onPressed: () => const RegisterRoute().go(context),
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,

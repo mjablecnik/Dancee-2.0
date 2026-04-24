@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../i18n/strings.g.dart';
@@ -98,13 +98,13 @@ class AppBottomNavBar extends StatelessWidget {
   void _navigate(BuildContext context, NavTab tab) {
     switch (tab) {
       case NavTab.events:
-        context.go('/events');
+        const EventsRoute().go(context);
       case NavTab.courses:
-        context.go('/courses');
+        const CoursesRoute().go(context);
       case NavTab.saved:
-        context.go('/saved');
+        const SavedRoute().go(context);
       case NavTab.profile:
-        context.go('/profile');
+        const ProfileRoute().go(context);
     }
   }
 }

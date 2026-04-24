@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../i18n/strings.g.dart';
@@ -119,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         state.mapOrNull(
           error: (s) => setState(() => _authError = s.message),
           unauthenticated: (_) {
-            if (context.mounted) context.go('/login');
+            if (context.mounted) const LoginRoute().go(context);
           },
         );
       },

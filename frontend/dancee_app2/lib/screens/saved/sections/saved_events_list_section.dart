@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/entities/course.dart';
@@ -86,7 +86,7 @@ class SavedEventsListSection extends StatelessWidget {
           itemType: 'event',
           itemId: event.id,
         ),
-        onTap: () => context.push('/events/detail?id=${event.id}'),
+        onTap: () => EventDetailRoute(id: event.id).push(context),
       );
     } else {
       final course = favItem.item as Course;
@@ -102,7 +102,7 @@ class SavedEventsListSection extends StatelessWidget {
           itemType: 'course',
           itemId: course.id,
         ),
-        onTap: () => context.push('/courses/detail?id=${course.id}'),
+        onTap: () => CourseDetailRoute(id: course.id).push(context),
       );
     }
   }

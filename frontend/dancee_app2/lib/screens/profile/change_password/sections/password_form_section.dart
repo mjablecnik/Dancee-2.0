@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
@@ -382,7 +383,7 @@ class _PasswordFormSectionState extends State<PasswordFormSection> {
   Widget _buildForgotPasswordLink(BuildContext context) {
     return Center(
       child: TextButton(
-        onPressed: () => context.push('/forgot-password'),
+        onPressed: () => const ForgotPasswordRoute().push(context),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

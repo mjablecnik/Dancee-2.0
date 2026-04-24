@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../i18n/strings.g.dart';
@@ -87,9 +87,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
           authenticated: (s) {
             if (s.emailVerified) {
               if (s.isNewUser) {
-                context.go('/onboarding');
+                const OnboardingRoute().go(context);
               } else {
-                context.go('/events');
+                const EventsRoute().go(context);
               }
             } else {
               setState(() => _notVerifiedYet = true);

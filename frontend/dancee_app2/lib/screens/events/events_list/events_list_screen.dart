@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../i18n/strings.g.dart';
@@ -33,7 +33,7 @@ class EventsListScreen extends StatelessWidget {
                   : regions.map(regionLabel).join(', ');
               return EventsHeaderSection(
                 location: location,
-                onLocationTap: () => context.push('/events/filter-location'),
+                onLocationTap: () => const FilterLocationRoute().push(context),
                 hasActiveFilters: filterState.hasActiveFilters,
                 onClearFilters: () => context.read<FilterCubit>().clearAll(),
               );
@@ -57,7 +57,7 @@ class EventsListScreen extends StatelessWidget {
                         BlocBuilder<FilterCubit, FilterState>(
                           builder: (context, filterState) {
                             return DanceStylesFilterSection(
-                              onShowAll: () => context.push('/events/filter-dance'),
+                              onShowAll: () => const FilterDanceRoute().push(context),
                             );
                           },
                         ),
@@ -66,7 +66,7 @@ class EventsListScreen extends StatelessWidget {
                           events: loaded.featuredEvents,
                           allDanceStyles: context.read<FilterCubit>().allDanceStyles,
                           activeFilterCodes: context.read<FilterCubit>().state.selectedDanceStyles,
-                          onEventTap: (id) => context.push('/events/detail?id=$id'),
+                          onEventTap: (id) => EventDetailRoute(id: id).push(context),
                         ),
                         if (loaded.featuredEvents.isNotEmpty)
                           const SizedBox(height: AppSpacing.xxxl),
@@ -76,7 +76,7 @@ class EventsListScreen extends StatelessWidget {
                           activeFilterCodes: context.read<FilterCubit>().state.selectedDanceStyles,
                           hasActiveFilters: context.read<FilterCubit>().state.hasActiveFilters,
                           onClearFilters: () => context.read<FilterCubit>().clearAll(),
-                          onEventTap: (id) => context.push('/events/detail?id=$id'),
+                          onEventTap: (id) => EventDetailRoute(id: id).push(context),
                         ),
                       ],
                     ),

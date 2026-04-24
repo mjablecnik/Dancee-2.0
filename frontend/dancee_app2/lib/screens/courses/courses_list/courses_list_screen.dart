@@ -1,7 +1,7 @@
 import 'package:dancee_app2/screens/events/events_list/sections/events_header_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/theme.dart';
 import '../../../data/entities/course.dart';
@@ -50,7 +50,7 @@ class CoursesListScreen extends StatelessWidget {
                   : regions.map(regionLabel).join(', ');
               return EventsHeaderSection(
                 location: location,
-                onLocationTap: () => context.push('/events/filter-location?source=courses'),
+                onLocationTap: () => const FilterLocationRoute(source: 'courses').push(context),
                 hasActiveFilters: filterState.hasActiveFilters,
                 onClearFilters: () => context.read<FilterCubit>().clearAll(),
               );
@@ -81,7 +81,7 @@ class CoursesListScreen extends StatelessWidget {
                               (d) => selectedCodes.contains(d.code),
                             );
                             return DanceStylesFilterSection(
-                              onShowAll: () => context.push('/events/filter-dance?source=courses'),
+                              onShowAll: () => const FilterDanceRoute(source: 'courses').push(context),
                             );
                           },
                         ),
@@ -239,7 +239,7 @@ class _AllCoursesSection extends StatelessWidget {
                       price: course.price ?? '',
                       isFavorited: course.isFavorited,
                       onTap: () =>
-                          context.push('/courses/detail?id=${course.id}'),
+                          CourseDetailRoute(id: course.id).push(context),
                       onFavoriteTap: () =>
                           context.read<FavoritesCubit>().toggleFavorite(
                                 itemType: 'course',

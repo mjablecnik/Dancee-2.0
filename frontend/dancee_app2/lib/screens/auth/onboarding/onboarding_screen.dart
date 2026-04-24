@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/app_routes.dart';
 import '../../../core/colors.dart';
 import '../../../core/service_locator.dart';
 import '../../../core/clients.dart';
@@ -52,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Future<void> _finish() async {
     await _savePreferences();
-    if (mounted) context.go('/events');
+    if (mounted) const EventsRoute().go(context);
   }
 
   Future<void> _savePreferences() async {

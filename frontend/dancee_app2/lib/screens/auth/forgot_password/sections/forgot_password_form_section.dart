@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/colors.dart';
 import '../../../../core/theme.dart';
 import '../../../../i18n/strings.g.dart';
@@ -181,7 +181,7 @@ class _ForgotPasswordFormSectionState extends State<ForgotPasswordFormSection> {
                   style: const TextStyle(color: appMuted, fontSize: AppTypography.fontSizeMd),
                 ),
                 TextButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () => const LoginRoute().go(context),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.only(left: AppSpacing.xs),
                     minimumSize: Size.zero,
